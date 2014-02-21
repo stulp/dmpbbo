@@ -5,6 +5,8 @@ install(TARGETS bbo DESTINATION ${LIB_INSTALL_DIR})
 file(GLOB HEADERS *.hpp)
 install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/bbo)
 
+add_subdirectory(updaters)
+
 add_subdirectory(demos)
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
 	add_subdirectory(tests)
