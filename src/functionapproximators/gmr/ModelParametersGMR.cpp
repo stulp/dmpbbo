@@ -30,8 +30,8 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
-#include "utilities/EigenBoostSerialization.hpp"
-#include "utilities/BoostSerializationToString.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 

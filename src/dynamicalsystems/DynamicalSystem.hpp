@@ -28,7 +28,7 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 namespace DmpBbo {
 

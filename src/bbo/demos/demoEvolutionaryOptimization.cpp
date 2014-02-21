@@ -27,7 +27,7 @@
 #include <iomanip> 
 #include <eigen3/Eigen/Core>
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include "bbo/CostFunction.hpp"
 #include "bbo/runEvolutionaryOptimization.hpp"

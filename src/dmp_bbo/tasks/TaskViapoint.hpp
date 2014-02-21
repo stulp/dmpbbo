@@ -28,7 +28,7 @@
 
 #include "dmp_bbo/TaskWithTrajectoryDemonstrator.hpp"
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 /** If the viapoint_time is set to NO_VIAPOINT_TIME, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
 #define NO_VIAPOINT_TIME -1

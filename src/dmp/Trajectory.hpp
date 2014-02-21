@@ -28,7 +28,7 @@
 #include <eigen3/Eigen/Core>
 
 #include <boost/serialization/access.hpp>
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 
 namespace DmpBbo {

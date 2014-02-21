@@ -20,7 +20,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <fstream>
 #include <sstream>

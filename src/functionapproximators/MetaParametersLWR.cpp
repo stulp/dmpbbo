@@ -31,8 +31,8 @@
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersLWR);
 
 
-#include "utilities/BoostSerializationToString.hpp"
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <unordered_map>

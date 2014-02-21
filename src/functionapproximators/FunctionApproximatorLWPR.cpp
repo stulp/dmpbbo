@@ -30,7 +30,7 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorLWPR);
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/ModelParametersLWPR.hpp"

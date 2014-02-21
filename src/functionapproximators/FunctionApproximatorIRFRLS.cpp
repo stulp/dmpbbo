@@ -33,7 +33,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorIRFRLS);
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/ModelParametersIRFRLS.hpp"
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <eigen3/Eigen/LU>
 

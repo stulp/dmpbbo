@@ -30,7 +30,7 @@
 
 #include "dmp_bbo/TaskSolverParallel.hpp"
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 namespace DmpBbo {
   

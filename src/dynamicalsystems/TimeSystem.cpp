@@ -35,7 +35,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TimeSystem);
 #include <iostream>
 #include <eigen3/Eigen/Core>
 
-#include "utilities/BoostSerializationToString.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
 using namespace Eigen;

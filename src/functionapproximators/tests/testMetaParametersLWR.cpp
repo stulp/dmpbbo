@@ -24,7 +24,7 @@
 #include "functionapproximators/ModelParametersLWR.hpp"
 //#include "functionapproximators/FunctionApproximatorLWR.hpp"
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 #include "../demos/targetFunction.hpp"
 
 #include <iostream>
