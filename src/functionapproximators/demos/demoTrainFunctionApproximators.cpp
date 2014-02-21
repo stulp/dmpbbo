@@ -31,11 +31,11 @@
 #include <time.h>
 #include <boost/filesystem.hpp>
 
-//#include "functionapproximators/FunctionApproximatorGMR.hpp"
+#include "functionapproximators/FunctionApproximatorGMR.hpp"
 #include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-//#include "functionapproximators/MetaParametersGMR.hpp"
+#include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
@@ -132,7 +132,6 @@ int main(int n_args, char** args)
   
   
   
-  /*
   // Gaussian Mixture Regression (GMR)
   int number_of_gaussians = 5;
   MetaParametersGMR* meta_parameters_gmr = new MetaParametersGMR(n_input_dims,number_of_gaussians);
@@ -148,8 +147,6 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
-  */
-
 
   
     // Locally Weighted Projection Regression  (LIBRARIES NOT LINKED CORRECTLY IN PYTHON)

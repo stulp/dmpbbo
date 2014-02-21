@@ -24,8 +24,8 @@
 
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-//#include "functionapproximators/MetaParametersGMR.hpp"
-//#include "functionapproximators/FunctionApproximatorGMR.hpp"
+#include "functionapproximators/MetaParametersGMR.hpp"
+#include "functionapproximators/FunctionApproximatorGMR.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
 #ifdef USE_LWPR
@@ -47,7 +47,7 @@ void getFunctionApproximatorsVector(int input_dim, std::vector<FunctionApproxima
   vector<string> names;
   names.push_back("LWR");
   names.push_back("LWPR");
-  //names.push_back("GMR");
+  names.push_back("GMR");
   names.push_back("IRFRLS");
 
   for (unsigned int i_name=0; i_name<names.size(); i_name++)
@@ -89,12 +89,12 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
 #endif // USE_LWPR
   }
 
-  //if (name.compare("GMR")==0)
-  //{
-  //  // Gaussian Mixture Regression  
-  //  int number_of_gaussians = 5;
-  //  return new MetaParametersGMR(input_dim,number_of_gaussians);
-  //}
+  if (name.compare("GMR")==0)
+  {
+    // Gaussian Mixture Regression  
+    int number_of_gaussians = 5;
+    return new MetaParametersGMR(input_dim,number_of_gaussians);
+  }
   
   if (name.compare("IRFRLS")==0)
   {
@@ -131,8 +131,8 @@ FunctionApproximator* getFunctionApproximatorByName(string name, int input_dim)
 #endif // USE_LWPR
   }
 
-  //if (name.compare("GMR")==0)
-  //  return new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
+  if (name.compare("GMR")==0)
+    return new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
   
   if (name.compare("IRFRLS")==0)
     return new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
