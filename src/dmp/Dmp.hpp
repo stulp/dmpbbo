@@ -27,7 +27,7 @@
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "functionapproximators/Parameterizable.hpp"
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include <boost/serialization/assume_abstract.hpp>
 
 #include <set>

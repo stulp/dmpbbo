@@ -30,7 +30,7 @@
 #include <iomanip>
 #include <eigen3/Eigen/Core>
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 using namespace std;
 using namespace Eigen;

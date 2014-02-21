@@ -36,7 +36,7 @@
 #include "bbo/TaskSolver.hpp"
 #include "bbo/ExperimentBBO.hpp"
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 
 

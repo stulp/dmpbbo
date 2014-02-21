@@ -24,7 +24,7 @@
 #ifndef DISTRIBUTIONGAUSSIAN_H
 #define DISTRIBUTIONGAUSSIAN_H   
 
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <vector>
 #include <sstream>

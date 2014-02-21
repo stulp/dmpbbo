@@ -36,7 +36,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGMR);
 
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 
 using namespace std;

@@ -30,8 +30,8 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWPR);
 
-#include "utilities/BoostSerializationToString.hpp"
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include "functionapproximators/ModelParametersLWR.hpp"
 

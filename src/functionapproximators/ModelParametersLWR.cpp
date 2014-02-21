@@ -30,9 +30,9 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
 
-#include "utilities/EigenFileIO.hpp"
-#include "utilities/BoostSerializationToString.hpp"
-#include "utilities/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <fstream>

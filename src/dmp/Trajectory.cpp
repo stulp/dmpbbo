@@ -23,7 +23,7 @@
 
 #include "dmp/Trajectory.hpp"
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <fstream>
 #include <iostream>

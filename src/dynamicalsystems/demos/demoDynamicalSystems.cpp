@@ -29,7 +29,7 @@
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
 #include <iomanip>

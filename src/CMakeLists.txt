@@ -1,4 +1,4 @@
-add_subdirectory(utilities)
+add_subdirectory(dmpbbo_io)
 add_subdirectory(functionapproximators)
 add_subdirectory(dynamicalsystems)
 add_subdirectory(dmp)

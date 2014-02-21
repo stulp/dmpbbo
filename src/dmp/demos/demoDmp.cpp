@@ -37,7 +37,7 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
-#include "utilities/EigenFileIO.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
 #include <fstream>
