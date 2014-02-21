@@ -1,0 +1,83 @@
+Please make sure you have installed all the required packages (cmake, boost and Eigen, see below)
+before trying to compile. We assume that you use a compiler that is compatible with the C++11
+standard.
+
+To compile, do:
+  mkdir -p build_dir; cd build_dir; cmake .. -DCMAKE_BUILD_TYPE=Release; make; make Docs
+
+To compile a version that has debugging symbols included, and compiles some tests also:
+  mkdir -p build_dir_debug; cd build_dir_debug; cmake .. -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1
+
+To install libs in /usr/local/lib, headers in /usr/local/include and binaries in oo_dmp_bbo/bin:
+  sudo make install
+
+________________________________________________________________________________    
+STATIC VS SHARED LIBRARIES
+
+The default is to build shared libraries, e.g. libdmp.so. Calling "sudo make install" 
+will install them in /usr/local/lib. Make sure that /usr/local/lib is in your 
+LD_LIBRARY_PATH, or  the binaries will not be able to dynamically link the required 
+libraries.
+
+Alternatively, you can build static libraries and link them statically during 
+compilation. Just change 
+  set(SHARED_OR_STATIC "SHARED") => set(SHARED_OR_STATIC "STATIC")
+in CMakeLists.txt in this directory.
+
+
+________________________________________________________________________________    
+INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
+
+sudo apt-get install cmake doxygen libboost-filesystem-dev libboost-system-dev libboost-serialization-dev
+
+"sudo apt-get eigen3" currently (February 2014) installs version 3.1.2. However, DmpBbo
+requires version >= 3.2. To get the latest Eigen version:
+  use this PPA: https://launchpad.net/~kalakris/+archive/eigen
+  or do a manual install: see below
+
+
+________________________________________________________________________________    
+MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES
+
+___________________________________
+CMAKE (required)
+  http://www.cmake.org/cmake/resources/software.html	
+
+___________________________________
+EIGEN (required, version >= 3.2)
+  http://eigen.tuxfamily.org/dox/GettingStarted.html
+  Getting the latest version (thanks to Ryan Lober):
+		sudo apt-get install mercurial
+		"go to whereever you want to start the installation"
+		hg clone https://bitbucket.org/eigen/eigen/
+		cd eigen
+		mkdir build_dir
+		cd build_dir
+		cmake ..
+  	sudo make install
+  	
+___________________________________
+BOOST (required modules: filesystem, system, serialization. version >=1.34) 
+  http://www.boost.org/doc/libs/1_55_0/more/getting_started/
+  http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/
+  http://www.boost.org/doc/libs/1_55_0/libs/system/doc/
+  http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/ 
+  	
+___________________________________
+DOXYGEN (optional, version >1.7.5, for the \cite command)
+  http://www.stack.nl/~dimitri/doxygen/download.html#srcbin
+
+___________________________________
+LWPR (optional)
+  
+To use the Locally Weighted Projection Regression algorithm as a 
+function approximator, install the following software:
+  http://sourceforge.net/projects/lwpr/
+Our build system assumes the resulting headers/libraries are installed in 
+/usr/local/include and /usr/local/lib respectively. If they are in a 
+non-standard location (because you don't want to 'make install' or such) 
+please modify the following lines in src/functionapproximators/FindLWPR.cmake
+accordingly: 
+  find_path(LWPR_INCLUDE_DIR lwpr.hh HINTS /usr/local/include/)
+  find_library(LWPR_LIBRARY liblwpr.a HINTS /usr/local/lib/)
+

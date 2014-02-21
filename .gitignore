@@ -1,0 +1,6 @@
+*~
+*.bak
+build_dir*
+bin/
+bin_test/
+thirdparty/

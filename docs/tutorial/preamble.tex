@@ -1,0 +1,48 @@
+\usepackage{a4wide}
+\usepackage{makeidx}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{alltt}
+\usepackage{times}
+\usepackage{ifpdf}
+
+
+\ifpdf
+\usepackage[pdftex,
+            pagebackref=true,
+            colorlinks=true,
+            linkcolor=blue,
+            unicode
+           ]{hyperref}
+\else
+\usepackage[ps2pdf,
+            pagebackref=true,
+            colorlinks=true,
+            linkcolor=blue,
+            unicode
+           ]{hyperref}
+\usepackage{pspicture}
+\fi
+\usepackage[utf8]{inputenc}
+
+
+
+% Replace doxygen fancy header (set in doxygen package) with our own
+\lhead[\fancyplain{}{\bfseries\thepage}]{DMP Tutorial}%
+\rhead[\fancyplain{}{\bfseries\thepage}]{\footnotesize Freek Stulp}%
+\rfoot[\fancyplain{}{\bfseries\thepage}]{\footnotesize ENSTA-ParisTech}%
+
+\lstset{language=C++,inputencoding=utf8,basicstyle=\footnotesize,breaklines=true,breakatwhitespace=true,tabsize=8,numbers=left}
+
+\setcounter{secnumdepth}{-1} 
+
+% My preferred font
+\sffamily 
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
+
+
