@@ -28,6 +28,7 @@
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
 #include "bbo/UpdateSummary.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iomanip>
 #include <fstream>
@@ -41,24 +42,35 @@ namespace DmpBbo {
 
 bool saveTask(string save_directory, Task* task, TaskSolver* task_solver, bool overwrite=false);
 
-bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, bool overwrite=false);
+bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite=false);
 
 void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, string save_directory, bool overwrite)
 {
+  if (!save_directory.empty()) 
+    task->savePerformRolloutsPlotScript(save_directory);
+  
   if (!saveTask(save_directory, task, task_solver, overwrite))
     return;
 
   // Some definitions
   int n_parallel = distributions.size();
+  vector<MatrixXd> sample_eval(n_parallel);
   vector<MatrixXd> samples(n_parallel);
-  MatrixXd cost_vars;
-  VectorXd costs;
+  MatrixXd cost_vars, cost_vars_eval;
+  VectorXd costs, cost_eval;
   vector<UpdateSummary> update_summaries(n_parallel);
   
   // Optimization loop
   //cout << "init  =  " << "  distribution[0]=" << *(distributions[0] << endl;
   for (int i_update=1; i_update<=n_updates; i_update++)
   {
+    // 0. Get cost of current distribution mean
+    for (int pp=0; pp<n_parallel; pp++)
+      sample_eval[pp] = distributions[pp]->mean().transpose();
+    task_solver->performRollouts(sample_eval,cost_vars_eval);
+    task->evaluate(cost_vars_eval,cost_eval);
+    for (int pp=0; pp<n_parallel; pp++)
+      update_summaries[pp].cost_eval = cost_eval[0];
     
     // 1. Sample from distribution
     for (int pp=0; pp<n_parallel; pp++)
@@ -85,13 +97,13 @@ void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_so
     cout << endl;
     
     if (!save_directory.empty()) 
-      saveUpdate(save_directory,i_update,update_summaries,cost_vars,overwrite);
+      saveUpdate(save_directory,i_update,update_summaries,cost_vars,cost_vars_eval,overwrite);
 
   
   }
 }
 
-bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, bool overwrite)
+bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite)
 {
   if (save_directory.empty())
     return true;
@@ -108,20 +120,23 @@ bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>
   else
   {
     for (int i_parallel=0; i_parallel<n_parallel; i_parallel++)
-     saveToDirectory(update_summaries[i_parallel], directory_update, i_parallel+1);
+    {
+      stringstream stream_dim;
+      stream_dim << directory_update << "/dim" << setw(2) << setfill('0') << i_parallel << "/";
+      saveToDirectory(update_summaries[i_parallel], stream_dim.str());
+    }
+    VectorXi n_parallel_vec = VectorXi::Constant(1,n_parallel);
+    saveMatrix(save_directory,"n_parallel.txt",n_parallel_vec,overwrite);
   }
- 
-  string filename = directory_update+"/cost_vars.txt";
-  ofstream file;
-  file.open(filename.c_str());
-  if (!file.is_open())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Couldn't open file '" << filename << "' for writing." << endl;
-    return false;
-  }
-  file << cost_vars;
-  file.close();
+
+  saveMatrix(directory_update,"cost_vars_eval.txt",cost_vars_eval,overwrite);
+  VectorXd cost_eval = VectorXd::Constant(1,update_summaries[0].cost_eval);
+  saveMatrix(directory_update,"cost_eval.txt",cost_eval,overwrite);
+
+  saveMatrix(directory_update,"cost_vars.txt",cost_vars,overwrite);
+  saveMatrix(directory_update,"costs.txt",update_summaries[0].costs,overwrite);
+
+  saveMatrix(directory_update,"weights.txt",update_summaries[0].weights,overwrite);
   
   return true;
  
