@@ -112,10 +112,6 @@ void runEvolutionaryOptimization(
   string save_directory, 
   bool overwrite)
 {
-  if (!save_directory.empty()) 
-    task->savePerformRolloutsPlotScript(save_directory);
-
-
   // Some variables
   MatrixXd samples;
   MatrixXd cost_vars, cost_vars_eval;
@@ -153,6 +149,7 @@ void runEvolutionaryOptimization(
     else
     {
       cout << i_update << " ";
+
       stringstream stream;
       stream << save_directory << "/update" << setw(5) << setfill('0') << i_update << "/";
       saveToDirectory(update_summary, stream.str());
@@ -160,6 +157,9 @@ void runEvolutionaryOptimization(
       bool overwrite = true;
       saveMatrix(stream.str(),"cost_vars.txt",cost_vars,overwrite);
       saveMatrix(stream.str(),"cost_vars_eval.txt",cost_vars_eval,overwrite);
+      
+      if (i_update==1 && !save_directory.empty()) 
+        task->savePerformRolloutsPlotScript(save_directory);
     }
   
   }

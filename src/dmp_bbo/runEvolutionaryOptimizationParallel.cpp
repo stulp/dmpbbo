@@ -96,10 +96,13 @@ void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_so
         cout  << endl << "    distributions["<<ii<<"]=" << *(distributions[ii]);
     cout << endl;
     
-    if (!save_directory.empty()) 
+    if (!save_directory.empty())
+    {
       saveUpdate(save_directory,i_update,update_summaries,cost_vars,cost_vars_eval,overwrite);
-
-  
+      if (i_update==1) 
+        task->savePerformRolloutsPlotScript(save_directory);
+    }
+    
   }
 }
 
