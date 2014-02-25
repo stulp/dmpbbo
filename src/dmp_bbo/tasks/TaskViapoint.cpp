@@ -208,8 +208,16 @@ bool TaskViapoint::savePerformRolloutsPlotScript(string directory) const
   file << "        x = np.reshape(cost_vars[k,:],(n_time_steps, n_vars))" << endl;
   file << "        y = x[:,0:n_dims]" << endl;
   file << "        t = x[:,3*n_dims]" << endl;
-  file << "        line_handles = ax.plot(t,y,linewidth=0.5)" << endl;
-  file << "    ax.plot(viapoint_time,viapoint,'ok')" << endl;
+  if (viapoint_.size()==1)
+  {
+    file << "        line_handles = ax.plot(t,y,linewidth=0.5)" << endl;
+    file << "    ax.plot(viapoint_time,viapoint,'ok')" << endl;
+  }
+  else
+  {
+    file << "        line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)" << endl;
+    file << "    ax.plot(viapoint[0],viapoint[1],'ok')" << endl;
+  }
   file << "    return line_handles" << endl;
   file << "if __name__=='__main__':" << endl;
   file << "    # See if input directory was passed" << endl;
