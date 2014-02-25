@@ -12,13 +12,17 @@ from plotUpdateSummary import plotUpdateSummaryFromDirectory
 
 
 def plotUpdateLines(n_samples_per_update,y_limits,ax):
-
+    # Find good number of horizontal update lines to plot    
+    updates = numpy.arange(0, len(n_samples_per_update))
+    while len(n_samples_per_update)>20:
+      n_samples_per_update = n_samples_per_update[0:-1:5]
+      updates = updates[0:-1:5]
+    
     ax.plot([n_samples_per_update, n_samples_per_update],y_limits,'-',color='#bbbbbb',linewidth=0.5,zorder=0)
-    for ii in range(len(n_samples_per_update)-2):
+    for ii in range(len(n_samples_per_update)-1):
         y = y_limits[0] + 0.9*(y_limits[1]-y_limits[0])
-        if ( (n_samples_per_update<15) | ((ii+1)%5==0) ): 
-            ax.text(n_samples_per_update[ii+1], y,str(ii+1),
-            horizontalalignment='center',verticalalignment='top',rotation='vertical')
+        ax.text(n_samples_per_update[ii+1], y,str(updates[ii+1]),  
+                          horizontalalignment='center',verticalalignment='top',rotation='vertical')
         
     y = y_limits[0] + 0.95*(y_limits[1]-y_limits[0])
     ax.text(mean(ax.get_xlim()), y,'number of updates',
