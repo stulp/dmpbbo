@@ -58,25 +58,29 @@ def plotLearningCurve(n_samples_per_update,costs_per_sample,cost_evals=[],ax=Non
 
     return (xs, ys)
   
+def plotExplorationCurve(n_samples_per_update,exploration_curve,ax=None):
+    if (ax==None):
+        return
+    ax.plot(n_samples_per_update,exploration_curve,'-',color='green',linewidth=2)
+    y_limits = ax.get_ylim()
+    plotUpdateLines(n_samples_per_update,y_limits,ax)
+    ax.set_xlabel('number of evaluations')
+    ax.set_ylabel('sqrt of max. eigval of covar')
+    ax.set_title('Exploration magnitude')
 
-def plotExplorationCurve(n_samples_per_update,covars_per_update,ax=None):
-    max_eigval_per_update = [];
+def plotExplorationCurveCovars(n_samples_per_update,covars_per_update,ax=None):
+    sqrt_max_eigvals = [];
     for update in range(len(covars_per_update)):
         if (isnan(covars_per_update[update]).any()):
             print update
             print covars_per_update[update]
         eigvals, eigvecs = np.linalg.eig(covars_per_update[update])
-        max_eigval_per_update.append(max(eigvals))
+        sqrt_max_eigvals.append(sqrt(max(eigvals)))
 
     if (ax!=None):
-        ax.plot(n_samples_per_update,sqrt(max_eigval_per_update),'-',color='green',linewidth=2)
-        y_limits = ax.get_ylim()
-        plotUpdateLines(n_samples_per_update,y_limits,ax)
-        ax.set_xlabel('number of evaluations')
-        ax.set_ylabel('sqrt of max. eigval of covar')
-        ax.set_title('Exploration magnitude')
+        plotExplorationCurve(n_samples_per_update,sqrt_max_eigvals,ax)
         
-    return max_eigval_per_update
+    return sqrt_max_eigvals
   
 
 def plotEvolutionaryOptimization(n_updates,directory,axs=None,plot_all_rollouts=False):
@@ -119,7 +123,7 @@ def plotEvolutionaryOptimization(n_updates,directory,axs=None,plot_all_rollouts=
     #################################
     # Plot the exploration magnitude
     ax = (None if axs==None else axs[0])
-    max_eigval_per_update = plotExplorationCurve(n_samples_per_update,covars_per_update,ax)
+    max_eigval_per_update = plotExplorationCurveCovars(n_samples_per_update,covars_per_update,ax)
     
     #################################
     # Plot the learning curve

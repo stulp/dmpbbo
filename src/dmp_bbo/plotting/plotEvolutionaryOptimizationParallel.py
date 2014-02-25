@@ -16,6 +16,7 @@ from plotUpdateSummary import plotUpdateSummaryFromDirectory
 from plotEvolutionaryOptimization import plotUpdateLines
 from plotEvolutionaryOptimization import plotLearningCurve
 from plotEvolutionaryOptimization import plotExplorationCurve
+from plotEvolutionaryOptimization import plotExplorationCurveCovars
 
 def plotEvolutionaryOptimizationParallel(n_updates,directory,axs=None,plot_all_rollouts=False):
 
@@ -77,7 +78,7 @@ def plotEvolutionaryOptimizationParallel(n_updates,directory,axs=None,plot_all_r
         #################################
         # Plot the exploration magnitude
         ax = (None if axs==None else axs[0])
-        max_eigval_per_update = plotExplorationCurve(n_samples_per_update,covars_per_update,ax)
+        max_eigval_per_update = plotExplorationCurveCovars(n_samples_per_update,covars_per_update,ax)
     
     ax = (None if axs==None else axs[2])
     if (ax!=None):
