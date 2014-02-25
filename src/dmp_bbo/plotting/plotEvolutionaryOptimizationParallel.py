@@ -17,7 +17,7 @@ from plotEvolutionaryOptimization import plotUpdateLines
 from plotEvolutionaryOptimization import plotLearningCurve
 from plotEvolutionaryOptimization import plotExplorationCurve
 
-def plotEvolutionaryOptimization(n_updates,directory,axs=None,plot_all_rollouts=False):
+def plotEvolutionaryOptimizationParallel(n_updates,directory,axs=None,plot_all_rollouts=False):
 
     if (n_updates==0):
       n_updates += 1;
@@ -125,7 +125,7 @@ def plotEvolutionaryOptimization(n_updates,directory,axs=None,plot_all_rollouts=
     return (update_centers, mean_costs, n_samples_per_update, max_eigval_per_update)
     
 
-def plotEvolutionaryOptimizations(n_updates,directories,axs):
+def plotEvolutionaryOptimizationsParallel(n_updates,directories,axs):
     
     all_updates = np.empty((len(directories),n_updates), dtype=float)
     all_mean_costs = np.empty((len(directories),n_updates), dtype=float)
@@ -133,7 +133,7 @@ def plotEvolutionaryOptimizations(n_updates,directories,axs):
     all_max_eigval_per_update = np.empty((len(directories),n_updates+1), dtype=float)
     for dd in range(len(directories)):
 
-        update_centers, mean_costs, n_samples_per_update, max_eigval_per_update = plotEvolutionaryOptimization(n_updates,directories[dd])
+        update_centers, mean_costs, n_samples_per_update, max_eigval_per_update = plotEvolutionaryOptimizationParallel(n_updates,directories[dd])
         
         all_updates[dd] = update_centers
         all_mean_costs[dd] = mean_costs
@@ -214,11 +214,11 @@ if __name__=='__main__':
             axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
         else:
             axs = [ fig.add_subplot(132), fig.add_subplot(133), fig.add_subplot(131) ]
-        plotEvolutionaryOptimization(n_updates,directories[0],axs)
+        plotEvolutionaryOptimizationParallel(n_updates,directories[0],axs)
         #anim = animation.FuncAnimation(fig, plotEvolutionaryOptimization, frames=n_updates, fargs=(directory,), interval=100)
     else:
         axs = [ fig.add_subplot(121),  fig.add_subplot(122) ]
-        plotEvolutionaryOptimizations(n_updates,directories,axs)
+        plotEvolutionaryOptimizationsParallel(n_updates,directories,axs)
  
     plt.show()
 
