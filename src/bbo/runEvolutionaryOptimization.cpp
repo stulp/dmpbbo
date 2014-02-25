@@ -112,8 +112,9 @@ void runEvolutionaryOptimization(
   string save_directory, 
   bool overwrite)
 {
-  //if (!saveCostFunction(save_directory, cost_function, overwrite)) todo fix this
-  //  return;
+  if (!save_directory.empty()) 
+    task->savePerformRolloutsPlotScript(save_directory);
+
 
   // Some variables
   MatrixXd samples;
@@ -159,9 +160,6 @@ void runEvolutionaryOptimization(
       bool overwrite = true;
       saveMatrix(stream.str(),"cost_vars.txt",cost_vars,overwrite);
       saveMatrix(stream.str(),"cost_vars_eval.txt",cost_vars_eval,overwrite);
-      
-      task->savePerformRolloutsPlotScript(save_directory);
-
     }
   
   }
