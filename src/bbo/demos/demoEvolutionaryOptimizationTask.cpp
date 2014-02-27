@@ -297,8 +297,8 @@ int main(int n_args, char* args[])
     n_samples_per_update
   );
   
-  cout << "___________________________________________________________" << endl;
-  cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
+  //cout << "___________________________________________________________" << endl;
+  //cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
   runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   return 0;

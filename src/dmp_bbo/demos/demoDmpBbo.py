@@ -32,7 +32,7 @@ if __name__=='__main__':
     subprocess.call(command, shell=True)
       
     fig = plt.figure(1,figsize=(12, 4))
-    axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
+    axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141)]
     plotEvolutionaryOptimization(directory,axs)
 
     plt.show()

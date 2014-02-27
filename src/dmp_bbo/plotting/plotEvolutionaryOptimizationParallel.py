@@ -12,7 +12,7 @@ import time
 lib_path = os.path.abspath('../../bbo/plotting')
 sys.path.append(lib_path)
 
-from plotUpdateSummary import plotUpdateSummaryFromDirectory
+from plotUpdateSummaryParallel import plotUpdateSummaryParallelFromDirectory
 from plotEvolutionaryOptimization import *
 
 def plotEvolutionaryOptimizationParallel(directory,axs,plot_all_rollouts=False):
@@ -35,9 +35,7 @@ def plotEvolutionaryOptimizationParallel(directory,axs,plot_all_rollouts=False):
     dim_dir = "";
     ax = (None if axs==None else axs[0])
     for i_parallel in range(n_parallel):
-        if (n_parallel>1):
-            dim_dir = "dim%02d" % i_parallel
-        (covar_at_samples, sqrt_max_eigvals) = loadExplorationCurve(directory,dim_dir)
+        (covar_at_samples, sqrt_max_eigvals) = loadExplorationCurve(directory,i_parallel)
         plotExplorationCurve(covar_at_samples,sqrt_max_eigvals,ax)
     plotUpdateLines(update_at_samples,ax)
 
@@ -47,17 +45,9 @@ def plotEvolutionaryOptimizationParallel(directory,axs,plot_all_rollouts=False):
     if (ax!=None):
         #################################
         # Visualize the update in parameter space 
-        for i_parallel in range(n_parallel):
-            for update in range(n_updates):
-                cur_directory = '%s/update%05d' % (directory, update+1)
-                if (n_parallel==1):
-                  cur_directory_dim = cur_directory;
-                else:
-                  cur_directory_dim = '%s/dim%02d' % (cur_directory, i_parallel)
-                plotUpdateSummaryFromDirectory(cur_directory_dim,ax,False)
-            
-        #cur_directory = '%s/update%05d' % (directory, n_updates)
-        #plotUpdateSummaryFromDirectory(cur_directory,ax,True)
+        for update in range(n_updates):
+            cur_directory = '%s/update%05d' % (directory, update+1)
+            plotUpdateSummaryParallelFromDirectory(cur_directory,ax,False)
         ax.set_title('Search space')
           
     if ( (axs!=None) and (len(axs)>3) ):

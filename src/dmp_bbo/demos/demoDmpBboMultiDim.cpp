@@ -68,7 +68,7 @@ int main(int n_args, char* args[])
   // Make the task
   int n_dim=2;
   
-  VectorXd viapoint = VectorXd::LinSpaced(n_dim,1.5,2.0);
+  VectorXd viapoint = VectorXd::LinSpaced(n_dim,1.5,2);
   double viapoint_time = 0.2;
   TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
   
@@ -90,9 +90,11 @@ int main(int n_args, char* args[])
   Dmp* dmp = new Dmp(tau, y_init, y_attr, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
   // Make the task solver
+  double integrate_dmp_beyond_tau_factor = 1.25;
+  double dt=0.01;
   set<string> parameters_to_optimize;
-  parameters_to_optimize.insert("slopes");
-  TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize);
+  parameters_to_optimize.insert("offsets");
+  TaskSolverParallel* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;
@@ -101,10 +103,10 @@ int main(int n_args, char* args[])
   vector<DistributionGaussian*> distributions(n_dim);
   for (int i_dim=0; i_dim<n_dim; i_dim++)
   {
-    cout << mean_init_vec[i_dim].transpose() << endl;
+    //cout << mean_init_vec[i_dim].transpose() << endl;
     VectorXd mean_init = mean_init_vec[i_dim];
   
-    MatrixXd covar_init = 10000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
+    MatrixXd covar_init = 100000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
     
     distributions[i_dim] = new DistributionGaussian(mean_init,covar_init);
   }
@@ -112,13 +114,14 @@ int main(int n_args, char* args[])
 
   // Make the parameter updater
   double eliteness = 10;
-  double covar_decay_factor = 0.8;
+  double covar_decay_factor = 0.9;
   string weighting_method("PI-BB");
   Updater* updater = new UpdaterCovarDecay(eliteness, covar_decay_factor, weighting_method);
   
   // Run the optimization
   int n_updates = 40;
   int n_samples_per_update = 15;
-  runEvolutionaryOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory);
+  bool overwrite = true;
+  runEvolutionaryOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

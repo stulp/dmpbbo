@@ -116,6 +116,7 @@ int main(int n_args, char* args[])
   // Run the optimization
   int n_updates = 40;
   int n_samples_per_update = 15;
-  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
+  bool overwrite = true;
+  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

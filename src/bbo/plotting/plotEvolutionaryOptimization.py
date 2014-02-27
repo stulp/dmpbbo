@@ -76,21 +76,25 @@ def loadLearningCurve(directory):
         
     return (update_at_samples, costs_all, eval_at_samples, costs_eval)
 
-def loadExplorationCurve(directory,subdir=""):
+def loadExplorationCurve(directory,i_parallel=-1):
     n_updates = loadNumberOfUpdates(directory)
+
+    suffix=""
+    if (i_parallel>=0):
+        suffix = '_%02d' % i_parallel
 
     # Load all the covar matrices
     covar_at_samples = [0]
     covars_per_update = [];
     for update in range(n_updates):
         cur_directory = '%s/update%05d/' % (directory, update+1)
-        covar = np.loadtxt(cur_directory+subdir+"/distribution_covar.txt")
+        covar = np.loadtxt(cur_directory+"/distribution_covar"+suffix+".txt")
         covars_per_update.append(covar)
         cur_costs = np.loadtxt(cur_directory+"/costs.txt")
         covar_at_samples.append(covar_at_samples[-1]+len(cur_costs))
 
     # Load final covar matrix
-    covar = np.loadtxt(cur_directory+subdir+"/distribution_new_covar.txt")
+    covar = np.loadtxt(cur_directory+"/distribution_new_covar"+suffix+".txt")
     covars_per_update.append(covar)
         
     # Compute sqrt of max of eigenvalues

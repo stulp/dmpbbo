@@ -52,26 +52,27 @@ void runEvolutionaryOptimization(
   const Updater* const updater, 
   int n_updates, 
   int n_samples_per_update, 
-  string save_directory, 
-  bool overwrite)
+  string save_directory,
+  bool overwrite,
+  bool only_learning_curve)
 {
-  //if (!saveCostFunction(save_directory, cost_function, overwrite)) todo fix this
-  //  return;
 
   // Some variables
   MatrixXd samples;
   VectorXd costs, cost_eval;
+  // Bookkeeping
+  vector<UpdateSummary> update_summaries;
   UpdateSummary update_summary;
+  
+  if (save_directory.empty()) 
+    cout << "init  =  " << "  distribution=" << *initial_distribution;
   
   // Optimization loop
   DistributionGaussian* distribution = initial_distribution->clone();
-  if (save_directory.empty()) 
-    cout << "init  =  " << "  distribution=" << *distribution << endl;
-  for (int i_update=1; i_update<=n_updates; i_update++)
+  for (int i_update=0; i_update<n_updates; i_update++)
   {
     // 0. Get cost of current distribution mean
     cost_function->evaluate(distribution->mean().transpose(),cost_eval);
-    update_summary.cost_eval = cost_eval[0];
     
     // 1. Sample from distribution
     distribution->generateSamples(n_samples_per_update, samples);
@@ -82,21 +83,23 @@ void runEvolutionaryOptimization(
     // 3. Update parameters
     updater->updateDistribution(*distribution, samples, costs, *distribution, update_summary);
       
+    
     // Some output and/or saving to file (if "directory" is set)
     if (save_directory.empty()) 
     {
-      cout << "update=" << i_update << " cost_eval=" << update_summary.cost_eval << "    " << *distribution << endl;
+      cout << "\t cost_eval=" << cost_eval << endl << i_update+1 << "  " << *distribution;
     }
     else
     {
-      cout << i_update << " ";
-      stringstream stream;
-      stream << save_directory << "/update" << setw(5) << setfill('0') << i_update << "/";
-      saveToDirectory(update_summary, stream.str());
+      update_summary.cost_eval = cost_eval[0];
+      update_summaries.push_back(update_summary);
     }
-  
   }
-  cout << endl;
+  
+  // Save update summaries to file, if necessary
+  if (!save_directory.empty())
+    saveToDirectory(update_summaries,save_directory,overwrite,only_learning_curve);
+
 }
 
 // This function could have been integrated with the above. But I preferred to duplicate a bit of
@@ -110,24 +113,27 @@ void runEvolutionaryOptimization(
   int n_updates, 
   int n_samples_per_update, 
   string save_directory, 
-  bool overwrite)
+  bool overwrite,
+  bool only_learning_curve)
 {
   // Some variables
   MatrixXd samples;
   MatrixXd cost_vars, cost_vars_eval;
   VectorXd costs, cost_eval;
+  // Bookkeeping
+  vector<UpdateSummary> update_summaries;
   UpdateSummary update_summary;
+  
+  if (save_directory.empty()) 
+    cout << "init  =  " << "  distribution=" << *initial_distribution;
   
   // Optimization loop
   DistributionGaussian* distribution = initial_distribution->clone();
-  if (save_directory.empty()) 
-    cout << "init  =  " << "  distribution=" << *distribution << endl;
-  for (int i_update=1; i_update<=n_updates; i_update++)
+  for (int i_update=0; i_update<n_updates; i_update++)
   {
     // 0. Get cost of current distribution mean
     task_solver->performRollouts(distribution->mean().transpose(),cost_vars_eval);
     task->evaluate(cost_vars_eval,cost_eval);
-    update_summary.cost_eval = cost_eval[0];
     
     // 1. Sample from distribution
     distribution->generateSamples(n_samples_per_update, samples);
@@ -141,32 +147,33 @@ void runEvolutionaryOptimization(
     // 3. Update parameters
     updater->updateDistribution(*distribution, samples, costs, *distribution, update_summary);
       
+    
     // Some output and/or saving to file (if "directory" is set)
     if (save_directory.empty()) 
     {
-      cout << "update=" << i_update << " cost_eval=" << update_summary.cost_eval << "    " << *distribution << endl;
+      cout << "\t cost_eval=" << cost_eval << endl << i_update+1 << "  " << *distribution;
     }
     else
     {
-      cout << i_update << " ";
-
-      stringstream stream;
-      stream << save_directory << "/update" << setw(5) << setfill('0') << i_update << "/";
-      saveToDirectory(update_summary, stream.str());
-      
-      bool overwrite = true;
-      saveMatrix(stream.str(),"cost_vars.txt",cost_vars,overwrite);
-      saveMatrix(stream.str(),"cost_vars_eval.txt",cost_vars_eval,overwrite);
-      
-      if (i_update==1 && !save_directory.empty()) 
-        task->savePerformRolloutsPlotScript(save_directory);
+      update_summary.cost_eval = cost_eval[0];
+      update_summary.cost_vars_eval = cost_vars_eval;
+      update_summary.cost_vars = cost_vars;
+      update_summaries.push_back(update_summary);
     }
-  
   }
-  cout << endl;
+  
+  // Save update summaries to file, if necessary
+  if (!save_directory.empty())
+  {
+    saveToDirectory(update_summaries,save_directory,overwrite,only_learning_curve);
+    // If you store only the learning curve, no need to save the script to visualize rollouts    
+    if (!only_learning_curve)
+      task->savePerformRolloutsPlotScript(save_directory);
+  }
+
 }
 
-void runEvolutionaryOptimization(ExperimentBBO* experiment, string save_directory, bool overwrite)
+void runEvolutionaryOptimization(ExperimentBBO* experiment, string save_directory, bool overwrite,   bool only_learning_curve)
 {
  if (experiment->cost_function!=NULL)
  {
@@ -177,7 +184,8 @@ void runEvolutionaryOptimization(ExperimentBBO* experiment, string save_director
      experiment->n_updates, 
      experiment->n_samples_per_update, 
      save_directory,
-     overwrite);
+     overwrite,
+     only_learning_curve);
  }
  else
  {
@@ -189,7 +197,8 @@ void runEvolutionaryOptimization(ExperimentBBO* experiment, string save_director
      experiment->n_updates, 
      experiment->n_samples_per_update, 
      save_directory,
-     overwrite);
+     overwrite,
+     only_learning_curve);
  }
 }
 

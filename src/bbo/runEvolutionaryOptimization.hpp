@@ -46,6 +46,7 @@ class ExperimentBBO;
  * \param[in] n_samples_per_update The number of samples per update
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
 void runEvolutionaryOptimization(
   const CostFunction* const cost_function, 
@@ -54,7 +55,8 @@ void runEvolutionaryOptimization(
   int n_updates, 
   int n_samples_per_update, 
   std::string save_directory=std::string(""),
-  bool overwrite=false);
+  bool overwrite=false,
+  bool only_learning_curve=false);
 
 /** Run an evolutionary optimization process.
  * \param[in] task The Task to optimize
@@ -65,6 +67,7 @@ void runEvolutionaryOptimization(
  * \param[in] n_samples_per_update The number of samples per update
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
 void runEvolutionaryOptimization(
   const Task* const task, 
@@ -74,17 +77,20 @@ void runEvolutionaryOptimization(
   int n_updates, 
   int n_samples_per_update, 
   std::string save_directory=std::string(""),
-  bool overwrite=false);
+  bool overwrite=false,
+  bool only_learning_curve=false);
 
 /** Run an evolutionary optimization process.
  * \param[in] experiment The experiment to run, cf. ExperimentBBO
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
 void runEvolutionaryOptimization(
   ExperimentBBO* experiment, 
   std::string save_directory=std::string(""),
-  bool overwrite=false);
+  bool overwrite=false,
+  bool only_learning_curve=false);
 
 }
 

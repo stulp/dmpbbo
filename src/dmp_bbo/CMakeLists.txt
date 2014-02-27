@@ -1,4 +1,4 @@
-file(GLOB SOURCES runEvolutionaryOptimizationParallel.cpp TaskSolverDmp.cpp) 
+file(GLOB SOURCES *.cpp) 
 add_library(dmp_bbo ${SHARED_OR_STATIC} ${SOURCES})
 install(TARGETS dmp_bbo DESTINATION ${LIB_INSTALL_DIR})
 

@@ -1,6 +1,6 @@
 /**
- * @file   UpdateSummary.hpp
- * @brief  UpdateSummary class header file.
+ * @file   UpdateSummaryParallel.hpp
+ * @brief  UpdateSummaryParallel class header file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bbo/UpdateSummary.hpp"
+#include "dmp_bbo/UpdateSummaryParallel.hpp"
 
 #include "bbo/DistributionGaussian.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -38,8 +38,10 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-bool saveToDirectory(const UpdateSummary& summary, string directory, bool overwrite)
+
+bool saveToDirectory(const UpdateSummaryParallel& summary, string directory, bool overwrite)
 {
+
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
   {
@@ -56,34 +58,53 @@ bool saveToDirectory(const UpdateSummary& summary, string directory, bool overwr
   string dir = directory;
   VectorXd cost_eval_vec = VectorXd::Constant(1,summary.cost_eval);
   
-  if (!saveMatrix(dir, "distribution_mean.txt",  summary.distribution->mean(),  ow)) return false;
-  if (!saveMatrix(dir, "distribution_covar.txt", summary.distribution->covar(), ow)) return false;
   if (!saveMatrix(dir, "cost_eval.txt",          cost_eval_vec,                 ow)) return false;
-  if (!saveMatrix(dir, "samples.txt",            summary.samples,               ow)) return false;
   if (!saveMatrix(dir, "costs.txt",              summary.costs,                 ow)) return false;
   if (!saveMatrix(dir, "weights.txt",            summary.weights,               ow)) return false;
-  if (!saveMatrix(dir, "distribution_new_mean.txt",  summary.distribution_new->mean(),  ow)) return false;
-  if (!saveMatrix(dir, "distribution_new_covar.txt", summary.distribution_new->covar(), ow)) return false;
-  
   if (summary.cost_vars_eval.size()>0)
     if (!saveMatrix(dir, "cost_vars_eval.txt",summary.cost_vars_eval, ow)) return false;
   if (summary.cost_vars.size()>0)
     if (!saveMatrix(dir, "cost_vars.txt",summary.cost_vars, ow)) return false;
+
+  int n_parallel = summary.distributions.size();
+  VectorXi n_parallel_vec = VectorXi::Constant(1,n_parallel);
+  saveMatrix(directory,"n_parallel.txt",n_parallel_vec,overwrite);
+  
+  for (int ii=0; ii<n_parallel; ii++)
+  {
+    stringstream stream;
+    stream << "_" << setw(2) << setfill('0') << ii << ".txt";
+    string suf = stream.str();
+    if (!saveMatrix(dir, "distribution_mean"+suf,  summary.distributions[ii]->mean(),  ow))
+      return false;
+    if (!saveMatrix(dir, "distribution_covar"+suf, summary.distributions[ii]->covar(), ow)) 
+      return false;
+    if (!saveMatrix(dir, "samples"+suf,            summary.samples[ii],               ow)) 
+      return false;
+    if (!saveMatrix(dir, "distribution_new_mean"+suf,  summary.distributions_new[ii]->mean(),  ow)) 
+      return false;
+    if (!saveMatrix(dir, "distribution_new_covar"+suf, summary.distributions_new[ii]->covar(), ow)) 
+      return false;
+  }  
   
   return true;
   
 }
 
-bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
+bool saveToDirectory(const vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
 {
   
   // Save the learning curve
-  int n_updates = update_summaries.size();
-  MatrixXd learning_curve(n_updates,3);
+  int n_updates = update_summaries.size();  
+  assert(n_updates>0);
+  
+  int n_parallel = update_summaries[0].distributions.size();
+  MatrixXd learning_curve(n_updates,2+n_parallel);
   learning_curve(0,0) = 0; // First evaluation is at 0
   
   for (int i_update=0; i_update<n_updates; i_update++)
   {
+
     // Number of samples at which an evaluation was performed.
     if (i_update>0)
     {
@@ -94,9 +115,13 @@ bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string 
     // The cost of the evaluation at this update
     learning_curve(i_update,1) = update_summaries[i_update].cost_eval;
     
-    // The largest eigenvalue of the covariance matrix
-    MatrixXd eigen_values = update_summaries[i_update].distribution->covar().eigenvalues().real();
-    learning_curve(i_update,2) = sqrt(eigen_values.maxCoeff());
+    for (int i_parallel=0; i_parallel<n_parallel; i_parallel++)
+    {
+      // The largest eigenvalue of the covariance matrix, for each distribution
+      DistributionGaussian* distribution = update_summaries[i_update].distributions[i_parallel];
+      MatrixXd eigen_values = distribution->covar().eigenvalues().real();
+      learning_curve(i_update,2+i_parallel) = sqrt(eigen_values.maxCoeff());
+    }
     
   }
 
