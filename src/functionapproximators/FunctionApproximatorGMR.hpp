@@ -79,6 +79,16 @@ protected:
   void kMeansInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd*>& centers, std::vector<double*>& priors,
     std::vector<Eigen::MatrixXd*>& covars, int nbMaxIter=1000);
 
+  /** Initialize Gaussian for EM algorithm using a same-size slicing on the first dimension (method used in Calinon GMR implementation).
+   * Particulary suited when input is 1-D and data distribution is uniform over input dimension
+   * \param[in]  data A data matrix (n_exemples x (n_in_dim + n_out_dim))
+   * \param[out]  centers A list (std::vector) of n_gaussian non initiallized centers (n_in_dim + n_out_dim)
+   * \param[out]  priors A list (std::vector) of n_gaussian non initiallized priors
+   * \param[out]  covars A list (std::vector) of n_gaussian non initiallized covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
+   */
+  void firstDimSlicingInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd*>& centers, std::vector<double*>& priors,
+    std::vector<Eigen::MatrixXd*>& covars);
+
   /** EM algorithm. 
    * \param[in] data A (n_exemples x (n_in_dim + n_out_dim)) data matrix
    * \param[in,out] centers A list (std::vector) of n_gaussian centers (vector of size (n_in_dim + n_out_dim))

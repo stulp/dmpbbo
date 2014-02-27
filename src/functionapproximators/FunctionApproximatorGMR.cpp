@@ -103,7 +103,10 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   MatrixXd gmmData = MatrixXd(inputs.rows(), gmmDim);
   gmmData << inputs, targets;
 
-  kMeansInit(gmmData, gmmCenters, gmmPriors, gmmCovars);
+  if (inputs.cols() == 1)
+    firstDimSlicingInit(gmmData, gmmCenters, gmmPriors, gmmCovars);
+  else
+    kMeansInit(gmmData, gmmCenters, gmmPriors, gmmCovars);
   EM(gmmData, gmmCenters, gmmPriors, gmmCovars);
 
   std::vector<VectorXd*> centers;
@@ -186,6 +189,57 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   }
 }
 
+void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vector<VectorXd*>& centers, std::vector<double*>& priors,
+  std::vector<MatrixXd*>& covars)
+{
+
+  VectorXd firstDim = data.col(0);
+
+  VectorXi assign(data.rows());
+  assign.setZero();
+
+  double minVal = firstDim.minCoeff();
+  double maxVal = firstDim.maxCoeff();
+
+  for (int iFirstDim = 0; iFirstDim < firstDim.size(); iFirstDim++)
+  {
+    size_t center = int((firstDim[iFirstDim] - minVal) / (maxVal - minVal) * centers.size());
+
+    if (center == centers.size())
+      center--;
+
+    assign[iFirstDim] = center;
+  }
+  
+  // Init means
+  VectorXi nbPoints = VectorXi::Zero(centers.size());
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+    centers[iCenter]->setZero();
+  for (int iData = 0; iData < data.rows(); iData++)
+  {
+    *(centers[assign[iData]]) += data.row(iData).transpose();
+    nbPoints[assign[iData]]++;
+  }
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+    *(centers[iCenter]) /= nbPoints[iCenter];
+
+  // Init covars
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+    covars[iCenter]->setZero();
+  for (int iData = 0; iData < data.rows(); iData++)
+    *(covars[assign[iData]]) += (data.row(iData).transpose() - *(centers[assign[iData]])) * (data.row(iData).transpose() - *(centers[assign[iData]])).transpose();
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+    *(covars[iCenter]) /= nbPoints[iCenter];
+
+  // Be sure that covar is invertible
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5;
+
+  // Init priors
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+    *(priors[iCenter]) = 1. / centers.size();
+}
+
 void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<VectorXd*>& centers, std::vector<double*>& priors,
   std::vector<MatrixXd*>& covars, int nbMaxIter)
 {
@@ -257,6 +311,10 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
     *(covars[iCenter]) /= nbPoints[iCenter];
 
+  // Be sure that covar is invertible
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5f;
+
   // Init priors
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
     *(priors[iCenter]) = 1. / centers.size();
@@ -268,12 +326,24 @@ void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd*>& c
   MatrixXd assign(centers.size(), data.rows());
   assign.setZero();
 
+  double oldLoglik = -1e10f;
+  double loglik = 0;
+
   for (int iIter = 0; iIter < nbMaxIter; iIter++)
   {
     // E step
     for (int iData = 0; iData < data.rows(); iData++)
       for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
         assign(iCenter, iData) = *(priors[iCenter]) * normal(data.row(iData).transpose(), *(centers[iCenter]), *(covars[iCenter]));
+
+    oldLoglik = loglik;
+    loglik = 0;
+    for (int iData = 0; iData < data.rows(); iData++)
+      loglik += log(assign.col(iData).sum());
+    loglik /= data.rows();
+
+    if (fabs(loglik / oldLoglik - 1) < 1e-8f)
+      break;
 
     for (int iData = 0; iData < data.rows(); iData++)
       assign.col(iData) /= assign.col(iData).sum();
@@ -307,6 +377,10 @@ void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd*>& c
 
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
       *(covars[iCenter]) /= assign.row(iCenter).sum();
+
+    // Be sure that covar is invertible
+    for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5f;
   }
 }
 
