@@ -92,7 +92,7 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   if (name.compare("GMR")==0)
   {
     // Gaussian Mixture Regression  
-    int number_of_gaussians = 5;
+    int number_of_gaussians = 10;
     return new MetaParametersGMR(input_dim,number_of_gaussians);
   }
   
