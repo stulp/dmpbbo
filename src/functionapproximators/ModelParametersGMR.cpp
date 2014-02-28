@@ -119,18 +119,12 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
   
-  ar & BOOST_SERIALIZATION_NVP(priors_);
-  /*
   ar & BOOST_SERIALIZATION_NVP(centers_);
-  ar & BOOST_SERIALIZATION_NVP(widths_);
+  ar & BOOST_SERIALIZATION_NVP(priors_);
   ar & BOOST_SERIALIZATION_NVP(slopes_);
-  ar & BOOST_SERIALIZATION_NVP(offsets_);
-  ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
-  ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-  ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-  ar & BOOST_SERIALIZATION_NVP(caching_);
-  */
+  ar & BOOST_SERIALIZATION_NVP(biases_);
+  ar & BOOST_SERIALIZATION_NVP(nb_in_dim_);
+  ar & BOOST_SERIALIZATION_NVP(inverseCovarsL_);
 }
 
 

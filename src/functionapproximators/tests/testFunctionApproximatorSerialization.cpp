@@ -73,6 +73,11 @@ int main(int n_args, char** args)
     
     for (unsigned int i_name=0; i_name<fa_names.size(); i_name++)
     {
+      // GMR on 2D too slow
+      if (fa_names[i_name].compare("GMR")==0)
+        if (n_input_dims==2)
+          continue;
+        
       FunctionApproximator* cur_obj = getFunctionApproximatorByName(fa_names[i_name],n_input_dims);
       if (cur_obj==NULL)
         continue;
