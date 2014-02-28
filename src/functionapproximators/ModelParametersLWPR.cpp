@@ -226,6 +226,7 @@ void ModelParametersLWPR::setParameterVectorAll(const VectorXd& values) {
 
 bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
+  return true;
   
   if (lwpr_object_->nIn()!=1)
   {
