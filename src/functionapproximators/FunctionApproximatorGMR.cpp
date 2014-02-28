@@ -151,9 +151,8 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   }
   
   const ModelParametersGMR* model_parameters_GMR = static_cast<const ModelParametersGMR*>(getModelParameters());
-  const MetaParametersGMR* meta_parameters_GMR = static_cast<const MetaParametersGMR*>(getMetaParameters());
-  int nbGaussian = meta_parameters_GMR->number_of_gaussians_;
 
+  int nbGaussian =  model_parameters_GMR->biases_.size();
   int nbOutDim = model_parameters_GMR->biases_[0].size();
 
   output = MatrixXd(input.rows(), nbOutDim);
