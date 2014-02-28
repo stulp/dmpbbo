@@ -33,6 +33,8 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGMR);
 #include <iostream> 
 #include <eigen3/Eigen/LU>
 #include <eigen3/Eigen/Cholesky>
+#include <ctime>
+#include <cstdlib>
 
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
@@ -48,6 +50,8 @@ FunctionApproximatorGMR::FunctionApproximatorGMR(MetaParametersGMR* meta_paramet
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  // TODO : find a more appropriate place for rand initialization
+  srand(unsigned(time(0)));
 }
 
 FunctionApproximatorGMR::FunctionApproximatorGMR(ModelParametersGMR* model_parameters)
