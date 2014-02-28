@@ -151,12 +151,12 @@ int main(int n_args, char** args)
   
     // Locally Weighted Projection Regression
 #ifdef USE_LWPR
-  double   w_gen=0.2;
-  double   w_prune=0.8;
-  bool     update_D=true;
-  double   init_alpha=0.0001;
-  double   penalty=0.01;
-  VectorXd init_D=VectorXd::Constant(n_input_dims,100);
+    double   w_gen=0.2;
+    double   w_prune=0.8;
+    bool     update_D=true;
+    double   init_alpha=0.1;
+    double   penalty=0.005;
+    VectorXd init_D=VectorXd::Constant(n_input_dims,200);
   MetaParametersLWPR* meta_parameters_lwpr = new MetaParametersLWPR(n_input_dims,init_D,w_gen,w_prune,update_D,init_alpha,penalty);
   fa = new FunctionApproximatorLWPR(meta_parameters_lwpr);
     
