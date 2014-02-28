@@ -10,13 +10,13 @@ import numpy
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../bbo/plotting')
+lib_path = os.path.abspath('../../dmp_bbo/plotting')
 sys.path.append(lib_path)
 
-from plotEvolutionaryOptimization import plotEvolutionaryOptimization
+from plotEvolutionaryOptimizationParallel import plotEvolutionaryOptimizationParallel
 
 if __name__=='__main__':
-    executable = "../../../bin/demoDmpBbo"
+    executable = "../../../bin/demoDmpBboMultiDim"
     
     if (not os.path.isfile(executable)):
         print ""
@@ -26,15 +26,14 @@ if __name__=='__main__':
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoDmpBbo/"
+    directory = "/tmp/demoDmpBboMultiDim/"
     command = executable+" "+directory
     print command
     subprocess.call(command, shell=True)
       
     fig = plt.figure(1,figsize=(12, 4))
-    axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141)]
-    plotEvolutionaryOptimization(directory,axs)
-
+    axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
+    plotEvolutionaryOptimizationParallel(directory,axs)
     plt.show()
     
 

@@ -35,11 +35,10 @@ if __name__=='__main__':
       print command
       subprocess.call(command, shell=True)
       
-      n_updates = 40 
       fig = plt.figure(figure_number)
       figure_number += 1;
       axs = [ fig.add_subplot(132), fig.add_subplot(133), fig.add_subplot(131) ]
-      plotEvolutionaryOptimization(n_updates,directory,axs)
+      plotEvolutionaryOptimization(directory,axs)
       fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
 
     plt.show()

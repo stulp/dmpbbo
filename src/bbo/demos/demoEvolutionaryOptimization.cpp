@@ -160,10 +160,9 @@ int main(int n_args, char* args[])
     
   
   int n_samples_per_update = 10;
-  
   int n_updates = 40;
-  
-  runEvolutionaryOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,directory);
+  bool overwrite = true;  
+  runEvolutionaryOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }
 

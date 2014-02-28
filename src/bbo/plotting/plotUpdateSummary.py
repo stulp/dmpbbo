@@ -73,6 +73,7 @@ def plotUpdateSummary(distribution_mean,distribution_covar,samples,costs,weights
             
     mean_handle = ax.plot(distribution_mean[0],distribution_mean[1],'o',label='old')
     mean_handle_new = ax.plot(distribution_new_mean[0],distribution_new_mean[1],'o',label='new')
+    mean_handle_link = ax.plot([distribution_mean[0], distribution_new_mean[0]],[distribution_mean[1], distribution_new_mean[1]],'-')
     patch = plot_error_ellipse(distribution_mean[0:2],distribution_covar[0:2,0:2],ax)
     patch_new = plot_error_ellipse(distribution_new_mean[0:2],distribution_new_covar[0:2,0:2],ax)
     if (highlight):
@@ -85,6 +86,7 @@ def plotUpdateSummary(distribution_mean,distribution_covar,samples,costs,weights
         plt.setp(mean_handle_new,color='gray')
         plt.setp(patch,edgecolor='gray')
         plt.setp(patch_new,edgecolor='gray')
+    plt.setp(mean_handle_link,color='gray')
     ax.set_aspect('equal')
 
     plt.rcParams['text.usetex']=True

@@ -1,6 +1,6 @@
 /**
- * @file   UpdateSummary.hpp
- * @brief  UpdateSummary class header file.
+ * @file   UpdateSummaryParallel.hpp
+ * @brief  UpdateSummaryParallel class header file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef UPDATESUMMARY_H
-#define UPDATESUMMARY_H   
+#ifndef UPDATESUMMARYPARALLEL_H
+#define UPDATESUMMARYPARALLEL_H   
 
 #include <string>
 #include <vector>
@@ -40,12 +40,12 @@ class DistributionGaussian;
  * Used for logging purposes.
  * This is a "plain old data" class, i.e. all member variables are public
  */
-class UpdateSummary {
+class UpdateSummaryParallel {
 public:
   /** Distribution before update. */
-  DistributionGaussian* distribution;
+  std::vector<DistributionGaussian*> distributions;
   /** Samples in the epoch. */
-  Eigen::MatrixXd samples;
+  std::vector<Eigen::MatrixXd> samples;
   /** Cost of the evaluation sample */
   double cost_eval;
   /** Costs of the samples in the epoch. */
@@ -53,7 +53,7 @@ public:
   /** Weights of the samples in the epoch, computed from their costs. */
   Eigen::MatrixXd weights;
   /** Distribution after the update. */
-  DistributionGaussian* distribution_new;
+  std::vector<DistributionGaussian*> distributions_new;
   
   /** The cost-relevant variables. Only used when Task/TaskSolver approach is used.  */
   Eigen::MatrixXd cost_vars;
@@ -68,9 +68,9 @@ public:
  * \param[in] update_summary Object to write
  * \param[in] directory Directory to which to write object
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
- * \return true if saving the UpdateSummary was successful, false otherwise
+ * \return true if saving the summary was successful, false otherwise
  */
-bool saveToDirectory(const UpdateSummary& update_summary, std::string directory, bool overwrite=false);
+bool saveToDirectory(const UpdateSummaryParallel& update_summary, std::string directory, bool overwrite=false);
 
 
 /**
@@ -79,9 +79,9 @@ bool saveToDirectory(const UpdateSummary& update_summary, std::string directory,
  * \param[in] directory Directory to which to write object
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
- * \return true if saving the UpdateSummary was successful, false otherwise
+ * \return true if saving the summary was successful, false otherwise
  */
- bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
+bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
 
 }
 
@@ -92,19 +92,19 @@ namespace serialization {
 
 /** Serialize class data members to boost archive. 
  * \param[in] ar Boost archive
- * \param[in] update_summary UpdateSummary object to serialize.
+ * \param[in] update_summary UpdateSummaryParallel object to serialize.
  * \param[in] version Version of the class
  * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
  */
 template<class Archive>
-void serialize(Archive & ar, DmpBbo::UpdateSummary& update_summary, const unsigned int version)
+void serialize(Archive & ar, DmpBbo::UpdateSummaryParallel& update_summary, const unsigned int version)
 {
-  ar & BOOST_SERIALIZATION_NVP(update_summary.distribution);
+  ar & BOOST_SERIALIZATION_NVP(update_summary.distributions);
   ar & BOOST_SERIALIZATION_NVP(update_summary.samples);
   ar & BOOST_SERIALIZATION_NVP(update_summary.cost_eval);
   ar & BOOST_SERIALIZATION_NVP(update_summary.costs);
   ar & BOOST_SERIALIZATION_NVP(update_summary.weights);
-  ar & BOOST_SERIALIZATION_NVP(update_summary.distribution_new);
+  ar & BOOST_SERIALIZATION_NVP(update_summary.distributions_new);
   ar & BOOST_SERIALIZATION_NVP(update_summary.cost_vars);
   ar & BOOST_SERIALIZATION_NVP(update_summary.cost_vars_eval);
 }
@@ -114,7 +114,7 @@ void serialize(Archive & ar, DmpBbo::UpdateSummary& update_summary, const unsign
 
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdateSummary,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdateSummaryParallel,boost::serialization::object_serializable);
 
 #endif
 

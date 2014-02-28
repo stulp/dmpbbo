@@ -251,7 +251,7 @@ int main(int n_args, char* args[])
   TaskSolver* task_solver = new DemoTaskSolverApproximateQuadraticFunction(inputs); 
   
   VectorXd mean_init  =  0.5*VectorXd::Ones(n_params);
-  MatrixXd covar_init =  0.2*MatrixXd::Identity(n_params,n_params);
+  MatrixXd covar_init =  0.25*MatrixXd::Identity(n_params,n_params);
   DistributionGaussian* distribution = new DistributionGaussian(mean_init, covar_init); 
   
   Updater* updater = NULL;
@@ -297,8 +297,8 @@ int main(int n_args, char* args[])
     n_samples_per_update
   );
   
-  cout << "___________________________________________________________" << endl;
-  cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
+  //cout << "___________________________________________________________" << endl;
+  //cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
   runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   return 0;

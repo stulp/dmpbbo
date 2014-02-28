@@ -21,13 +21,14 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bbo/runEvolutionaryOptimization.hpp"
+#include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
 
 #include "bbo/Task.hpp"
-#include "dmp_bbo/TaskSolverParallel.hpp"
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
-#include "bbo/UpdateSummary.hpp"
+#include "dmp_bbo/TaskSolverParallel.hpp"
+#include "dmp_bbo/UpdateSummaryParallel.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iomanip>
 #include <fstream>
@@ -41,24 +42,35 @@ namespace DmpBbo {
 
 bool saveTask(string save_directory, Task* task, TaskSolver* task_solver, bool overwrite=false);
 
-bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, bool overwrite=false);
+bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite=false);
 
-void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, string save_directory, bool overwrite)
-{
-  if (!saveTask(save_directory, task, task_solver, overwrite))
-    return;
-
-  // Some definitions
+void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, string save_directory, bool overwrite, bool only_learning_curve)
+{  
+  // Some variables
   int n_parallel = distributions.size();
+  vector<MatrixXd> sample_eval(n_parallel);
   vector<MatrixXd> samples(n_parallel);
-  MatrixXd cost_vars;
-  VectorXd costs;
-  vector<UpdateSummary> update_summaries(n_parallel);
+  MatrixXd cost_vars, cost_vars_eval;
+  VectorXd costs, cost_eval;
+  // Bookkeeping
+  // This is where the UpdateSummary objects are stored, one for each parallel optimization
+  vector<UpdateSummary> cur_summaries(n_parallel);
+  // This is the UpdateSummaryParallel, that merges the above
+  UpdateSummaryParallel update_summary;
+  update_summary.distributions.resize(n_parallel); // Pre-allocate enough space here
+  update_summary.distributions_new.resize(n_parallel); // Pre-allocate enough space here
+  update_summary.samples.resize(n_parallel); // Pre-allocate enough space here
+  // This is where the UpdateSummaryParallel objects are accumulated, one for each update
+  vector<UpdateSummaryParallel> update_summaries;
   
   // Optimization loop
-  //cout << "init  =  " << "  distribution[0]=" << *(distributions[0] << endl;
-  for (int i_update=1; i_update<=n_updates; i_update++)
+  for (int i_update=0; i_update<n_updates; i_update++)
   {
+    // 0. Get cost of current distribution mean
+    for (int pp=0; pp<n_parallel; pp++)
+      sample_eval[pp] = distributions[pp]->mean().transpose();
+    task_solver->performRollouts(sample_eval,cost_vars_eval);
+    task->evaluate(cost_vars_eval,cost_eval);
     
     // 1. Sample from distribution
     for (int pp=0; pp<n_parallel; pp++)
@@ -73,113 +85,44 @@ void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_so
     // 4. Update parameters
     for (int pp=0; pp<n_parallel; pp++)
       updater->updateDistribution(*(distributions[pp]), samples[pp], costs, *(distributions[pp]),
-                                                                      (update_summaries[pp]));
+                                                                      (cur_summaries[pp]));
       
-    // Some output and saving to file (if "directory" is set)
-    cout << "update=" << i_update << "  mean(costs)=" << costs.mean() << "    ";
-    if (distributions.size()==1)
-      cout << *(distributions[0]);
-    else
-      for (unsigned int ii=0; ii<distributions.size(); ii++)
-        cout  << endl << "    distributions["<<ii<<"]=" << *(distributions[ii]);
-    cout << endl;
-    
-    if (!save_directory.empty()) 
-      saveUpdate(save_directory,i_update,update_summaries,cost_vars,overwrite);
-
-  
-  }
-}
-
-bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, bool overwrite)
-{
-  if (save_directory.empty())
-    return true;
-
-  stringstream stream;
-  stream << save_directory << "/update" << setw(5) << setfill('0') << i_update << "/";
-  string directory_update = stream.str();
-  
-  int n_parallel = update_summaries.size();
-  if (n_parallel==1)
-  {
-    saveToDirectory(update_summaries[0], directory_update);
-  }
-  else
-  {
-    for (int i_parallel=0; i_parallel<n_parallel; i_parallel++)
-     saveToDirectory(update_summaries[i_parallel], directory_update, i_parallel+1);
-  }
- 
-  string filename = directory_update+"/cost_vars.txt";
-  ofstream file;
-  file.open(filename.c_str());
-  if (!file.is_open())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Couldn't open file '" << filename << "' for writing." << endl;
-    return false;
-  }
-  file << cost_vars;
-  file.close();
-  
-  return true;
- 
-}
-
-
-
-bool saveTask(string save_directory, Task* task, TaskSolver* task_solver, bool overwrite)
-{
-  // todo This needs to be replaced with boost serialization
-  if (save_directory.empty())
-    return true;
-
-  if (boost::filesystem::exists(save_directory))
-  {
-    if (overwrite==false)
+    // Some output and/or saving to file (if "directory" is set)
+    if (save_directory.empty()) 
     {
-      cerr << __FILE__ << ":" << __LINE__ << ":";
-      cerr << "ERROR: Trying to save data to file, but directory '" << save_directory << "' already exists. ABORT." << endl;
-      return false;
+      cout << i_update+1 << "  cost_eval=" << cost_eval << "  ";
+      if (distributions.size()==1)
+        cout << *(distributions[0]);
+      else
+        for (unsigned int ii=0; ii<distributions.size(); ii++)
+          cout  << endl << "       distributions["<<ii<<"]=" << *(distributions[ii]);
+      cout << endl;
+    }
+    else
+    {
+      update_summary.cost_eval = cost_eval[0];
+      update_summary.cost_vars_eval = cost_vars_eval;
+      update_summary.cost_vars = cost_vars;
+      update_summary.costs =  costs;
+      for (int pp=0; pp<n_parallel; pp++)
+      {
+        update_summary.distributions[pp] =  cur_summaries[pp].distribution;
+        update_summary.distributions_new[pp] =  cur_summaries[pp].distribution_new;
+        update_summary.samples[pp] =  cur_summaries[pp].samples;
+      }
+      update_summaries.push_back(update_summary);
     }
   }
-  else
+
+  // Save update summaries to file, if necessary
+  if (!save_directory.empty())
   {
-    // Make directory if it doesn't already exist
-    if (!boost::filesystem::create_directories(save_directory))
-    {
-      cerr << __FILE__ << ":" << __LINE__ << ":";
-      cerr << "Couldn't make directory file '" << save_directory << "'." << endl;
-      return false;
-    }      
+    saveToDirectory(update_summaries,save_directory,overwrite,only_learning_curve);
+    // If you store only the learning curve, no need to save the script to visualize rollouts    
+    if (!only_learning_curve)
+      task->savePerformRolloutsPlotScript(save_directory);
   }
   
-
-  string filename = save_directory+"/task.txt";
-  ofstream file;
-  file.open(filename.c_str());
-  if (!file.is_open())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Couldn't open file '" << filename << "' for writing." << endl;
-    return false;
-  }
-  file << *task;
-  file.close();
-
-  filename = save_directory+"/task_solver.txt";
-  file.open(filename.c_str());
-  if (!file.is_open())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Couldn't open file '" << filename << "' for writing." << endl;
-    return false;
-  }
-  file << *task_solver;
-  file.close();
-     
-  return true;
 }
 
 }
