@@ -224,19 +224,17 @@ void ModelParametersLWPR::setParameterVectorAll(const VectorXd& values) {
 };
 
 
-bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+ModelParametersLWR* ModelParametersLWPR::toModelParametersLWR(void) const
 {
-  return true;
-  
   if (lwpr_object_->nIn()!=1)
   {
-    cout << "Warning: Can only call saveGridData() when input dim of LWPR is 1" << endl;
-    return false;
+    cout << "Warning: Can only call toModelParametersLWR() when input dim of LWPR is 1" << endl;
+    return NULL;
   }
   if (lwpr_object_->model.nOut!=1)
   {
-    cout << "Warning: Can only call saveGridData() when output dim of LWPR is 1" << endl;
-    return false;
+    cout << "Warning: Can only call toModelParametersLWR() when output dim of LWPR is 1" << endl;
+    return NULL;
   }
   
   int i_in = 0;
@@ -288,11 +286,21 @@ bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max,
   //cout << "  offsets=" << offsets.transpose() << endl;
   //cout << "  slopes=" << slopes.transpose() << endl;
 
+  bool asymmetric_kernels=false;
   bool lines_pivot_at_max_activation=true;
-  ModelParametersLWR mp_lwr(centers,widths,slopes,offsets,lines_pivot_at_max_activation);
-  mp_lwr.saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
 
-  return true;
+  return new ModelParametersLWR(centers,widths,slopes,offsets,
+                                           asymmetric_kernels,lines_pivot_at_max_activation);
+}
+
+bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  
+  ModelParametersLWR* mp_lwr = toModelParametersLWR();
+  if (mp_lwr==NULL)
+    return false;
+
+  return mp_lwr->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
 }
 
 

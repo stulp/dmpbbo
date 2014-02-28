@@ -34,6 +34,7 @@ class LWPR_Object;
 
 namespace DmpBbo {
 
+class ModelParametersLWR; // Required for conversion to ModelParametersLWR
 
 /** \brief Model parameters for the Locally Weighted Projection Regression (LWPR) function approximator
  * \ingroup FunctionApproximators
@@ -70,6 +71,13 @@ public:
   }
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite) const;
   
+  /** 
+   * Convert these LWPR model parameters to LWR model parameters.
+   * \return model_parameters_lwr LWR model parameter representation
+   * \remarks Currently only works if input and output dimensionality are 1
+   * \todo Convert for input dim >1
+   */
+  ModelParametersLWR* toModelParametersLWR(void) const;
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

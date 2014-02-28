@@ -79,8 +79,8 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
     double   w_prune=0.8;
     bool     update_D=true;
     double   init_alpha=0.1;
-    double   penalty=0.1;
-    VectorXd init_D=VectorXd::Constant(input_dim,20);
+    double   penalty=0.005;
+    VectorXd init_D=VectorXd::Constant(input_dim,200);
     return new MetaParametersLWPR(input_dim,init_D,w_gen,w_prune,update_D,init_alpha,penalty);
 #else
     cerr << __FILE__ << ":" << __LINE__ << ":";
