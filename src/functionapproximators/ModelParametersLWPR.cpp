@@ -228,12 +228,12 @@ ModelParametersLWR* ModelParametersLWPR::toModelParametersLWR(void) const
 {
   if (lwpr_object_->nIn()!=1)
   {
-    cout << "Warning: Can only call toModelParametersLWR() when input dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toModelParametersLWR() when input dim of LWPR is 1" << endl;
     return NULL;
   }
   if (lwpr_object_->model.nOut!=1)
   {
-    cout << "Warning: Can only call toModelParametersLWR() when output dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toModelParametersLWR() when output dim of LWPR is 1" << endl;
     return NULL;
   }
   
