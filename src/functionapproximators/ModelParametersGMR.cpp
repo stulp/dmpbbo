@@ -53,18 +53,19 @@ ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd> centers, std::vecto
   inverseCovarsL_(inverseCovarsL)
 {  
   size_t nb_receptive_fields = centers.size();
+  assert(nb_receptive_fields>0);
   assert(priors.size() == nb_receptive_fields);
   assert(slopes.size() == nb_receptive_fields);
   assert(biases.size() == nb_receptive_fields);
   assert(inverseCovarsL.size() == nb_receptive_fields);
 
-  nb_in_dim_ = centers[0].size();
+  int nb_in_dim = getExpectedInputDim();
   for (size_t i = 0; i < nb_receptive_fields; i++)
   {
-    assert(centers[i].size() == nb_in_dim_);
-    assert(slopes[i].cols() == nb_in_dim_);
-    assert(inverseCovarsL[i].rows() == nb_in_dim_);
-    assert(inverseCovarsL[i].cols() == nb_in_dim_);
+    assert(centers[i].size() == nb_in_dim);
+    assert(slopes[i].cols() == nb_in_dim);
+    assert(inverseCovarsL[i].rows() == nb_in_dim);
+    assert(inverseCovarsL[i].cols() == nb_in_dim);
   }
 
   int nb_out_dim = slopes[0].rows();
@@ -110,7 +111,8 @@ ModelParameters* ModelParametersGMR::clone(void) const
 }
 
 int ModelParametersGMR::getExpectedInputDim(void) const  {
-  return nb_in_dim_;
+  assert(centers_.size()>0); // This is also checked in the constructor
+  return centers_[0].size();
 };
 
 template<class Archive>
@@ -123,7 +125,6 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(priors_);
   ar & BOOST_SERIALIZATION_NVP(slopes_);
   ar & BOOST_SERIALIZATION_NVP(biases_);
-  ar & BOOST_SERIALIZATION_NVP(nb_in_dim_);
   ar & BOOST_SERIALIZATION_NVP(inverseCovarsL_);
 }
 

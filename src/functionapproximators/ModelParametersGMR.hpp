@@ -75,8 +75,6 @@ private:
   std::vector<Eigen::VectorXd> biases_;
   std::vector<Eigen::MatrixXd> inverseCovarsL_;
 
-  int nb_in_dim_;
-
   int  all_values_vector_size_;
   
   /**
