@@ -59,26 +59,26 @@ int main(int n_args, char** args)
 
   // GMR
   
-  vector<VectorXd*> centers_gmr;
-  vector<double*> priors_gmr;
-  vector<MatrixXd*> slopes_gmr;
-  vector<VectorXd*> biases_gmr;
-  vector<MatrixXd*> inverseCovarsL_gmr;
+  vector<VectorXd> centers_gmr;
+  vector<double> priors_gmr;
+  vector<MatrixXd> slopes_gmr;
+  vector<VectorXd> biases_gmr;
+  vector<MatrixXd> inverseCovarsL_gmr;
   
   VectorXd centers_gmr_1 = (100.0*VectorXd::Random(n_dims)).cast<int>().cast<double>().array().abs();
-  centers_gmr.push_back(&centers_gmr_1);
+  centers_gmr.push_back(centers_gmr_1);
 
   double a = 0.3;
-  priors_gmr.push_back(&a);
+  priors_gmr.push_back(a);
 
   MatrixXd slopes_gmr_1 = (100.0*MatrixXd::Random(n_dims,n_dims)).cast<int>().cast<double>().array().abs();
-  slopes_gmr.push_back(&slopes_gmr_1);
+  slopes_gmr.push_back(slopes_gmr_1);
   
   VectorXd biases_gmr_1 = (100.0*VectorXd::Random(n_dims)).cast<int>().cast<double>().array().abs(); 
-  biases_gmr.push_back(&biases_gmr_1);
+  biases_gmr.push_back(biases_gmr_1);
 
   MatrixXd inverseCovarsL_gmr_1 = (100.0*MatrixXd::Random(n_dims,n_dims)).cast<int>().cast<double>().array().abs();
-  inverseCovarsL_gmr.push_back(&inverseCovarsL_gmr_1);
+  inverseCovarsL_gmr.push_back(inverseCovarsL_gmr_1);
   
   model_parameters.push_back(new ModelParametersGMR(centers_gmr,priors_gmr,slopes_gmr,biases_gmr,inverseCovarsL_gmr));
   

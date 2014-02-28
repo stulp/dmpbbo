@@ -149,7 +149,7 @@ int main(int n_args, char** args)
   delete fa;
 
   
-    // Locally Weighted Projection Regression  (LIBRARIES NOT LINKED CORRECTLY IN PYTHON)
+    // Locally Weighted Projection Regression
 #ifdef USE_LWPR
   double   w_gen=0.2;
   double   w_prune=0.8;

@@ -22,6 +22,7 @@
  */
  
 #include <boost/serialization/export.hpp>
+#include <boost/serialization/vector.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
@@ -41,9 +42,9 @@ using namespace std;
 namespace DmpBbo {
 
 
-ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd*> centers, std::vector<double*> priors,
-    std::vector<MatrixXd*> slopes, std::vector<VectorXd*> biases,
-    std::vector<MatrixXd*> inverseCovarsL)
+ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd> centers, std::vector<double> priors,
+    std::vector<MatrixXd> slopes, std::vector<VectorXd> biases,
+    std::vector<MatrixXd> inverseCovarsL)
 :
   centers_(centers),
   priors_(priors),
@@ -57,53 +58,53 @@ ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd*> centers, std::vect
   assert(biases.size() == nb_receptive_fields);
   assert(inverseCovarsL.size() == nb_receptive_fields);
 
-  nb_in_dim_ = centers[0]->size();
+  nb_in_dim_ = centers[0].size();
   for (size_t i = 0; i < nb_receptive_fields; i++)
   {
-    assert(centers[i]->size() == nb_in_dim_);
-    assert(slopes[i]->cols() == nb_in_dim_);
-    assert(inverseCovarsL[i]->rows() == nb_in_dim_);
-    assert(inverseCovarsL[i]->cols() == nb_in_dim_);
+    assert(centers[i].size() == nb_in_dim_);
+    assert(slopes[i].cols() == nb_in_dim_);
+    assert(inverseCovarsL[i].rows() == nb_in_dim_);
+    assert(inverseCovarsL[i].cols() == nb_in_dim_);
   }
 
-  int nb_out_dim = slopes[0]->rows();
+  int nb_out_dim = slopes[0].rows();
   for (size_t i = 0; i < nb_receptive_fields; i++)
   {
-    assert(slopes[i]->rows() == nb_out_dim);
-    assert(biases[i]->size() == nb_out_dim);
+    assert(slopes[i].rows() == nb_out_dim);
+    assert(biases[i].size() == nb_out_dim);
   }
   
   all_values_vector_size_ = 0;
   
-  all_values_vector_size_ += centers_.size() * centers_[0]->size();
+  all_values_vector_size_ += centers_.size() * centers_[0].size();
   all_values_vector_size_ += priors_.size();
-  all_values_vector_size_ += slopes_.size() * slopes_[0]->rows() * slopes_[0]->cols();
-  all_values_vector_size_ += biases_.size() * biases_[0]->size();
-  all_values_vector_size_ += inverseCovarsL_.size() * (inverseCovarsL_[0]->rows() * (inverseCovarsL_[0]->cols() + 1)) / 2;
+  all_values_vector_size_ += slopes_.size() * slopes_[0].rows() * slopes_[0].cols();
+  all_values_vector_size_ += biases_.size() * biases_[0].size();
+  all_values_vector_size_ += inverseCovarsL_.size() * (inverseCovarsL_[0].rows() * (inverseCovarsL_[0].cols() + 1)) / 2;
   
 };
 
 ModelParameters* ModelParametersGMR::clone(void) const
 {
-  std::vector<VectorXd*> centers;
+  std::vector<VectorXd> centers;
   for (size_t i = 0; i < centers_.size(); i++)
-    centers.push_back(new VectorXd(*(centers_[i])));
+    centers.push_back(VectorXd(centers_[i]));
 
-  std::vector<double*> priors;
+  std::vector<double> priors;
   for (size_t i = 0; i < priors_.size(); i++)
-    priors.push_back(new double(*(priors_[i])));
+    priors.push_back(priors_[i]);
 
-  std::vector<MatrixXd*> slopes;
+  std::vector<MatrixXd> slopes;
   for (size_t i = 0; i < slopes_.size(); i++)
-    slopes.push_back(new MatrixXd(*(slopes_[i])));
+    slopes.push_back(MatrixXd(slopes_[i]));
 
-  std::vector<VectorXd*> biases;
+  std::vector<VectorXd> biases;
   for (size_t i = 0; i < biases_.size(); i++)
-    biases.push_back(new VectorXd(*(biases_[i])));
+    biases.push_back(VectorXd(biases_[i]));
 
-  std::vector<MatrixXd*> inverseCovarsL;
+  std::vector<MatrixXd> inverseCovarsL;
   for (size_t i = 0; i < inverseCovarsL_.size(); i++)
-    inverseCovarsL.push_back(new MatrixXd(*(inverseCovarsL_[i])));
+    inverseCovarsL.push_back(MatrixXd(inverseCovarsL_[i]));
 
   return new ModelParametersGMR(centers, priors, slopes, biases, inverseCovarsL); 
 }
@@ -118,7 +119,7 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
   
-  std::cerr << "ERROR: Don't know how to serialize ModelParametersGMR yet..." << std::endl;
+  ar & BOOST_SERIALIZATION_NVP(priors_);
   /*
   ar & BOOST_SERIALIZATION_NVP(centers_);
   ar & BOOST_SERIALIZATION_NVP(widths_);
@@ -158,7 +159,7 @@ void ModelParametersGMR::getParameterVectorMask(const std::set<std::string> sele
   int offset = 0;
   int size;
 
-  size = centers_.size() * centers_[0]->size();
+  size = centers_.size() * centers_[0].size();
   if (selected_values_labels.find("centers")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(1);
   offset += size;
@@ -168,18 +169,18 @@ void ModelParametersGMR::getParameterVectorMask(const std::set<std::string> sele
     selected_mask.segment(offset,size).fill(2);
   offset += size;
 
-  size = slopes_.size() * slopes_[0]->rows() * slopes_[0]->cols();
+  size = slopes_.size() * slopes_[0].rows() * slopes_[0].cols();
   if (selected_values_labels.find("slopes")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(3);
   offset += size;
 
     
-  size = biases_.size() * biases_[0]->size();
+  size = biases_.size() * biases_[0].size();
   if (selected_values_labels.find("biases")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(4);
   offset += size;
 
-  size = inverseCovarsL_.size() * (inverseCovarsL_[0]->rows() * (inverseCovarsL_[0]->cols() + 1))/2;
+  size = inverseCovarsL_.size() * (inverseCovarsL_[0].rows() * (inverseCovarsL_[0].cols() + 1))/2;
   if (selected_values_labels.find("inverse_covars_l")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(5);
   offset += size;
@@ -195,37 +196,37 @@ void ModelParametersGMR::getParameterVectorAll(VectorXd& values) const
 
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    values.segment(offset, centers_[i]->size()) = *(centers_[i]);
-    offset += centers_[i]->size();
+    values.segment(offset, centers_[i].size()) = centers_[i];
+    offset += centers_[i].size();
   }
 
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    values[offset] = *(priors_[i]);
+    values[offset] = priors_[i];
     offset += 1;
   }
 
   for (size_t i = 0; i < slopes_.size(); i++)
   {
-    for (int col = 0; col < slopes_[i]->cols(); col++)
+    for (int col = 0; col < slopes_[i].cols(); col++)
     {
-      values.segment(offset, slopes_[i]->rows()) = slopes_[i]->col(col);
-      offset += slopes_[i]->rows();
+      values.segment(offset, slopes_[i].rows()) = slopes_[i].col(col);
+      offset += slopes_[i].rows();
     }
   }
 
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    values.segment(offset, biases_[i]->size()) = *(biases_[i]);
-    offset += biases_[i]->size();
+    values.segment(offset, biases_[i].size()) = biases_[i];
+    offset += biases_[i].size();
   }
 
   for (size_t i = 0; i < inverseCovarsL_.size(); i++)
   {
-    for (int row = 0; row < inverseCovarsL_[i]->rows(); row++)
+    for (int row = 0; row < inverseCovarsL_[i].rows(); row++)
       for (int col = 0; col < row + 1; col++)
       {
-        values[offset] = (*inverseCovarsL_[i])(row, col);
+        values[offset] = inverseCovarsL_[i](row, col);
         offset += 1;
       }
   }
@@ -246,36 +247,36 @@ void ModelParametersGMR::setParameterVectorAll(const VectorXd& values)
 
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    *(centers_[i]) = values.segment(offset, centers_[i]->size());
-    offset += centers_[i]->size();
+    centers_[i] = values.segment(offset, centers_[i].size());
+    offset += centers_[i].size();
   }
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    *(priors_[i]) = values[offset];
+    priors_[i] = values[offset];
     offset += 1;
   }
 
   for (size_t i = 0; i < slopes_.size(); i++)
   {
-    for (int col = 0; col < slopes_[i]->cols(); col++)
+    for (int col = 0; col < slopes_[i].cols(); col++)
     {
-      slopes_[i]->col(col) = values.segment(offset, slopes_[i]->rows());
-      offset += slopes_[i]->rows();
+      slopes_[i].col(col) = values.segment(offset, slopes_[i].rows());
+      offset += slopes_[i].rows();
     }
   }
 
   for (size_t i = 0; i < centers_.size(); i++)
   {
-    *(biases_[i]) = values.segment(offset, biases_[i]->size());
-    offset += biases_[i]->size();
+    biases_[i] = values.segment(offset, biases_[i].size());
+    offset += biases_[i].size();
   }
 
   for (size_t i = 0; i < inverseCovarsL_.size(); i++)
   {
-    for (int row = 0; row < inverseCovarsL_[i]->rows(); row++)
+    for (int row = 0; row < inverseCovarsL_[i].rows(); row++)
       for (int col = 0; col < row + 1; col++)
       {
-        (*inverseCovarsL_[i])(row, col) = values[offset];
+        inverseCovarsL_[i](row, col) = values[offset];
         offset += 1;
       }
   }

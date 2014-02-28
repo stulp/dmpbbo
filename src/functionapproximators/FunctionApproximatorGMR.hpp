@@ -76,8 +76,8 @@ protected:
    * \param[out]  covars A list (std::vector) of n_gaussian non initiallized covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
    * \param[in]  nbMaxIter The maximum number of iterations
    */
-  void kMeansInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd*>& centers, std::vector<double*>& priors,
-    std::vector<Eigen::MatrixXd*>& covars, int nbMaxIter=1000);
+  void kMeansInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& centers, std::vector<double>& priors,
+    std::vector<Eigen::MatrixXd>& covars, int nbMaxIter=1000);
 
   /** Initialize Gaussian for EM algorithm using a same-size slicing on the first dimension (method used in Calinon GMR implementation).
    * Particulary suited when input is 1-D and data distribution is uniform over input dimension
@@ -86,8 +86,8 @@ protected:
    * \param[out]  priors A list (std::vector) of n_gaussian non initiallized priors
    * \param[out]  covars A list (std::vector) of n_gaussian non initiallized covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
    */
-  void firstDimSlicingInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd*>& centers, std::vector<double*>& priors,
-    std::vector<Eigen::MatrixXd*>& covars);
+  void firstDimSlicingInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& centers, std::vector<double>& priors,
+    std::vector<Eigen::MatrixXd>& covars);
 
   /** EM algorithm. 
    * \param[in] data A (n_exemples x (n_in_dim + n_out_dim)) data matrix
@@ -96,8 +96,8 @@ protected:
    * \param[in,out] covars A list (std::vector) of n_gaussian covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
    * \param[in] nbMaxIter The maximum number of iterations
    */
-  void EM(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd*>& centers, std::vector<double*>& priors,
-    std::vector<Eigen::MatrixXd*>& covars, int nbMaxIter=200);
+  void EM(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& centers, std::vector<double>& priors,
+    std::vector<Eigen::MatrixXd>& covars, int nbMaxIter=200);
   
 
   /** Compute P(data), data ~ N(center, covar)

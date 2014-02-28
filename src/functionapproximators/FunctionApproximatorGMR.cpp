@@ -93,15 +93,15 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   int nbGaussian = meta_parameters_GMR->number_of_gaussians_;
   int gmmDim = inputs.cols() + targets.cols();
 
-  std::vector<VectorXd*> gmmCenters;
-  std::vector<double*> gmmPriors;
-  std::vector<MatrixXd*> gmmCovars;
+  std::vector<VectorXd> gmmCenters;
+  std::vector<double> gmmPriors;
+  std::vector<MatrixXd> gmmCovars;
 
   for (int i = 0; i < nbGaussian; i++)
   {
-    gmmCenters.push_back(new VectorXd(gmmDim));
-    gmmPriors.push_back(new double(0));
-    gmmCovars.push_back(new MatrixXd(gmmDim, gmmDim));
+    gmmCenters.push_back(VectorXd(gmmDim));
+    gmmPriors.push_back(0.0);
+    gmmCovars.push_back(MatrixXd(gmmDim, gmmDim));
   }
 
   MatrixXd gmmData = MatrixXd(inputs.rows(), gmmDim);
@@ -113,33 +113,33 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
     kMeansInit(gmmData, gmmCenters, gmmPriors, gmmCovars);
   EM(gmmData, gmmCenters, gmmPriors, gmmCovars);
 
-  std::vector<VectorXd*> centers;
-  std::vector<MatrixXd*> slopes;
-  std::vector<VectorXd*> biases;
-  std::vector<MatrixXd*> inverseCovarsL;
+  std::vector<VectorXd> centers;
+  std::vector<MatrixXd> slopes;
+  std::vector<VectorXd> biases;
+  std::vector<MatrixXd> inverseCovarsL;
 
   int nbInDim = inputs.cols();
   int nbOutDim = targets.cols();
 
   for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
   {
-    centers.push_back(new VectorXd(gmmCenters[iCenter]->segment(0, nbInDim)));
+    centers.push_back(VectorXd(gmmCenters[iCenter].segment(0, nbInDim)));
 
-    slopes.push_back(new MatrixXd(gmmCovars[iCenter]->block(nbInDim, 0, nbOutDim, nbInDim) * gmmCovars[iCenter]->block(0, 0, nbInDim, nbInDim).inverse()));
+    slopes.push_back(MatrixXd(gmmCovars[iCenter].block(nbInDim, 0, nbOutDim, nbInDim) * gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse()));
     
-    biases.push_back(new VectorXd(gmmCenters[iCenter]->segment(nbInDim, nbOutDim) -
-      *(slopes[iCenter]) * gmmCenters[iCenter]->segment(0, nbInDim)));
+    biases.push_back(VectorXd(gmmCenters[iCenter].segment(nbInDim, nbOutDim) -
+      slopes[iCenter]*gmmCenters[iCenter].segment(0, nbInDim)));
 
-    MatrixXd L = gmmCovars[iCenter]->block(0, 0, nbInDim, nbInDim).inverse().llt().matrixL();
-    inverseCovarsL.push_back(new MatrixXd(L));
+    MatrixXd L = gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse().llt().matrixL();
+    inverseCovarsL.push_back(MatrixXd(L));
   }
 
   setModelParameters(new ModelParametersGMR(centers, gmmPriors, slopes, biases, inverseCovarsL));
 
-  for (size_t i = 0; i < gmmCenters.size(); i++)
-    delete gmmCenters[i];
-  for (size_t i = 0; i < gmmCovars.size(); i++)
-    delete gmmCovars[i];
+  //for (size_t i = 0; i < gmmCenters.size(); i++)
+  //  delete gmmCenters[i];
+  //for (size_t i = 0; i < gmmCovars.size(); i++)
+  //delete gmmCovars[i];
 }
 
 void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
@@ -154,7 +154,7 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   const MetaParametersGMR* meta_parameters_GMR = static_cast<const MetaParametersGMR*>(getMetaParameters());
   int nbGaussian = meta_parameters_GMR->number_of_gaussians_;
 
-  int nbOutDim = model_parameters_GMR->biases_[0]->size();
+  int nbOutDim = model_parameters_GMR->biases_[0].size();
 
   output = MatrixXd(input.rows(), nbOutDim);
 
@@ -166,9 +166,9 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd center = *(model_parameters_GMR->centers_[iCenter]);
-      partialH[iCenter] = -1. / 2 * ((inputPoint - center).transpose() * *(model_parameters_GMR->inverseCovarsL_[iCenter]) *
-        model_parameters_GMR->inverseCovarsL_[iCenter]->transpose() * (inputPoint - center))(0, 0);
+      VectorXd center = model_parameters_GMR->centers_[iCenter];
+      partialH[iCenter] = -1. / 2 * ((inputPoint - center).transpose() * model_parameters_GMR->inverseCovarsL_[iCenter] *
+        model_parameters_GMR->inverseCovarsL_[iCenter].transpose() * (inputPoint - center))(0, 0);
     }
     double max = partialH.maxCoeff();
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
@@ -176,9 +176,9 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
 
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd center = *(model_parameters_GMR->centers_[iCenter]);
-      double det = 1. / pow((*(model_parameters_GMR->inverseCovarsL_[iCenter]) * model_parameters_GMR->inverseCovarsL_[iCenter]->transpose()).determinant(), 2);
-      h[iCenter] = *(model_parameters_GMR->priors_[iCenter]) * 1. / sqrt(pow(2 * M_PI, center.rows()) * det) * exp(partialH[iCenter]);
+      VectorXd center = model_parameters_GMR->centers_[iCenter];
+      double det = 1. / pow((model_parameters_GMR->inverseCovarsL_[iCenter]* model_parameters_GMR->inverseCovarsL_[iCenter].transpose()).determinant(), 2);
+      h[iCenter] = model_parameters_GMR->priors_[iCenter]*1. / sqrt(pow(2 * M_PI, center.rows()) * det) * exp(partialH[iCenter]);
     }
     h /= h.sum();
 
@@ -186,15 +186,15 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
     prediction.setZero();
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd tmp = *(model_parameters_GMR->slopes_[iCenter]) * inputPoint;
-      prediction += h[iCenter] * (*(model_parameters_GMR->biases_[iCenter]) + tmp);
+      VectorXd tmp = model_parameters_GMR->slopes_[iCenter] * inputPoint;
+      prediction += h[iCenter] * (model_parameters_GMR->biases_[iCenter] + tmp);
     }
     output.row(i) = prediction;
   }
 }
 
-void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vector<VectorXd*>& centers, std::vector<double*>& priors,
-  std::vector<MatrixXd*>& covars)
+void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
+  std::vector<MatrixXd>& covars)
 {
 
   VectorXd firstDim = data.col(0);
@@ -218,34 +218,34 @@ void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vec
   // Init means
   VectorXi nbPoints = VectorXi::Zero(centers.size());
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    centers[iCenter]->setZero();
+    centers[iCenter].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
   {
-    *(centers[assign[iData]]) += data.row(iData).transpose();
+    centers[assign[iData]] += data.row(iData).transpose();
     nbPoints[assign[iData]]++;
   }
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(centers[iCenter]) /= nbPoints[iCenter];
+    centers[iCenter] /= nbPoints[iCenter];
 
   // Init covars
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    covars[iCenter]->setZero();
+    covars[iCenter].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
-    *(covars[assign[iData]]) += (data.row(iData).transpose() - *(centers[assign[iData]])) * (data.row(iData).transpose() - *(centers[assign[iData]])).transpose();
+    covars[assign[iData]] += (data.row(iData).transpose() - centers[assign[iData]]) * (data.row(iData).transpose() - centers[assign[iData]]).transpose();
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(covars[iCenter]) /= nbPoints[iCenter];
+    covars[iCenter] /= nbPoints[iCenter];
 
   // Be sure that covar is invertible
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5;
+      covars[iCenter] += MatrixXd::Identity(covars[iCenter].rows(), covars[iCenter].cols()) * 1e-5;
 
   // Init priors
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(priors[iCenter]) = 1. / centers.size();
+    priors[iCenter] = 1. / centers.size();
 }
 
-void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<VectorXd*>& centers, std::vector<double*>& priors,
-  std::vector<MatrixXd*>& covars, int nbMaxIter)
+void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
+  std::vector<MatrixXd>& covars, int nbMaxIter)
 {
 
   MatrixXd dataCentered = data.rowwise() - data.colwise().mean();
@@ -258,7 +258,7 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
   std::random_shuffle (dataIndex.begin(), dataIndex.end());
 
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(centers[iCenter]) = data.row(dataIndex[iCenter]);
+    centers[iCenter] = data.row(dataIndex[iCenter]);
 
   VectorXi assign(data.rows());
   assign.setZero();
@@ -270,7 +270,7 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
     converged = true;
     for (int iData = 0; iData < data.rows(); iData++)
     {
-      VectorXd v = (*(centers[assign[iData]]) - data.row(iData).transpose());
+      VectorXd v = (centers[assign[iData]] - data.row(iData).transpose());
 
       double minDist = v.transpose() * dataCovInverse * v;
 
@@ -279,7 +279,7 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
         if (iCenter == assign[iData])
           continue;
 
-        v = (*(centers[iCenter]) - data.row(iData).transpose());
+        v = (centers[iCenter] - data.row(iData).transpose());
         double dist = v.transpose() * dataCovInverse * v;
         if (dist < minDist)
         {
@@ -293,39 +293,39 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
     // M step
     VectorXi nbPoints = VectorXi::Zero(centers.size());
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      centers[iCenter]->setZero();
+      centers[iCenter].setZero();
     for (int iData = 0; iData < data.rows(); iData++)
     {
-      *(centers[assign[iData]]) += data.row(iData).transpose();
+      centers[assign[iData]] += data.row(iData).transpose();
       nbPoints[assign[iData]]++;
     }
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      *(centers[iCenter]) /= nbPoints[iCenter];
+      centers[iCenter] /= nbPoints[iCenter];
   }
 
   // Init covars
   VectorXi nbPoints = VectorXi::Zero(centers.size());
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    covars[iCenter]->setZero();
+    covars[iCenter].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
   {
-    *(covars[assign[iData]]) += (data.row(iData).transpose() - *(centers[assign[iData]])) * (data.row(iData).transpose() - *(centers[assign[iData]])).transpose();
+    covars[assign[iData]] += (data.row(iData).transpose() - centers[assign[iData]]) * (data.row(iData).transpose() - centers[assign[iData]]).transpose();
     nbPoints[assign[iData]]++;
   }
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(covars[iCenter]) /= nbPoints[iCenter];
+    covars[iCenter] /= nbPoints[iCenter];
 
   // Be sure that covar is invertible
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5f;
+    covars[iCenter] += MatrixXd::Identity(covars[iCenter].rows(), covars[iCenter].cols()) * 1e-5f;
 
   // Init priors
   for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-    *(priors[iCenter]) = 1. / centers.size();
+    priors[iCenter] = 1. / centers.size();
 }
 
-void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd*>& centers, std::vector<double*>& priors,
-    std::vector<MatrixXd*>& covars, int nbMaxIter)
+void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
+    std::vector<MatrixXd>& covars, int nbMaxIter)
 {
   MatrixXd assign(centers.size(), data.rows());
   assign.setZero();
@@ -338,7 +338,7 @@ void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd*>& c
     // E step
     for (int iData = 0; iData < data.rows(); iData++)
       for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-        assign(iCenter, iData) = *(priors[iCenter]) * normal(data.row(iData).transpose(), *(centers[iCenter]), *(covars[iCenter]));
+        assign(iCenter, iData) = priors[iCenter] * normal(data.row(iData).transpose(), centers[iCenter], covars[iCenter]);
 
     oldLoglik = loglik;
     loglik = 0;
@@ -355,36 +355,36 @@ void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd*>& c
     // M step
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
     {
-      centers[iCenter]->setZero();
-      covars[iCenter]->setZero();
-      *(priors[iCenter]) = 0;
+      centers[iCenter].setZero();
+      covars[iCenter].setZero();
+      priors[iCenter] = 0;
     }
 
     for (int iData = 0; iData < data.rows(); iData++)
     {
       for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
       {
-        *(centers[iCenter]) += assign(iCenter, iData) * data.row(iData).transpose();
-        *(priors[iCenter]) += assign(iCenter, iData);
+        centers[iCenter] += assign(iCenter, iData) * data.row(iData).transpose();
+        priors[iCenter] += assign(iCenter, iData);
       }
     }
 
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
     {
-      *(centers[iCenter]) /= assign.row(iCenter).sum();
-      *(priors[iCenter]) /= assign.cols();
+      centers[iCenter] /= assign.row(iCenter).sum();
+      priors[iCenter] /= assign.cols();
     }
 
     for (int iData = 0; iData < data.rows(); iData++)
       for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-        *(covars[iCenter]) += assign(iCenter, iData) * (data.row(iData).transpose() - *(centers[iCenter])) * (data.row(iData).transpose() - *(centers[iCenter])).transpose();
+        covars[iCenter] += assign(iCenter, iData) * (data.row(iData).transpose() - centers[iCenter]) * (data.row(iData).transpose() - centers[iCenter]).transpose();
 
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      *(covars[iCenter]) /= assign.row(iCenter).sum();
+      covars[iCenter] /= assign.row(iCenter).sum();
 
     // Be sure that covar is invertible
     for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
-      *(covars[iCenter]) += MatrixXd::Identity(covars[iCenter]->rows(), covars[iCenter]->cols()) * 1e-5f;
+      covars[iCenter] += MatrixXd::Identity(covars[iCenter].rows(), covars[iCenter].cols()) * 1e-5f;
   }
 }
 

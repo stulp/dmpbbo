@@ -42,7 +42,7 @@ if __name__=='__main__':
         #print command
         subprocess.call(command, shell=True)
         
-        for dim in [1, 2]:
+        for dim in [1]:
             fig = plt.figure(fig_number)
             fig_number = fig_number+1
             
