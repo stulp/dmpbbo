@@ -45,14 +45,17 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time)
-: viapoint_(viapoint),   viapoint_time_(viapoint_time), goal_(VectorXd::Zero(viapoint.size())), goal_time_(-1),
+TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
+: viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius), 
+  goal_(VectorXd::Zero(viapoint.size())), goal_time_(-1),
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(0.0)
 {
+  assert(viapoint_radius_>=0.0);
 }
 
-TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time,const VectorXd& goal,  double goal_time)
-: viapoint_(viapoint),   viapoint_time_(viapoint_time), goal_(goal), goal_time_(goal_time),
+TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time, const VectorXd& goal,  double goal_time)
+: viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(0.0),
+  goal_(goal), goal_time_(goal_time),
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(1.0)
 {
   assert(viapoint_.size()==goal.size());
@@ -92,13 +95,17 @@ void TaskViapoint::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_para
     double dist_to_viapoint = 0.0;
     if (viapoint_weight_!=0.0)
     {
-      if (viapoint_time_ == NO_VIAPOINT_TIME)
+      if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
       {
+        // Don't compute the distance at some time, but rather get the minimum distance
         const MatrixXd y = rollout.block(0, 0, rollout.rows(), n_dims);
         dist_to_viapoint = (y.rowwise() - viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
       }
       else
       {
+        // Compute the minimum distance at a specific time
+        
+        // Get the time_step at which viapoint_time_step approx ts[time_step]
         int viapoint_time_step = 0;
         while (viapoint_time_step < ts.size() && ts[viapoint_time_step] < viapoint_time_)
           viapoint_time_step++;
@@ -107,6 +114,14 @@ void TaskViapoint::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_para
 
         VectorXd y_via = rollout.row(viapoint_time_step).segment(0,n_dims);
         dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
+      }
+      
+      if (viapoint_radius_>0.0)
+      {
+        // The viapoint_radius defines a radius within which the cost is always 0
+        dist_to_viapoint -= viapoint_radius_;
+        if (dist_to_viapoint<0.0)
+          dist_to_viapoint = 0.0;
       }
     }
     

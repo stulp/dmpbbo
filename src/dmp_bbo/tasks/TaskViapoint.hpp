@@ -30,13 +30,20 @@
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
-/** If the viapoint_time is set to NO_VIAPOINT_TIME, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
-#define NO_VIAPOINT_TIME -1
 
 namespace DmpBbo {
-  
+
 /**
  * Task for passing through a viapoint with minimal acceleration.
+ * There are three components that this task penalizes:
+ * \li The distance to a viapoint
+ * <ul>
+ * \li  if viapoint_radius > 0, the penalty is the distance minus the radius (and not smaller than 0)
+ * \li if the viapoint_time is set, the trajectory must pass through the viapoint at a certain time. If not the shortest distance to the viapoint along the trajectory is used.
+ * </ul>
+ * \li The squared accelerations at each time step
+ * \li Not being at the goal after a certain time
+ * The relative weights of these cost components are also member variables
  */
 class TaskViapoint : public TaskWithTrajectoryDemonstrator
 {
@@ -44,6 +51,7 @@ private:
   
   Eigen::VectorXd viapoint_;
   double   viapoint_time_;
+  double   viapoint_radius_;
   
   Eigen::VectorXd goal_;
   double   goal_time_;
@@ -53,11 +61,15 @@ private:
   double   goal_weight_;
   
 public:
+  /** If the viapoint_time is set to MINIMUM_DIST, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
+  static const int TIME_AT_MINIMUM_DIST=-1; 
+
   /** Constructor.
    * \param[in] viapoint The viapoint to which to pass through.
    * \param[in] viapoint_time The time at which to pass through the viapoint.
+   * \param[in] viapoint_radius The distance to the viapoint within which this cost is 0
    */
-  TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time);
+  TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time=TIME_AT_MINIMUM_DIST, double viapoint_radius=0.0);
   
   /** Constructor.
    * \param[in] viapoint The viapoint to which to pass through.
@@ -115,6 +127,7 @@ private:
     
     ar & BOOST_SERIALIZATION_NVP(viapoint_);
     ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
+    ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
     ar & BOOST_SERIALIZATION_NVP(goal_);
     ar & BOOST_SERIALIZATION_NVP(goal_time_);
     ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
