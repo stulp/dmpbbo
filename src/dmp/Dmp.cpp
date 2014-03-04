@@ -476,11 +476,11 @@ void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Ei
     localspring_system_.differentialEquation(xs.row(tt).SPRING, xd_spring);
     xds.row(tt).SPRING = xd_spring;
     
-    VectorXd perturbation = VectorXd::Constant(dim_orig(),0.0);
+    RowVectorXd perturbation = RowVectorXd::Constant(dim_orig(),0.0);
     if (analytical_solution_perturber_!=NULL)
       for (int i_dim=0; i_dim<dim_orig(); i_dim++)
         perturbation(i_dim) = (*analytical_solution_perturber_)();
-
+      
     // Add forcing term to the acceleration of the spring state
     xds.row(tt).SPRING_Z = xds.row(tt).SPRING_Z + forcing_terms.row(tt)/tau() + perturbation;
     // Compute y component from z
