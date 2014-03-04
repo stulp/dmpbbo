@@ -98,6 +98,7 @@ int main(int n_args, char* args[])
   bool use_normalized_parameter=true;  
   TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize,
                                        dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter);
+  // task_solver->set_perturbation(1.0); // Add perturbations
   
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;

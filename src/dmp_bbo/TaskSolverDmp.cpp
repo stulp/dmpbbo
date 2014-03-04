@@ -61,6 +61,12 @@ TaskSolverDmp::TaskSolverDmp(Dmp* dmp, set<string> optimize_parameters, double d
   n_time_steps_ = (integrate_time_/dt)+1;
   use_normalized_parameter_ = use_normalized_parameter;
 }
+
+void TaskSolverDmp::set_perturbation(double perturbation_standard_deviation)
+{
+  dmp_->set_perturbation_analytical_solution(perturbation_standard_deviation);
+}
+
   
 void TaskSolverDmp::performRollouts(const vector<MatrixXd>& samples, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
 {
@@ -92,10 +98,39 @@ void TaskSolverDmp::performRollouts(const vector<MatrixXd>& samples, const Matri
       model_parameters_vec[dd] = samples[dd].row(k);
     dmp_->setModelParametersVectors(model_parameters_vec, use_normalized_parameter_);
     
-    MatrixXd xs_ana;
-    MatrixXd xds_ana;
-    MatrixXd forcing_terms;
+    int n_dims = dmp_->dim(); // Dimensionality of the system
+    MatrixXd xs_ana(n_time_steps_,n_dims);
+    MatrixXd xds_ana(n_time_steps_,n_dims);
+    MatrixXd forcing_terms(n_time_steps_,n_dofs);
+    forcing_terms.fill(0.0);
     dmp_->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms);
+
+    /*    
+    // Here's the non-analytical version, which is slower.
+    MatrixXd xs(n_time_steps_,n_dims);
+    MatrixXd xds(n_time_steps_,n_dims);
+    
+    // Use integrateStart to get the initial x and xd
+    VectorXd x(n_dims);
+    VectorXd xd(n_dims);
+    dmp_->integrateStart(x,xd);
+    xs.row(0)  = x.transpose();
+    xds.row(0)  = xd.transpose();
+    // Use DynamicalSystemSystem::integrateStep to integrate numerically step-by-step
+    double dt = ts[1]-ts[0];
+    for (int ii=1; ii<n_time_steps_; ii++)
+    {
+      dmp_->integrateStep(dt,x,           x,          xd); 
+      //                     previous x   updated x   updated xd
+      xs.row(ii)  = x.transpose();
+      xds.row(ii)  = xd.transpose();
+    }
+    MatrixXd ys;
+    MatrixXd yds;
+    MatrixXd ydds;
+    dmp_->statesAsTrajectory(xs,xds,ys,yds,ydds);
+    */
+
     
     MatrixXd ys_ana;
     MatrixXd yds_ana;

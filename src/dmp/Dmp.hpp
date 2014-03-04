@@ -30,6 +30,10 @@
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include <boost/serialization/assume_abstract.hpp>
 
+#include <boost/random.hpp>
+#include <boost/random/variate_generator.hpp>
+#include <boost/random/normal_distribution.hpp>
+
 #include <set>
 
 namespace DmpBbo {
@@ -133,7 +137,6 @@ public:
    * \param[in]  ts  A vector of times for which to compute the analytical solutions
    * \param[out] xs  Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
    * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-   * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
    * \param[out] forcing_terms The forcing terms for each dimension, for debugging purposes only.
    * \param[out] fa_output The output of the function approximators, for debugging purposes only.
    *
@@ -146,7 +149,6 @@ public:
    *
    * \param[in]  ts  A vector of times for which to compute the analytical solutions
    * \param[out] xs  Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-   * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
    * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
    * \param[out] forcing_terms The forcing terms for each dimension, for debugging purposes only.
    *
@@ -311,6 +313,19 @@ public:
    */
   virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
   
+  void set_perturbation_analytical_solution(double perturbation_standard_deviation)
+  {
+    if (perturbation_standard_deviation>0.0)
+    {
+      boost::normal_distribution<> normal(0, perturbation_standard_deviation);
+      analytical_solution_perturber_ = new boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >(rng, normal);
+    }
+    else
+    {
+      analytical_solution_perturber_ = NULL;
+    }
+  }
+  
 protected:
 
   /** Get a pointer to the function approximator for a certain dimension.
@@ -323,6 +338,7 @@ protected:
     return function_approximators_[i_dim];
   }
    
+  
 private:
   /** @name Linear closed loop controller
    *  @{
@@ -359,6 +375,10 @@ private:
   void initSubSystems(DmpType dmp_type);
   
   void initFunctionApproximators(std::vector<FunctionApproximator*> function_approximators);
+  
+  /** Boost's random number generator. Shared by all object instances. */
+  static boost::mt19937 rng;
+  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > *analytical_solution_perturber_;
   
 protected:
    Dmp(void) {};
