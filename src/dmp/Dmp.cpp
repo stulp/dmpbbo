@@ -67,6 +67,8 @@ namespace DmpBbo {
 #define PHASEM(T)     block(0,3*dim_orig()+0,T,       1)
 #define GATINGM(T)    block(0,3*dim_orig()+1,T,       1)
 
+boost::mt19937 Dmp::rng = boost::mt19937(getpid() + time(0));
+
 Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr, 
          vector<FunctionApproximator*> function_approximators,
          double alpha_spring_damper, 
@@ -163,6 +165,7 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
     
   spring_system_ = new SpringDamperSystem(tau(),initial_state(),attractor_state(),alpha_spring_damper);  
   spring_system_->set_name(name()+"_spring-damper");
+  analytical_solution_perturber_ = NULL; // Do not perturb spring-damper as default
 
   goal_system_ = goal_system;
   if (goal_system!=NULL)
@@ -386,6 +389,11 @@ void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Ei
 {
   int n_time_steps = ts.size();
   
+  // Usually, we expect xs and xds to be of size T X dim(), so we resize to that. However, if the
+  // input matrices were of size dim() X T, we return the matrices of that size by doing a 
+  // transposeInPlace at the end. That way, the user can also request dim() X T sized matrices.
+  bool caller_expects_transposed = (xs.rows()==dim() && xs.cols()==n_time_steps);
+  
   // INTEGRATE SYSTEMS ANALYTICALLY AS MUCH AS POSSIBLE
 
   // Integrate phase
@@ -468,12 +476,23 @@ void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Ei
     localspring_system_.differentialEquation(xs.row(tt).SPRING, xd_spring);
     xds.row(tt).SPRING = xd_spring;
     
+    VectorXd perturbation = VectorXd::Constant(dim_orig(),0.0);
+    if (analytical_solution_perturber_!=NULL)
+      for (int i_dim=0; i_dim<dim_orig(); i_dim++)
+        perturbation(i_dim) = (*analytical_solution_perturber_)();
+
     // Add forcing term to the acceleration of the spring state
-    xds.row(tt).SPRING_Z = xds.row(tt).SPRING_Z + forcing_terms.row(tt)/tau();
+    xds.row(tt).SPRING_Z = xds.row(tt).SPRING_Z + forcing_terms.row(tt)/tau() + perturbation;
     // Compute y component from z
     xds.row(tt).SPRING_Y = xs.row(tt).SPRING_Z/tau();
     
   } 
+  
+  if (caller_expects_transposed)
+  {
+    xs.transposeInPlace();
+    xds.transposeInPlace();
+  }
 }
 
 void Dmp::computeFunctionApproximatorInputsAndTargets(const Trajectory& trajectory, VectorXd& fa_inputs_phase, MatrixXd& f_target) const

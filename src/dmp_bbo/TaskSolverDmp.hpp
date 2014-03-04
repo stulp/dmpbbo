@@ -64,6 +64,7 @@ public:
    */
 	std::string toString(void) const;
 
+  void set_perturbation(double perturbation_standard_deviation);
 
 private:
   /**
