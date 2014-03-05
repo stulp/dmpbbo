@@ -1,3 +1,10 @@
 The predecessor of this code was a object-oriented Matlab implementation, which was designed and implemented together with Gennaro Raiola. 
 
 The design of the function approximator module was done together with Thibaut Munzer. Thibaut also implemented the core functionality (train and predict functions) of the GMR and IRFRLS function approximators.
+
+Thanks to those who proofread the tutorial and found several mistakes:
+  Gennaro Raiola
+  Thibaut Munzer
+  Olivier Sigaud
+  Jacco van der Spek
+  Xavier Lamy
