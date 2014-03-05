@@ -458,8 +458,6 @@ The representation described in the previous section has some nice properties in
 \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}) + f(t))/\tau \\ {z}/\tau  \end{array} \right]   \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0  \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {?} \\ {y}^g \end{array} \right]
 \f}
 
-\todo Question mark above
-
 The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function \f$ f(t)\f$ is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see \ref page_func_approx. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
 
 \image html dmp_forcing_terms-svg.png "A non-linear forcing term enable more complex trajectories to be generated (these DMPs use a goal system and an exponential gating term)."
@@ -467,15 +465,12 @@ The forcing term is an open loop controller, i.e. it depends only on time. By mo
 
 \subsection sec_forcing_convergence Ensuring Convergence to 0 of the Forcing Term: the Gating System
 
-Since we add a forcing term to the dynamical system, we can no longer guarantee that the system will converge towards \f$ x^g \f$; perhaps the forcing term continually pushes it away \f$ x^g \f$ (perhaps it doesn't, but the point is that we cannot \em guarantee that it \em always doesn't).
+Since we add a forcing term to the dynamical system, we can no longer guarantee that the system will converge towards \f$ x^g \f$; perhaps the forcing term continually pushes it away \f$ x^g \f$ (perhaps it doesn't, but the point is that we cannot \em guarantee that it \em always doesn't). That is why there is a question mark in the attractor state in the equation above.
 To guarantee that the movement will always converge towards the attractor \f$ x^g \f$, we need to ensure that the forcing term decreases to 0 towards the end of the movement. To do so, a gating term is added, which is 1 at the beginning of the movement, and 0 at the end. This gating term itself is determined by, of course, a dynamical system. In \cite ijspeert02movement, it was suggested to use an exponential system. We add this extra system to our dynamical system by expanding the state as follows:
 
 \f{eqnarray*}{
 \dot{x} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \\ {\dot{x}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({y}^{g}-{y})-{z}) + x\cdot f(t))/\tau \\ {z}/\tau \\ -\alpha_x x/\tau  \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \\ 0 \end{array} \right]
 \f}
-
-\todo Find different symbol for gating system
-
 
 \subsection sec_forcing_autonomy Ensuring Autonomy of the Forcing Term: the Phase System
 
@@ -485,7 +480,7 @@ By introducing the dependence of the forcing term \f$ f(t)\f$ on time \f$ t \f$ 
 \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \\ {\dot{x}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({y}^{g}-{y})-{z}) + x\cdot f(x))/\tau \\ {z}/\tau \\ -\alpha_x x/\tau  \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \\ 0 \end{array} \right]
 \f}
 
-\todo \b Remark. Why \f$ f(t)s(x^g-x_0) \f$?
+\todo Discuss goal-dependent scaling, i.e. \f$ f(t)s(x^g-x_0) \f$?
 
 
 \subsection sec_multidim_dmp Multi-dimensional Dynamic Movement Primitives
@@ -499,13 +494,13 @@ Since DMPs usually have multi-dimensional states (e.g. one output \f$ {\mathbf{y
 So far, the graphs have shown 1-dimensional systems. To generate D-dimensional trajectories for, for instance, the 7 joints of an arm or the 3D position of its end-effector, we simply use D transformation systems. A key principle in DMPs is to use one and the same phase system for all of the transformation systems, to ensure that the output of the transformation systems are synchronized in time. The image below show the evolution of all the dynamical systems involved in integrating a multi-dimensional DMP.
 
 \image html dmpplot_ijspeert2002movement-svg.png "The various dynamical systems and forcing terms in multi-dimensional DMPs."
-\image latex dmpplot_ijspeert2002movement-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=6cm
+\image latex dmpplot_ijspeert2002movement-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=8cm
 
 <em>
 
 \subsection Implementation
 
-\todo Implementation: Simply inherits from DynamicalSystem.
+Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).
 
 </em>
 
@@ -519,7 +514,7 @@ A disadvantage of using an exponential system as a gating term is that the gatin
 Therefore, sigmoid systems have more recently been proposed \cite kulvicius12joining as a gating system. This leads to the following DMP formulation (since the gating and phase system are no longer shared, we introduce a new state variable \f$ v \f$ for the gating term:
 
 \f{eqnarray*}{
-\left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{x}}  \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + x\cdot f(v))/\tau \\ \mathbf{z}/\tau \\ -\alpha_x x/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 1 \\ 1 \end{array} \right]
+\left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{x}}  \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + v\cdot f(x))/\tau \\ \mathbf{z}/\tau \\ -\alpha_x x/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 1 \\ 1 \end{array} \right]
 \mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ 0 \\ 0 \end{array} \right]
 \f}
 
@@ -565,12 +560,14 @@ In my experience, this DMP formulation is the best for learning human-like point
 
 
 \image html dmpplot_kulvicius2012joining-svg.png "The various dynamical systems and forcing terms in multi-dimensional DMPs."
-\image latex dmpplot_kulvicius2012joining-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=6cm
+\image latex dmpplot_kulvicius2012joining-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=7cm
 
 
 \section sec_dmp_issues Known Issues
 
 \todo Known Issues
+
+\li Scaling towards novel goals
 
 \section sec_dmp_summary Summary
 
@@ -579,15 +576,5 @@ The core idea in dynamical movement primitives is to combine dynamical systems, 
 Further enhancements can be made by making the system autonomous (by using the output of a phase system rather than time as an input to the function approximator), or having initial velocities and accelerations of 0 (by using a delayed goal system).
 
 Multi-dimensional DMPs are achieved by using multi-dimensional dynamical systems, and learning one function approximator for each dimension. Synchronization of the different dimensions is ensure by coupling them with only \em one phase system.
-
-<em>
-
-\section sec_dmp_implementation Implementation
-
-@todo Implementation of DMPs
-
-Write this
-</em>
-
 
 */
