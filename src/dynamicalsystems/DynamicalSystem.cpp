@@ -58,6 +58,9 @@ void DynamicalSystem::integrateStart(const VectorXd& x_init, Ref<VectorXd> x, Re
 }
 
 void DynamicalSystem::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const {
+  // Check size. Leads to faster numerical integration and makes Eigen::Ref easier to deal with   
+  assert(x.size()==dim());
+  assert(xd.size()==dim());
   
   // Return value for state variables
   // Pad the end with zeros: Why? In the spring-damper system, the state consists of x = [y z]. 
@@ -71,6 +74,8 @@ void DynamicalSystem::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const {
 
 void DynamicalSystem::integrateStep(double dt, const Ref<const VectorXd> x, Ref<VectorXd> x_updated, Ref<VectorXd> xd_updated) const
 {
+  // Check size. Leads to faster numerical integration and makes Eigen::Ref easier to deal with   
+  assert(x.size()==dim());
   if (integration_method_ == RUNGE_KUTTA)
     integrateStepRungeKutta(dt, x, x_updated, xd_updated);
   else

@@ -119,6 +119,8 @@ public:
    * \param[out] x               - The first vector of state variables
    * \param[out] xd              - The first vector of rates of change of the state variables
    *
+   * \remarks x and xd should be of size dim() X 1. This forces you to pre-allocate memory, which
+   * speeds things up (and also makes Eigen's Ref functionality easier to deal with).
    */
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const;
 
@@ -138,6 +140,9 @@ public:
    * \param[in]  x          Current state
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
+   *
+   * \remarks x should be of size dim() X 1. This forces you to pre-allocate memory, which
+   * speeds things up (and also makes Eigen's Ref functionality easier to deal with).
    */
   virtual void integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated) const;
 
