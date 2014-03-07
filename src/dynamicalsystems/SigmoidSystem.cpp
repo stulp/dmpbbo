@@ -100,6 +100,7 @@ void SigmoidSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) co
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
 {
   int T = ts.size();
+  assert(T>0);
 
   // Usually, we expect xs and xds to be of size T X dim(), so we resize to that. However, if the
   // input matrices were of size dim() X T, we return the matrices of that size by doing a 
