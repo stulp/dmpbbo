@@ -388,6 +388,7 @@ void Dmp::statesAsTrajectory(const VectorXd& ts, const MatrixXd& x_in, const Mat
 void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_outputs) const
 {
   int n_time_steps = ts.size();
+  assert(n_time_steps>0);
   
   // Usually, we expect xs and xds to be of size T X dim(), so we resize to that. However, if the
   // input matrices were of size dim() X T, we return the matrices of that size by doing a 
