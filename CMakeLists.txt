@@ -3,7 +3,7 @@
 
 # Some settings related to building/installing libraries and header files
 # Set this to STATIC if you want to build static libraries instead.
-set(SHARED_OR_STATIC "SHARED")
+set(SHARED_OR_STATIC "STATIC")
 set(LIB_INSTALL_DIR /usr/local/lib)
 set(INCLUDE_INSTALL_DIR /usr/local/include)
 
