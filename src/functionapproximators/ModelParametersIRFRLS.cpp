@@ -48,9 +48,9 @@ ModelParametersIRFRLS::ModelParametersIRFRLS(MatrixXd linear_models, MatrixXd co
   cosines_periodes_(cosines_periodes),
   cosines_phase_(cosines_phase)
 {
-  int nb_cos = cosines_periodes.rows();
-  assert(cosines_phase.size() == nb_cos);
-  assert(linear_models.rows() == nb_cos);
+
+  assert(cosines_phase.size() == cosines_periodes.rows());
+  assert(linear_models.rows() == cosines_periodes.rows());
 
   nb_in_dim_ = cosines_periodes.cols();
   // int nb_output_dim = linear_models.cols();

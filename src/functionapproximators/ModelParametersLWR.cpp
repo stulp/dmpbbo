@@ -56,9 +56,10 @@ ModelParametersLWR::ModelParametersLWR(const MatrixXd& centers, const MatrixXd& 
   slopes_as_angles_(false),
   caching_(true)
 {
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_basis_functions = centers.rows();
   int n_dims = centers.cols();
-  
+#endif  
   assert(n_basis_functions==widths_.rows());
   assert(n_dims           ==widths_.cols());
   assert(n_basis_functions==slopes_.rows());
