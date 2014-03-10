@@ -52,8 +52,9 @@ def plotDynamicalSystem(data,axs):
         lines[len(lines):] = axs[1].plot(ts,yds)
         axs[1].set_ylabel(r"$\dot{y} = z/\tau$")
         
-        xs_yds = zs/yds
-        tau = xs_yds[3:,:].mean()
+        # Avoid division by zero by ignoring first/last values yds is zero
+        xs_yds = zs[3:-3,:]/yds[3:-3,:]
+        tau = xs_yds.mean()
         
         lines[len(lines):] = axs[2].plot(ts,zds/tau)
         axs[2].set_ylabel(r"$\ddot{y} = \dot{z}/\tau$")
