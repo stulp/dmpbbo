@@ -68,10 +68,12 @@ public:
    * \param[out] costs The scalar cost for each sample.
    */
   void evaluate(const MatrixXd& samples, VectorXd& costs) const {
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
     int n_dims    = samples.cols();
-    int n_samples = samples.rows();
-
+#endif
     assert(n_dims==point_.size());
+    
+    int n_samples = samples.rows();
 
     costs.resize(n_samples);
     for (int ss=0; ss<n_samples; ss++)

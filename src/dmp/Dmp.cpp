@@ -365,7 +365,9 @@ void Dmp::statesAsTrajectory(const MatrixXd& x_in, const MatrixXd& xd_in, Matrix
 
 void Dmp::statesAsTrajectory(const VectorXd& ts, const MatrixXd& x_in, const MatrixXd& xd_in, Trajectory& trajectory) const {
   int n_time_steps = ts.rows();
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_dims       = x_in.cols();
+#endif
   assert(n_time_steps==x_in.rows());
   assert(n_time_steps==xd_in.rows());
   assert(n_dims==xd_in.cols());
