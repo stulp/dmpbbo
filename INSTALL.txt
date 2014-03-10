@@ -1,6 +1,19 @@
-Please make sure you have installed all the required packages (cmake, boost and Eigen, see below)
-before trying to compile. We assume that you use a compiler that is compatible with the C++11
-standard.
+________________________________________________________________________________    
+INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
+(for manual installation see "MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES" below) 
+
+sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev sudo apt-get install doxygen graphviz 
+
+"sudo apt-get eigen3" currently (February 2014) installs version 3.1.2. However, DmpBbo
+requires version >= 3.2. To get the latest Eigen version:
+  use this PPA: https://launchpad.net/~kalakris/+archive/eigen
+  or do a manual install: see "MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES" below
+  
+________________________________________________________________________________    
+BUILDING DMPBBO 
+
+Please make sure you have installed all the required packages before trying to compile. 
+We assume that you use a compiler that is compatible with the C++11 standard.
 
 To compile, do:
   mkdir -p build_dir; cd build_dir; cmake .. -DCMAKE_BUILD_TYPE=Release; make; make Docs
@@ -8,32 +21,27 @@ To compile, do:
 To compile a version that has debugging symbols included, and compiles some tests also:
   mkdir -p build_dir_debug; cd build_dir_debug; cmake .. -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1
 
-To install libs in /usr/local/lib, headers in /usr/local/include and binaries in oo_dmp_bbo/bin:
+To install libs in /usr/local/lib, headers in /usr/local/include and binaries in dmpbbo/bin:
   sudo make install
 
 ________________________________________________________________________________    
 STATIC VS SHARED LIBRARIES
 
-The default is to build shared libraries, e.g. libdmp.so. Calling "sudo make install" 
-will install them in /usr/local/lib. Make sure that /usr/local/lib is in your 
-LD_LIBRARY_PATH, or  the binaries will not be able to dynamically link the required 
-libraries.
+The default is to build static libraries (e.g. libdmp.a) and to statically link these 
+libraries to the demo and test executables (the reason for this is the boost bug below).
 
-Alternatively, you can build static libraries and link them statically during 
-compilation. Just change 
+Alternatively, you can build shared libraries by changing the CMakeLists.txt in this directory:
   set(SHARED_OR_STATIC "SHARED") => set(SHARED_OR_STATIC "STATIC")
-in CMakeLists.txt in this directory.
+Calling "sudo make install" will install the shared libraries  in /usr/local/lib. Make sure that /usr/local/lib is in your LD_LIBRARY_PATH, or  the binaries will not be able to dynamically link the required libraries.
 
+If you use shared libraries, your program may crash with:
+    pure virtual method called
+    terminate called without an active exception
+This is a bug in boost::serialization for versions >=1.44, which can be fixed with this patch:
+    https://svn.boost.org/trac/boost/ticket/4842#comment:21
+    https://svn.boost.org/trac/boost/attachment/ticket/4842/void_cast.cpp.patch
+Note that the crash happens towards the very end of the program, just before returning from main() when desctructors are called. So it does not affect functionality, but it is just very irritating that boost crashes and sometimes dumps a core (I use boost version 1.48, maybe the issue is fixed in later versions). If I had known things like this would happen, I would have probably used cereal (http://uscilab.github.io/cereal/) rather than boost::serialization... 
 
-________________________________________________________________________________    
-INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
-
-sudo apt-get install cmake doxygen libboost-filesystem-dev libboost-system-dev libboost-serialization-dev
-
-"sudo apt-get eigen3" currently (February 2014) installs version 3.1.2. However, DmpBbo
-requires version >= 3.2. To get the latest Eigen version:
-  use this PPA: https://launchpad.net/~kalakris/+archive/eigen
-  or do a manual install: see below
 
 
 ________________________________________________________________________________    
