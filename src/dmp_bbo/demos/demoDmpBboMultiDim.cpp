@@ -106,7 +106,7 @@ int main(int n_args, char* args[])
     //cout << mean_init_vec[i_dim].transpose() << endl;
     VectorXd mean_init = mean_init_vec[i_dim];
   
-    MatrixXd covar_init = 100000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
+    MatrixXd covar_init = 1000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
     
     distributions[i_dim] = new DistributionGaussian(mean_init,covar_init);
   }
