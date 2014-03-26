@@ -24,6 +24,7 @@
 #include "functionapproximators/Parameterizable.hpp"
 
 #include <iostream>
+#include <limits>
 #include <eigen3/Eigen/Core>
 
 using namespace std;
@@ -158,31 +159,33 @@ void Parameterizable::getParameterVectorAllMinMax(Eigen::VectorXd& min_vec, Eige
   Eigen::VectorXd all_values = parameter_vector_all_initial_;
   
   // Example: 
-  // selected_mask = [ 1   1   1   0   0   0   3   3   3   0   0   0  ] 
-  // all_values    = [1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0 1.0 2.0 3.0 ] 
+  // selected_mask = [  1   1   1     2   2   2     3   3   3     1   1    1   ] 
+  // all_values    = [ 1.0 2.0 3.0   4.0 5.0 6.0   7.0 8.0 9.0  20.0 21.0 22.0 ] 
   //
   // For all blocks in selected_mask, compute the min/max in all_values for that block.
   // In the example above
-  //   block 1 : min = 1.0; max = 3.0;
-  //   block 3 : min = 7.0; max = 9.0;
+  //   block 1 : min = 1.0; max = 22.0;
+  //   block 2 : min = 4.0; max =  6.0;
+  //   block 3 : min = 7.0; max =  9.0;
   //
   // Then min_vec and max_vec will be as follows:
-  //   min_vec = [1.0 1.0 1.0 7.0 7.0 7.0]
-  //   max_vec = [3.0 3.0 3.0 9.0 9.0 9.0]
+  //   min_vec = [ 1.0 1.0 1.0   4.0 4.0 4.0   7.0 7.0 7.0     1.0 1.0 1.0 ]
+  //   max_vec = [ 3.0 3.0 3.0   6.0 6.0 6.0   9.0 9.0 9.0  20.0 21.0 22.0 ]
   
   min_vec.resize(getParameterVectorAllSize());
   max_vec.resize(getParameterVectorAllSize());
 
   // We cannot do this with Eigen::Block, because regions might not be contiguous
   int n_blocks = selected_mask.maxCoeff();
-  int i_vec = 0;
   for (int i_block=1; i_block<=n_blocks; i_block++)
   {
     if ((selected_mask.array() == i_block).any())
     {
-      double min_this_block = all_values.maxCoeff();
-      double max_this_block = all_values.minCoeff(); 
+      // Initialize values to extrema 
+      double min_this_block = std::numeric_limits<double>::max();
+      double max_this_block = std::numeric_limits<double>::lowest();
       
+      // Determine the min/max values in this block
       for (int all_ii=0; all_ii<selected_mask.size(); all_ii++)
       {
         if (selected_mask[all_ii]==i_block)
@@ -192,13 +195,13 @@ void Parameterizable::getParameterVectorAllMinMax(Eigen::VectorXd& min_vec, Eige
         }
       }
       
+      // Set the min/max for this block
       for (int all_ii=0; all_ii<selected_mask.size(); all_ii++)
       {
         if (selected_mask[all_ii]==i_block)
         {
-          min_vec[i_vec] = min_this_block;
-          max_vec[i_vec] = max_this_block;
-          i_vec++;
+          min_vec[all_ii] = min_this_block;
+          max_vec[all_ii] = max_this_block;
         }
       }
       
