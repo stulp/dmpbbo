@@ -612,6 +612,9 @@ void Dmp::setSelectedParameters(const set<string>& selected_values_labels)
     if (function_approximators_[dd]!=NULL)
       if (function_approximators_[dd]->isTrained())
         function_approximators_[dd]->setSelectedParameters(selected_values_labels);
+      
+  // Call superclass for initializations
+  Parameterizable::setSelectedParameters(selected_values_labels);
 }
 
 void Dmp::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
