@@ -595,14 +595,27 @@ void Dmp::train(const Trajectory& trajectory, string save_directory, bool overwr
   }
 }
 
-void Dmp::getSelectableParameters(set<string>& selected_values_labels) const {
+void Dmp::getSelectableParameters(set<string>& selectable_values_labels) const {
   assert(function_approximators_.size()>0);
-  //for (int dd=0; dd<dim_orig(); dd++)
-  // Assumes all function approximators are the same
-  int dd=0;
-  if (function_approximators_[dd]!=NULL)
-    if (function_approximators_[dd]->isTrained())
-      function_approximators_[dd]->getSelectableParameters(selected_values_labels);  
+  for (int dd=0; dd<dim_orig(); dd++)
+  {
+    if (function_approximators_[dd]!=NULL)
+    {
+      if (function_approximators_[dd]->isTrained())
+      {
+        set<string> cur_labels;
+        function_approximators_[dd]->getSelectableParameters(cur_labels);
+        selectable_values_labels.insert(cur_labels.begin(), cur_labels.end());
+      }
+    }
+  }
+  selectable_values_labels.insert("goal");
+  
+  //cout << "selected_values_labels=["; 
+  //for (string label : selected_values_labels) 
+  //  cout << label << " ";
+  //cout << "]" << endl;
+  
 }
 
 void Dmp::setSelectedParameters(const set<string>& selected_values_labels)
@@ -612,9 +625,23 @@ void Dmp::setSelectedParameters(const set<string>& selected_values_labels)
     if (function_approximators_[dd]!=NULL)
       if (function_approximators_[dd]->isTrained())
         function_approximators_[dd]->setSelectedParameters(selected_values_labels);
-      
+
   // Call superclass for initializations
   Parameterizable::setSelectedParameters(selected_values_labels);
+
+  VectorXi lengths_per_dimension = VectorXi::Zero(dim_orig());
+  for (int dd=0; dd<dim_orig(); dd++)
+  {
+    if (function_approximators_[dd]!=NULL)
+      if (function_approximators_[dd]->isTrained())
+        lengths_per_dimension[dd] = function_approximators_[dd]->getParameterVectorSelectedSize();
+    
+    if (selected_values_labels.find("goal")!=selected_values_labels.end())
+      lengths_per_dimension[dd]++;
+  }
+  
+  setVectorLengthsPerDimension(lengths_per_dimension);
+      
 }
 
 void Dmp::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
@@ -629,15 +656,36 @@ void Dmp::getParameterVectorMask(const std::set<std::string> selected_values_lab
   selected_mask.resize(getParameterVectorAllSize());
   selected_mask.fill(0);
   
+  const int TMP_GOAL_NUMBER = -1;
   int offset = 0;
   VectorXi cur_mask;
   for (int dd=0; dd<dim_orig(); dd++)
   {
     function_approximators_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
+
+    // This makes sure that the indices for each function approximator are different    
+    int mask_offset = selected_mask.maxCoeff(); 
+    for (int ii=0; ii<cur_mask.size(); ii++)
+      if (cur_mask[ii]!=0)
+        cur_mask[ii] += mask_offset;
+        
     selected_mask.segment(offset,cur_mask.size()) = cur_mask;
     offset += cur_mask.size();
+    
+    // Goal
+    if (selected_values_labels.find("goal")!=selected_values_labels.end())
+      selected_mask(offset) = TMP_GOAL_NUMBER;
+    offset++;
+    
   }
-  assert(offset == getParameterVectorAllSize());   
+  assert(offset == getParameterVectorAllSize());
+  
+  // Replace TMP_GOAL_NUMBER with current max value
+  int goal_number = selected_mask.maxCoeff() + 1; 
+  for (int ii=0; ii<selected_mask.size(); ii++)
+    if (selected_mask[ii]==TMP_GOAL_NUMBER)
+      selected_mask[ii] = goal_number;
+    
 }
 
 int Dmp::getParameterVectorAllSize(void) const
@@ -645,6 +693,9 @@ int Dmp::getParameterVectorAllSize(void) const
   int total_size = 0;
   for (unsigned int dd=0; dd<function_approximators_.size(); dd++)
     total_size += function_approximators_[dd]->getParameterVectorAllSize();
+  
+  // For the goal
+  total_size += dim_orig();
   return total_size;
 }
 
@@ -654,11 +705,15 @@ void Dmp::getParameterVectorAll(VectorXd& values) const
   values.resize(getParameterVectorAllSize());
   int offset = 0;
   VectorXd cur_values;
+  VectorXd attractor = attractor_state();
   for (int dd=0; dd<dim_orig(); dd++)
   {
     function_approximators_[dd]->getParameterVectorAll(cur_values);
     values.segment(offset,cur_values.size()) = cur_values;
     offset += cur_values.size();
+
+    values(offset) = attractor(dd);
+    offset++;
   }
 }
 
@@ -667,30 +722,20 @@ void Dmp::setParameterVectorAll(const VectorXd& values)
   assert(values.size()==getParameterVectorAllSize());
   int offset = 0;
   VectorXd cur_values;
+  VectorXd attractor(dim_orig());
   for (int dd=0; dd<dim_orig(); dd++)
   {
     int n_parameters_required = function_approximators_[dd]->getParameterVectorAllSize();
     cur_values = values.segment(offset,n_parameters_required);
     function_approximators_[dd]->setParameterVectorAll(cur_values);
     offset += n_parameters_required;
+    
+    attractor(dd) = values(offset);
+    offset += 1;
   }
-}
-
-void Dmp::getModelParametersVectors(vector<VectorXd>& model_parameters, bool normalized) const
-{
-  model_parameters.clear();
-  VectorXd model_parameters_vector;
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    function_approximators_[dd]->getParameterVectorSelected(model_parameters_vector, normalized);
-    model_parameters.push_back(model_parameters_vector);
-  }
-}
-
-void Dmp::setModelParametersVectors(const vector<VectorXd>& model_parameters, bool normalized)
-{
-  for (int dd=0; dd<dim_orig(); dd++)
-    function_approximators_[dd]->setParameterVectorSelected(model_parameters[dd], normalized);
+  
+  // Set the goal
+  set_attractor_state(attractor); 
 }
 
 

@@ -62,16 +62,19 @@ int main(int n_args, char** args)
 
   Dmp::DmpType dmp_type = Dmp::KULVICIUS_2012_JOINING;
   int input_dim = 1;
-  int n_basis_functions = 3;
+  
   
   vector<FunctionApproximator*> function_approximators(dim);    
   // Initialize one LWR for each dimension
-  VectorXd slopes = VectorXd::Constant(n_basis_functions,0.2);
-  VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0,1);
-  VectorXd widths  = VectorXd::Constant(n_basis_functions,centers[1]-centers[0]);
+  VectorXi n_basis_functions_vector(2); n_basis_functions_vector << 2, 3; 
   for (int dd=0; dd<dim; dd++)
   {
+    int n_basis_functions = n_basis_functions_vector[dd];
+    VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0,1);
+    VectorXd widths  = VectorXd::Constant(n_basis_functions,centers[1]-centers[0]);
+    VectorXd slopes = VectorXd::Constant(n_basis_functions,(dd+1)*0.2);
     VectorXd offsets = VectorXd::LinSpaced(n_basis_functions,10*(dd+1),16*(dd+1));
+    
     MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,n_basis_functions);      
     ModelParametersLWR* model_parameters = new ModelParametersLWR(centers,widths,slopes,offsets);
     function_approximators[dd] = new FunctionApproximatorLWR(meta_parameters,model_parameters);
@@ -88,6 +91,8 @@ int main(int n_args, char** args)
   //selected_labels.insert("widths");
   //selected_labels.insert("centers");
 
+  selected_labels.insert("goal");
+  
   dmp->setSelectedParameters(selected_labels);
   
   cout << "vector size (all     ) = " << dmp->getParameterVectorAllSize() << endl;
@@ -131,48 +136,31 @@ int main(int n_args, char** args)
   
   dmp->getParameterVectorSelectedNormalized(values_normalized);
   cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
-  /*
-  
-  
-  
-  
-  
-  
-  
 
-  mp->getParameterVectorAll(values);
-  //mp->getParameterVectorAllMinMax(min_values,max_values);
-
+  cout << "_______________________________________________" << endl;
+  vector<VectorXd> vector_values(dim);
+  int goal_space = 0;
+  if (selected_labels.find("goal")!=selected_labels.end())
+    goal_space = 1;
+  cout << "  goal_space=" << goal_space << endl;
+  vector_values[0] = VectorXd::Constant(2*n_basis_functions_vector[0]+goal_space,-1);
+  vector_values[1] = VectorXd::Constant(2*n_basis_functions_vector[1]+goal_space,-1);
+  
+  dmp->setParameterVectorSelected(vector_values);
+  
+  dmp->getParameterVectorAll(values);
   cout << "values     (all     ): " << values.transpose() << endl;
-  //cout << "min_values (all     ): " << min_values.transpose() << endl;
-  //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
   
-  mp->getParameterVectorSelected(values);
-  mp->getParameterVectorSelectedMinMax(min_values,max_values);
-  mp->getParameterVectorSelectedNormalized(values_normalized);
+  dmp->getParameterVectorSelected(values);
   cout << "values     (selected): " << values.transpose() << endl;
+  
+  dmp->getParameterVectorSelectedMinMax(min_values,max_values);
   cout << "min_values (selected): " << min_values.transpose() << endl;
-  cout << "max_values (selected): " << max_values.transpose() << endl;
+  cout << "max_values (selected): " << max_values.transpose() << endl ;
+  
+  dmp->getParameterVectorSelectedNormalized(values_normalized);
   cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
   
-  new_values = VectorXd::LinSpaced(mp->getParameterVectorSelectedSize(),0.49,0.51);
-  mp->setParameterVectorSelectedNormalized(new_values);
-
-  mp->getParameterVectorAll(values);
-  //mp->getParameterVectorAllMinMax(min_values,max_values);
-
-  cout << "values     (all     ): " << values.transpose() << endl;
-  //cout << "min_values (all     ): " << min_values.transpose() << endl;
-  //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
-  
-  mp->getParameterVectorSelected(values);
-  mp->getParameterVectorSelectedMinMax(min_values,max_values);
-  mp->getParameterVectorSelectedNormalized(values_normalized);
-  cout << "values     (selected): " << values.transpose() << endl;
-  cout << "min_values (selected): " << min_values.transpose() << endl;
-  cout << "max_values (selected): " << max_values.transpose() << endl;
-  cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;  
-  */
   delete dmp;
  
   return 0;

@@ -241,6 +241,54 @@ void Parameterizable::getParameterVectorSelectedMinMax(Eigen::VectorXd& min_vec,
 }
 */
 
+
+void Parameterizable::getParameterVectorSelected(vector<VectorXd>& vector_values, bool normalized) const
+{
+  VectorXd values;
+  getParameterVectorSelected(values,normalized);
+  
+  if (lengths_per_dimension_.size()==0)
+  {
+    vector_values.resize(1);
+    vector_values[0] = values;
+    return;
+  }
+
+  assert(values.size()==lengths_per_dimension_.sum());
+  
+  vector_values.resize(lengths_per_dimension_.size());
+  int offset = 0;
+  for (int i_dim=0; i_dim<lengths_per_dimension_.size(); i_dim++)
+  {
+    vector_values[i_dim] = values.segment(offset,lengths_per_dimension_[i_dim]);
+    offset += lengths_per_dimension_[i_dim];
+  }
+
+}
+
+void Parameterizable::setParameterVectorSelected(const vector<VectorXd>& vector_values, bool normalized)
+{
+  if (lengths_per_dimension_.size()==0)
+  {
+    assert(vector_values.size()==1);
+    assert(vector_values[0].size()==getParameterVectorSelectedSize());
+    setParameterVectorSelected(vector_values[0]);
+    return;
+  }
+  
+  VectorXd values(lengths_per_dimension_.sum());
+  int offset = 0;
+  for (int i_dim=0; i_dim<lengths_per_dimension_.size(); i_dim++)
+  {
+    assert(vector_values[i_dim].size() == lengths_per_dimension_[i_dim]);
+    values.segment(offset,lengths_per_dimension_[i_dim]) = vector_values[i_dim];
+    offset += lengths_per_dimension_[i_dim];
+  }
+  
+  setParameterVectorSelected(values);
+}
+
+
 void Parameterizable::setParameterVectorModifier(std::string modifier, bool new_value)
 {
   if (parameter_vector_all_initial_.size()>0)

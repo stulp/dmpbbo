@@ -200,6 +200,33 @@ public:
    */
   void setParameterVectorModifier(std::string modifier, bool new_value);
   
+  
+  /**
+   * \todo Document this
+   */
+  void setVectorLengthsPerDimension(Eigen::VectorXi lengths_per_dimension)
+  {
+    assert(lengths_per_dimension.sum()==getParameterVectorSelectedSize());
+    lengths_per_dimension_ = lengths_per_dimension;
+  }
+  
+  /**
+   * Get the values of the selected parameters in one vector.
+   * \param[out] values The selected parameters concatenated in one vector
+   * \param[in] normalized Whether to normalize the data or not
+   * \remarks The lenghts of each Eigen::VectorXd in the std::vector is set with Parameterizable::setVectorLengthsPerDimension()
+   */
+  void getParameterVectorSelected(std::vector<Eigen::VectorXd>& values, bool normalized=false) const;
+  
+  /**
+   * Set all the values of the selected parameters with a vector of vectors.
+   * \param[in] values The new values of the selected parameters in one vector
+   * \param[in] normalized Whether the data is normalized or not
+   * \remarks The lenghts of each Eigen::VectorXd in the std::vector is set with Parameterizable::setVectorLengthsPerDimension()
+   */
+  void setParameterVectorSelected(const std::vector<Eigen::VectorXd>& values, bool normalized=false);
+
+  
 private:
   /** Turn certain modifiers on or off, see Parameterizable::setParameterVectorModifier().
    *
@@ -215,6 +242,10 @@ private:
   
   Eigen::VectorXi selected_mask_;
 
+  /** 
+   * \see Parameterizable::setVectorLengthsPerDimension()
+   */
+  Eigen::VectorXi lengths_per_dimension_;
   
   // Since this is a cached variable, it needs to be mutable so that const functions may change it.
   mutable Eigen::VectorXd parameter_vector_all_initial_;
