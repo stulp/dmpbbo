@@ -278,25 +278,13 @@ public:
     
   //virtual bool isTrained(void) const;
   
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
+  void getSelectableParameters(std::set<std::string>& selectable_values_labels) const;
   void setSelectedParameters(const std::set<std::string>& selected_values_labels);
 
   int getParameterVectorAllSize(void) const;
   void getParameterVectorAll(Eigen::VectorXd& values) const;
   void setParameterVectorAll(const Eigen::VectorXd& values);
   void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-
-  /** Get the model parameters as a vector of vectors. 
-   *  \param[out] model_parameters The vectors of model parameters
-   *  \param[in] normalized boolean to indacate that values should be normalized
-   */
-   void getModelParametersVectors(std::vector<Eigen::VectorXd>& model_parameters, bool normalized=false) const;
-  
-  /** Set the model parameters as a vector of vectors. 
-   *  \param[in] model_parameters The vectors of model parameters
-   *  \param[in] normalized boolean to indacate that values are normalized
-   */
-   void setModelParametersVectors(const std::vector<Eigen::VectorXd>& model_parameters, bool normalized=false);
 
   /** Given a trajectory, compute the inputs and targets for the function approximators.
    * For a standard Dmp (such as the one in this class) the inputs will be the phase over time, and

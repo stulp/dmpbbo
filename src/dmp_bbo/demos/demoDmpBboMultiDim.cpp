@@ -94,11 +94,12 @@ int main(int n_args, char* args[])
   double dt=0.01;
   set<string> parameters_to_optimize;
   parameters_to_optimize.insert("offsets");
+  
   TaskSolverParallel* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;
-  dmp->getModelParametersVectors(mean_init_vec);
+  dmp->getParameterVectorSelected(mean_init_vec);
   
   vector<DistributionGaussian*> distributions(n_dim);
   for (int i_dim=0; i_dim<n_dim; i_dim++)

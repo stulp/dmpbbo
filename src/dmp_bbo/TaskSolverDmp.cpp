@@ -96,7 +96,7 @@ void TaskSolverDmp::performRollouts(const vector<MatrixXd>& samples, const Matri
   {
     for (int dd=0; dd<n_dofs; dd++)
       model_parameters_vec[dd] = samples[dd].row(k);
-    dmp_->setModelParametersVectors(model_parameters_vec, use_normalized_parameter_);
+    dmp_->setParameterVectorSelected(model_parameters_vec, use_normalized_parameter_);
     
     int n_dims = dmp_->dim(); // Dimensionality of the system
     MatrixXd xs_ana(n_time_steps_,n_dims);
