@@ -81,7 +81,18 @@ bool saveToDirectory(const UpdateSummary& update_summary, std::string directory,
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  * \return true if saving the UpdateSummary was successful, false otherwise
  */
- bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
+bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
+
+/**
+ * Save an update summary to a directory.
+ * This version searches directory for subdirectories updateN and writes the data into a new 
+ * directory updateN+1 (the actual format is update%05d). E.g. if there are directories:
+ * update00000, update00001, and update00002, this function will write to update00003
+ * \param[in] update_summary Object to write
+ * \param[in] directory Directory to which to write object
+ * \return true if saving the UpdateSummary was successful, false otherwise
+ */
+bool saveToDirectoryNewUpdate(const UpdateSummary& update_summary, std::string directory);
 
 }
 
