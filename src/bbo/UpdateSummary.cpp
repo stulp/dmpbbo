@@ -117,4 +117,44 @@ bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string 
   return true;
 }
 
+bool saveToDirectoryNewUpdate(const UpdateSummary& update_summary, std::string directory)
+{
+
+  // Make directory if it doesn't already exist
+  if (!boost::filesystem::exists(directory))
+  {
+    if (!boost::filesystem::create_directories(directory))
+    {
+      cerr << __FILE__ << ":" << __LINE__ << ":";
+      cerr << "Couldn't make directory file '" << directory << "'." << endl;
+      return false;
+    }
+    // Directory didn't exist yet, so this must be the first update.
+    directory += "/update00001/";
+    bool overwrite=true;
+    return saveToDirectory(update_summary,directory,overwrite);
+  }
+  
+  // Find the directory with the highest update
+  // todo: this can probably be done more efficiently with boost::filesystem somehow
+  int MAX_UPDATE = 99999; // Cannot store more in %05d format
+  int i_update=1;
+  while (i_update<MAX_UPDATE)
+  {
+    stringstream stream;
+    stream << directory << "/update" << setw(5) << setfill('0') << i_update << "/";
+    string directory_update = stream.str();
+    if (!boost::filesystem::exists(directory_update))
+    {
+      // Found a directory that doesn't exist yet!
+      bool overwrite=true;
+      return saveToDirectory(update_summary,directory_update,overwrite);
+    }
+    i_update++;
+  }
+  
+  std::cerr << "Sorry, directory " << directory << " is already full with update subdirectories." << std::endl;
+  return false;
+}
+
 }
