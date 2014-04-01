@@ -272,7 +272,7 @@ void Parameterizable::setParameterVectorSelected(const vector<VectorXd>& vector_
   {
     assert(vector_values.size()==1);
     assert(vector_values[0].size()==getParameterVectorSelectedSize());
-    setParameterVectorSelected(vector_values[0]);
+    setParameterVectorSelected(vector_values[0],normalized);
     return;
   }
   
@@ -285,7 +285,7 @@ void Parameterizable::setParameterVectorSelected(const vector<VectorXd>& vector_
     offset += lengths_per_dimension_[i_dim];
   }
   
-  setParameterVectorSelected(values);
+  setParameterVectorSelected(values,normalized);
 }
 
 
