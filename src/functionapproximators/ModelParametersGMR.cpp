@@ -52,6 +52,8 @@ ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd> centers, std::vecto
   biases_(biases),
   inverseCovarsL_(inverseCovarsL)
 {  
+  
+#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for nb_in_dim and nb_out_dim.
   size_t nb_receptive_fields = centers.size();
   assert(nb_receptive_fields>0);
   assert(priors.size() == nb_receptive_fields);
@@ -74,7 +76,8 @@ ModelParametersGMR::ModelParametersGMR(std::vector<VectorXd> centers, std::vecto
     assert(slopes[i].rows() == nb_out_dim);
     assert(biases[i].size() == nb_out_dim);
   }
-  
+#endif
+
   all_values_vector_size_ = 0;
   
   all_values_vector_size_ += centers_.size() * centers_[0].size();
