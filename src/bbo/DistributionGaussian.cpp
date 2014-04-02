@@ -39,7 +39,16 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
+// Initialize random number generator
 boost::mt19937 DistributionGaussian::rng = boost::mt19937(getpid() + time(0));
+
+// Initialize uni-variate unit normal distribution
+boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >
+*DistributionGaussian::normal_distribution_unit
+   = new boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >(
+        rng, 
+        boost::normal_distribution<>(0, 1)
+     );
 
 
 DistributionGaussian::DistributionGaussian(const VectorXd& mean, const MatrixXd& covar) 
@@ -73,6 +82,8 @@ void DistributionGaussian::generateSamples(int n_samples, MatrixXd& samples) con
     // Now perform the Cholesky decomposition, which makes it easier to generate samples. 
     MatrixXd A(covar_.llt().matrixL());
     covar_decomposed_ = A;
+    // Remark: it would have been better to do this in the constructor and set_covar, 
+    // but I couldn't get it to work with boost::serialization (I tried hard)
   }
   
   
@@ -80,14 +91,12 @@ void DistributionGaussian::generateSamples(int n_samples, MatrixXd& samples) con
   samples.resize(n_samples,n_dims);
   
   // http://en.wikipedia.org/wiki/Multivariate_normal_distribution#Drawing_values_from_the_distribution
-  boost::normal_distribution<> normal(0, 1);
-  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > genZ(rng, normal);
   VectorXd z(n_dims);
   for (int i_sample=0; i_sample<n_samples; i_sample++)
   {
     // Generate vector with samples from standard normal distribution N(0,1) 
     for (int i_dim=0; i_dim<n_dims; i_dim++)
-      z(i_dim) = genZ();
+      z(i_dim) = (*normal_distribution_unit)();
 
     // Compute x = mu + Az
     samples.row(i_sample) = mean_ + covar_decomposed_*z;

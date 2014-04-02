@@ -96,6 +96,10 @@ public:
 private:
   /** Boost's random number generator. Shared by all object instances. */
   static boost::mt19937 rng;
+  
+  /** Generator for samples from a univariate unit normal distribution. Shared by all object instances. */
+  static boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > *normal_distribution_unit;
+
   /** Mean of the distribution */
   Eigen::VectorXd mean_;
   /** Covariance matrix of the distribution */
