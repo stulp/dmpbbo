@@ -1,6 +1,2 @@
-*~
-*.bak
-build_dir*
-bin/
-bin_test/
-thirdparty/
+bin
+build_dir
