@@ -428,11 +428,13 @@ In the last two steps, we change the attractor state from 0 to \f$y^g\f$, where 
 
 To avoid overshooting or slow convergence towards \f$y^g\f$, we prefer to have a \em critically \em damped spring-damper system for the DMP. For such systems \f$c = 2\sqrt{mk}\f$ must hold, see \ref dyn_sys_critical_damping. In our notation this becomes \f$\alpha = 2\sqrt{\alpha\beta}\f$, which leads to \f$\beta = \alpha/4\f$. This determines the value of \f$\beta\f$ for a given value of \f$\alpha\f$ in DMPs. The influence of \f$\alpha\f$ is illustrated in the first figure in \ref sec_dyn_sys_intro.
 
-Rewriting the second order dynamical system as a first order system (see \ref dyn_sys_rewrite_second_first) with expanded state \f$ [y~z]\f$ yields:
+Rewriting the second order dynamical system as a first order system (see \ref dyn_sys_rewrite_second_first) with expanded state \f$ [z~y]\f$ yields:
 
 \f{eqnarray*}{
 \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}))/\tau \\ {z}/\tau  \end{array} \right]  \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0  \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \end{array} \right]
 \f}
+
+Please note that in the implementation, the state is implemented as  \f$ [y~z]\f$. The order is inconsequential, but we use the notation above (\f$[z~y]\f$) throughout the rest of this tutorial section, for consistency with the DMP literature.
 
 
 \section sec_forcing Arbitrary Smooth Movements: the Forcing Term
@@ -490,6 +492,7 @@ So far, the graphs have shown 1-dimensional systems. To generate D-dimensional t
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).
 
+Please note that in this tutorial we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
 </em>
 
 
