@@ -580,7 +580,7 @@ A spring-damper system is called critically damped when it converges to the attr
 For implementation purposes, it is more convenient to work only with 1st order systems. Fortunately, we can expand the state \f$ x \f$ into two components \f$ x = [y~z]^T\f$ with \f$ z = \dot{y}\f$, and rewrite the differential equation as follows:
 
 \f$
-\left[ \begin{array}{l} \dot{z} \\ \dot{y} \end{array} \right] = \left[ \begin{array}{l} (-ky -cz)/m \\ z \end{array} \right]
+\left[ \begin{array}{l} \dot{y} \\ \dot{z} \end{array} \right] = \left[ \begin{array}{l} z \\ (-ky -cz)/m \end{array} \right]
 \f$
 
 With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state:
