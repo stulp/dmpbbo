@@ -25,7 +25,7 @@
 
 #ifndef EIGENBOOSTSERIALIZATION_HPP
 #define EIGENBOOSTSERIALIZATION_HPP
-
+#define EIGEN2_SUPPORT
 #include <eigen3/Eigen/Core>
 
 #include <boost/serialization/split_free.hpp>

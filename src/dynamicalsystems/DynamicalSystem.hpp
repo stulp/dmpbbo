@@ -23,7 +23,7 @@
 
 #ifndef _DYNAMICALSYSTEM_H_
 #define _DYNAMICALSYSTEM_H_
-
+#define EIGEN2_SUPPORT
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>

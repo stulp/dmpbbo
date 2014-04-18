@@ -23,9 +23,10 @@
 
 #ifndef _TRAJECTORY_H_
 #define _TRAJECTORY_H_
+#define EIGEN2_SUPPORT
 
-#include <iosfwd>
 #include <eigen3/Eigen/Core>
+#include <iosfwd>
 
 #include <boost/serialization/access.hpp>
 #include "dmpbbo_io/EigenBoostSerialization.hpp"

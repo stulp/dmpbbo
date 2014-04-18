@@ -23,7 +23,7 @@
  
 #ifndef METAPARAMETERSLWR_H
 #define METAPARAMETERSLWR_H
-
+#define EIGEN2_SUPPORT
 #include "functionapproximators/MetaParameters.hpp"
 
 #include <iosfwd>

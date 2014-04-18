@@ -23,7 +23,7 @@
  
 #ifndef MODELPARAMETERSLWR_H
 #define MODELPARAMETERSLWR_H
-
+#define EIGEN2_SUPPORT
 #include "functionapproximators/ModelParameters.hpp"
 
 #include <iosfwd>

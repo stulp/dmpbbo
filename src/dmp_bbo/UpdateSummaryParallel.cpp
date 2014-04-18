@@ -20,7 +20,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#define EIGEN2_SUPPORT
 #include "dmp_bbo/UpdateSummaryParallel.hpp"
 
 #include "bbo/DistributionGaussian.hpp"
@@ -69,7 +69,7 @@ bool saveToDirectory(const UpdateSummaryParallel& summary, string directory, boo
   int n_parallel = summary.distributions.size();
   VectorXi n_parallel_vec = VectorXi::Constant(1,n_parallel);
   saveMatrix(directory,"n_parallel.txt",n_parallel_vec,overwrite);
-
+/*
   for (int ii=0; ii<n_parallel; ii++)
   {
     stringstream stream;
@@ -86,7 +86,7 @@ bool saveToDirectory(const UpdateSummaryParallel& summary, string directory, boo
     if (!saveMatrix(dir, "distribution_new_covar"+suf, summary.distributions_new[ii]->covar(), ow))
       return false;
   }
-
+*/
   return true;
 
 }

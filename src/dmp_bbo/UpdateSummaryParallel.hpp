@@ -23,7 +23,7 @@
 
 #ifndef UPDATESUMMARYPARALLEL_H
 #define UPDATESUMMARYPARALLEL_H
-
+#define EIGEN2_SUPPORT
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>

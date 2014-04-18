@@ -23,7 +23,7 @@
  
 #ifndef TaskSolverDmp_H
 #define TaskSolverDmp_H
-
+#define EIGEN2_SUPPORT
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
