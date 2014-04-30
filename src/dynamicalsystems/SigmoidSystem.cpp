@@ -3,20 +3,20 @@
  * @brief  SigmoidSystem class source file.
  * @author Freek Stulp
  *
- * This file is part of DmpBbo, a set of libraries and programs for the 
+ * This file is part of DmpBbo, a set of libraries and programs for the
  * black-box optimization of dynamical movement primitives.
  * Copyright (C) 2014 Freek Stulp, ENSTA-ParisTech
- * 
+ *
  * DmpBbo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DmpBbo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -32,7 +32,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SigmoidSystem);
 
 #include <cmath>
 #include <vector>
-#include <iostream>  
+#include <iostream>
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -60,12 +60,29 @@ DynamicalSystem* SigmoidSystem::clone(void) const
   return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_,name());
 }
 
+/// ----------------------------------------------------------------------------
+  void SigmoidSystem::printVariables(void)
+  {
+    std::cout << "_prev_tau = " << _prev_tau << std::endl;
+    std::cout << "_new_tau = " << _new_tau << std::endl;
+    std::cout << "Ks_ = " << Ks_ << std::endl;
+    std::cout << "inflection_point_time_ = " << inflection_point_time_ << std::endl;
+    std::cout << "max_rate_ = " << max_rate_ << std::endl;
+  }
+  /// ----------------------------------------------------------------------------
+
+
 void SigmoidSystem::set_tau(double new_tau) {
 
-  // Get previous tau from superclass with tau() and set it with set_tau()  
+  // Get previous tau from superclass with tau() and set it with set_tau()
   double prev_tau = tau();
+  /// ----------------------------------------------------------------------------
+  _prev_tau = prev_tau;
+  _new_tau = new_tau;
+  /// ----------------------------------------------------------------------------
+
   DynamicalSystem::set_tau(new_tau);
-  
+
   inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; // todo document this
   Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
 }
@@ -74,7 +91,7 @@ void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
   assert(y_init.size()==dim_orig());
   DynamicalSystem::set_initial_state(y_init);
   Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
-}    
+}
 
 VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflection_point_time_time)
 {
@@ -103,7 +120,7 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
   assert(T>0);
 
   // Usually, we expect xs and xds to be of size T X dim(), so we resize to that. However, if the
-  // input matrices were of size dim() X T, we return the matrices of that size by doing a 
+  // input matrices were of size dim() X T, we return the matrices of that size by doing a
   // transposeInPlace at the end. That way, the user can also request dim() X T sized matrices.
   bool caller_expects_transposed = (xs.rows()==dim() && xs.cols()==T);
 
@@ -114,19 +131,26 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
   // Auxillary variables to improve legibility
   double r = max_rate_;
   VectorXd exp_rt = (-r*ts).array().exp();
-  
+
+    std::cout<<"exp_rt: \n"<<exp_rt<<std::endl;
+
   VectorXd y_init = initial_state();
-      
+
   for (int dd=0; dd<dim(); dd++)
   {
     // Auxillary variables to improve legibility
     double K = Ks_[dd];
     double b = (K/y_init[dd])-1;
-        
+
+
+    std::cout<<"y_init[dd]: "<<y_init[dd]<<std::endl;
+    std::cout<<"K: "<<K<<std::endl;
+    std::cout<<"b: "<<b<<std::endl;
+
     xs.block(0,dd,T,1)  = K/(1+b*exp_rt.array());
     xds.block(0,dd,T,1) = K*r*b*((1 + b*exp_rt.array()).square().inverse().array()) * exp_rt.array();
   }
-  
+
   if (caller_expects_transposed)
   {
     xs.transposeInPlace();
@@ -145,7 +169,7 @@ void SigmoidSystem::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(Ks_);
 }
 
-  
+
 string SigmoidSystem::toString(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("SigmoidSystem");
