@@ -3,27 +3,27 @@
  * @brief  UpdateSummaryParallel class header file.
  * @author Freek Stulp
  *
- * This file is part of DmpBbo, a set of libraries and programs for the 
+ * This file is part of DmpBbo, a set of libraries and programs for the
  * black-box optimization of dynamical movement primitives.
  * Copyright (C) 2014 Freek Stulp, ENSTA-ParisTech
- * 
+ *
  * DmpBbo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DmpBbo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #ifndef UPDATESUMMARYPARALLEL_H
-#define UPDATESUMMARYPARALLEL_H   
-
+#define UPDATESUMMARYPARALLEL_H
+#define EIGEN2_SUPPORT
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
@@ -31,12 +31,12 @@
 #include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
-  
+
 // Forward declaration
 class DistributionGaussian;
 
 // POD class, http://en.wikipedia.org/wiki/Plain_old_data_structure
-/** POD class for storing the information relevant to a distribution update. 
+/** POD class for storing the information relevant to a distribution update.
  * Used for logging purposes.
  * This is a "plain old data" class, i.e. all member variables are public
  */
@@ -54,13 +54,13 @@ public:
   Eigen::MatrixXd weights;
   /** Distribution after the update. */
   std::vector<DistributionGaussian*> distributions_new;
-  
+
   /** The cost-relevant variables. Only used when Task/TaskSolver approach is used.  */
   Eigen::MatrixXd cost_vars;
-  /** The cost-relevant variables for the evaluation. 
+  /** The cost-relevant variables for the evaluation.
       Only used when Task/TaskSolver approach is used.  */
   Eigen::MatrixXd cost_vars_eval;
-  
+
 };
 
 /**
@@ -81,18 +81,7 @@ bool saveToDirectory(const UpdateSummaryParallel& update_summary, std::string di
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  * \return true if saving the summary was successful, false otherwise
  */
-bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
-
-/**
- * Save an update summary to a directory.
- * This version searches directory for subdirectories updateN and writes the data into a new 
- * directory updateN+1 (the actual format is update%05d). E.g. if there are directories:
- * update00000, update00001, and update00002, this function will write to update00003
- * \param[in] update_summary Object to write
- * \param[in] directory Directory to which to write object
- * \return true if saving the UpdateSummary was successful, false otherwise
- */
-bool saveToDirectoryNewUpdate(const UpdateSummaryParallel& update_summary, std::string directory);
+bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false, bool stack_updates=false);
 
 }
 
@@ -101,7 +90,7 @@ bool saveToDirectoryNewUpdate(const UpdateSummaryParallel& update_summary, std::
 namespace boost {
 namespace serialization {
 
-/** Serialize class data members to boost archive. 
+/** Serialize class data members to boost archive.
  * \param[in] ar Boost archive
  * \param[in] update_summary UpdateSummaryParallel object to serialize.
  * \param[in] version Version of the class

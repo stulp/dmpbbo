@@ -23,7 +23,7 @@
 
 #ifndef PARAMETERIZABLE_H
 #define PARAMETERIZABLE_H
-
+#define EIGEN2_SUPPORT
 #include <set>
 #include <string>
 #include <eigen3/Eigen/Core>

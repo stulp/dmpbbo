@@ -26,7 +26,7 @@
 
 #ifndef _FUNCTIONAPPROXIMATOR_H_
 #define _FUNCTIONAPPROXIMATOR_H_
-
+#define EIGEN2_SUPPORT
 #include "Parameterizable.hpp"
 
 #include <boost/serialization/nvp.hpp>

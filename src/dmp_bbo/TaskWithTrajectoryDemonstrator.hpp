@@ -23,7 +23,7 @@
 
 #ifndef TASKWITHTRAJECTORYDEMONSTRATOR_H
 #define TASKWITHTRAJECTORYDEMONSTRATOR_H
-
+#define EIGEN2_SUPPORT
 #include "bbo/Task.hpp"
 #include "bbo/DistributionGaussian.hpp"
 #include "dmp/Trajectory.hpp"

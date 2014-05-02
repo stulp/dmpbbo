@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-
+#define EIGEN2_SUPPORT
 #ifndef UPDATER_H
 #define UPDATER_H
 

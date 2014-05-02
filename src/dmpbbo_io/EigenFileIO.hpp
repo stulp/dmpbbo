@@ -25,7 +25,7 @@
 
 #ifndef EIGENSAVEMATRIX_HPP
 #define EIGENSAVEMATRIX_HPP
-
+#define EIGEN2_SUPPORT
 #include <string>
 #include <fstream>
 #include <iostream>

@@ -23,7 +23,7 @@
  
 #ifndef TASK_SOLVER_PARALLEL_H
 #define TASK_SOLVER_PARALLEL_H
-
+#define EIGEN2_SUPPORT
 #include "bbo/TaskSolver.hpp"
 
 #include <vector>

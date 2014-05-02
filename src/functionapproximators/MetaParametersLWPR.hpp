@@ -23,7 +23,7 @@
 
 #ifndef METAPARAMETERSLWPR_H
 #define METAPARAMETERSLWPR_H
-
+#define EIGEN2_SUPPORT
 #include "functionapproximators/MetaParameters.hpp"
 
 #include <eigen3/Eigen/Core>

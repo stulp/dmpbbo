@@ -3,24 +3,24 @@
  * @brief  SigmoidSystem class source file.
  * @author Freek Stulp
  *
- * This file is part of DmpBbo, a set of libraries and programs for the 
+ * This file is part of DmpBbo, a set of libraries and programs for the
  * black-box optimization of dynamical movement primitives.
  * Copyright (C) 2014 Freek Stulp, ENSTA-ParisTech
- * 
+ *
  * DmpBbo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * DmpBbo is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#define EIGEN2_SUPPORT
 #include <boost/serialization/export.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
@@ -32,7 +32,8 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SigmoidSystem);
 
 #include <cmath>
 #include <vector>
-#include <iostream>  
+#include <iostream>
+//#include <assert.h>
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -45,10 +46,19 @@ namespace DmpBbo {
 
 SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate, double inflection_point_time, string name)
 : DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size()), name),
-  max_rate_(max_rate),
+  max_rate_(abs(max_rate)),
   inflection_point_time_(inflection_point_time)
 {
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
+    /// Tried to add this assert, but it doesn't work??? -> assert((max_rate_<50.) && (max_rate_>0.0) && "Max_Rate should be <50 and >0. I suggest using 40!");
+    max_rate_ /= tau; // Normalize the slope over any timescale
+    int steps = round((tau - 0.0) / 0.001); // ensure a timeline with step size ~= 0.001
+    VectorXd ts = VectorXd::LinSpaced(steps, 0.0, tau);
+    MatrixXd xs(ts.rows(), dim());
+    MatrixXd xds(ts.rows(), dim());
+    SigmoidSystem::analyticalSolution(ts, xs, xds); // integrate analytical solution to determine differential equations starting point
+    VectorXd num_y_init = xs.row(1); // pull the first value from the integration
+    SigmoidSystem::set_initial_state(num_y_init); // sets the differential system != 1 but on the right slope to follow the analytical system
+
 }
 
 SigmoidSystem::~SigmoidSystem(void)
@@ -60,41 +70,28 @@ DynamicalSystem* SigmoidSystem::clone(void) const
   return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_,name());
 }
 
+
+
 void SigmoidSystem::set_tau(double new_tau) {
 
-  // Get previous tau from superclass with tau() and set it with set_tau()  
+  // Get previous tau from superclass with tau() and set it with set_tau()
   double prev_tau = tau();
+
   DynamicalSystem::set_tau(new_tau);
-  
-  inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; // todo document this
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
+
+  inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; /// This may have been comprimised!!! Need to check
 }
 
 void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
   assert(y_init.size()==dim_orig());
   DynamicalSystem::set_initial_state(y_init);
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
-}    
-
-VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflection_point_time_time)
-{
-  // Known
-  //   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
-  //   N(t_inf) = K / 2
-  // Plug into each other and solve for K
-  //   K / ( 1 + (K/N_0 - 1)*exp(-r*t_infl)) = K/2
-  //              (K/N_0 - 1)*exp(-r*t_infl) = 1
-  //                             (K/N_0 - 1) = 1/exp(-r*t_infl)
-  //                                       K = N_0*(1+(1/exp(-r*t_infl)))
-  VectorXd Ks = N_0s;
-  for (int dd=0; dd<Ks.size(); dd++)
-    Ks[dd] = N_0s[dd]*(1+(1/exp(-r*inflection_point_time_time)));
-  return Ks;
 }
+
 
 void SigmoidSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
 {
-  xd = max_rate_*x.array()*(1-(x.array()/Ks_.array()));
+  /** -Max_rate * [x.*(1-x)] <- Must ensure that x is initialized*/
+  xd = -1.*(max_rate_)*x.array()*(1-x.array());
 }
 
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
@@ -103,7 +100,7 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
   assert(T>0);
 
   // Usually, we expect xs and xds to be of size T X dim(), so we resize to that. However, if the
-  // input matrices were of size dim() X T, we return the matrices of that size by doing a 
+  // input matrices were of size dim() X T, we return the matrices of that size by doing a
   // transposeInPlace at the end. That way, the user can also request dim() X T sized matrices.
   bool caller_expects_transposed = (xs.rows()==dim() && xs.cols()==T);
 
@@ -113,20 +110,20 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
 
   // Auxillary variables to improve legibility
   double r = max_rate_;
-  VectorXd exp_rt = (-r*ts).array().exp();
-  
-  VectorXd y_init = initial_state();
-      
+  double M = inflection_point_time_;
+  VectorXd exp_rt = (r*(ts.array() - M).array()).array().exp();
+
   for (int dd=0; dd<dim(); dd++)
   {
-    // Auxillary variables to improve legibility
-    double K = Ks_[dd];
-    double b = (K/y_init[dd])-1;
-        
-    xs.block(0,dd,T,1)  = K/(1+b*exp_rt.array());
-    xds.block(0,dd,T,1) = K*r*b*((1 + b*exp_rt.array()).square().inverse().array()) * exp_rt.array();
+    /**  x = 1./((1+exp(Max_Rate*(ts-M))))
+       dx = -Max_Rate*[x.*(1-x)]
+    */
+
+    xs.block(0,dd,T,1)  = 1/(1+exp_rt.array()).array();
+    xds.block(0,dd,T,1) = -r*xs.block(0,dd,T,1).array() * ((1 - xs.block(0,dd,T,1).array()).array());
+
   }
-  
+
   if (caller_expects_transposed)
   {
     xs.transposeInPlace();
@@ -142,10 +139,10 @@ void SigmoidSystem::serialize(Archive & ar, const unsigned int version)
 
   ar & BOOST_SERIALIZATION_NVP(max_rate_);
   ar & BOOST_SERIALIZATION_NVP(inflection_point_time_);
-  ar & BOOST_SERIALIZATION_NVP(Ks_);
+
 }
 
-  
+
 string SigmoidSystem::toString(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("SigmoidSystem");
