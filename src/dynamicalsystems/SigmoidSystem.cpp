@@ -33,6 +33,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SigmoidSystem);
 #include <cmath>
 #include <vector>
 #include <iostream>
+//#include <assert.h>
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -45,10 +46,19 @@ namespace DmpBbo {
 
 SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate, double inflection_point_time, string name)
 : DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size()), name),
-  max_rate_(max_rate),
+  max_rate_(abs(max_rate)),
   inflection_point_time_(inflection_point_time)
 {
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
+    /// Tried to add this assert, but it doesn't work??? -> assert((max_rate_<50.) && (max_rate_>0.0) && "Max_Rate should be <50 and >0. I suggest using 40!");
+    max_rate_ /= tau; // Normalize the slope over any timescale
+    int steps = round((tau - 0.0) / 0.001); // ensure a timeline with step size ~= 0.001
+    VectorXd ts = VectorXd::LinSpaced(steps, 0.0, tau);
+    MatrixXd xs(ts.rows(), dim());
+    MatrixXd xds(ts.rows(), dim());
+    SigmoidSystem::analyticalSolution(ts, xs, xds); // integrate analytical solution to determine differential equations starting point
+    VectorXd num_y_init = xs.row(1); // pull the first value from the integration
+    SigmoidSystem::set_initial_state(num_y_init); // sets the differential system != 1 but on the right slope to follow the analytical system
+
 }
 
 SigmoidSystem::~SigmoidSystem(void)
@@ -60,58 +70,28 @@ DynamicalSystem* SigmoidSystem::clone(void) const
   return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_,name());
 }
 
-/// ----------------------------------------------------------------------------
-  void SigmoidSystem::printVariables(void)
-  {
-    std::cout << "_prev_tau = " << _prev_tau << std::endl;
-    std::cout << "_new_tau = " << _new_tau << std::endl;
-    std::cout << "Ks_ = " << Ks_ << std::endl;
-    std::cout << "inflection_point_time_ = " << inflection_point_time_ << std::endl;
-    std::cout << "max_rate_ = " << max_rate_ << std::endl;
-  }
-  /// ----------------------------------------------------------------------------
 
 
 void SigmoidSystem::set_tau(double new_tau) {
 
   // Get previous tau from superclass with tau() and set it with set_tau()
   double prev_tau = tau();
-  /// ----------------------------------------------------------------------------
-  _prev_tau = prev_tau;
-  _new_tau = new_tau;
-  /// ----------------------------------------------------------------------------
 
   DynamicalSystem::set_tau(new_tau);
 
-  inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; // todo document this
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
+  inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; /// This may have been comprimised!!! Need to check
 }
 
 void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
   assert(y_init.size()==dim_orig());
   DynamicalSystem::set_initial_state(y_init);
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_, inflection_point_time_);
 }
 
-VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflection_point_time_time)
-{
-  // Known
-  //   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
-  //   N(t_inf) = K / 2
-  // Plug into each other and solve for K
-  //   K / ( 1 + (K/N_0 - 1)*exp(-r*t_infl)) = K/2
-  //              (K/N_0 - 1)*exp(-r*t_infl) = 1
-  //                             (K/N_0 - 1) = 1/exp(-r*t_infl)
-  //                                       K = N_0*(1+(1/exp(-r*t_infl)))
-  VectorXd Ks = N_0s;
-  for (int dd=0; dd<Ks.size(); dd++)
-    Ks[dd] = N_0s[dd]*(1+(1/exp(-r*inflection_point_time_time)));
-  return Ks;
-}
 
 void SigmoidSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
 {
-  xd = max_rate_*x.array()*(1-(x.array()/Ks_.array()));
+  /** -Max_rate * [x.*(1-x)] <- Must ensure that x is initialized*/
+  xd = -1.*(max_rate_)*x.array()*(1-x.array());
 }
 
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
@@ -130,25 +110,18 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
 
   // Auxillary variables to improve legibility
   double r = max_rate_;
-  VectorXd exp_rt = (-r*ts).array().exp();
-
-    std::cout<<"exp_rt: \n"<<exp_rt<<std::endl;
-
-  VectorXd y_init = initial_state();
+  double M = inflection_point_time_;
+  VectorXd exp_rt = (r*(ts.array() - M).array()).array().exp();
 
   for (int dd=0; dd<dim(); dd++)
   {
-    // Auxillary variables to improve legibility
-    double K = Ks_[dd];
-    double b = (K/y_init[dd])-1;
+    /**  x = 1./((1+exp(Max_Rate*(ts-M))))
+       dx = -Max_Rate*[x.*(1-x)]
+    */
 
+    xs.block(0,dd,T,1)  = 1/(1+exp_rt.array()).array();
+    xds.block(0,dd,T,1) = -r*xs.block(0,dd,T,1).array() * ((1 - xs.block(0,dd,T,1).array()).array());
 
-    std::cout<<"y_init[dd]: "<<y_init[dd]<<std::endl;
-    std::cout<<"K: "<<K<<std::endl;
-    std::cout<<"b: "<<b<<std::endl;
-
-    xs.block(0,dd,T,1)  = K/(1+b*exp_rt.array());
-    xds.block(0,dd,T,1) = K*r*b*((1 + b*exp_rt.array()).square().inverse().array()) * exp_rt.array();
   }
 
   if (caller_expects_transposed)
@@ -166,7 +139,7 @@ void SigmoidSystem::serialize(Archive & ar, const unsigned int version)
 
   ar & BOOST_SERIALIZATION_NVP(max_rate_);
   ar & BOOST_SERIALIZATION_NVP(inflection_point_time_);
-  ar & BOOST_SERIALIZATION_NVP(Ks_);
+
 }
 
 

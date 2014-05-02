@@ -58,23 +58,13 @@ public:
   void set_tau(double tau);
   void set_initial_state(const Eigen::VectorXd& y_init);
 
-  /// ----------------------------------------------------------------------------
-  void printVariables(void);
-  /// ----------------------------------------------------------------------------
-
 	std::string toString(void) const;
 
 private:
-  static Eigen::VectorXd computeKs(const Eigen::VectorXd& N_0s, double r, double inflection_point_time_time);
 
   double max_rate_;
   double inflection_point_time_;
-  Eigen::VectorXd Ks_;
 
-  /// ----------------------------------------------------------------------------
-    double _prev_tau;
-    double _new_tau;
-  /// ----------------------------------------------------------------------------
 
   /**
    * Default constructor.
