@@ -446,6 +446,7 @@ delete dyn_sys;
 
 \em Remark. Both analyticalSolution and differentialEquation functions above are const, i.e. they do not change the DynamicalSystem itself.
 
+\em Remark. DynamicalSystem::integrateStep uses either Euler integration, or 4-th order Runge-Kutta.  The latter is more accurate, but requires 4 calls of DynamicalSystem::differentialEquation() instead of 1). Which one is used can be set with DynamicalSystem::set_integration_method(). To numerically integrate a dynamical system, one must carefully choose the integration time dt. Choosing it too low leads to inaccurate integration, and the numerical integration will diverge from the 'true' solution acquired through analytical solution. See http://en.wikipedia.org/wiki/Euler%27s_method for examples. Choosing dt depends entirely on the time-scale (seconds vs. years) and parameters of the dynamical system (time constant, decay parameters). 
 
 \subsection dynsys_implementation1_plotting Plotting
 
