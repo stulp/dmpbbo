@@ -78,6 +78,12 @@ void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
 
 VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflection_point_time_time)
 {
+  // The idea here is that the initial state (called N_0s above), max_rate (r above) and the 
+  // inflection_point_time are set by the user.
+  // The only parameter that we have left to tune is the "carrying capacity" K.
+  //   http://en.wikipedia.org/wiki/Logistic_function#In_ecology:_modeling_population_growth
+  // In the below, we set K so that the initial state is N_0s for the given r and tau
+  
   // Known
   //   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
   //   N(t_inf) = K / 2
@@ -89,6 +95,28 @@ VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflect
   VectorXd Ks = N_0s;
   for (int dd=0; dd<Ks.size(); dd++)
     Ks[dd] = N_0s[dd]*(1+(1/exp(-r*inflection_point_time_time)));
+  
+
+  // If Ks is too close to N_0===initial_state, then the differential equation will always return 0 
+  // See differentialEquation below
+  //   xd = max_rate_*x*(1-(x/Ks_));
+  // For initial_state this is
+  //   xd = max_rate_*initial_state*(1-(initial_state/Ks_));
+  // If initial_state is very close/equal to Ks we get
+  //   xd = max_rate_*Ks*(1-(Ks/Ks_));
+  //   xd = max_rate_*Ks*(1-1);
+  //   xd = max_rate_*Ks*0;
+  //   xd = 0;
+  // And integration fails, especially for Euler integration.
+  // So we now give a warning if this is likely to happen.
+  VectorXd div = N_0s.array()/Ks.array()-1;
+  //cout << setprecision(20) <<  div << endl;
+  if ((div.array().abs() < 10e-9).any()) // 10e-9 determined empirically
+  {
+    cerr << endl << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "In function SigmoidSystem::computeKs(), Ks is too close to N_0s. This may lead to errors during numerical integration. Recommended solution: choose a lower magnitude for the maximum rate of change (currently it is "<<r<<")" << endl;
+  }
+  
   return Ks;
 }
 
