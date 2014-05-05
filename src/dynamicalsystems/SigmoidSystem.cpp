@@ -50,6 +50,8 @@ SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate
   inflection_point_time_(inflection_point_time)
 {
     /// Tried to add this assert, but it doesn't work??? -> assert((max_rate_<50.) && (max_rate_>0.0) && "Max_Rate should be <50 and >0. I suggest using 40!");
+    K_ = x_init;
+    std::cout << "K_ = " << K_ << std::endl;
     max_rate_ /= tau; // Normalize the slope over any timescale
     int steps = round((tau - 0.0) / 0.001); // ensure a timeline with step size ~= 0.001
     VectorXd ts = VectorXd::LinSpaced(steps, 0.0, tau);
@@ -91,7 +93,9 @@ void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
 void SigmoidSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
 {
   /** -Max_rate * [x.*(1-x)] <- Must ensure that x is initialized*/
-  xd = -1.*(max_rate_)*x.array()*(1-x.array());
+  for (int dd=0; dd<dim(); dd++){
+    xd = -1.*(max_rate_)*x.array()*(1. - (x.array() / K_(dd,0)).array());
+    }
 }
 
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
@@ -119,8 +123,8 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
        dx = -Max_Rate*[x.*(1-x)]
     */
 
-    xs.block(0,dd,T,1)  = 1/(1+exp_rt.array()).array();
-    xds.block(0,dd,T,1) = -r*xs.block(0,dd,T,1).array() * ((1 - xs.block(0,dd,T,1).array()).array());
+    xs.block(0,dd,T,1)  = K_(dd,0) / (1+exp_rt.array()).array();
+    xds.block(0,dd,T,1) = -r*xs.block(0,dd,T,1).array() * ((1 - (xs.block(0,dd,T,1).array() / K_(dd,0))).array());
 
   }
 

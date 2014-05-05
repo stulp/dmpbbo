@@ -64,7 +64,7 @@ private:
 
   double max_rate_;
   double inflection_point_time_;
-
+  Eigen::VectorXd K_;
 
   /**
    * Default constructor.
