@@ -57,6 +57,7 @@ public:
 
   void set_tau(double tau);
   void set_initial_state(const Eigen::VectorXd& y_init);
+  void initializeSystem(double tau_tmp);
 
 	std::string toString(void) const;
 

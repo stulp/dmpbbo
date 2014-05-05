@@ -51,16 +51,9 @@ SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate
 {
     /// Tried to add this assert, but it doesn't work??? -> assert((max_rate_<50.) && (max_rate_>0.0) && "Max_Rate should be <50 and >0. I suggest using 40!");
     K_ = x_init;
-    std::cout << "K_ = " << K_ << std::endl;
-    max_rate_ /= tau; // Normalize the slope over any timescale
-    int steps = round((tau - 0.0) / 0.001); // ensure a timeline with step size ~= 0.001
-    VectorXd ts = VectorXd::LinSpaced(steps, 0.0, tau);
-    MatrixXd xs(ts.rows(), dim());
-    MatrixXd xds(ts.rows(), dim());
-    SigmoidSystem::analyticalSolution(ts, xs, xds); // integrate analytical solution to determine differential equations starting point
-    VectorXd num_y_init = xs.row(1); // pull the first value from the integration
-    SigmoidSystem::set_initial_state(num_y_init); // sets the differential system != 1 but on the right slope to follow the analytical system
 
+    max_rate_ /= tau; // Normalize the slope over any timescale
+    SigmoidSystem::initializeSystem(tau);
 }
 
 SigmoidSystem::~SigmoidSystem(void)
@@ -72,7 +65,16 @@ DynamicalSystem* SigmoidSystem::clone(void) const
   return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_,name());
 }
 
-
+void SigmoidSystem::initializeSystem(double tau_tmp)
+{
+    int steps = round((tau_tmp - 0.0) / 0.001); // ensure a timeline with step size ~= 0.001
+    VectorXd ts = VectorXd::LinSpaced(steps, 0.0, tau_tmp);
+    MatrixXd xs(ts.rows(), dim());
+    MatrixXd xds(ts.rows(), dim());
+    SigmoidSystem::analyticalSolution(ts, xs, xds); // integrate analytical solution to determine differential equations starting point
+    VectorXd num_y_init = xs.row(1); // pull the first value from the integration
+    SigmoidSystem::set_initial_state(num_y_init); // sets the differential system != 1 but on the right slope to follow the analytical system
+}
 
 void SigmoidSystem::set_tau(double new_tau) {
 
@@ -82,6 +84,8 @@ void SigmoidSystem::set_tau(double new_tau) {
   DynamicalSystem::set_tau(new_tau);
 
   inflection_point_time_ = new_tau*inflection_point_time_/prev_tau; /// This may have been comprimised!!! Need to check
+  max_rate_ = new_tau*max_rate_/prev_tau; // Normalize the slope over any timescale
+  SigmoidSystem::initializeSystem(new_tau);
 }
 
 void SigmoidSystem::set_initial_state(const VectorXd& y_init) {
