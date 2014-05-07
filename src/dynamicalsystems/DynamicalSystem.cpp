@@ -75,7 +75,7 @@ void DynamicalSystem::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const {
 void DynamicalSystem::integrateStep(double dt, const Ref<const VectorXd> x, Ref<VectorXd> x_updated, Ref<VectorXd> xd_updated) const
 {
   assert(dt>0.0);
-  if (dt>0.01) {std::cout<<"WARNING: The selected timestep, dt, may be numerically instable. Consider choosing dt < 0.01."<<std::endl;}
+  //if (dt>0.01) {std::cout<<"WARNING: The selected timestep, dt, may be numerically instable. Consider choosing dt < 0.01."<<std::endl;}
   // Check size. Leads to faster numerical integration and makes Eigen::Ref easier to deal with
   assert(x.size()==dim());
   if (integration_method_ == RUNGE_KUTTA)

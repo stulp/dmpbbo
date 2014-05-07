@@ -234,6 +234,7 @@ Dmp* Dmp::clone(void) const {
 
 void Dmp::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const
 {
+
   assert(x.size()==dim());
   assert(xd.size()==dim());
 
@@ -256,11 +257,11 @@ void Dmp::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const
 
   // Set the attractor state of the spring system
   spring_system_->set_attractor_state(x.GOAL);
-
   // Start integrating all futher subsystems
   spring_system_->integrateStart(x.SPRING, xd.SPRING);
   phase_system_->integrateStart(  x.PHASE,  xd.PHASE);
   gating_system_->integrateStart(x.GATING, xd.GATING);
+
 
   // Add rates of change
   differentialEquation(x,xd);
@@ -331,7 +332,6 @@ void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
   // Non-linear forcing term
   phase_system_->differentialEquation(x.PHASE, xd.PHASE);
   gating_system_->differentialEquation(x.GATING, xd.GATING);
-
   MatrixXd phase_state(1,1);
   phase_state = x.PHASE;
   MatrixXd fa_output(1,dim_orig());
@@ -341,7 +341,6 @@ void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
   double gating = (x.GATING)[0];
   VectorXd g_minus_y0 = (attractor_state()-initial_state()).transpose();
   VectorXd forcing_term = gating*fa_output.row(t0); // todo .array()*g_minus_y0.array();
-
   // Add forcing term to the ZD component of the spring state
   xd.SPRING_Z = xd.SPRING_Z + forcing_term/tau();
 
