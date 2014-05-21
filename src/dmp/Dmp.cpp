@@ -146,7 +146,7 @@ void Dmp::initSubSystems(DmpType dmp_type)
   else if (dmp_type==KULVICIUS_2012_JOINING || dmp_type==COUNTDOWN_2013)
   {
     goal_system   = new ExponentialSystem(tau(),initial_state(),attractor_state(),15);
-    gating_system = new SigmoidSystem(tau(),one_1,-40,0.9*tau()); 
+    gating_system = new SigmoidSystem(tau(),one_1,-20,0.9*tau()); 
     bool count_down = (dmp_type==COUNTDOWN_2013);    
     phase_system  = new TimeSystem(tau(),count_down);
   }
