@@ -74,9 +74,30 @@ bool saveToDirectory(const UpdateSummary& summary, string directory, bool overwr
   
 }
 
-bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
+bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve, bool stack_updates)
 {
-  
+  int dir_buffer = 1;
+  if ((stack_updates) && (overwrite))//ensuring overwrite will continue to update the learning curve file
+  {
+    if (boost::filesystem::exists(directory))
+    {
+      int MAX_UPDATE = 99999; // Cannot store more in %05d format
+      int old_update=1;
+      while ((old_update<MAX_UPDATE) && (dir_buffer==1))
+      {
+        stringstream stream;
+        stream << directory << "/update" << setw(5) << setfill('0') << old_update << "/";
+        string directory_update = stream.str();
+        if (!boost::filesystem::exists(directory_update))
+        {
+          // Found a directory that doesn't exist yet!
+          dir_buffer = old_update;
+        }
+        old_update++;
+      }
+    }
+  }
+
   // Save the learning curve
   int n_updates = update_summaries.size();
   MatrixXd learning_curve(n_updates,3);
@@ -109,7 +130,7 @@ bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string 
     for (int i_update=0; i_update<n_updates; i_update++)
     {
       stringstream stream;
-      stream << directory << "/update" << setw(5) << setfill('0') << i_update+1 << "/";
+      stream << directory << "/update" << setw(5) << setfill('0') << i_update+dir_buffer << "/";
       if (!saveToDirectory(update_summaries[i_update], stream.str(),overwrite))
         return false;
     }

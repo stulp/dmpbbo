@@ -81,7 +81,7 @@ bool saveToDirectory(const UpdateSummary& update_summary, std::string directory,
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  * \return true if saving the UpdateSummary was successful, false otherwise
  */
-bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false);
+bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite=false, bool only_learning_curve=false, bool stack_updates=false);
 
 /**
  * Save an update summary to a directory.
