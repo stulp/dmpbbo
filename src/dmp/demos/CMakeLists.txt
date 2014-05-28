@@ -8,3 +8,7 @@ add_executable(demoDmpContextual demoDmpContextual.cpp)
 target_link_libraries(demoDmpContextual dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
 install(TARGETS demoDmpContextual DESTINATION bin)
 
+add_executable(demoDmpTrainFromTrajectoryFile demoDmpTrainFromTrajectoryFile.cpp)
+target_link_libraries(demoDmpTrainFromTrajectoryFile dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+install(TARGETS demoDmpTrainFromTrajectoryFile DESTINATION bin)
+
