@@ -51,10 +51,11 @@ Trajectory::Trajectory(const VectorXd& ts, const MatrixXd& ys,  const MatrixXd& 
     misc_ = MatrixXd(n_time_steps,0);
   assert(n_time_steps==misc_.rows());
   
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_dims = ys_.cols();
   assert(n_dims==yds_.cols());
   assert(n_dims==ydds_.cols());
-  
+#endif  
     
 }
 
