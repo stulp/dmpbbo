@@ -114,6 +114,15 @@ bool DmpContextualTwoStep::isTrained(void) const
 
 void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const vector<MatrixXd>& task_parameters, string save_directory, bool overwrite)
 {
+  // Here's the basic structure of this function
+  // 1) Do some checks
+  // 2) Train a separate Dmp for each demonstration, and get the resulting model parameters
+  // 3) Gather all task parameter values for all demonstrations
+  // 4) Train the policy parameter function for each dimension and each model parameter
+  
+  //-----------------------------------------------------
+  // 1) Do some checks
+  
   // Check if inputs are of the right size.
   unsigned int n_demonstrations = trajectories.size();
   assert(n_demonstrations==task_parameters.size());  
@@ -128,6 +137,10 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   set_initial_state(trajectories[0].initial_y());
   set_attractor_state(trajectories[0].final_y());
 
+  std::set<std::string> selected;
+  selected.insert("offsets");
+  selected.insert("slopes");
+  
   MatrixXd cur_task_parameters;
   VectorXd cur_model_parameters;// todo Remove redundant tmp variable
   vector<MatrixXd> all_model_parameters(n_demonstrations); 
@@ -142,7 +155,9 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
     
     for (int i_dim=0; i_dim<dim_orig(); i_dim++)
     {
-      function_approximator(i_dim)->setSelectedParametersOne(string("slopes")); // todo Should be argument of constructor
+
+      // todo Should be argument of constructor
+      function_approximator(i_dim)->setSelectedParameters(selected); 
   
       function_approximator(i_dim)->getParameterVectorSelected(cur_model_parameters);
       //cout << cur_model_parameters << endl;
