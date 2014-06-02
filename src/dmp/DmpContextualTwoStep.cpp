@@ -120,6 +120,7 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   // 3) Gather all task parameter values for all demonstrations
   // 4) Train the policy parameter function for each dimension and each model parameter
   
+  
   //-----------------------------------------------------
   // 1) Do some checks
   
@@ -137,6 +138,8 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   set_initial_state(trajectories[0].initial_y());
   set_attractor_state(trajectories[0].final_y());
 
+  //-----------------------------------------------------
+  // 2) Train a separate Dmp for each demonstration, and get the resulting model parameters
   std::set<std::string> selected;
   selected.insert("offsets");
   selected.insert("slopes");
@@ -172,6 +175,9 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   }
 
    
+  //-----------------------------------------------------
+  // 3) Gather all task parameter values for all demonstrations
+  
   // Gather task parameters in a matrix
   int n_task_parameters = task_parameters[0].cols();
   // This is the first time task_parameters_ is set, because this is the first time we know 
@@ -201,6 +207,8 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
     inputs.row(i_demo) = cur_task_parameters_t0;
   }
 
+  //-----------------------------------------------------
+  // 4) Train the policy parameter function for each dimension and each model parameter
   
   // Input to policy parameter functions: task_parameters
   // Target for each policy parameter function: all_model_parameters.col(param)
