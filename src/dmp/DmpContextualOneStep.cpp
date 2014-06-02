@@ -146,8 +146,7 @@ void  DmpContextualOneStep::train(const vector<Trajectory>& trajectories, const 
     
   }
 
-  // Now we have a vector of matrices with different numbers of rows, but the same number of 
-  // columns. We now concatenate them into one big matrix.
+  // We have all inputs and targets. Now train the function approximator for each dimension.
   
   for (int dd=0; dd<dim_orig(); dd++)
   {
