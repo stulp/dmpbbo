@@ -163,16 +163,27 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   // n_task_parameters.
   // We set it so that set_task_parameters can check if task_parameters_.cols()==n_task_parameters
   task_parameters_ = MatrixXd::Zero(1,n_task_parameters);
+  VectorXd cur_task_parameters_t0;
   
   MatrixXd inputs(n_demonstrations,n_task_parameters);
   for (unsigned int i_demo=0; i_demo<n_demonstrations; i_demo++)
   {
-    if (task_parameters[i_demo].rows()>0)
+    // These are the task parameters for the current demonstration at t=0
+    cur_task_parameters_t0 = task_parameters[i_demo].row(0);
+    
+    // Task parameter may not change over time for 2-Step contextual DMP
+    // Start comparison to i_time=0 at i_time=1
+    for (unsigned int i_time=1; i_time<task_parameters[i_demo].rows(); i_time++)
     {
-      cerr << __FILE__ << ":" << __LINE__ << ":";
-      cerr << "WARNING. For DmpContextualTwoStep, task parameters may not vary over time during training. Using task parameters at t=0 only." << endl;
+      if ( (cur_task_parameters_t0.array() != task_parameters[i_demo].row(i_time).array()).any())
+      {
+        cerr << __FILE__ << ":" << __LINE__ << ":";
+        cerr << "WARNING. For DmpContextualTwoStep, task parameters may not vary over time during training. Using task parameters at t=0 only." << endl;
+      }
     }
-    inputs.row(i_demo) = task_parameters[i_demo].row(0);
+
+    // Take the first row, i.e. at time_i = 0. We checked above if they are constant over time.
+    inputs.row(i_demo) = cur_task_parameters_t0;
   }
 
   
