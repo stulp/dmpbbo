@@ -1,5 +1,5 @@
 ################################################################################
-file(GLOB SOURCES Parameterizable.cpp MetaParameters.cpp ModelParameters.cpp FunctionApproximator.cpp  *LWR.cpp *IRFRLS.cpp *GMR.cpp) 
+file(GLOB SOURCES Parameterizable.cpp MetaParameters.cpp ModelParameters.cpp FunctionApproximator.cpp  *LWR.cpp *IRFRLS.cpp *GMR.cpp *RBFN.cpp) 
 if(LWPR_FOUND)
   file(GLOB SOURCES ${SOURCES} *LWPR.cpp) 
 endif()
