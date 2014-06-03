@@ -35,10 +35,12 @@
 #include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
+#include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
+#include "functionapproximators/MetaParametersRBFN.hpp"
 
 
 #include "targetFunction.hpp"
@@ -172,6 +174,24 @@ int main(int n_args, char** args)
   delete fa;
 #endif // USE_LWPR
 
+  // Radial Basis Function Network
+  intersection = 0.7;
+  n_rfs = 9;
+  if (n_input_dims==2) n_rfs = 5;
+  num_rfs_per_dim = VectorXi::Constant(n_input_dims,n_rfs);
+  MetaParametersRBFN* meta_parameters_rbfn = new MetaParametersRBFN(n_input_dims,num_rfs_per_dim,intersection);
+  fa = new FunctionApproximatorRBFN(meta_parameters_rbfn);
+
+  cout << "_____________________________________" << endl << fa->getName() << endl;
+  cout << "    Training"  << endl;
+  if (!directory.empty()) directory_fa =  directory+"/"+fa->getName();
+  fa->train(inputs,targets,directory_fa,overwrite);
+  cout << "    Predicting" << endl;
+  fa->predict(inputs,outputs);
+  meanAbsoluteErrorPerOutputDimension(targets,outputs);
+  cout << endl << endl;
+  
+  delete fa;
  
   return 0;
 }

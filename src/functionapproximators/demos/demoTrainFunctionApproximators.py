@@ -29,7 +29,7 @@ if __name__=='__main__':
     subprocess.call([executable, directory])
     
     # Plot the results in each directory
-    function_approximator_names = ["LWR","LWPR","GMR","IRFRLS"]
+    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR","RBFN"]
     fig = plt.figure()
     subplot_number = 1;
     for name in function_approximator_names:
@@ -51,4 +51,5 @@ if __name__=='__main__':
     ax.legend(['targets','predictions'])
     plt.show()
     
+    #fig.savefig("lwr.svg")
 
