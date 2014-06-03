@@ -13,6 +13,7 @@ lib_path = os.path.abspath('../plotting')
 sys.path.append(lib_path)
 from plotData import plotDataFromDirectory
 from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
+from plotBasisFunctions import plotBasisFunctionsFromDirectory
 
 if __name__=='__main__':
     executable = "../../../bin/demoTrainFunctionApproximators"
@@ -43,6 +44,9 @@ if __name__=='__main__':
             plotDataFromDirectory(directory_fa,ax)
             if (name=="LWR" or name=="LWPR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
+            elif (name=="RBFN"):
+                plot_normalized=False
+                plotBasisFunctionsFromDirectory(directory_fa,ax,plot_normalized)
             ax.set_ylim(-1.0,1.5)
         except IOError:
             print "WARNING: Could not find data for function approximator "+name
