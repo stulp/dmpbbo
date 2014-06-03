@@ -104,21 +104,21 @@ void ModelParametersRBFN::kernelActivations(const MatrixXd& inputs, MatrixXd& ke
 
 void ModelParametersRBFN::weightedBasisFunctions(const MatrixXd& inputs, MatrixXd& output) const
 {  
+  output.resize(inputs.rows(),1); // Fix this
+  // Assert that memory has been pre-allocated.
+  assert(inputs.rows()==output.rows());
+  
   // Get the basis function activations  
-  kernelActivations(inputs,output);
-  
+  MatrixXd activations; // todo avoid allocation
+  kernelActivations(inputs,activations);
+    
   // Weight the basis function activations  
-  for (int b=0; b<output.cols(); b++)
-    output.col(b).array() *= weights_(b);
+  for (int b=0; b<activations.cols(); b++)
+    activations.col(b).array() *= weights_(b);
 
-  cout << "_____________________" << endl;  
-  cout << "inputs=" << inputs.rows() << " X " << inputs.cols() << endl;
-  cout << "output=" << output.rows() << " X " << output.cols() << endl;
-  cout << "  output=" << output << endl;
-  output = output.rowwise().sum();
-  cout << "output=" << output.rows() << " X " << output.cols() << endl;
-  cout << "  output=" << output << endl;
-  
+  // Sum over weighed basis functions
+  output = activations.rowwise().sum();
+    
 }
 
 void ModelParametersRBFN::kernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
