@@ -26,6 +26,7 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
+#include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/ModelParametersRBFN.hpp"
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRBFN);
@@ -301,26 +302,7 @@ bool ModelParametersRBFN::saveGridData(const VectorXd& min, const VectorXd& max,
   assert(n_dims==n_samples_per_dim.size());
   
   MatrixXd inputs;
-  if (n_dims==1)
-  {
-    inputs  = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-  }
-  else if (n_dims==2)
-  {
-    int n_samples = n_samples_per_dim[0]*n_samples_per_dim[1];
-    inputs = MatrixXd::Zero(n_samples, n_dims);
-    VectorXd x1 = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-    VectorXd x2 = VectorXd::LinSpaced(n_samples_per_dim[1], min[1], max[1]);
-    for (int ii=0; ii<x1.size(); ii++)
-    {
-      for (int jj=0; jj<x2.size(); jj++)
-      {
-        inputs(ii*x2.size()+jj,0) = x1[ii];
-        inputs(ii*x2.size()+jj,1) = x2[jj];
-      }
-    }
-  }  
-  
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
   MatrixXd outputs;
   weightedBasisFunctions(inputs,outputs);
 

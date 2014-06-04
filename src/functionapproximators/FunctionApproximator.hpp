@@ -187,6 +187,9 @@ public:
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   
+  
+  static void generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_test);
+  
 protected:
 
   /** Accessor for FunctionApproximator::model_parameters_

@@ -216,6 +216,38 @@ string FunctionApproximator::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML(name.c_str());
 }
 
+void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_grid)
+{
+  int n_dims = min.size();
+  assert(n_dims==max.size());
+  assert(n_dims==n_samples_per_dim.size());
+  
+  if (n_dims==1)
+  {
+    inputs_grid = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
+  }
+  else if (n_dims==2)
+  {
+    int n_samples = n_samples_per_dim[0]*n_samples_per_dim[1];
+    inputs_grid = MatrixXd::Zero(n_samples, n_dims);
+    VectorXd x1 = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
+    VectorXd x2 = VectorXd::LinSpaced(n_samples_per_dim[1], min[1], max[1]);
+    for (int ii=0; ii<x1.size(); ii++)
+    {
+      for (int jj=0; jj<x2.size(); jj++)
+      {
+        inputs_grid(ii*x2.size()+jj,0) = x1[ii];
+        inputs_grid(ii*x2.size()+jj,1) = x2[jj];
+      }
+    }
+  }  
+  else
+  {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "Can only generate input grids for n_dims<3, but found " << n_dims << endl;
+  }
+}
+
 
 void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets, string save_directory, bool overwrite)
 {
@@ -237,6 +269,15 @@ void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets
     if (getExpectedInputDim()==2) n_samples_per_dim = 40;
     VectorXi n_samples_per_dim_vec = VectorXi::Constant(getExpectedInputDim(),n_samples_per_dim);
 
+    MatrixXd inputs_grid;
+    FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim_vec, inputs_grid);
+    
+    MatrixXd outputs_grid(inputs_grid.rows(),1);
+    predict(inputs_grid,outputs_grid);
+    saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim_vec,overwrite);
+    saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
+    saveMatrix(save_directory,"outputs_grid.txt",outputs_grid,overwrite);
+    
     model_parameters_->saveGridData(min, max, n_samples_per_dim_vec, save_directory, overwrite);
     
   }
@@ -247,6 +288,8 @@ void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets
   saveMatrix(save_directory,"inputs.txt",inputs,overwrite);
   saveMatrix(save_directory,"targets.txt",targets,overwrite);
   saveMatrix(save_directory,"outputs.txt",outputs,overwrite);
+  
+  
   
   string filename = save_directory+"/plotdata.py";
   ofstream outfile;

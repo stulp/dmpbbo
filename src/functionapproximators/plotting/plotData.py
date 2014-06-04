@@ -28,8 +28,21 @@ def plotDataTargets(inputs,target,ax):
 def plotDataPredictions(inputs,predictions,ax,n_samples_per_dim=[]):
     """Plot outputs against targets, and apply default style for predictions."""
     lines = plotData(inputs,predictions,ax)
-    plt.setp(lines, linestyle='.', label='predictions', color='red')
+    plt.setp(lines, marker='.', label='predictions', color='red')
     return lines
+    
+def plotResiduals(inputs,targets,predictions,ax):
+    lines = []
+    n_dims = len(numpy.atleast_1d(inputs[0]))
+    if (n_dims>2):
+        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        return lines
+    for ii in range(len(inputs)):
+        if (n_dims==1):
+            lines = ax.plot([inputs[ii], inputs[ii]],[targets[ii], predictions[ii] ], '-r')
+        elif (n_dims==2):
+            lines = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ], '-r')
+
     
 def plotDataPredictionsGrid(inputs,predictions,ax,n_samples_per_dim=[]):
     """Plot outputs against targets, and apply default style for predictions."""
@@ -57,9 +70,6 @@ def plotDataFromDirectory(directory,ax):
     predictions = numpy.loadtxt(directory+'/outputs.txt')
         
     # Plotting
-    plotDataTargets(inputs,targets,ax)
-    plotDataPredictions(inputs,predictions,ax)   
-    
     try:
       inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
       predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
@@ -67,6 +77,12 @@ def plotDataFromDirectory(directory,ax):
     except IOError:
       # Everything's fine: user did not store grid predictions
       predictions_grid = [];
+      
+      
+    plotResiduals(inputs,targets,predictions,ax)
+    plotDataTargets(inputs,targets,ax)
+    #plotDataPredictions(inputs,predictions,ax)   
+    
     
     
     # Annotation
