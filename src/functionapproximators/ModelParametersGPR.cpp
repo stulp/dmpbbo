@@ -65,13 +65,14 @@ void ModelParametersGPR::predictMean(const Eigen::MatrixXd& inputs, Eigen::Matri
 {
   assert(inputs.cols()==getExpectedInputDim());
   unsigned int n_samples = inputs.rows();
+  unsigned int n_samples_train = train_inputs_.rows();
   
   outputs.resize(n_samples,1);
   
-  RowVectorXd K(n_samples);
+  RowVectorXd K(n_samples_train);
   for (unsigned int ii=0; ii<n_samples; ii++)
   {
-    for (int jj=0; jj<train_inputs_.rows(); jj++)
+    for (unsigned int jj=0; jj<n_samples_train; jj++)
       K(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
 
     outputs(ii) = K*gram_inv_targets_;
@@ -119,7 +120,6 @@ void ModelParametersGPR::setParameterVectorAll(const VectorXd& values) {
 
 bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
-  /*
   if (save_directory.empty())
     return true;
   
@@ -149,21 +149,20 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
       }
     }
   }  
-      
-  MatrixXd weighted_lines;
-  locallyWeightedLines(inputs, weighted_lines);
-  
-  MatrixXd activations;
-  kernelActivations(inputs, activations);
+  MatrixXd outputs;
+  predictMean(inputs, outputs);
+
+  //MatrixXd activations;
+  //kernelActivations(inputs, activations);
     
-  MatrixXd normalized_activations;
-  normalizedKernelActivations(inputs, normalized_activations);
     
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"train_inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"weighted_lines.txt",weighted_lines,overwrite);
-  saveMatrix(save_directory,"activations.txt",activations,overwrite);
-  */
+  saveMatrix(save_directory,"outputs_grid.txt",outputs,overwrite);
+  //saveMatrix(save_directory,"activations.txt",activations,overwrite);
+  
+  // todo move this up into FunctionApproximator, i.e. saveLatentFunction or something
+  
   return true;
   
 }
