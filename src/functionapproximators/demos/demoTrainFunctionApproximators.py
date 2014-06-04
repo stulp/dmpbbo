@@ -29,7 +29,7 @@ if __name__=='__main__':
     subprocess.call([executable, directory])
     
     # Plot the results in each directory
-    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR","RBFN"]
+    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR","RBFN","GPR"]
     fig = plt.figure()
     subplot_number = 1;
     for name in function_approximator_names:
