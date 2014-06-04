@@ -41,7 +41,7 @@ if __name__=='__main__':
         directory_fa = directory +"/"+ name
         try:
             plotDataFromDirectory(directory_fa,ax)
-            if (name=="LWR" or name=="LWPR"):
+            if (name=="LWR" or name=="LWPR" or name=="GPR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
             ax.set_ylim(-1.0,1.5)
         except IOError:
