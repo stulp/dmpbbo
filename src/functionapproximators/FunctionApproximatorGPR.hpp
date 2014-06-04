@@ -68,6 +68,8 @@ public:
     return std::string("GPR");  
   };
   
+  static double covarianceFunction(const Eigen::VectorXd& input1, const   Eigen::VectorXd& input2, double maximum_covariance, double length);
+
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

@@ -46,16 +46,16 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers_per_dim' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
    *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
-   * \param[in] weights             Weights, being G^-1*y, where G is the Gram matrix
+   * \param[in] gram_inv_targets    G^-1*y, where G is the Gram matrix
    */
-   ModelParametersGPR(Eigen::MatrixXd inputs, Eigen::VectorXd weights, double maximum_covariance, double length);
+   ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::VectorXd gram_inv_targets, double maximum_covariance, double length);
    
   std::string toString(void) const;
   
 	ModelParameters* clone(void) const;
 	
   int getExpectedInputDim(void) const  {
-    return inputs_.cols();
+    return train_inputs_.cols();
   };
   
   
@@ -69,12 +69,19 @@ public:
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
+  /** Predict the mean outputs for these train_inputs. 
+   * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
+   * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
+   *
+   */
+  void predictMean(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
+    
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
-  Eigen::MatrixXd inputs_;
-  Eigen::VectorXd weights_;
+  Eigen::MatrixXd train_inputs_;
+  Eigen::VectorXd gram_inv_targets_;
   double maximum_covariance_;
   double length_;
 

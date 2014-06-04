@@ -36,11 +36,13 @@
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorGPR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/MetaParametersGPR.hpp"
 
 
 #include "targetFunction.hpp"
@@ -181,6 +183,21 @@ int main(int n_args, char** args)
   num_rfs_per_dim = VectorXi::Constant(n_input_dims,n_rfs);
   MetaParametersRBFN* meta_parameters_rbfn = new MetaParametersRBFN(n_input_dims,num_rfs_per_dim,intersection);
   fa = new FunctionApproximatorRBFN(meta_parameters_rbfn);
+
+  cout << "_____________________________________" << endl << fa->getName() << endl;
+  cout << "    Training"  << endl;
+  if (!directory.empty()) directory_fa =  directory+"/"+fa->getName();
+  fa->train(inputs,targets,directory_fa,overwrite);
+  cout << "    Predicting" << endl;
+  fa->predict(inputs,outputs);
+  meanAbsoluteErrorPerOutputDimension(targets,outputs);
+  cout << endl << endl;
+  
+  // Gaussian Process Regression
+  double maximum_covariance = 1.0;
+  double length = 0.1;
+  MetaParametersGPR* meta_parameters_gpr = new MetaParametersGPR(n_input_dims,maximum_covariance,length);
+  fa = new FunctionApproximatorGPR(meta_parameters_gpr);
 
   cout << "_____________________________________" << endl << fa->getName() << endl;
   cout << "    Training"  << endl;

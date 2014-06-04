@@ -48,12 +48,16 @@ FunctionApproximatorGPR::FunctionApproximatorGPR(MetaParametersGPR *meta_paramet
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  cerr << __FILE__ << ":" << __LINE__ << ":";
+  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
 }
 
 FunctionApproximatorGPR::FunctionApproximatorGPR(ModelParametersGPR *model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
+  cerr << __FILE__ << ":" << __LINE__ << ":";
+  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
 }
 
 
@@ -81,7 +85,6 @@ FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
  * \param[out] result  The pseudo-inverse of the matrix.
  * \param[in]  epsilon Don't know, not my code ;-)
  * \return     true if pseudo-inverse possible, false otherwise
- */
 template<typename _Matrix_Type_>
 bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
 epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
@@ -101,6 +104,14 @@ tolerance).select(svd.singularValues().
       
   return true;
 }
+*/
+
+
+double FunctionApproximatorGPR::covarianceFunction(const VectorXd& input1, const VectorXd& input2, double maximum_covariance, double length) {
+  double norm_2 = (input1-input2).squaredNorm();
+  return maximum_covariance*exp(-0.5*norm_2/(length*length)); 
+}
+
 
 
 void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targets)
@@ -115,16 +126,26 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
   assert(inputs.rows() == targets.rows());
   assert(inputs.cols()==getExpectedInputDim());
 
-  const MetaParametersGPR* meta_parameters_lwr = 
+  const MetaParametersGPR* meta_parameters_gpr = 
     dynamic_cast<const MetaParametersGPR*>(getMetaParameters());
   
+  double max_covar = meta_parameters_gpr->maximum_covariance();
+  double length = meta_parameters_gpr->length();
   
-  MatrixXd gram;
-  setModelParameters(new ModelParametersGPR(gram));
+  MatrixXd gram(inputs.rows(),inputs.rows());
+  for (int ii=0; ii<inputs.rows(); ii++)
+  {
+    for (int jj=0; jj<inputs.rows(); jj++)
+    {
+      gram(ii,jj) = covarianceFunction(inputs.row(ii),inputs.row(jj),max_covar,length);
+    }
+  }
+  MatrixXd gram_inv_targets = gram.inverse() * targets.col(0);
+  setModelParameters(new ModelParametersGPR(inputs,gram_inv_targets,max_covar,length));
   
 }
 
-void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -132,7 +153,9 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& output)
     return;
   }
 
-  const ModelParametersGPR* model_parameters_lwr = static_cast<const ModelParametersGPR*>(getModelParameters());
+  const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
+  
+  model_parameters_gpr->predictMean(inputs, outputs);
 }
 
 template<class Archive>

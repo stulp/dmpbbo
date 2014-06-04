@@ -27,6 +27,7 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/ModelParametersGPR.hpp"
+#include "functionapproximators/FunctionApproximatorGPR.hpp"
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
@@ -45,10 +46,10 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(MatrixXd inputs, VectorXd weights, double maximum_covariance, double length)
+ModelParametersGPR::ModelParametersGPR(MatrixXd train_inputs, VectorXd gram_inv_targets, double maximum_covariance, double length)
 :
-  inputs_(inputs),
-  weights_(weights),
+  train_inputs_(train_inputs),
+  gram_inv_targets_(gram_inv_targets),
   maximum_covariance_(maximum_covariance),
   length_(length)
 {
@@ -57,127 +58,25 @@ ModelParametersGPR::ModelParametersGPR(MatrixXd inputs, VectorXd weights, double
 }
 
 ModelParameters* ModelParametersGPR::clone(void) const {
-  return new ModelParametersGPR(inputs_,weights_,maximum_covariance_,length_); 
+  return new ModelParametersGPR(train_inputs_,gram_inv_targets_,maximum_covariance_,length_); 
 }
 
-void ModelParametersGPR::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
+void ModelParametersGPR::predictMean(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) const
 {
-  kernelActivations(centers_,widths_,inputs,kernel_activations,asymmetric_kernels_);  
-}
-
-void ModelParametersGPR::normalizedKernelActivations(const MatrixXd& inputs, MatrixXd& normalized_kernel_activations) const
-{
-  if (caching_)
+  assert(inputs.cols()==getExpectedInputDim());
+  unsigned int n_samples = inputs.rows();
+  
+  outputs.resize(n_samples,1);
+  
+  RowVectorXd K(n_samples);
+  for (unsigned int ii=0; ii<n_samples; ii++)
   {
-    // If the cached inputs matrix has the same size as the one now requested
-    //     (this also takes care of the case when inputs_cached is empty and need to be initialized)
-    if ( inputs.rows()==inputs_cached_.rows() && inputs.cols()==inputs_cached_.cols() )
-    {
-      // And they have the same values
-      if ( (inputs.array()==inputs_cached_.array()).all() )
-      {
-        // Then you can return the cached values
-        normalized_kernel_activations = normalized_kernel_activations_cached_;
-        return;
-      }
-    }
-  }
+    for (int jj=0; jj<train_inputs_.rows(); jj++)
+      K(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
 
-  // Cache could not be used, actually do the work
-  normalizedKernelActivations(centers_,widths_,inputs,normalized_kernel_activations,asymmetric_kernels_);
-
-  if (caching_)
-  {
-    // Cache the current results now.  
-    inputs_cached_ = inputs;
-    normalized_kernel_activations_cached_ = normalized_kernel_activations;
+    outputs(ii) = K*gram_inv_targets_;
   }
   
-}
-
-void ModelParametersGPR::kernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations, bool asymmetric_kernels)
-{
-  
-  // Check and set sizes
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  int n_dims            = centers.cols();
-  assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
-  assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
-  kernel_activations.resize(n_samples,n_basis_functions);  
-
-  double c,w,x;
-  for (int bb=0; bb<n_basis_functions; bb++)
-  {
-
-    // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
-    //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-    // Because Sigma is diagonal in our case, this simplifies to
-    //   activation = exp(\sum_d=1^D [-0.5*(x_d-mu_d)^2/Sigma_(d,d)]) 
-    //              = \prod_d=1^D exp(-0.5*(x_d-mu_d)^2/Sigma_(d,d)) 
-    // This last product is what we compute below incrementally
-    
-    kernel_activations.col(bb).fill(1.0);
-    for (int i_dim=0; i_dim<n_dims; i_dim++)
-    {
-      c = centers(bb,i_dim);
-      for (int i_s=0; i_s<n_samples; i_s++)
-      {
-        x = inputs(i_s,i_dim);
-        w = widths(bb,i_dim);
-        
-        if (asymmetric_kernels && x<c && bb>0)
-          // Get the width of the previous basis function
-          // This is the part that makes it assymetric
-          w = widths(bb-1,i_dim);
-          
-        kernel_activations(i_s,bb) *= exp(-0.5*pow(x-c,2)/(w*w));
-      }
-    }
-  }
-}
-
-void ModelParametersGPR::normalizedKernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& normalized_kernel_activations, bool asymmetric_kernels)
-{
-
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  normalized_kernel_activations.resize(n_samples,n_basis_functions);  
-  
-  if (n_basis_functions==1)
-  {
-    // Locally Weighted Regression with only one basis function is pretty odd.
-    // Essentially, you are taking the "Locally Weighted" part out of the regression, and it becomes
-    // standard least squares 
-    // Anyhow, for those that still want to "abuse" GPR as R (i.e. without LW), we explicitly
-    // set the normalized kernels to 1 here, to avoid numerical issues in the normalization below.
-    // (normalizing a Gaussian basis function with itself leads to 1 everywhere).
-    normalized_kernel_activations.fill(1.0);
-    return;
-  }  
-
-  // Get activations of kernels
-  // Note that these are not normalized yet, even though they are called
-  // 'normalized_kernel_activations'. This is just to save allocating extra memory.
-  kernelActivations(centers,widths,inputs,normalized_kernel_activations,asymmetric_kernels);
-  
-  // Compute sum for each row (each value in input_vector)
-  MatrixXd sum_kernel_activations = normalized_kernel_activations.rowwise().sum(); // n_samples x 1
-
-  // Add small number to avoid division by zero. Not full-proof...  
-  if ((sum_kernel_activations.array()==0).any())
-    sum_kernel_activations.array() += sum_kernel_activations.maxCoeff()/100000.0;
-  
-  // Normalize for each row (each value in input_vector)  
-  normalized_kernel_activations = normalized_kernel_activations.array()/sum_kernel_activations.replicate(1,n_basis_functions).array();
 }
 
 template<class Archive>
@@ -186,15 +85,11 @@ void ModelParametersGPR::serialize(Archive & ar, const unsigned int version)
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
 
-  ar & BOOST_SERIALIZATION_NVP(centers_);
-  ar & BOOST_SERIALIZATION_NVP(widths_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_);
-  ar & BOOST_SERIALIZATION_NVP(offsets_);
-  ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
-  ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-  ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-  ar & BOOST_SERIALIZATION_NVP(caching_);
+  ar & BOOST_SERIALIZATION_NVP(train_inputs_);
+  ar & BOOST_SERIALIZATION_NVP(gram_inv_targets_);
+  ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);            
+  ar & BOOST_SERIALIZATION_NVP(length_);     
+                                    
 }
 
 string ModelParametersGPR::toString(void) const
@@ -205,137 +100,26 @@ string ModelParametersGPR::toString(void) const
 void ModelParametersGPR::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
-  selected_values_labels.insert("centers");
-  selected_values_labels.insert("widths");
-  selected_values_labels.insert("offsets");
-  selected_values_labels.insert("slopes");
 }
 
 
 void ModelParametersGPR::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
 {
-
-  selected_mask.resize(getParameterVectorAllSize());
-  selected_mask.fill(0);
-  
-  int offset = 0;
-  int size;
-  
-  // Centers
-  size = centers_.rows()*centers_.cols();
-  if (selected_values_labels.find("centers")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(1);
-  offset += size;
-  
-  // Widths
-  size = widths_.rows()*widths_.cols();
-  if (selected_values_labels.find("widths")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(2);
-  offset += size;
-  
-  // Offsets
-  size = offsets_.rows()*offsets_.cols();
-  if (selected_values_labels.find("offsets")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(3);
-  offset += size;
-
-  // Slopes
-  size = slopes_.rows()*slopes_.cols();
-  if (selected_values_labels.find("slopes")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(4);
-  offset += size;
-
-  assert(offset == getParameterVectorAllSize());   
+  selected_mask.resize(0);
 }
 
 void ModelParametersGPR::getParameterVectorAll(VectorXd& values) const
 {
   values.resize(getParameterVectorAllSize());
-  int offset = 0;
-  
-  for (int i_dim=0; i_dim<centers_.cols(); i_dim++)
-  {
-    values.segment(offset,centers_.rows()) = centers_.col(i_dim);
-    offset += centers_.rows();
-  }
-  
-  for (int i_dim=0; i_dim<widths_.cols(); i_dim++)
-  {
-    values.segment(offset,widths_.rows()) = widths_.col(i_dim);
-    offset += widths_.rows();
-  }
-  
-  values.segment(offset,offsets_.rows()) = offsets_;
-  offset += offsets_.rows();
-  
-  VectorXd cur_slopes;
-  for (int i_dim=0; i_dim<slopes_.cols(); i_dim++)
-  {
-    cur_slopes = slopes_.col(i_dim);
-    if (slopes_as_angles_)
-    {
-      // cur_slopes is a slope, but the values vector expects the angle with the x-axis. Do the 
-      // conversion here.
-      for (int ii=0; ii<cur_slopes.size(); ii++)
-        cur_slopes[ii] = atan2(cur_slopes[ii],1.0);
-    }
-    
-    values.segment(offset,slopes_.rows()) = cur_slopes;
-    offset += slopes_.rows();
-  }
-  
-  assert(offset == getParameterVectorAllSize());   
+  values.resize(0);
 };
 
 void ModelParametersGPR::setParameterVectorAll(const VectorXd& values) {
-
-  if (all_values_vector_size_ != values.size())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ": values is of wrong size." << endl;
-    return;
-  }
-  
-  int offset = 0;
-  int size = centers_.rows();
-  int n_dims = centers_.cols();
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(centers_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    centers_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-  }
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(widths_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    widths_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-  }
-
-  offsets_ = values.segment(offset,size);
-  offset += size;
-  // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
-
-  MatrixXd old_slopes = slopes_;
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    slopes_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-    // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
-  }
-
-  assert(offset == getParameterVectorAllSize());   
 };
 
 bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
+  /*
   if (save_directory.empty())
     return true;
   
@@ -366,9 +150,6 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
     }
   }  
       
-  MatrixXd lines;
-  getLines(inputs, lines);
-  
   MatrixXd weighted_lines;
   locallyWeightedLines(inputs, weighted_lines);
   
@@ -379,24 +160,13 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
   normalizedKernelActivations(inputs, normalized_activations);
     
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"lines.txt",lines,overwrite);
+  saveMatrix(save_directory,"train_inputs_grid.txt",inputs,overwrite);
   saveMatrix(save_directory,"weighted_lines.txt",weighted_lines,overwrite);
   saveMatrix(save_directory,"activations.txt",activations,overwrite);
-  saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
-  
+  */
   return true;
   
 }
 
-void ModelParametersGPR::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
-{
-  if (modifier.compare("lines_pivot_at_max_activation")==0)
-    set_lines_pivot_at_max_activation(new_value);
-  
-  if (modifier.compare("slopes_as_angles")==0)
-    set_slopes_as_angles(new_value);
-  
-}
 
 }

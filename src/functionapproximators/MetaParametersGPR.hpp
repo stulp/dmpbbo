@@ -50,6 +50,9 @@ public:
 	MetaParametersGPR* clone(void) const;
 
 	std::string toString(void) const;
+	
+	double maximum_covariance() const { return maximum_covariance_; }
+	double length() const { return length_; }
 
 private:
   double maximum_covariance_;
