@@ -46,16 +46,16 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers_per_dim' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
    *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
-   * \param[in] gram_matrix         The Gram matrix
+   * \param[in] weights             Weights, being G^-1*y, where G is the Gram matrix
    */
-  ModelParametersGPR(int expected_input_dim, double maximum_covariance, double length, MatrixXd gram_matrix);
+   ModelParametersGPR(Eigen::MatrixXd inputs, Eigen::VectorXd weights, double maximum_covariance, double length);
    
   std::string toString(void) const;
   
 	ModelParameters* clone(void) const;
 	
   int getExpectedInputDim(void) const  {
-    return centers_.cols();
+    return inputs_.cols();
   };
   
   
@@ -73,9 +73,10 @@ protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
+  Eigen::MatrixXd inputs_;
+  Eigen::VectorXd weights_;
   double maximum_covariance_;
   double length_;
-  double gram_matrix_;
 
   /**
    * Default constructor.

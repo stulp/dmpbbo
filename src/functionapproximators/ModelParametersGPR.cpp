@@ -45,18 +45,19 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(int expected_input_dim, double maximum_covariance, double length, MatrixXd gram_matrix)
+ModelParametersGPR::ModelParametersGPR(MatrixXd inputs, VectorXd weights, double maximum_covariance, double length)
 :
+  inputs_(inputs),
+  weights_(weights),
   maximum_covariance_(maximum_covariance),
   length_(length)
-  gram_matrix_(gram_matrix)
 {
   assert(maximum_covariance_>0);
   assert(length_>0);
 }
 
 ModelParameters* ModelParametersGPR::clone(void) const {
-  return new ModelParametersGPR(expected_input_dim_,maximum_covariance_,length_,gram_matrix_); 
+  return new ModelParametersGPR(inputs_,weights_,maximum_covariance_,length_); 
 }
 
 void ModelParametersGPR::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
@@ -93,140 +94,6 @@ void ModelParametersGPR::normalizedKernelActivations(const MatrixXd& inputs, Mat
   }
   
 }
-
-void ModelParametersGPR::set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation)
-{
-  // If no change, just return
-  if (lines_pivot_at_max_activation_ == lines_pivot_at_max_activation)
-    return;
-
-  //cout << "________________" << endl;
-  //cout << centers_.transpose() << endl;  
-  //cout << slopes_.transpose() << endl;  
-  //cout << offsets_.transpose() << endl;  
-  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-
-  // If you pivot lines around the point when the basis function has maximum activation (i.e.
-  // at the center of the Gaussian), you must compute the new offset corresponding to this
-  // slope, and vice versa    
-  int n_lines = centers_.rows();
-  VectorXd ac(n_lines); // slopes*centers
-  for (int i_line=0; i_line<n_lines; i_line++)
-  {
-    ac[i_line] = slopes_.row(i_line) * centers_.row(i_line).transpose();
-  }
-    
-  if (lines_pivot_at_max_activation)
-  {
-    // Representation was "y = ax + b", now it will be "y = a(x-c) + b^new" 
-    // Since "y = ax + b" can be rewritten as "y = a(x-c) + (b+ac)", we know that "b^new = (ac+b)"
-    offsets_ = offsets_ + ac;
-  }
-  else
-  {
-    // Representation was "y = a(x-c) + b", now it will be "y = ax + b^new" 
-    // Since "y = a(x-c) + b" can be rewritten as "y = ax + (b-ac)", we know that "b^new = (b-ac)"
-    offsets_ = offsets_ - ac;
-  } 
-  // Remark, the above could have been done as a one-liner, but I prefer the more legible version.
-  
-  //cout << offsets_.transpose() << endl;  
-  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-  
-  lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
-}
-
-void ModelParametersGPR::set_slopes_as_angles(bool slopes_as_angles)
-{
-  slopes_as_angles_ = slopes_as_angles;
-  cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "Not implemented yet!!!" << endl;
-  slopes_as_angles_ = false;
-}
-
-
-
-
-void ModelParametersGPR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
-{
-  int n_time_steps = inputs.rows();
-
-  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
-  
-  // Compute values along lines for each time step  
-  // Line representation is "y = ax + b"
-  lines = inputs*slopes_.transpose() + offsets_.transpose().replicate(n_time_steps,1);
-  
-  if (lines_pivot_at_max_activation_)
-  {
-    // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
-    // Therefore, we still have to subtract "ac"
-    int n_lines = centers_.rows();
-    VectorXd ac(n_lines); // slopes*centers  = ac
-    for (int i_line=0; i_line<n_lines; i_line++)
-      ac[i_line] = slopes_.row(i_line) * centers_.row(i_line).transpose();
-    //cout << "ac = " << ac.rows() << "X" << ac.cols() << endl;
-    lines = lines - ac.transpose().replicate(n_time_steps,1);
-  }
-  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
-}
-  
-void ModelParametersGPR::locallyWeightedLines(const MatrixXd& inputs, MatrixXd& output) const
-{
-  
-  MatrixXd lines;
-  getLines(inputs, lines);
-
-  // Weight the values for each line with the normalized basis function activations  
-  MatrixXd activations;
-  normalizedKernelActivations(inputs,activations);
-  
-  output = (lines.array()*activations.array()).rowwise().sum();
-}
-
-/*
-void ModelParametersGPR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
-{
-  cout << __FILE__ << ":" << __LINE__ << ":Here" << endl;
-  // Check and set sizes
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  int n_dims            = centers.cols();
-  assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
-  assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
-  kernel_activations.resize(n_samples,n_basis_functions);  
-
-
-  VectorXd center, width;
-  for (int bb=0; bb<n_basis_functions; bb++)
-  {
-    center = centers.row(bb);
-    width  = widths.row(bb);
-
-    // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
-    //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-    // Because Sigma is diagonal in our case, this simplifies to
-    //   activation = exp(\sum_d=1^D [-0.5*(x_d-mu_d)^2/Sigma_(d,d)]) 
-    //              = \prod_d=1^D exp(-0.5*(x_d-mu_d)^2/Sigma_(d,d)) 
-    // This last product is what we compute below incrementally
-    
-    kernel_activations.col(bb).fill(1.0);
-    for (int i_dim=0; i_dim<n_dims; i_dim++)
-    {
-      kernel_activations.col(bb).array() *= exp(-0.5*pow(inputs.col(i_dim).array()-center[i_dim],2)/(width[i_dim]*width[i_dim])).array();
-    }
-  }
-}
-*/
 
 void ModelParametersGPR::kernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations, bool asymmetric_kernels)
 {
