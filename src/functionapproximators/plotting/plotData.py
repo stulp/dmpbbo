@@ -61,7 +61,7 @@ def plotDataFromDirectory(directory,ax):
     plotDataPredictions(inputs,predictions,ax)   
     
     try:
-      inputs_grid = numpy.loadtxt(directory+'/train_inputs_grid.txt')
+      inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
       predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
       plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
     except IOError:
