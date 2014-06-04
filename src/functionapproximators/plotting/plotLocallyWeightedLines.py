@@ -14,7 +14,7 @@ def plotLocallyWeightedLines(inputs,lines,lines_weighted,ax,n_samples_per_dim,ac
     if (n_dims==1):
         
         #line_handles = ax.plot(inputs,lines, '-', color='#cccccc')
-        line_handles = ax.plot(inputs,lines_weighted, '-', color='red')
+        line_handles = ax.plot(inputs,lines_weighted, '-', color='lightblue')
 
         y_lim_min = min(lines_weighted) - 0.2*(max(lines_weighted)-min(lines_weighted))
         y_lim_max = max(lines_weighted) + 0.2*(max(lines_weighted)-min(lines_weighted))

@@ -1,6 +1,6 @@
 /**
- * @file   FunctionApproximatorRBFN.cpp
- * @brief  FunctionApproximatorRBFN class source file.
+ * @file   FunctionApproximatorGPR.cpp
+ * @brief  FunctionApproximatorGPR class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -26,12 +26,12 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorGPR.hpp"
 
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRBFN);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGPR);
 
-#include "functionapproximators/ModelParametersRBFN.hpp"
-#include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/ModelParametersGPR.hpp"
+#include "functionapproximators/MetaParametersGPR.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -44,37 +44,37 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(MetaParametersRBFN *meta_parameters, ModelParametersRBFN *model_parameters) 
+FunctionApproximatorGPR::FunctionApproximatorGPR(MetaParametersGPR *meta_parameters, ModelParametersGPR *model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
   cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "FunctionApproximatorRBFN is still under development! No guarantees on functionality..." << endl;
+  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
 }
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN *model_parameters) 
+FunctionApproximatorGPR::FunctionApproximatorGPR(ModelParametersGPR *model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
   cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "FunctionApproximatorRBFN is still under development! No guarantees on functionality..." << endl;
+  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
 }
 
 
-FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
+FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
 
-  MetaParametersRBFN*  meta_params  = NULL;
+  MetaParametersGPR*  meta_params  = NULL;
   if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersRBFN*>(getMetaParameters()->clone());
+    meta_params = dynamic_cast<MetaParametersGPR*>(getMetaParameters()->clone());
 
-  ModelParametersRBFN* model_params = NULL;
+  ModelParametersGPR* model_params = NULL;
   if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersRBFN*>(getModelParameters()->clone());
+    model_params = dynamic_cast<ModelParametersGPR*>(getModelParameters()->clone());
 
   if (meta_params==NULL)
-    return new FunctionApproximatorRBFN(model_params);
+    return new FunctionApproximatorGPR(model_params);
   else
-    return new FunctionApproximatorRBFN(meta_params,model_params);
+    return new FunctionApproximatorGPR(meta_params,model_params);
 };
 
 
@@ -85,7 +85,6 @@ FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
  * \param[out] result  The pseudo-inverse of the matrix.
  * \param[in]  epsilon Don't know, not my code ;-)
  * \return     true if pseudo-inverse possible, false otherwise
- */
 template<typename _Matrix_Type_>
 bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
 epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
@@ -105,13 +104,21 @@ tolerance).select(svd.singularValues().
       
   return true;
 }
+*/
 
 
-void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& targets)
+double FunctionApproximatorGPR::covarianceFunction(const VectorXd& input1, const VectorXd& input2, double maximum_covariance, double length) {
+  double norm_2 = (input1-input2).squaredNorm();
+  return maximum_covariance*exp(-0.5*norm_2/(length*length)); 
+}
+
+
+
+void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targets)
 {
   if (isTrained())  
   {
-    cerr << "WARNING: You may not call FunctionApproximatorRBFN::train more than once. Doing nothing." << endl;
+    cerr << "WARNING: You may not call FunctionApproximatorGPR::train more than once. Doing nothing." << endl;
     cerr << "   (if you really want to retrain, call reTrain function instead)" << endl;
     return;
   }
@@ -119,28 +126,26 @@ void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& tar
   assert(inputs.rows() == targets.rows());
   assert(inputs.cols()==getExpectedInputDim());
 
-  const MetaParametersRBFN* meta_parameters_lwr = 
-    dynamic_cast<const MetaParametersRBFN*>(getMetaParameters());
+  const MetaParametersGPR* meta_parameters_gpr = 
+    dynamic_cast<const MetaParametersGPR*>(getMetaParameters());
   
-  VectorXd min = inputs.colwise().minCoeff();
-  VectorXd max = inputs.colwise().maxCoeff();
+  double max_covar = meta_parameters_gpr->maximum_covariance();
+  double length = meta_parameters_gpr->length();
   
-  MatrixXd centers, widths, activations;
-  meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
-
-  ModelParametersRBFN::kernelActivations(centers,widths,inputs,activations);
-  
-  // The design matrix
-  MatrixXd X = activations;
-
-  // Least squares
-  VectorXd weights = (X.transpose()*X).inverse()*X.transpose()*targets;
-
-  setModelParameters(new ModelParametersRBFN(centers,widths,weights));
+  MatrixXd gram(inputs.rows(),inputs.rows());
+  for (int ii=0; ii<inputs.rows(); ii++)
+  {
+    for (int jj=0; jj<inputs.rows(); jj++)
+    {
+      gram(ii,jj) = covarianceFunction(inputs.row(ii),inputs.row(jj),max_covar,length);
+    }
+  }
+  MatrixXd gram_inv_targets = gram.inverse() * targets.col(0);
+  setModelParameters(new ModelParametersGPR(inputs,gram_inv_targets,max_covar,length));
   
 }
 
-void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -148,13 +153,13 @@ void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
     return;
   }
 
-  const ModelParametersRBFN* model_parameters_lwr = static_cast<const ModelParametersRBFN*>(getModelParameters());
+  const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
   
-  model_parameters_lwr->weightedBasisFunctions(inputs, output);
+  model_parameters_gpr->predictMean(inputs, outputs);
 }
 
 template<class Archive>
-void FunctionApproximatorRBFN::serialize(Archive & ar, const unsigned int version)
+void FunctionApproximatorGPR::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
