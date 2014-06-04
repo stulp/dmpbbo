@@ -320,12 +320,17 @@ bool ModelParametersRBFN::saveGridData(const VectorXd& min, const VectorXd& max,
       }
     }
   }  
+  
+  MatrixXd outputs;
+  weightedBasisFunctions(inputs,outputs);
+
       
   MatrixXd activations;
   kernelActivations(inputs, activations);
     
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
+  saveMatrix(save_directory,"outputs_grid.txt",outputs,overwrite);
   saveMatrix(save_directory,"activations.txt",activations,overwrite);
   
   return true;
