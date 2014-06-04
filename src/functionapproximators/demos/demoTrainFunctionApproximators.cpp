@@ -176,6 +176,9 @@ int main(int n_args, char** args)
   delete fa;
 #endif // USE_LWPR
 
+  // RBFN and GPR are still under development, so they are excluded here.
+  return 0;
+
   // Radial Basis Function Network
   intersection = 0.7;
   n_rfs = 9;
