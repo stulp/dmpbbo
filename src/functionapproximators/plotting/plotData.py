@@ -30,7 +30,13 @@ def plotDataPredictions(inputs,predictions,ax,n_samples_per_dim=[]):
     lines = plotData(inputs,predictions,ax)
     plt.setp(lines, linestyle='.', label='predictions', color='red')
     return lines
-
+    
+def plotDataPredictionsGrid(inputs,predictions,ax,n_samples_per_dim=[]):
+    """Plot outputs against targets, and apply default style for predictions."""
+    lines = plotData(inputs,predictions,ax)
+    plt.setp(lines, linestyle='-', marker=None, label='latent function', color='lightblue')
+    return lines
+    
 def getDataDimFromDirectory(directory):
     try:
       inputs   = numpy.loadtxt(directory+'/inputs.txt')    
@@ -51,8 +57,17 @@ def plotDataFromDirectory(directory,ax):
     predictions = numpy.loadtxt(directory+'/outputs.txt')
         
     # Plotting
-    plotDataTargets(inputs,targets,ax)   
+    plotDataTargets(inputs,targets,ax)
     plotDataPredictions(inputs,predictions,ax)   
+    
+    try:
+      inputs_grid = numpy.loadtxt(directory+'/train_inputs_grid.txt')
+      predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
+      plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
+    except IOError:
+      # Everything's fine: user did not store grid predictions
+      predictions_grid = [];
+    
     
     # Annotation
     if (n_dims==1):
