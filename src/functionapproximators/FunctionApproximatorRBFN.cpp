@@ -48,12 +48,16 @@ FunctionApproximatorRBFN::FunctionApproximatorRBFN(MetaParametersRBFN *meta_para
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  cerr << __FILE__ << ":" << __LINE__ << ":";
+  cerr << "FunctionApproximatorRBFN is still under development! No guarantees on functionality..." << endl;
 }
 
 FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN *model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
+  cerr << __FILE__ << ":" << __LINE__ << ":";
+  cerr << "FunctionApproximatorRBFN is still under development! No guarantees on functionality..." << endl;
 }
 
 
