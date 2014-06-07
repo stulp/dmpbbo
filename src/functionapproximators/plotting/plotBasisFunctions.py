@@ -54,7 +54,17 @@ def plotBasisFunctionsFromDirectory(directory,ax,plot_normalized=True):
         # Assume data is 1D
         n_samples_per_dim = len(inputs)
         
-    plotBasisFunctions(inputs,activations,ax,n_samples_per_dim) 
+    lines_bfs = plotBasisFunctions(inputs,activations,ax,n_samples_per_dim) 
+
+    try:
+        activations_weighted = numpy.loadtxt(directory+'/activations_weighted.txt')                             
+        lines_bfs_weighted = plotBasisFunctions(inputs,activations_weighted,ax,n_samples_per_dim) 
+        plt.setp(lines_bfs,color='#aaffaa')
+        plt.setp(lines_bfs_weighted,color='green')
+        
+    except IOError:
+        plt.setp(lines_bfs,color='green')
+        
 
     if (n_dims==1):
       ax.set_xlabel('input');

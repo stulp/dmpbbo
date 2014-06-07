@@ -295,25 +295,20 @@ bool ModelParametersRBFN::saveGridData(const VectorXd& min, const VectorXd& max,
   if (save_directory.empty())
     return true;
   
-  //cout << "        Saving RBFN model grid data to: " << save_directory << "." << endl;
-  
-  int n_dims = min.size();
-  assert(n_dims==max.size());
-  assert(n_dims==n_samples_per_dim.size());
-  
   MatrixXd inputs;
   FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-  MatrixXd outputs;
-  weightedBasisFunctions(inputs,outputs);
-
       
   MatrixXd activations;
   kernelActivations(inputs, activations);
     
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"outputs_grid.txt",outputs,overwrite);
   saveMatrix(save_directory,"activations.txt",activations,overwrite);
+
+  // Weight the basis function activations  
+  for (int b=0; b<activations.cols(); b++)
+    activations.col(b).array() *= weights_(b);
+  saveMatrix(save_directory,"activations_weighted.txt",activations,overwrite);
   
   return true;
   

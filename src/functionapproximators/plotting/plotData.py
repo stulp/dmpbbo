@@ -21,7 +21,7 @@ def plotData(inputs,outputs,ax):
 def plotDataTargets(inputs,target,ax):
     """Plot outputs against targets, and apply default style for targets."""
     lines = plotData(inputs,target,ax)
-    plt.setp(lines, linestyle='.', label='targets', color='black')                  
+    plt.setp(lines, linestyle='.', label='targets', color='black',markersize=7)                  
     return lines
 
 
@@ -39,15 +39,15 @@ def plotResiduals(inputs,targets,predictions,ax):
         return lines
     for ii in range(len(inputs)):
         if (n_dims==1):
-            lines = ax.plot([inputs[ii], inputs[ii]],[targets[ii], predictions[ii] ], '-r')
+            lines = ax.plot([inputs[ii], inputs[ii]],[targets[ii], predictions[ii] ], '-r',linewidth=2,label='residuals')
         elif (n_dims==2):
-            lines = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ], '-r')
+            lines = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ], '-r',linewidth=2,label='residuals')
 
     
 def plotDataPredictionsGrid(inputs,predictions,ax,n_samples_per_dim=[]):
     """Plot outputs against targets, and apply default style for predictions."""
     lines = plotData(inputs,predictions,ax)
-    plt.setp(lines, linestyle='-', marker=None, label='latent function', color='lightblue')
+    plt.setp(lines, linestyle='-', marker=None, label='latent function', color='lightblue',linewidth=3)
     return lines
     
 def getDataDimFromDirectory(directory):

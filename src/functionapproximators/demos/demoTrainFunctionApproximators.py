@@ -30,8 +30,17 @@ if __name__=='__main__':
     subprocess.call([executable, directory])
     
     # Plot the results in each directory
-    # RBFN and GPR are still under development, so they are excluded here.
-    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR"] # ,"RBFN","GPR"]
+    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR","RBFN","GPR"]
+    
+    # How well are these function approximators coded ;-)
+    devel = {}
+    devel["LWR"] = "stable"
+    devel["LWPR"] = "stable"
+    devel["IRFRLS"] = "testing"
+    devel["GMR"] = "testing"
+    devel["RBFN"] = "unstable"
+    devel["GPR"] = "unstable"
+    
     fig = plt.figure()
     subplot_number = 1;
     for name in function_approximator_names:
@@ -51,9 +60,13 @@ if __name__=='__main__':
             ax.set_ylim(-1.0,1.5)
         except IOError:
             print "WARNING: Could not find data for function approximator "+name
-        ax.set_title(name)
+        ax.set_title(name+" ("+devel[name]+")")
     
-    ax.legend(['targets','predictions'])
+    ax.legend(['f(x)','residuals'])
+    print "stable/testing/unstable in the titles refers to the development status of the algorithm"
+    print "   * stable    - tested and should work"
+    print "   * testing   - seems ok, but still needs testing"
+    print "   * unstable  - seems ok, but still needs testing, and is still being modified regularly"
     plt.show()
     
     #fig.savefig("lwr.svg")

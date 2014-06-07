@@ -7,18 +7,18 @@ from plotData import getDataDimFromDirectory
 from plotData import plotDataFromDirectory
 from plotBasisFunctions import plotBasisFunctions
 
-def plotLocallyWeightedLines(inputs,lines,lines_weighted,ax,n_samples_per_dim,activations_normalized=[],activations=[]):
+def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations_normalized=[],activations=[]):
     """Plots locally weighted lines, whilst being smart about the dimensionality of input data."""
     
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims==1):
         
         #line_handles = ax.plot(inputs,lines, '-', color='#cccccc')
-        line_handles = ax.plot(inputs,lines_weighted, '-', color='lightblue')
+        #line_handles = ax.plot(inputs,lines_weighted, '-', color='lightblue')
 
-        y_lim_min = min(lines_weighted) - 0.2*(max(lines_weighted)-min(lines_weighted))
-        y_lim_max = max(lines_weighted) + 0.2*(max(lines_weighted)-min(lines_weighted))
-        ax.set_ylim(y_lim_min,y_lim_max)
+        #y_lim_min = min(lines_weighted) - 0.2*(max(lines_weighted)-min(lines_weighted))
+        #y_lim_max = max(lines_weighted) + 0.2*(max(lines_weighted)-min(lines_weighted))
+        #ax.set_ylim(y_lim_min,y_lim_max)
 
         if (len(activations_normalized)>0):
               ax_two = ax.twinx()
@@ -32,8 +32,8 @@ def plotLocallyWeightedLines(inputs,lines,lines_weighted,ax,n_samples_per_dim,ac
               ax_two.set_ylim(-2.0,3.0)
    
               for ii in xrange(len(activations_normalized[0])):
-                    active = activations_normalized[:,ii]>(max(activations_normalized[:,ii])*0.75)
-                    ax.plot(inputs[active],lines[active,ii], '-',color='#aaaaaa',linewidth='3')
+                    active = activations_normalized[:,ii]>(max(activations_normalized[:,ii])*0.001)
+                    line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
     
     elif (n_dims==2):
         n_lines = len(lines[0])
@@ -72,7 +72,6 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
       return False;
       
     lines  = numpy.loadtxt(directory+'/lines.txt')                         
-    lines_weighted = numpy.loadtxt(directory+'/weighted_lines.txt')
     
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims>2):
@@ -93,7 +92,7 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
     except IOError:
         activations = []
       
-    plotLocallyWeightedLines(inputs,lines,lines_weighted,ax,n_samples_per_dim,activations_normalized,activations) 
+    plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations_normalized,activations) 
 
     if (n_dims==1):
       ax.set_xlabel('input');

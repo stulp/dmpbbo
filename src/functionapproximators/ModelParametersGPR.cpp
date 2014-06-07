@@ -123,15 +123,28 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
   if (save_directory.empty())
     return true;
   
-  //cout << "        Saving GPR model grid data to: " << save_directory << "." << endl;
-  
-  int n_dims = min.size();
-  assert(n_dims==max.size());
-  assert(n_dims==n_samples_per_dim.size());
-  
+  MatrixXd inputs;
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+
   cerr << __FILE__ << ":" << __LINE__ << ":";
   cerr << "Implement this" << endl;
 
+  /*
+  MatrixXd lines;
+  getLines(inputs, lines);
+  
+  MatrixXd activations;
+  kernelActivations(inputs, activations);
+    
+  MatrixXd normalized_activations;
+  normalizedKernelActivations(inputs, normalized_activations);
+    
+  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
+  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
+  saveMatrix(save_directory,"lines.txt",lines,overwrite);
+  saveMatrix(save_directory,"activations.txt",activations,overwrite);
+  saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
+  */
   
   return true;
   
