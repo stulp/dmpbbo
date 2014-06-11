@@ -194,8 +194,8 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   // Gaussian Process Regression
-  double maximum_covariance = 1.0;
-  double length = 0.1;
+  double maximum_covariance = 5.5;
+  double length = 0.08;
   MetaParametersGPR* meta_parameters_gpr = new MetaParametersGPR(n_input_dims,maximum_covariance,length);
   fa = new FunctionApproximatorGPR(meta_parameters_gpr);
 

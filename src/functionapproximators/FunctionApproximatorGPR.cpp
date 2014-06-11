@@ -140,8 +140,7 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
       gram(ii,jj) = covarianceFunction(inputs.row(ii),inputs.row(jj),max_covar,length);
     }
   }
-  MatrixXd gram_inv_targets = gram.inverse() * targets.col(0);
-  setModelParameters(new ModelParametersGPR(inputs,gram_inv_targets,max_covar,length));
+  setModelParameters(new ModelParametersGPR(inputs,targets,gram,max_covar,length));
   
 }
 
@@ -156,6 +155,19 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
   
   model_parameters_gpr->predictMean(inputs, outputs);
+}
+
+void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
+{
+  if (!isTrained())  
+  {
+    cerr << "WARNING: You may not call FunctionApproximatorLWPR::predict if you have not trained yet. Doing nothing." << endl;
+    return;
+  }
+
+  const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
+  
+  model_parameters_gpr->predictVariance(inputs, variances);
 }
 
 template<class Archive>

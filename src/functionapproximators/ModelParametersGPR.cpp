@@ -39,6 +39,8 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 #include <fstream>
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/SVD>
+#include <eigen3/Eigen/LU>
 
 
 using namespace std;
@@ -46,19 +48,27 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(MatrixXd train_inputs, VectorXd gram_inv_targets, double maximum_covariance, double length)
+ModelParametersGPR::ModelParametersGPR(MatrixXd train_inputs, VectorXd train_targets, MatrixXd gram, double maximum_covariance, double length)
 :
   train_inputs_(train_inputs),
-  gram_inv_targets_(gram_inv_targets),
+  train_targets_(train_targets),
+  gram_(gram),
   maximum_covariance_(maximum_covariance),
   length_(length)
 {
+  assert(gram_.rows()==gram_.cols());
+  assert(train_inputs_.rows()==gram_.rows());
+  assert(train_inputs_.rows()==train_targets_.rows());
+  
+  gram_inv_ = gram_.inverse();
+  gram_inv_targets_ = gram_inv_ * train_targets_.col(0);
+
   assert(maximum_covariance_>0);
   assert(length_>0);
 }
 
 ModelParameters* ModelParametersGPR::clone(void) const {
-  return new ModelParametersGPR(train_inputs_,gram_inv_targets_,maximum_covariance_,length_); 
+  return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,length_); 
 }
 
 void ModelParametersGPR::predictMean(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) const
@@ -69,15 +79,44 @@ void ModelParametersGPR::predictMean(const Eigen::MatrixXd& inputs, Eigen::Matri
   
   outputs.resize(n_samples,1);
   
-  RowVectorXd K(n_samples_train);
+  RowVectorXd k(n_samples_train);
   for (unsigned int ii=0; ii<n_samples; ii++)
   {
     for (unsigned int jj=0; jj<n_samples_train; jj++)
-      K(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
+      k(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
 
-    outputs(ii) = K*gram_inv_targets_;
+    outputs(ii) = k*gram_inv_targets_;
   }
   
+}
+
+
+void ModelParametersGPR::predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variance) const
+{
+  assert(inputs.cols()==getExpectedInputDim());
+  unsigned int n_samples = inputs.rows();
+  unsigned int n_samples_train = train_inputs_.rows();
+  
+  variance.resize(n_samples,1);
+  
+  VectorXd k(n_samples_train);
+  for (unsigned int ii=0; ii<n_samples; ii++)
+  {
+    // Covariance with the input itself
+    double k_self =  FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),inputs.row(ii),maximum_covariance_,length_);
+    
+    // Covariance of input with all target inputs
+    for (unsigned int jj=0; jj<n_samples_train; jj++)
+      k(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
+    
+    VectorXd rest = k.transpose()*gram_inv_*k;
+    //cout << "k=" << k.rows() << " X " << k.cols() << endl;
+    //cout << "gram_inv_=" << gram_inv_.rows() << " X " << gram_inv_.cols() << endl;
+    //cout << "rest=" << rest.rows() << " X " << rest.cols() << endl;
+    assert(rest.rows()==1);
+    assert(rest.cols()==1);
+    variance(ii) = k_self - rest(0);
+  }
 }
 
 template<class Archive>

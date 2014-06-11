@@ -63,6 +63,8 @@ public:
 	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
 
 	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+
+	void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances);
   
 	inline std::string getName(void) const {
     return std::string("GPR");  

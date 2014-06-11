@@ -62,7 +62,8 @@ if __name__=='__main__':
             print "WARNING: Could not find data for function approximator "+name
         ax.set_title(name+" ("+devel[name]+")")
     
-    ax.legend(['f(x)','residuals'])
+    ax.legend(['f(x)','+std','-std','residuals'])
+    
     print "stable/testing/unstable in the titles refers to the development status of the algorithm"
     print "   * stable    - tested and should work"
     print "   * testing   - seems ok, but still needs testing"

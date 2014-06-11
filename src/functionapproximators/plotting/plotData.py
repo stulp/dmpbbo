@@ -1,5 +1,6 @@
 from mpl_toolkits.mplot3d import Axes3D
-import numpy                                                                  
+import numpy                                     
+import math
 import matplotlib.pyplot as plt                                               
 import sys
 
@@ -29,6 +30,14 @@ def plotDataPredictions(inputs,predictions,ax,n_samples_per_dim=[]):
     """Plot outputs against targets, and apply default style for predictions."""
     lines = plotData(inputs,predictions,ax)
     plt.setp(lines, marker='.', label='predictions', color='red')
+    return lines
+
+def plotDataVariance(inputs,predictions,variances,ax):
+    #lines = plotData(inputs,predictions+math.sqrt(abs(variances)),ax)
+    lines = plotData(inputs,predictions+2*((variances)),ax)
+    plt.setp(lines, linestyle='-',marker='None', label='variance', color='lightblue')
+    lines = plotData(inputs,predictions-2*((variances)),ax)
+    plt.setp(lines, linestyle='-',marker='None', label='variance', color='lightblue')
     return lines
     
 def plotResiduals(inputs,targets,predictions,ax):
@@ -74,6 +83,12 @@ def plotDataFromDirectory(directory,ax):
       inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
       predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
       plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
+      try:
+        variances_grid = numpy.loadtxt(directory+'/variances_grid.txt')
+        plotDataVariance(inputs_grid,predictions_grid,variances_grid,ax)
+      except IOError:
+        # Everything's fine: user did not store grid predictions
+        variances_grid = [];
     except IOError:
       # Everything's fine: user did not store grid predictions
       predictions_grid = [];

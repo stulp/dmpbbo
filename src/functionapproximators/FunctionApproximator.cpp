@@ -274,9 +274,19 @@ void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets
     
     MatrixXd outputs_grid(inputs_grid.rows(),1);
     predict(inputs_grid,outputs_grid);
+    
     saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim_vec,overwrite);
     saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
     saveMatrix(save_directory,"outputs_grid.txt",outputs_grid,overwrite);
+
+
+    MatrixXd variances_grid;
+    predictVariance(inputs_grid,variances_grid);
+    if (!variances_grid.size()==0)
+    {
+      variances_grid = variances_grid.array().sqrt();
+      saveMatrix(save_directory,"variances_grid.txt",variances_grid,overwrite);
+    }
     
     model_parameters_->saveGridData(min, max, n_samples_per_dim_vec, save_directory, overwrite);
     
@@ -284,6 +294,8 @@ void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets
 
   MatrixXd outputs;
   predict(inputs,outputs);
+
+    
 
   saveMatrix(save_directory,"inputs.txt",inputs,overwrite);
   saveMatrix(save_directory,"targets.txt",targets,overwrite);

@@ -114,6 +114,17 @@ public:
    */
   virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) = 0;
   
+  /** Query the function approximator to get the variance of a prediction
+   * This function is not implemented by all function approximators. Therefore, the default
+   * implementation fills outputs with 0s.
+   *  \param[in]  inputs    Input values of the query
+   *  \param[out] variances Predicted variance for the output values
+   */
+  virtual void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances)
+  {
+    variances.fill(0);
+  }
+  
   /** Determine whether the function approximator has already been trained with data or not.
    *  \return true if the function approximator has already been trained, false otherwise.
    */
