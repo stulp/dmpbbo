@@ -113,28 +113,51 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
     kMeansInit(gmmData, gmmCenters, gmmPriors, gmmCovars);
   EM(gmmData, gmmCenters, gmmPriors, gmmCovars);
 
-  std::vector<VectorXd> centers;
-  std::vector<MatrixXd> slopes;
-  std::vector<VectorXd> biases;
-  std::vector<MatrixXd> inverseCovarsL;
+  std::vector<Eigen::VectorXd> mu_xs;
+  std::vector<Eigen::VectorXd> mu_ys;
+
+  std::vector<Eigen::MatrixXd> sigma_xs;
+  std::vector<Eigen::MatrixXd> sigma_ys;
+  std::vector<Eigen::MatrixXd> sigma_y_xs;
 
   int nbInDim = inputs.cols();
   int nbOutDim = targets.cols();
 
   for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
   {
-    centers.push_back(VectorXd(gmmCenters[iCenter].segment(0, nbInDim)));
+    mu_xs.push_back(gmmCenters[iCenter].segment(0, nbInDim));
+    mu_ys.push_back(gmmCenters[iCenter].segment(nbInDim, nbOutDim));
 
-    slopes.push_back(MatrixXd(gmmCovars[iCenter].block(nbInDim, 0, nbOutDim, nbInDim) * gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse()));
-    
-    biases.push_back(VectorXd(gmmCenters[iCenter].segment(nbInDim, nbOutDim) -
-      slopes[iCenter]*gmmCenters[iCenter].segment(0, nbInDim)));
-
-    MatrixXd L = gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse().llt().matrixL();
-    inverseCovarsL.push_back(MatrixXd(L));
+    sigma_xs.push_back(gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim));
+    sigma_ys.push_back(gmmCovars[iCenter].block(nbInDim, nbInDim, nbOutDim, nbOutDim));
+    sigma_y_xs.push_back(gmmCovars[iCenter].block(nbInDim, 0, nbOutDim, nbInDim));
   }
 
-  setModelParameters(new ModelParametersGMR(centers, gmmPriors, slopes, biases, inverseCovarsL));
+
+  setModelParameters(new ModelParametersGMR(gmmPriors, mu_xs, mu_ys, sigma_xs, sigma_ys, sigma_y_xs));
+
+  // std::vector<VectorXd> centers;
+  // std::vector<MatrixXd> slopes;
+  // std::vector<VectorXd> biases;
+  // std::vector<MatrixXd> inverseCovarsL;
+
+  // // int nbInDim = inputs.cols();
+  // // int nbOutDim = targets.cols();
+
+  // for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
+  // {
+  //   centers.push_back(VectorXd(gmmCenters[iCenter].segment(0, nbInDim)));
+
+  //   slopes.push_back(MatrixXd(gmmCovars[iCenter].block(nbInDim, 0, nbOutDim, nbInDim) * gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse()));
+    
+  //   biases.push_back(VectorXd(gmmCenters[iCenter].segment(nbInDim, nbOutDim) -
+  //     slopes[iCenter]*gmmCenters[iCenter].segment(0, nbInDim)));
+
+  //   MatrixXd L = gmmCovars[iCenter].block(0, 0, nbInDim, nbInDim).inverse().llt().matrixL();
+  //   inverseCovarsL.push_back(MatrixXd(L));
+  // }
+
+  // setModelParameters(new ModelParametersGMR(centers, gmmPriors, slopes, biases, inverseCovarsL));
 
   //for (size_t i = 0; i < gmmCenters.size(); i++)
   //  delete gmmCenters[i];
@@ -152,8 +175,9 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   
   const ModelParametersGMR* model_parameters_GMR = static_cast<const ModelParametersGMR*>(getModelParameters());
 
-  int nbGaussian =  model_parameters_GMR->biases_.size();
-  int nbOutDim = model_parameters_GMR->biases_[0].size();
+  int nbGaussian = model_parameters_GMR->priors_.size();
+  int nbInDim = model_parameters_GMR->mu_xs_[0].size();
+  int nbOutDim = model_parameters_GMR->mu_ys_[0].size();
 
   output = MatrixXd(input.rows(), nbOutDim);
 
@@ -165,28 +189,37 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd center = model_parameters_GMR->centers_[iCenter];
-      partialH[iCenter] = -1. / 2 * ((inputPoint - center).transpose() * model_parameters_GMR->inverseCovarsL_[iCenter] *
-        model_parameters_GMR->inverseCovarsL_[iCenter].transpose() * (inputPoint - center))(0, 0);
+      VectorXd center = model_parameters_GMR->mu_xs_[iCenter];
+      partialH[iCenter] = -1. / 2 * ((inputPoint - center).transpose() * model_parameters_GMR->inverted_sigma_xs_[iCenter] * (inputPoint - center))(0, 0);
     }
-    double max = partialH.maxCoeff();
-    for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
-      partialH[iCenter] -= max;
+    // double max = partialH.maxCoeff();
+    // for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
+    //   partialH[iCenter] -= max;
+
+    // for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
+    // {
+    //   VectorXd center = model_parameters_GMR->centers_[iCenter];
+    //   double det = 1. / pow((model_parameters_GMR->inverted_sigma_xs_[iCenter]).determinant(), 2);
+    //   h[iCenter] = model_parameters_GMR->priors_[iCenter]*1. / sqrt(pow(2 * M_PI, center.rows()) * det) * exp(partialH[iCenter]);
+    // }
+    // h /= h.sum();
 
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd center = model_parameters_GMR->centers_[iCenter];
-      double det = 1. / pow((model_parameters_GMR->inverseCovarsL_[iCenter]* model_parameters_GMR->inverseCovarsL_[iCenter].transpose()).determinant(), 2);
-      h[iCenter] = model_parameters_GMR->priors_[iCenter]*1. / sqrt(pow(2 * M_PI, center.rows()) * det) * exp(partialH[iCenter]);
+      double power_of_two_pi = pow(2 * M_PI, - nbInDim / 2.);
+      double sqrt_det = pow(model_parameters_GMR->sigma_xs_[iCenter].determinant(), -1./2);
+
+      h[iCenter] = model_parameters_GMR->priors_[iCenter] * power_of_two_pi * sqrt_det * exp(partialH[iCenter]);
     }
     h /= h.sum();
+
 
     VectorXd prediction(nbOutDim);
     prediction.setZero();
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      VectorXd tmp = model_parameters_GMR->slopes_[iCenter] * inputPoint;
-      prediction += h[iCenter] * (model_parameters_GMR->biases_[iCenter] + tmp);
+      VectorXd tmp = model_parameters_GMR->mu_ys_[iCenter] + model_parameters_GMR->sigma_y_xs_[iCenter] * model_parameters_GMR->sigma_ys_[iCenter].inverse() * (inputPoint - model_parameters_GMR->mu_xs_[iCenter]);
+      prediction += h[iCenter] * tmp;
     }
     output.row(i) = prediction;
   }
