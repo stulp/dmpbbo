@@ -82,8 +82,8 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   }
 #endif
 
-  //for (size_t i = 0; i < n_gaussians; i++)
-  //  covars_x_inverted_.push_back(covars_y_x_[i].inverse());
+  for (unsigned int i=0; i<n_gaussians; i++)
+    covars_x_inv_.push_back(covars_x_[i].inverse());
 
   all_values_vector_size_ = 0;
   
@@ -137,6 +137,7 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(covars_x_);
   ar & BOOST_SERIALIZATION_NVP(covars_y_);
   ar & BOOST_SERIALIZATION_NVP(covars_y_x_);
+  ar & BOOST_SERIALIZATION_NVP(covars_x_inv_);
 }
 
 

@@ -57,6 +57,7 @@ public:
 
   ModelParameters* clone(void) const;
 
+  /** @todo Determine which parameters should be modifiable in GMR. */
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
   void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
   void getParameterVectorAll(Eigen::VectorXd& all_values) const;
@@ -78,7 +79,8 @@ private:
   std::vector<Eigen::MatrixXd> covars_y_;
   std::vector<Eigen::MatrixXd> covars_y_x_;
 
-  // Add this for caching: std::vector<Eigen::MatrixXd> covars_x_inverted_;
+  /** This is covars_x_.inverse(). Since we used it often, we cache it here. */
+  std::vector<Eigen::MatrixXd> covars_x_inv_;
 
   int  all_values_vector_size_;
   

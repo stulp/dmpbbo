@@ -169,13 +169,20 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   //delete covars[i];
 }
 
-double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
+double FunctionApproximatorGMR::normalPDFWithInverseCovar(const VectorXd& mu, const MatrixXd& covar_inverse, const VectorXd& input)
 {
   VectorXd diff = input-mu;
-  double output = exp(-2*diff.transpose()*covar.inverse()*diff);
-  output *= pow(pow(2*M_PI,mu.size())*covar.determinant(),-0.5);   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
+  double output = exp(-2*diff.transpose()*covar_inverse*diff);
+  // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
+  double det = 1.0/covar_inverse.determinant();
+  output *= pow(pow(2*M_PI,mu.size())*det,-0.5);   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
   
   return output;
+}
+
+double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
+{
+  return FunctionApproximatorGMR::normalPDFWithInverseCovar(mu,covar.inverse(),input);
 }
 
 void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h) const
@@ -232,7 +239,7 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
     for (int i_gau=0; i_gau<n_gaussians; i_gau++)
     {
       VectorXd diff = input-gmm->means_x_[i_gau];
-      VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_[i_gau].inverse() * diff;
+      VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] * diff;
       outputs.row(i_input) += h[i_gau] * (gmm->means_y_[i_gau]+projected);
     }
   }
@@ -274,7 +281,7 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
     // Compute output, given probabilities of each Gaussian
     for (int i_gau=0; i_gau<n_gaussians; i_gau++)
     {
-      MatrixXd cur_covar = gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_[i_gau].inverse()*gmm->covars_y_x_[i_gau].transpose();
+      MatrixXd cur_covar = gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
       variances.row(i_input) += h[i_gau]*h[i_gau] * cur_covar;
     }
   }
