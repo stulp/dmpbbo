@@ -28,11 +28,13 @@
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/ModelParametersGMR.hpp"
+#include "functionapproximators/FunctionApproximator.hpp"
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
 #include <eigen3/Eigen/LU>
@@ -146,6 +148,69 @@ string ModelParametersGMR::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGMR");
 };
 
+bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& centers, const vector<MatrixXd>& covars, int iter)
+{
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+  {
+    stringstream stream;
+    stream << "gmm";
+    if (iter>=0)
+      stream << "_iter" << setw(2) << setfill('0') << iter;
+    stream  << "_mu" << setw(3) << setfill('0') << i_gau << ".txt";
+    string filename = stream.str();
+    if (!saveMatrix(directory, filename,  centers[i_gau],  true))
+      return false;
+    cout << "  filename=" << filename << endl;
+    
+    stringstream stream2;
+    stream2 << "gmm";
+    if (iter>=0)
+      stream2 << "_iter" << setw(2) << setfill('0') << iter;
+    stream2  << "_covar" << setw(3) << setfill('0') << i_gau << ".txt";
+    filename = stream2.str();
+    cout << "  filename=" << filename << endl;
+    if (!saveMatrix(directory, filename,  covars[i_gau],  true))
+      return false;    
+  }
+  return true;
+}
+
+bool ModelParametersGMR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  if (save_directory.empty())
+    return true;
+  
+  //MatrixXd inputs;
+  //FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+  //saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
+
+  int n_gaussians = means_x_.size();
+  int n_dims_in = means_x_[0].size();
+  int n_dims_out = means_y_[0].size();
+  int n_dims_gmm = n_dims_in + n_dims_out;
+  
+  
+  std::vector<VectorXd> means(n_gaussians);
+  std::vector<MatrixXd> covars(n_gaussians);
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  {
+    means[i_gau] = VectorXd(n_dims_gmm);
+    means[i_gau].segment(0, n_dims_in) = means_x_[i_gau];
+    means[i_gau].segment(n_dims_in, n_dims_out) = means_y_[i_gau];
+
+    covars[i_gau] = MatrixXd(n_dims_gmm,n_dims_gmm);
+    covars[i_gau].fill(0);
+    covars[i_gau].block(0, 0, n_dims_in, n_dims_in) = covars_x_[i_gau]; 
+    covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out) = covars_y_[i_gau]; 
+    covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in) = covars_y_x_[i_gau];
+    covars[i_gau].block(0, n_dims_in, n_dims_in, n_dims_out) = covars_y_x_[i_gau].transpose();
+  }
+  
+  saveGMM(save_directory,means,covars);
+ 
+  
+  return true;  
+}
 
 void ModelParametersGMR::getSelectableParameters(set<string>& selected_values_labels) const 
 {

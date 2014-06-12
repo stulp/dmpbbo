@@ -40,7 +40,6 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGMR);
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include "dmpbbo_io/EigenFileIO.hpp"
 
 
 using namespace std;
@@ -418,28 +417,6 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
     priors[i_gau] = 1. / centers.size();
 }
 
-void saveGMM(string directory, const vector<VectorXd>& centers, const vector<MatrixXd>& covars, int iter)
-{
-  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
-  {
-    stringstream stream;
-    stream << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gau << "_mu.txt";
-    string filename = stream.str();
-    if (!saveMatrix(directory, filename,  centers[i_gau],  true))
-      exit(0);
-    cout << "  filename=" << filename << endl;
-    
-    stringstream stream2;
-    stream2 << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gau << "_covar.txt";
-    filename = stream2.str();
-    cout << "  filename=" << filename << endl;
-    
-    if (!saveMatrix(directory, filename,  covars[i_gau],  true))
-      exit(0);
-    
-  }
-}
-
 void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
     std::vector<MatrixXd>& covars, int n_max_iter)
 {
@@ -453,7 +430,7 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
   {
     //cout << "  iIter=" << iIter << endl;
     // For debugging only
-    //saveGMM("/tmp/demoTrainFunctionApproximators/GMR",centers,covars,iIter);
+    //ModelParametersGMR::saveGMM("/tmp/demoTrainFunctionApproximators/GMR",centers,covars,iIter);
     
     // E step
     for (int iData = 0; iData < data.rows(); iData++)
