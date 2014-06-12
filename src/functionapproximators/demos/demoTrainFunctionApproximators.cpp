@@ -94,7 +94,10 @@ int main(int n_args, char** args)
   MatrixXd inputs, targets, outputs;
   targetFunction(n_samples_per_dim,inputs,targets);
   
-  
+  // Add some noise
+  //targets = targets + 0.1*VectorXd::Random(targets.rows(),targets.cols());
+
+  FunctionApproximator* fa;
   
   // Locally Weighted Regression
   double intersection = 0.5;
@@ -102,7 +105,7 @@ int main(int n_args, char** args)
   if (n_input_dims==2) n_rfs = 5;
   VectorXi num_rfs_per_dim = VectorXi::Constant(n_input_dims,n_rfs);
   MetaParametersLWR* meta_parameters_lwr = new MetaParametersLWR(n_input_dims,num_rfs_per_dim,intersection);
-  FunctionApproximator* fa = new FunctionApproximatorLWR(meta_parameters_lwr);
+  fa = new FunctionApproximatorLWR(meta_parameters_lwr);
 
   cout << "_____________________________________" << endl << fa->getName() << endl;
   cout << "    Training"  << endl;
@@ -114,6 +117,27 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
+
+  // Weighted Least Squares
+  // LWR with only one basis function
+  vector<VectorXd> centers_per_dim(1);
+  // Choose one center between min and max of inputs
+  centers_per_dim[0] = 0.5*(inputs.colwise().minCoeff()+inputs.colwise().maxCoeff());
+  meta_parameters_lwr = new MetaParametersLWR(n_input_dims, centers_per_dim);
+
+  fa = new FunctionApproximatorLWR(meta_parameters_lwr);
+
+  cout << "_____________________________________" << endl << fa->getName() << endl;
+  cout << "    Training"  << endl;
+  if (!directory.empty()) directory_fa =  directory+"/WLS";
+  fa->train(inputs,targets,directory_fa,overwrite);
+  cout << "    Predicting" << endl;
+  fa->predict(inputs,outputs);
+  meanAbsoluteErrorPerOutputDimension(targets,outputs);
+  cout << endl << endl;
+  
+  delete fa;
+
 
   
   // IRFRLS
@@ -137,7 +161,7 @@ int main(int n_args, char** args)
   
   
   // Gaussian Mixture Regression (GMR)
-  int number_of_gaussians = 5;
+  int number_of_gaussians = pow(5,n_input_dims);
   MetaParametersGMR* meta_parameters_gmr = new MetaParametersGMR(n_input_dims,number_of_gaussians);
   fa = new FunctionApproximatorGMR(meta_parameters_gmr);
     
@@ -194,8 +218,8 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   // Gaussian Process Regression
-  double maximum_covariance = 5.5;
-  double length = 0.08;
+  double maximum_covariance = 3;
+  double length = 0.1;
   MetaParametersGPR* meta_parameters_gpr = new MetaParametersGPR(n_input_dims,maximum_covariance,length);
   fa = new FunctionApproximatorGPR(meta_parameters_gpr);
 

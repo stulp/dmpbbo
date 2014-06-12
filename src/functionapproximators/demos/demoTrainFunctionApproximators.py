@@ -12,6 +12,7 @@ import os, sys, subprocess
 lib_path = os.path.abspath('../plotting')
 sys.path.append(lib_path)
 from plotData import plotDataFromDirectory
+from plotData import getDataDimFromDirectory
 from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
 from plotBasisFunctions import plotBasisFunctionsFromDirectory
 
@@ -30,10 +31,11 @@ if __name__=='__main__':
     subprocess.call([executable, directory])
     
     # Plot the results in each directory
-    function_approximator_names = ["LWR","LWPR","IRFRLS","GMR","RBFN","GPR"]
+    function_approximator_names = ["WLS","LWR","LWPR","IRFRLS","GMR","RBFN","GPR"]
     
     # How well are these function approximators coded ;-)
     devel = {}
+    devel["WLS"] = "stable"
     devel["LWR"] = "stable"
     devel["LWPR"] = "stable"
     devel["IRFRLS"] = "testing"
@@ -41,18 +43,21 @@ if __name__=='__main__':
     devel["RBFN"] = "unstable"
     devel["GPR"] = "unstable"
     
-    fig = plt.figure()
-    subplot_number = 1;
+    fig_number = 1;
     for name in function_approximator_names:
-    
-    
-        ax = fig.add_subplot(1,len(function_approximator_names),subplot_number)
-        subplot_number += 1;
-    
+        fig = plt.figure(fig_number)
+
         directory_fa = directory +"/"+ name
+        if (getDataDimFromDirectory(directory_fa)==1):
+            ax = fig.add_subplot(111)
+        else:
+            ax = fig.add_subplot(111, projection='3d')
+
+        fig_number += 1;
+    
         try:
             plotDataFromDirectory(directory_fa,ax)
-            if (name=="LWR" or name=="LWPR" or name=="GPR"):
+            if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GPR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
             elif (name=="RBFN"):
                 plot_normalized=False
