@@ -122,23 +122,23 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   expectationMaximization(data, means, priors, covars);
 
   // Extract the different input/output components from the means/covars which contain both
-  std::vector<Eigen::VectorXd> mean_xs(n_gaussians);
-  std::vector<Eigen::VectorXd> mean_ys(n_gaussians);
-  std::vector<Eigen::MatrixXd> covar_xs(n_gaussians);
-  std::vector<Eigen::MatrixXd> covar_ys(n_gaussians);
-  std::vector<Eigen::MatrixXd> covar_y_xs(n_gaussians);
+  std::vector<Eigen::VectorXd> means_x(n_gaussians);
+  std::vector<Eigen::VectorXd> means_y(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_x(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_y(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_y_x(n_gaussians);
   for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
   {
-    mean_xs[i_gau]    = means[i_gau].segment(0, n_dims_in);
-    mean_ys[i_gau]    = means[i_gau].segment(n_dims_in, n_dims_out);
+    means_x[i_gau]    = means[i_gau].segment(0, n_dims_in);
+    means_y[i_gau]    = means[i_gau].segment(n_dims_in, n_dims_out);
 
-    covar_xs[i_gau]   = covars[i_gau].block(0, 0, n_dims_in, n_dims_in);
-    covar_ys[i_gau]   = covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
-    covar_y_xs[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
+    covars_x[i_gau]   = covars[i_gau].block(0, 0, n_dims_in, n_dims_in);
+    covars_y[i_gau]   = covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
+    covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
 
 
-  setModelParameters(new ModelParametersGMR(priors, mean_xs, mean_ys, covar_xs, covar_ys, covar_y_xs));
+  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x));
 
   // std::vector<VectorXd> centers;
   // std::vector<MatrixXd> slopes;
@@ -178,6 +178,23 @@ double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& co
   return output;
 }
 
+void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h) const
+{
+  int n_gaussians = gmm->means_x_.size();
+  h.resize(n_gaussians);
+  VectorXd prior_times_gauss(n_gaussians);
+  
+  // Compute gaussian pdf and multiply it with prior probability
+  for (int i_gau=0; i_gau<n_gaussians; i_gau++)
+  {
+    double gauss = normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
+    prior_times_gauss(i_gau) = gmm->priors_[i_gau]*gauss;
+  }
+
+  // Normalize to get h
+  h = prior_times_gauss/prior_times_gauss.sum();
+}
+
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
@@ -202,22 +219,14 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   outputs.fill(0);
   
   // Pre-allocate some memory
-  VectorXd prior_times_gauss(n_gaussians);
   VectorXd h(n_gaussians);
   for (int i_input=0; i_input<n_inputs; i_input++)
   {
     // Compute output for this input
     VectorXd input = inputs.row(i_input);
-    
-    // Compute gaussian pdf and multiply it with prior probability
-    for (int i_gau=0; i_gau<n_gaussians; i_gau++)
-    {
-      double gauss = normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
-      prior_times_gauss(i_gau) = gmm->priors_[i_gau]*gauss;
-    }
 
-    // Normalize h
-    VectorXd h = prior_times_gauss/prior_times_gauss.sum();
+    // Compute probalities that each Gaussian would generate this input    
+    computeProbabilities(gmm, input, h);
     
     // Compute output, given probabilities of each Gaussian
     for (int i_gau=0; i_gau<n_gaussians; i_gau++)
@@ -225,6 +234,48 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
       VectorXd diff = input-gmm->means_x_[i_gau];
       VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_[i_gau].inverse() * diff;
       outputs.row(i_input) += h[i_gau] * (gmm->means_y_[i_gau]+projected);
+    }
+  }
+}
+
+void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
+{
+  if (!isTrained())  
+  {
+    cerr << "WARNING: You may not call FunctionApproximatorLWPR::predict if you have not trained yet. Doing nothing." << endl;
+    return;
+  }
+
+  const ModelParametersGMR* gmm = static_cast<const ModelParametersGMR*>(getModelParameters());
+  
+  // Dimensionality of input must be same as of the gmm inputs  
+  assert(gmm->means_x_[0].size()==inputs.cols());
+  
+  int n_gaussians = gmm->priors_.size();
+  assert(n_gaussians>0);
+  int n_dims_out = gmm->means_y_[0].size();
+  int n_inputs = inputs.rows();
+
+
+  // Make outputs of the right size
+  variances.resize(n_inputs, n_dims_out);
+  variances.fill(0);
+  
+  // Pre-allocate some memory
+  VectorXd h(n_gaussians);
+  for (int i_input=0; i_input<n_inputs; i_input++)
+  {
+    // Compute output for this input
+    VectorXd input = inputs.row(i_input);
+
+    // Compute probalities that each Gaussian would generate this input    
+    computeProbabilities(gmm, input, h);
+    
+    // Compute output, given probabilities of each Gaussian
+    for (int i_gau=0; i_gau<n_gaussians; i_gau++)
+    {
+      MatrixXd cur_covar = gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_[i_gau].inverse()*gmm->covars_y_x_[i_gau].transpose();
+      variances.row(i_input) += h[i_gau]*h[i_gau] * cur_covar;
     }
   }
 }
@@ -300,6 +351,8 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
   bool converged = false;
   for (int iIter = 0; iIter < n_max_iter && !converged; iIter++)
   {
+    //cout << "  iIter=" << iIter << endl;
+    
     // E step
     converged = true;
     for (int iData = 0; iData < data.rows(); iData++)
@@ -391,6 +444,7 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
 
   for (int iIter = 0; iIter < n_max_iter; iIter++)
   {
+    //cout << "  iIter=" << iIter << endl;
     // For debugging only
     //saveGMM("/tmp/demoTrainFunctionApproximators/GMR",centers,covars,iIter);
     

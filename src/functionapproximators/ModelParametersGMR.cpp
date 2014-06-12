@@ -82,8 +82,8 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   }
 #endif
 
-  for (size_t i = 0; i < nb_receptive_fields; i++)
-    covars_x_inverted_.push_back(covars_y_x_[i].inverse());
+  //for (size_t i = 0; i < nb_receptive_fields; i++)
+  //  covars_x_inverted_.push_back(covars_y_x_[i].inverse());
 
   all_values_vector_size_ = 0;
   

@@ -64,6 +64,8 @@ public:
   
 	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
 
+	void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances);
+	
 	std::string getName(void) const {
     return std::string("GMR");  
   };
@@ -75,6 +77,7 @@ protected:
    * \param[out]  priors A list (std::vector) of n_gaussian non initiallized priors
    * \param[out]  covars A list (std::vector) of n_gaussian non initiallized covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
    * \param[in]  n_max_iter The maximum number of iterations
+   * \author Thibaut Munzer
    */
   void kMeansInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& means, std::vector<double>& priors,
     std::vector<Eigen::MatrixXd>& covars, int n_max_iter=1000);
@@ -85,6 +88,7 @@ protected:
    * \param[out]  means A list (std::vector) of n_gaussian non initiallized means (n_in_dim + n_out_dim)
    * \param[out]  priors A list (std::vector) of n_gaussian non initiallized priors
    * \param[out]  covars A list (std::vector) of n_gaussian non initiallized covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
+   * \author Thibaut Munzer
    */
   void firstDimSlicingInit(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& means, std::vector<double>& priors,
     std::vector<Eigen::MatrixXd>& covars);
@@ -95,9 +99,10 @@ protected:
    * \param[in,out] priors A list (std::vector) of n_gaussian priors
    * \param[in,out] covars A list (std::vector) of n_gaussian covariance matrices ((n_in_dim + n_out_dim) x (n_in_dim + n_out_dim))
    * \param[in] n_max_iter The maximum number of iterations
+   * \author Thibaut Munzer
    */
   void expectationMaximization(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& means, std::vector<double>& priors,
-    std::vector<Eigen::MatrixXd>& covars, int n_max_iter=200);
+    std::vector<Eigen::MatrixXd>& covars, int n_max_iter=50);
   
 
   /** The probability density function (PDF) of the multi-variate normal distribution
@@ -108,6 +113,8 @@ protected:
    */
   static double normalPDF(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input);
  
+  void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h) const;
+
 private:
   /**
    * Default constructor.

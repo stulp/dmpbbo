@@ -47,10 +47,6 @@ public:
    *  \param[in] biases A list (std::vector) of nb_gaussian associated bias vector (nb_out_dim)
    *  \param[in] inverseCovarsL A list (std::vector) of nb_gaussian matrix. Each matrix is the inverse of the L part of the LLT decomposition of the covariance matrix (nb_in_dim x nb_in_dim)
    */
-  ModelParametersGMR(std::vector<Eigen::VectorXd> centers, std::vector<double> priors,
-    std::vector<Eigen::MatrixXd> slopes, std::vector<Eigen::VectorXd> biases,
-    std::vector<Eigen::MatrixXd> inverseCovarsL);
-
   ModelParametersGMR(std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
     std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
@@ -82,7 +78,7 @@ private:
   std::vector<Eigen::MatrixXd> covars_y_;
   std::vector<Eigen::MatrixXd> covars_y_x_;
 
-  std::vector<Eigen::MatrixXd> covars_x_inverted_;
+  // Add this for caching: std::vector<Eigen::MatrixXd> covars_x_inverted_;
 
   int  all_values_vector_size_;
   
