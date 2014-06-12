@@ -36,9 +36,11 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGMR);
 #include <ctime>
 #include <cstdlib>
 
+
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 
 using namespace std;
@@ -165,6 +167,15 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   //delete gmmCovars[i];
 }
 
+double gaussian(const VectorXd& mu, const MatrixXd& covar, const VectorXd input)
+{
+  VectorXd diff = input-mu;
+  double output = exp(-2*diff.transpose()*covar.inverse()*diff);
+  output *= pow(pow(2*M_PI,mu.size())*covar.determinant(),-0.5);   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
+  
+  return output;
+}
+
 void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
 {
   if (!isTrained())  
@@ -176,52 +187,39 @@ void FunctionApproximatorGMR::predict(const MatrixXd& input, MatrixXd& output)
   const ModelParametersGMR* model_parameters_GMR = static_cast<const ModelParametersGMR*>(getModelParameters());
 
   int nbGaussian = model_parameters_GMR->priors_.size();
-  int nbInDim = model_parameters_GMR->mu_xs_[0].size();
+  //int nbInDim = model_parameters_GMR->mu_xs_[0].size();
   int nbOutDim = model_parameters_GMR->mu_ys_[0].size();
 
-  output = MatrixXd(input.rows(), nbOutDim);
 
+  output.resize(input.rows(), nbOutDim);
+  output.fill(0);
   for (int i = 0; i < input.rows(); i++)
   {
+    // Compute output for this input
     VectorXd inputPoint = input.row(i);
-    VectorXd h(nbGaussian);
-    VectorXd partialH(nbGaussian);
-  
+    
+    // Compute gaussian probability and multiply it with prior probability
+    VectorXd gauss(nbGaussian);
+    VectorXd prior_times_gauss(nbGaussian);
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
       VectorXd center = model_parameters_GMR->mu_xs_[iCenter];
-      partialH[iCenter] = -1. / 2 * ((inputPoint - center).transpose() * model_parameters_GMR->inverted_sigma_xs_[iCenter] * (inputPoint - center))(0, 0);
+      MatrixXd covar = model_parameters_GMR->sigma_xs_[iCenter];
+      gauss(iCenter) = gaussian(center,covar,inputPoint);
+      prior_times_gauss(iCenter) = model_parameters_GMR->priors_[iCenter]*gauss(iCenter);
+      
     }
-    // double max = partialH.maxCoeff();
-    // for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
-    //   partialH[iCenter] -= max;
 
-    // for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
-    // {
-    //   VectorXd center = model_parameters_GMR->centers_[iCenter];
-    //   double det = 1. / pow((model_parameters_GMR->inverted_sigma_xs_[iCenter]).determinant(), 2);
-    //   h[iCenter] = model_parameters_GMR->priors_[iCenter]*1. / sqrt(pow(2 * M_PI, center.rows()) * det) * exp(partialH[iCenter]);
-    // }
-    // h /= h.sum();
-
+    // Normalize h
+    VectorXd h = prior_times_gauss/prior_times_gauss.sum();
+    
+    // Compute output, given probabilities of each Gaussian
     for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
     {
-      double power_of_two_pi = pow(2 * M_PI, - nbInDim / 2.);
-      double sqrt_det = pow(model_parameters_GMR->sigma_xs_[iCenter].determinant(), -1./2);
-
-      h[iCenter] = model_parameters_GMR->priors_[iCenter] * power_of_two_pi * sqrt_det * exp(partialH[iCenter]);
+      VectorXd diff = inputPoint-model_parameters_GMR->mu_xs_[iCenter];
+      VectorXd projected =  model_parameters_GMR->sigma_y_xs_[iCenter] * model_parameters_GMR->sigma_xs_[iCenter].inverse()*diff;
+      output.row(i) += h[iCenter] * (model_parameters_GMR->mu_ys_[iCenter]+projected);
     }
-    h /= h.sum();
-
-
-    VectorXd prediction(nbOutDim);
-    prediction.setZero();
-    for (int iCenter = 0; iCenter < nbGaussian; iCenter++)
-    {
-      VectorXd tmp = model_parameters_GMR->mu_ys_[iCenter] + model_parameters_GMR->sigma_y_xs_[iCenter] * model_parameters_GMR->sigma_ys_[iCenter].inverse() * (inputPoint - model_parameters_GMR->mu_xs_[iCenter]);
-      prediction += h[iCenter] * tmp;
-    }
-    output.row(i) = prediction;
   }
 }
 
@@ -356,6 +354,28 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
     priors[iCenter] = 1. / centers.size();
 }
 
+void saveGMM(string directory, const vector<VectorXd>& centers, const vector<MatrixXd>& covars, int iter)
+{
+  for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
+  {
+    stringstream stream;
+    stream << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << iCenter << "_mu.txt";
+    string filename = stream.str();
+    if (!saveMatrix(directory, filename,  centers[iCenter],  true))
+      exit(0);
+    cout << "  filename=" << filename << endl;
+    
+    stringstream stream2;
+    stream2 << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << iCenter << "_covar.txt";
+    filename = stream2.str();
+    cout << "  filename=" << filename << endl;
+    
+    if (!saveMatrix(directory, filename,  covars[iCenter],  true))
+      exit(0);
+    
+  }
+}
+
 void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
     std::vector<MatrixXd>& covars, int nbMaxIter)
 {
@@ -367,6 +387,9 @@ void FunctionApproximatorGMR::EM(const MatrixXd& data, std::vector<VectorXd>& ce
 
   for (int iIter = 0; iIter < nbMaxIter; iIter++)
   {
+    // For debugging only
+    //saveGMM("/tmp/demoTrainFunctionApproximators/GMR",centers,covars,iIter);
+    
     // E step
     for (int iData = 0; iData < data.rows(); iData++)
       for (size_t iCenter = 0; iCenter < centers.size(); iCenter++)
