@@ -502,14 +502,19 @@ bool ModelParametersLWR::saveGridData(const VectorXd& min, const VectorXd& max, 
   MatrixXd activations;
   kernelActivations(inputs, activations);
     
-  MatrixXd normalized_activations;
-  normalizedKernelActivations(inputs, normalized_activations);
-    
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
   saveMatrix(save_directory,"lines.txt",lines,overwrite);
   saveMatrix(save_directory,"activations.txt",activations,overwrite);
-  saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
+
+  // Save normalized kernel activations, but only if there is more than 1 basis function
+  // (normalizing with only 1 basis function doesn't make sense)
+  if (centers_.rows()>1)
+  {
+    MatrixXd normalized_activations;
+    normalizedKernelActivations(inputs, normalized_activations);
+    saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
+  }
   
   return true;
   
