@@ -194,7 +194,7 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
     
     // Task parameter may not change over time for 2-Step contextual DMP
     // Start comparison to i_time=0 at i_time=1
-    for (unsigned int i_time=1; i_time<task_parameters[i_demo].rows(); i_time++)
+    for (int i_time=1; i_time<task_parameters[i_demo].rows(); i_time++)
     {
       if ( (cur_task_parameters_t0.array() != task_parameters[i_demo].row(i_time).array()).any())
       {
