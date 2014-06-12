@@ -58,7 +58,7 @@ int main(int n_args, char** args)
   model_parameters.push_back(new ModelParametersIRFRLS(linear_models, cosines_periodes, cosines_phase));
 
   // GMR
-  
+  /*
   vector<VectorXd> centers_gmr;
   vector<double> priors_gmr;
   vector<MatrixXd> slopes_gmr;
@@ -81,6 +81,7 @@ int main(int n_args, char** args)
   inverseCovarsL_gmr.push_back(inverseCovarsL_gmr_1);
   
   model_parameters.push_back(new ModelParametersGMR(centers_gmr,priors_gmr,slopes_gmr,biases_gmr,inverseCovarsL_gmr));
+  */
   
   for (unsigned int mm=0; mm<model_parameters.size(); mm++)
   {
