@@ -43,47 +43,47 @@ using namespace std;
 namespace DmpBbo {
 
 ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
-  std::vector<Eigen::VectorXd> mu_xs, std::vector<Eigen::VectorXd> mu_ys,
-  std::vector<Eigen::MatrixXd> sigma_xs, std::vector<Eigen::MatrixXd> sigma_ys,
-  std::vector<Eigen::MatrixXd> sigma_y_xs)
+  std::vector<Eigen::VectorXd> means_x, std::vector<Eigen::VectorXd> means_y,
+  std::vector<Eigen::MatrixXd> covars_x, std::vector<Eigen::MatrixXd> covars_y,
+  std::vector<Eigen::MatrixXd> covars_y_x)
 :
   priors_(priors),
-  mu_xs_(mu_xs),
-  mu_ys_(mu_ys),
-  sigma_xs_(sigma_xs),
-  sigma_ys_(sigma_ys),
-  sigma_y_xs_(sigma_y_xs)
+  means_x_(means_x),
+  means_y_(means_y),
+  covars_x_(covars_x),
+  covars_y_(covars_y),
+  covars_y_x_(covars_y_x)
 {
   
 #ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for nb_in_dim and nb_out_dim.
   size_t nb_receptive_fields = priors.size();
   assert(nb_receptive_fields>0);
-  assert(mu_xs_.size() == nb_receptive_fields);
-  assert(mu_ys_.size() == nb_receptive_fields);
-  assert(sigma_xs_.size() == nb_receptive_fields);
-  assert(sigma_ys_.size() == nb_receptive_fields);
-  assert(sigma_y_xs_.size() == nb_receptive_fields);
+  assert(means_x_.size() == nb_receptive_fields);
+  assert(means_y_.size() == nb_receptive_fields);
+  assert(covars_x_.size() == nb_receptive_fields);
+  assert(covars_y_.size() == nb_receptive_fields);
+  assert(covars_y_x_.size() == nb_receptive_fields);
 
   int nb_in_dim = getExpectedInputDim();
   for (size_t i = 0; i < nb_receptive_fields; i++)
   {
-    assert(mu_xs_[i].size() == nb_in_dim);
-    assert(sigma_xs_[i].rows() == nb_in_dim);
-    assert(sigma_xs_[i].cols() == nb_in_dim);
-    assert(sigma_y_xs_[i].cols() == nb_in_dim);
+    assert(means_x_[i].size() == nb_in_dim);
+    assert(covars_x_[i].rows() == nb_in_dim);
+    assert(covars_x_[i].cols() == nb_in_dim);
+    assert(covars_y_x_[i].cols() == nb_in_dim);
   }
 
-  int nb_out_dim = mu_ys_[0].size();
+  int nb_out_dim = means_y_[0].size();
   for (size_t i = 0; i < nb_receptive_fields; i++)
   {
-    assert(sigma_ys_[i].rows() == nb_out_dim);
-    assert(sigma_ys_[i].cols() == nb_out_dim);
-    assert(sigma_y_xs_[i].rows() == nb_out_dim);
+    assert(covars_y_[i].rows() == nb_out_dim);
+    assert(covars_y_[i].cols() == nb_out_dim);
+    assert(covars_y_x_[i].rows() == nb_out_dim);
   }
 #endif
 
   for (size_t i = 0; i < nb_receptive_fields; i++)
-    inverted_sigma_xs_.push_back(sigma_y_xs_[i].inverse());
+    covars_x_inverted_.push_back(covars_y_x_[i].inverse());
 
   all_values_vector_size_ = 0;
   
@@ -101,28 +101,28 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
 ModelParameters* ModelParametersGMR::clone(void) const
 {
   std::vector<double> priors;
-  std::vector<VectorXd> mu_xs;
-  std::vector<VectorXd> mu_ys;
-  std::vector<MatrixXd> sigma_xs;
-  std::vector<MatrixXd> sigma_ys;
-  std::vector<MatrixXd> sigma_y_xs;
+  std::vector<VectorXd> means_x;
+  std::vector<VectorXd> means_y;
+  std::vector<MatrixXd> covars_x;
+  std::vector<MatrixXd> covars_y;
+  std::vector<MatrixXd> covars_y_x;
 
   for (size_t i = 0; i < priors_.size(); i++)
   {
     priors.push_back(priors_[i]);
-    mu_xs.push_back(VectorXd(mu_xs_[i]));
-    mu_ys.push_back(VectorXd(mu_xs_[i]));
-    sigma_xs.push_back(MatrixXd(mu_xs_[i]));
-    sigma_ys.push_back(MatrixXd(mu_ys_[i]));
-    sigma_y_xs.push_back(MatrixXd(sigma_y_xs_[i]));
+    means_x.push_back(VectorXd(means_x_[i]));
+    means_y.push_back(VectorXd(means_x_[i]));
+    covars_x.push_back(MatrixXd(means_x_[i]));
+    covars_y.push_back(MatrixXd(means_y_[i]));
+    covars_y_x.push_back(MatrixXd(covars_y_x_[i]));
   }
 
-  return new ModelParametersGMR(priors, mu_xs, mu_ys, sigma_xs, sigma_ys, sigma_y_xs); 
+  return new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x); 
 }
 
 int ModelParametersGMR::getExpectedInputDim(void) const  {
-  assert(mu_xs_.size()>0); // This is also checked in the constructor
-  return mu_xs_[0].size();
+  assert(means_x_.size()>0); // This is also checked in the constructor
+  return means_x_[0].size();
 };
 
 template<class Archive>
@@ -132,11 +132,11 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
   
   ar & BOOST_SERIALIZATION_NVP(priors_);
-  ar & BOOST_SERIALIZATION_NVP(mu_xs_);
-  ar & BOOST_SERIALIZATION_NVP(mu_ys_);
-  ar & BOOST_SERIALIZATION_NVP(sigma_xs_);
-  ar & BOOST_SERIALIZATION_NVP(sigma_ys_);
-  ar & BOOST_SERIALIZATION_NVP(sigma_y_xs_);
+  ar & BOOST_SERIALIZATION_NVP(means_x_);
+  ar & BOOST_SERIALIZATION_NVP(means_y_);
+  ar & BOOST_SERIALIZATION_NVP(covars_x_);
+  ar & BOOST_SERIALIZATION_NVP(covars_y_);
+  ar & BOOST_SERIALIZATION_NVP(covars_y_x_);
 }
 
 

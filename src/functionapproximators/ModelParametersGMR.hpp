@@ -75,14 +75,14 @@ protected:
 private:
   std::vector<double> priors_;
 
-  std::vector<Eigen::VectorXd> mu_xs_;
-  std::vector<Eigen::VectorXd> mu_ys_;
+  std::vector<Eigen::VectorXd> means_x_;
+  std::vector<Eigen::VectorXd> means_y_;
 
-  std::vector<Eigen::MatrixXd> sigma_xs_;
-  std::vector<Eigen::MatrixXd> sigma_ys_;
-  std::vector<Eigen::MatrixXd> sigma_y_xs_;
+  std::vector<Eigen::MatrixXd> covars_x_;
+  std::vector<Eigen::MatrixXd> covars_y_;
+  std::vector<Eigen::MatrixXd> covars_y_x_;
 
-  std::vector<Eigen::MatrixXd> inverted_sigma_xs_;
+  std::vector<Eigen::MatrixXd> covars_x_inverted_;
 
   int  all_values_vector_size_;
   
