@@ -10,6 +10,7 @@ from plotBasisFunctions import plotBasisFunctions
 def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations_normalized=[],activations=[]):
     """Plots locally weighted lines, whilst being smart about the dimensionality of input data."""
     
+    line_handles = []
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims==1):
         
@@ -19,23 +20,36 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations_norma
         #y_lim_min = min(lines_weighted) - 0.2*(max(lines_weighted)-min(lines_weighted))
         #y_lim_max = max(lines_weighted) + 0.2*(max(lines_weighted)-min(lines_weighted))
         #ax.set_ylim(y_lim_min,y_lim_max)
+        
+        # Assume normalized activations were used. If they are not available, used unnormalized ones
+        if activations_normalized is None:
+            activations_used = activations
+        else:
+            activations_used = activations_normalized
 
-        if (len(activations_normalized)>0):
+        if not activations_used is None:
               ax_two = ax.twinx()
               line_handles_bfs =               plotBasisFunctions(inputs,activations,ax_two,n_samples_per_dim)
               plt.setp(line_handles_bfs,color='#aaffaa')
-              line_handles_bfs = plotBasisFunctions(inputs,activations_normalized,ax_two,n_samples_per_dim)
+              if not activations_normalized is None:
+                  line_handles_bfs = plotBasisFunctions(inputs,activations_normalized,ax_two,n_samples_per_dim)
               plt.setp(line_handles_bfs,color='green')
               for tl in ax_two.get_yticklabels():
                     tl.set_color('green')
                     
               ax_two.set_ylim(-2.0,3.0)
-   
-              for ii in xrange(len(activations_normalized[0])):
-                    active = activations_normalized[:,ii]>(max(activations_normalized[:,ii])*0.001)
-                    line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
+              
+              n_basis_functions =  len(numpy.atleast_1d(activations_used[0]));
+              if n_basis_functions==1:
+                  active = activations_used>(max(activations_used)*0.001)
+                  line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth='1')
+              else:
+                  for ii in xrange(n_basis_functions):
+                      active = activations_used[:,ii]>(max(activations_used[:,ii])*0.001)
+                      line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
     
     elif (n_dims==2):
+        return []
         n_lines = len(lines[0])
         # Have a look at the colormaps here and decide which one you'd like:
         # http://matplotlib.org/1.2.1/examples/pylab_examples/show_colormaps.html
@@ -86,11 +100,11 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
     try:
         activations_normalized = numpy.loadtxt(directory+'/activations_normalized.txt')                             
     except IOError:
-        activations_normalized = []
+        activations_normalized = None
     try:
         activations = numpy.loadtxt(directory+'/activations.txt')                             
     except IOError:
-        activations = []
+        activations = None
       
     plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations_normalized,activations) 
 
