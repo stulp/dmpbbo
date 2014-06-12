@@ -127,14 +127,14 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   std::vector<Eigen::MatrixXd> covar_xs(n_gaussians);
   std::vector<Eigen::MatrixXd> covar_ys(n_gaussians);
   std::vector<Eigen::MatrixXd> covar_y_xs(n_gaussians);
-  for (int i_gaussian = 0; i_gaussian < n_gaussians; i_gaussian++)
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
   {
-    mean_xs[i_gaussian]    = means[i_gaussian].segment(0, n_dims_in);
-    mean_ys[i_gaussian]    = means[i_gaussian].segment(n_dims_in, n_dims_out);
+    mean_xs[i_gau]    = means[i_gau].segment(0, n_dims_in);
+    mean_ys[i_gau]    = means[i_gau].segment(n_dims_in, n_dims_out);
 
-    covar_xs[i_gaussian]   = covars[i_gaussian].block(0, 0, n_dims_in, n_dims_in);
-    covar_ys[i_gaussian]   = covars[i_gaussian].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
-    covar_y_xs[i_gaussian] = covars[i_gaussian].block(n_dims_in, 0, n_dims_out, n_dims_in);
+    covar_xs[i_gau]   = covars[i_gau].block(0, 0, n_dims_in, n_dims_in);
+    covar_ys[i_gau]   = covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
+    covar_y_xs[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
 
 
@@ -148,16 +148,16 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   // // int n_dims_in = inputs.cols();
   // // int n_dims_out = targets.cols();
 
-  // for (int i_gaussian = 0; i_gaussian < n_gaussians; i_gaussian++)
+  // for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
   // {
-  //   centers.push_back(VectorXd(means[i_gaussian].segment(0, n_dims_in)));
+  //   centers.push_back(VectorXd(means[i_gau].segment(0, n_dims_in)));
 
-  //   slopes.push_back(MatrixXd(covars[i_gaussian].block(n_dims_in, 0, n_dims_out, n_dims_in) * covars[i_gaussian].block(0, 0, n_dims_in, n_dims_in).inverse()));
+  //   slopes.push_back(MatrixXd(covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in) * covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse()));
     
-  //   biases.push_back(VectorXd(means[i_gaussian].segment(n_dims_in, n_dims_out) -
-  //     slopes[i_gaussian]*means[i_gaussian].segment(0, n_dims_in)));
+  //   biases.push_back(VectorXd(means[i_gau].segment(n_dims_in, n_dims_out) -
+  //     slopes[i_gau]*means[i_gau].segment(0, n_dims_in)));
 
-  //   MatrixXd L = covars[i_gaussian].block(0, 0, n_dims_in, n_dims_in).inverse().llt().matrixL();
+  //   MatrixXd L = covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse().llt().matrixL();
   //   inverseCovarsL.push_back(MatrixXd(L));
   // }
 
@@ -251,31 +251,31 @@ void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vec
   
   // Init means
   VectorXi nbPoints = VectorXi::Zero(centers.size());
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    centers[i_gaussian].setZero();
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    centers[i_gau].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
   {
     centers[assign[iData]] += data.row(iData).transpose();
     nbPoints[assign[iData]]++;
   }
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    centers[i_gaussian] /= nbPoints[i_gaussian];
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    centers[i_gau] /= nbPoints[i_gau];
 
   // Init covars
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    covars[i_gaussian].setZero();
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    covars[i_gau].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
     covars[assign[iData]] += (data.row(iData).transpose() - centers[assign[iData]]) * (data.row(iData).transpose() - centers[assign[iData]]).transpose();
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    covars[i_gaussian] /= nbPoints[i_gaussian];
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    covars[i_gau] /= nbPoints[i_gau];
 
   // Be sure that covar is invertible
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-      covars[i_gaussian] += MatrixXd::Identity(covars[i_gaussian].rows(), covars[i_gaussian].cols()) * 1e-5;
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      covars[i_gau] += MatrixXd::Identity(covars[i_gau].rows(), covars[i_gau].cols()) * 1e-5;
 
   // Init priors
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    priors[i_gaussian] = 1. / centers.size();
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    priors[i_gau] = 1. / centers.size();
 }
 
 void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
@@ -291,8 +291,8 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
     dataIndex.push_back(i); 
   std::random_shuffle (dataIndex.begin(), dataIndex.end());
 
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    centers[i_gaussian] = data.row(dataIndex[i_gaussian]);
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    centers[i_gau] = data.row(dataIndex[i_gau]);
 
   VectorXi assign(data.rows());
   assign.setZero();
@@ -308,73 +308,73 @@ void FunctionApproximatorGMR::kMeansInit(const MatrixXd& data, std::vector<Vecto
 
       double minDist = v.transpose() * dataCovInverse * v;
 
-      for (int i_gaussian = 0; i_gaussian < (int)centers.size(); i_gaussian++)
+      for (int i_gau = 0; i_gau < (int)centers.size(); i_gau++)
       {
-        if (i_gaussian == assign[iData])
+        if (i_gau == assign[iData])
           continue;
 
-        v = (centers[i_gaussian] - data.row(iData).transpose());
+        v = (centers[i_gau] - data.row(iData).transpose());
         double dist = v.transpose() * dataCovInverse * v;
         if (dist < minDist)
         {
           converged = false;
           minDist = dist;
-          assign[iData] = i_gaussian;
+          assign[iData] = i_gau;
         }
       }
     }
 
     // M step
     VectorXi nbPoints = VectorXi::Zero(centers.size());
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-      centers[i_gaussian].setZero();
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      centers[i_gau].setZero();
     for (int iData = 0; iData < data.rows(); iData++)
     {
       centers[assign[iData]] += data.row(iData).transpose();
       nbPoints[assign[iData]]++;
     }
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-      centers[i_gaussian] /= nbPoints[i_gaussian];
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      centers[i_gau] /= nbPoints[i_gau];
   }
 
   // Init covars
   VectorXi nbPoints = VectorXi::Zero(centers.size());
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    covars[i_gaussian].setZero();
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    covars[i_gau].setZero();
   for (int iData = 0; iData < data.rows(); iData++)
   {
     covars[assign[iData]] += (data.row(iData).transpose() - centers[assign[iData]]) * (data.row(iData).transpose() - centers[assign[iData]]).transpose();
     nbPoints[assign[iData]]++;
   }
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    covars[i_gaussian] /= nbPoints[i_gaussian];
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    covars[i_gau] /= nbPoints[i_gau];
 
   // Be sure that covar is invertible
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    covars[i_gaussian] += MatrixXd::Identity(covars[i_gaussian].rows(), covars[i_gaussian].cols()) * 1e-5f;
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    covars[i_gau] += MatrixXd::Identity(covars[i_gau].rows(), covars[i_gau].cols()) * 1e-5f;
 
   // Init priors
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-    priors[i_gaussian] = 1. / centers.size();
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    priors[i_gau] = 1. / centers.size();
 }
 
 void saveGMM(string directory, const vector<VectorXd>& centers, const vector<MatrixXd>& covars, int iter)
 {
-  for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
+  for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
   {
     stringstream stream;
-    stream << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gaussian << "_mu.txt";
+    stream << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gau << "_mu.txt";
     string filename = stream.str();
-    if (!saveMatrix(directory, filename,  centers[i_gaussian],  true))
+    if (!saveMatrix(directory, filename,  centers[i_gau],  true))
       exit(0);
     cout << "  filename=" << filename << endl;
     
     stringstream stream2;
-    stream2 << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gaussian << "_covar.txt";
+    stream2 << "gmm_iter" << setw(2) << setfill('0') << iter << "_gauss" << i_gau << "_covar.txt";
     filename = stream2.str();
     cout << "  filename=" << filename << endl;
     
-    if (!saveMatrix(directory, filename,  covars[i_gaussian],  true))
+    if (!saveMatrix(directory, filename,  covars[i_gau],  true))
       exit(0);
     
   }
@@ -396,8 +396,8 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
     
     // E step
     for (int iData = 0; iData < data.rows(); iData++)
-      for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-        assign(i_gaussian, iData) = priors[i_gaussian] * FunctionApproximatorGMR::normalPDF(centers[i_gaussian], covars[i_gaussian],data.row(iData).transpose());
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+        assign(i_gau, iData) = priors[i_gau] * FunctionApproximatorGMR::normalPDF(centers[i_gau], covars[i_gau],data.row(iData).transpose());
 
     oldLoglik = loglik;
     loglik = 0;
@@ -412,38 +412,38 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
       assign.col(iData) /= assign.col(iData).sum();
 
     // M step
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
     {
-      centers[i_gaussian].setZero();
-      covars[i_gaussian].setZero();
-      priors[i_gaussian] = 0;
+      centers[i_gau].setZero();
+      covars[i_gau].setZero();
+      priors[i_gau] = 0;
     }
 
     for (int iData = 0; iData < data.rows(); iData++)
     {
-      for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
       {
-        centers[i_gaussian] += assign(i_gaussian, iData) * data.row(iData).transpose();
-        priors[i_gaussian] += assign(i_gaussian, iData);
+        centers[i_gau] += assign(i_gau, iData) * data.row(iData).transpose();
+        priors[i_gau] += assign(i_gau, iData);
       }
     }
 
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
     {
-      centers[i_gaussian] /= assign.row(i_gaussian).sum();
-      priors[i_gaussian] /= assign.cols();
+      centers[i_gau] /= assign.row(i_gau).sum();
+      priors[i_gau] /= assign.cols();
     }
 
     for (int iData = 0; iData < data.rows(); iData++)
-      for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-        covars[i_gaussian] += assign(i_gaussian, iData) * (data.row(iData).transpose() - centers[i_gaussian]) * (data.row(iData).transpose() - centers[i_gaussian]).transpose();
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+        covars[i_gau] += assign(i_gau, iData) * (data.row(iData).transpose() - centers[i_gau]) * (data.row(iData).transpose() - centers[i_gau]).transpose();
 
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-      covars[i_gaussian] /= assign.row(i_gaussian).sum();
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      covars[i_gau] /= assign.row(i_gau).sum();
 
     // Be sure that covar is invertible
-    for (size_t i_gaussian = 0; i_gaussian < centers.size(); i_gaussian++)
-      covars[i_gaussian] += MatrixXd::Identity(covars[i_gaussian].rows(), covars[i_gaussian].cols()) * 1e-5f;
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      covars[i_gau] += MatrixXd::Identity(covars[i_gau].rows(), covars[i_gau].cols()) * 1e-5f;
   }
 }
 
