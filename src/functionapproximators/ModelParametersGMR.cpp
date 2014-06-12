@@ -55,47 +55,47 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   covars_y_x_(covars_y_x)
 {
   
-#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for nb_in_dim and nb_out_dim.
-  size_t nb_receptive_fields = priors.size();
-  assert(nb_receptive_fields>0);
-  assert(means_x_.size() == nb_receptive_fields);
-  assert(means_y_.size() == nb_receptive_fields);
-  assert(covars_x_.size() == nb_receptive_fields);
-  assert(covars_y_.size() == nb_receptive_fields);
-  assert(covars_y_x_.size() == nb_receptive_fields);
+#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for n_dims_in and n_dims_out.
+  size_t n_gaussians = priors.size();
+  assert(n_gaussians>0);
+  assert(means_x_.size() == n_gaussians);
+  assert(means_y_.size() == n_gaussians);
+  assert(covars_x_.size() == n_gaussians);
+  assert(covars_y_.size() == n_gaussians);
+  assert(covars_y_x_.size() == n_gaussians);
 
-  int nb_in_dim = getExpectedInputDim();
-  for (size_t i = 0; i < nb_receptive_fields; i++)
+  int n_dims_in = getExpectedInputDim();
+  for (size_t i = 0; i < n_gaussians; i++)
   {
-    assert(means_x_[i].size() == nb_in_dim);
-    assert(covars_x_[i].rows() == nb_in_dim);
-    assert(covars_x_[i].cols() == nb_in_dim);
-    assert(covars_y_x_[i].cols() == nb_in_dim);
+    assert(means_x_[i].size() == n_dims_in);
+    assert(covars_x_[i].rows() == n_dims_in);
+    assert(covars_x_[i].cols() == n_dims_in);
+    assert(covars_y_x_[i].cols() == n_dims_in);
   }
 
-  int nb_out_dim = means_y_[0].size();
-  for (size_t i = 0; i < nb_receptive_fields; i++)
+  int n_dims_out = means_y_[0].size();
+  for (size_t i = 0; i < n_gaussians; i++)
   {
-    assert(covars_y_[i].rows() == nb_out_dim);
-    assert(covars_y_[i].cols() == nb_out_dim);
-    assert(covars_y_x_[i].rows() == nb_out_dim);
+    assert(covars_y_[i].rows() == n_dims_out);
+    assert(covars_y_[i].cols() == n_dims_out);
+    assert(covars_y_x_[i].rows() == n_dims_out);
   }
 #endif
 
-  //for (size_t i = 0; i < nb_receptive_fields; i++)
+  //for (size_t i = 0; i < n_gaussians; i++)
   //  covars_x_inverted_.push_back(covars_y_x_[i].inverse());
 
   all_values_vector_size_ = 0;
   
   // NEW REPRESENTATION
-  // all_values_vector_size_ += nb_receptive_fields;
+  // all_values_vector_size_ += n_gaussians;
 
-  // all_values_vector_size_ += nb_receptive_fields * nb_in_dim;
-  // all_values_vector_size_ += nb_receptive_fields * nb_out_dim;
+  // all_values_vector_size_ += n_gaussians * n_dims_in;
+  // all_values_vector_size_ += n_gaussians * n_dims_out;
 
-  // all_values_vector_size_ += nb_receptive_fields * nb_in_dim * nb_in_dim;
-  // all_values_vector_size_ += nb_receptive_fields * nb_out_dim * nb_out_dim;
-  // all_values_vector_size_ += nb_receptive_fields * nb_out_dim * nb_in_dim;  
+  // all_values_vector_size_ += n_gaussians * n_dims_in * n_dims_in;
+  // all_values_vector_size_ += n_gaussians * n_dims_out * n_dims_out;
+  // all_values_vector_size_ += n_gaussians * n_dims_out * n_dims_in;  
 };
 
 ModelParameters* ModelParametersGMR::clone(void) const
