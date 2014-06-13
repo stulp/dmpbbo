@@ -3,7 +3,8 @@
 
 # Some settings related to building/installing libraries and header files
 # Set this to STATIC if you want to build static libraries instead.
-set(SHARED_OR_STATIC "STATIC")
+set(SHARED_OR_STATIC "SHARED")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC") 
 set(LIB_INSTALL_DIR /usr/local/lib)
 set(INCLUDE_INSTALL_DIR /usr/local/include)
 
@@ -26,6 +27,9 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 # Appends the cmake/modules path inside the MAKE_MODULE_PATH variable which stores the
 # directories of additional CMake modules (ie. MacroOutOfSourceBuild.cmake):
 set(CMAKE_MODULE_PATH ${oo_dmp_bbo_SOURCE_DIR}/cmake/modules "${CMAKE_SOURCE_DIR}/src/functionapproximators/" ${CMAKE_MODULE_PATH})
+
+# The command above returns a strange result, look:
+#message("module path : "  ${CMAKE_MODULE_PATH})
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
@@ -50,6 +54,7 @@ include_directories ( ${Boost_INCLUDE_DIRS} )
 ###############################################################################
 # Things to compile are in the src/ directory
 add_subdirectory(src)
+add_subdirectory(python)
 
 ###############################################################################
 # Generate doxygen documentation from CMake
