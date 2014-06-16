@@ -57,8 +57,9 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   covars_y_x_(covars_y_x)
 {
   
-#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for n_dims_in and n_dims_out.
   size_t n_gaussians = priors.size();
+  
+#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for n_dims_in and n_dims_out.
   assert(n_gaussians>0);
   assert(means_x_.size() == n_gaussians);
   assert(means_y_.size() == n_gaussians);
