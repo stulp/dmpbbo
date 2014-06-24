@@ -7,16 +7,17 @@ Dmp::Dmp(int n_dims_dmp, int n_basis_functions): n_dims(n_dims_dmp), traj(), wei
     VectorXd time_vect(VectorXd::LinSpaced(100, 0.0, 1));
     VectorXd min = time_vect.colwise().minCoeff();
     VectorXd max = time_vect.colwise().maxCoeff();
-    meta_parameters = new DmpBbo::MetaParametersRBFN(1, n_basis_functions);
+    meta_parameters = new DmpBbo::MetaParametersLWR(1, n_basis_functions);
     meta_parameters -> getCentersAndWidths(min, max, centers, widths);
-    model_parameters = new DmpBbo::ModelParametersRBFN(centers, widths, weights);
-    fa_lwr = new DmpBbo::FunctionApproximatorRBFN(model_parameters);
+    model_parameters = new DmpBbo::ModelParametersLWR(centers, widths, MatrixXd::Zero(n_basis_functions, 1), weights);
+    //cout << "centers" << endl << centers << "widths" << widths << "weights" << weights <<endl;
+    fa_lwr = new DmpBbo::FunctionApproximatorLWR(model_parameters);
     for (int dd=0; dd<n_dims_dmp; dd++) {
         function_approximators[dd] = fa_lwr->clone();
     }
     dmp = new DmpBbo::Dmp(n_dims_dmp, function_approximators, DmpBbo::Dmp::KULVICIUS_2012_JOINING);
     //dmp = new DmpBbo::Dmp(1., VectorXd::Zero(n_dims), VectorXd::Constant(n_dims, 1.), function_approximators);
-    selected_labels.insert("weights");
+    selected_labels.insert("offsets");
     dmp->setSelectedParameters(selected_labels);
 }
 
@@ -28,6 +29,14 @@ void Dmp::setTau(double tau) {
     dmp->set_tau(tau);
 }
 
+void Dmp::set_initial_state(const boost::python::list& state) {
+    dmp->set_initial_state(listToVectorXd(state));
+}
+
+void Dmp::set_attractor_state(const boost::python::list& state) {
+    dmp->set_attractor_state(listToVectorXd(state));
+}
+
 boost::python::list Dmp::trajectory(double duration, int n_steps, const boost::python::list& weights_) {
     VectorXd ts(VectorXd::LinSpaced(n_steps, 0.0, duration));
     weights = listToVectorXd(weights_);
@@ -36,10 +45,17 @@ boost::python::list Dmp::trajectory(double duration, int n_steps, const boost::p
     //}
     dmp->analyticalSolution(ts, traj);
     boost::python::list res;
+    res.append(vectorXdToList(ts));
     res.append(matrixXdToList(traj.ys()));
     res.append(matrixXdToList(traj.yds()));
     res.append(matrixXdToList(traj.ydds()));
     return res;
+}
+
+void Dmp::train(const boost::python::list& ts, const boost::python::list& xs, const boost::python::list& xds, const boost::python::list& xdds) {
+    DmpBbo::Trajectory traj(listToVectorXd(ts), listToMatrixXd(xs), listToMatrixXd(xds), listToMatrixXd(xdds));
+    cout << "exp_in_dim: " << function_approximators[0] -> getExpectedInputDim() << endl;
+    dmp->train(traj);
 }
 
 // boost::python::list Dmp::test(const boost::python::list& _ts, const boost::python::list& weights_) {

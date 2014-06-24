@@ -14,6 +14,9 @@ BOOST_PYTHON_MODULE(_dmpbbo)
     ;
     class_<Dmp>("Dmp", init<int, int>())
         .def("trajectory", &Dmp::trajectory)
+        .def("train", &Dmp::train)
         .def("set_tau", &Dmp::setTau)
+        .def("set_initial_state", &Dmp::set_initial_state)
+        .def("set_attractor_state", &Dmp::set_attractor_state)
     ;
 }

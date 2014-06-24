@@ -13,9 +13,9 @@
 //#include "dynamicalsystems/TimeSystem.hpp"
 //#include "dynamicalsystems/SpringDamperSystem.hpp"
 
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/MetaParametersRBFN.hpp"
-#include "functionapproximators/ModelParametersRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorLWR.hpp"
+#include "functionapproximators/MetaParametersLWR.hpp"
+#include "functionapproximators/ModelParametersLWR.hpp"
 #include "bbo/updaters/UpdaterCovarAdaptation.hpp"
 #include "bbo/DistributionGaussian.hpp"
 
@@ -33,12 +33,21 @@
 using namespace std;
 using namespace Eigen;
 
+// class Trajectory {
+// public:
+//     Trajectory(const& boost::python::list _ts, const& boost::python::list _ys, const& boost::python::list _yds, const& boost::python::list _ydds);
+// private
+// }
+
 class Dmp {
 public:
     Dmp(int n_dims_dmp, int n_basis_functions);
     DmpBbo::Dmp& getDmp();
     boost::python::list trajectory(double duration, int n_steps, const boost::python::list& weights);
     void setTau(double tau);
+    void set_initial_state(const boost::python::list& state);
+    void set_attractor_state(const boost::python::list& state);
+    void train(const boost::python::list& ts, const boost::python::list& xs, const boost::python::list& xds, const boost::python::list& xdds);
     //boost::python::list test(const boost::python::list& _ts, const boost::python::list& weights_);
 
 
@@ -48,10 +57,10 @@ private:
     set<string> selected_labels;
     DmpBbo::Trajectory traj;
     DmpBbo::Dmp* dmp;
-    DmpBbo::MetaParametersRBFN* meta_parameters;
-    DmpBbo::ModelParametersRBFN* model_parameters;
+    DmpBbo::MetaParametersLWR* meta_parameters;
+    DmpBbo::ModelParametersLWR* model_parameters;
     MatrixXd centers, widths, weights;
-    DmpBbo::FunctionApproximatorRBFN* fa_lwr;
+    DmpBbo::FunctionApproximatorLWR* fa_lwr;
     vector<DmpBbo::FunctionApproximator*> function_approximators;
 };
 

@@ -8,11 +8,20 @@ class Dmp(object):
         self.n_dims = n_dims_dmp
 
     def trajectory(self, duration, n_steps, weights):
-        xs, xds, xdds = self.delegate.trajectory(duration, n_steps, weights)
-        return xs, xds, xdds
+        ts, xs, xds, xdds = self.delegate.trajectory(duration, n_steps, weights)
+        return ts, xs, xds, xdds
+
+    def train(self, trajectory):
+        self.delegate.train(*trajectory)
 
     def set_tau(self, tau):
         self.delegate.set_tau(tau)
+
+    def set_initial_state(self, state):
+        self.delegate.set_initial_state(state)
+
+    def set_attractor_state(self, state):
+        self.delegate.set_attractor_state(state)
 
     # def test(self, time_vect, weights):
     #     phase, target = self.delegate.test(time_vect, weights)
