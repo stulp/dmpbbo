@@ -6,15 +6,17 @@ class Dmp(object):
     def __init__(self, n_dims_dmp, n_basis_functions):
         self.delegate = _dmpbbo.Dmp(n_dims_dmp, n_basis_functions)
         self.n_dims = n_dims_dmp
+        self.tau = 1.
 
-    def trajectory(self, duration, n_steps, weights):
-        ts, xs, xds, xdds = self.delegate.trajectory(duration, n_steps, weights)
+    def trajectory(self, n_steps, weights):
+        ts, xs, xds, xdds = self.delegate.trajectory(self.tau, n_steps, weights)
         return ts, xs, xds, xdds
 
     def train(self, trajectory):
         self.delegate.train(*trajectory)
 
     def set_tau(self, tau):
+        self.tau = tau
         self.delegate.set_tau(tau)
 
     def set_initial_state(self, state):
