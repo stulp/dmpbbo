@@ -10,7 +10,7 @@ class Dmp(object):
 
     def trajectory(self, n_steps, weights):
         ts, xs, xds, xdds = self.delegate.trajectory(self.tau, n_steps, weights)
-        return ts, xs, xds, xdds
+        return array(ts), array(xs), array(xds), array(xdds)
 
     def train(self, trajectory):
         self.delegate.train(*trajectory)
