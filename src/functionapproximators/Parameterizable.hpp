@@ -26,6 +26,7 @@
 
 #include <set>
 #include <string>
+#include <vector>
 #include <eigen3/Eigen/Core>
 
 #include <boost/serialization/nvp.hpp>
