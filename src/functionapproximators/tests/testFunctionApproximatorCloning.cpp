@@ -38,7 +38,22 @@ int main(int n_args, char** args)
 {
   int n_input_dims = 1;
   vector<FunctionApproximator*> function_approximators;
-  getFunctionApproximatorsVector(n_input_dims,function_approximators);
+  if (n_args==1)
+  {
+    // No name passed, get all function approximators
+    getFunctionApproximatorsVector(n_input_dims,function_approximators);
+  }
+  else
+  {
+    // Assume the arguments are names of function approximatores
+    for (int i_arg=1; i_arg<n_args; i_arg++)
+    {
+      FunctionApproximator* fa =  getFunctionApproximatorByName(args[i_arg],n_input_dims);
+      if (fa==NULL)
+        return -1;
+      function_approximators.push_back(fa);
+    }
+  }
 
   VectorXi n_samples_per_dim = VectorXi::Constant(n_input_dims,50);
   MatrixXd inputs, targets;
@@ -46,6 +61,7 @@ int main(int n_args, char** args)
   
   for (unsigned int dd=0; dd<function_approximators.size(); dd++)
   {
+    
     FunctionApproximator* cur_fa = function_approximators[dd]; 
     FunctionApproximator* cloned = cur_fa->clone(); 
     
