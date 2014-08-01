@@ -44,13 +44,13 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorLWR::FunctionApproximatorLWR(MetaParametersLWR *meta_parameters, ModelParametersLWR *model_parameters) 
+FunctionApproximatorLWR::FunctionApproximatorLWR(const MetaParametersLWR *const meta_parameters, const ModelParametersLWR *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
 }
 
-FunctionApproximatorLWR::FunctionApproximatorLWR(ModelParametersLWR *model_parameters) 
+FunctionApproximatorLWR::FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
@@ -58,19 +58,11 @@ FunctionApproximatorLWR::FunctionApproximatorLWR(ModelParametersLWR *model_param
 
 
 FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
-
-  MetaParametersLWR*  meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersLWR*>(getMetaParameters()->clone());
-
-  ModelParametersLWR* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersLWR*>(getModelParameters()->clone());
-
-  if (meta_params==NULL)
-    return new FunctionApproximatorLWR(model_params);
-  else
-    return new FunctionApproximatorLWR(meta_params,model_params);
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  return new FunctionApproximatorLWR(
+    dynamic_cast<const MetaParametersLWR*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersLWR*>(getModelParameters())
+    );
 };
 
 
@@ -81,7 +73,6 @@ FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
  * \param[out] result  The pseudo-inverse of the matrix.
  * \param[in]  epsilon Don't know, not my code ;-)
  * \return     true if pseudo-inverse possible, false otherwise
- */
 template<typename _Matrix_Type_>
 bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
 epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
@@ -101,6 +92,7 @@ tolerance).select(svd.singularValues().
       
   return true;
 }
+ */
 
 
 void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targets)

@@ -44,19 +44,20 @@ class FunctionApproximatorLWR : public FunctionApproximator
 {
 public:
   
-  /** Initialize a function approximator with meta- and optionally model-parameters
+  /** Initialize a function approximator with meta- and model-parameters
    *  \param[in] meta_parameters  The training algorithm meta-parameters
    *  \param[in] model_parameters The parameters of the trained model. If this parameter is not
    *                              passed, the function approximator is initialized as untrained. 
    *                              In this case, you must call FunctionApproximator::train() before
    *                              being able to call FunctionApproximator::predict().
+   * Either meta_parameters XOR model-parameters can passed as NULL, but not both.
    */
-  FunctionApproximatorLWR(MetaParametersLWR *meta_parameters, ModelParametersLWR *model_parameters=NULL);  
+  FunctionApproximatorLWR(const MetaParametersLWR *const meta_parameters, const ModelParametersLWR *const model_parameters=NULL);  
 
   /** Initialize a function approximator with model parameters
    *  \param[in] model_parameters The parameters of the (previously) trained model.
    */
-  FunctionApproximatorLWR(ModelParametersLWR *model_parameters);
+  FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters);
 
 	FunctionApproximator* clone(void) const;
   

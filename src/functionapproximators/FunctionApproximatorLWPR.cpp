@@ -44,14 +44,14 @@ using namespace std;
 
 namespace DmpBbo {
 
-FunctionApproximatorLWPR::FunctionApproximatorLWPR(MetaParametersLWPR *meta_parameters, ModelParametersLWPR *model_parameters) 
+FunctionApproximatorLWPR::FunctionApproximatorLWPR(const MetaParametersLWPR *const meta_parameters, const ModelParametersLWPR *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters),
   print_training_progress_(false)
 {
 }
 
-FunctionApproximatorLWPR::FunctionApproximatorLWPR(ModelParametersLWPR *model_parameters) 
+FunctionApproximatorLWPR::FunctionApproximatorLWPR(const ModelParametersLWPR *const model_parameters) 
 :
   FunctionApproximator(model_parameters),
   print_training_progress_(false)
@@ -59,22 +59,12 @@ FunctionApproximatorLWPR::FunctionApproximatorLWPR(ModelParametersLWPR *model_pa
 }
 
 FunctionApproximator* FunctionApproximatorLWPR::clone(void) const {
-  MetaParametersLWPR*  meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersLWPR*>(getMetaParameters()->clone());
-
-  ModelParametersLWPR* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersLWPR*>(getModelParameters()->clone());
-
-  FunctionApproximatorLWPR* fa_lwpr;
-  if (meta_params==NULL)
-    fa_lwpr = new FunctionApproximatorLWPR(model_params);
-  else
-    fa_lwpr = new FunctionApproximatorLWPR(meta_params,model_params);
-  
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  FunctionApproximatorLWPR* fa_lwpr = new FunctionApproximatorLWPR(
+    dynamic_cast<const MetaParametersLWPR*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersLWPR*>(getModelParameters())
+    );
   fa_lwpr->set_print_training_progress(print_training_progress_);
-  
   return fa_lwpr;
 };
 

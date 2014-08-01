@@ -50,31 +50,25 @@ using namespace std;
 
 namespace DmpBbo {
 
-FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(MetaParametersIRFRLS* meta_parameters, ModelParametersIRFRLS* model_parameters)
+FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(const MetaParametersIRFRLS *const meta_parameters, const ModelParametersIRFRLS *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
 }
 
-FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(ModelParametersIRFRLS* model_parameters)
+FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(const ModelParametersIRFRLS *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
 }
 
+
 FunctionApproximator* FunctionApproximatorIRFRLS::clone(void) const {
-  MetaParametersIRFRLS*  meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersIRFRLS*>(getMetaParameters()->clone());
-
-  ModelParametersIRFRLS* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersIRFRLS*>(getModelParameters()->clone());
-
-  if (meta_params==NULL)
-    return new FunctionApproximatorIRFRLS(model_params);
-  else
-    return new FunctionApproximatorIRFRLS(meta_params,model_params);
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  return new FunctionApproximatorIRFRLS(
+    dynamic_cast<const MetaParametersIRFRLS*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersIRFRLS*>(getModelParameters())
+    );
 };
 
 

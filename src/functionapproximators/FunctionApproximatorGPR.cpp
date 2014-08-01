@@ -44,15 +44,14 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorGPR::FunctionApproximatorGPR(MetaParametersGPR *meta_parameters, ModelParametersGPR *model_parameters) 
+FunctionApproximatorGPR::FunctionApproximatorGPR(const MetaParametersGPR *const meta_parameters, const ModelParametersGPR *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
   cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
-}
+  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;}
 
-FunctionApproximatorGPR::FunctionApproximatorGPR(ModelParametersGPR *model_parameters) 
+FunctionApproximatorGPR::FunctionApproximatorGPR(const ModelParametersGPR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
@@ -62,49 +61,13 @@ FunctionApproximatorGPR::FunctionApproximatorGPR(ModelParametersGPR *model_param
 
 
 FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
-
-  MetaParametersGPR*  meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersGPR*>(getMetaParameters()->clone());
-
-  ModelParametersGPR* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersGPR*>(getModelParameters()->clone());
-
-  if (meta_params==NULL)
-    return new FunctionApproximatorGPR(model_params);
-  else
-    return new FunctionApproximatorGPR(meta_params,model_params);
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  return new FunctionApproximatorGPR(
+    dynamic_cast<const MetaParametersGPR*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersGPR*>(getModelParameters())
+    );
 };
 
-
-
-/** Compute Moore-Penrose pseudo-inverse. 
- * Taken from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
- * \param[in]  a       The matrix to be inversed.
- * \param[out] result  The pseudo-inverse of the matrix.
- * \param[in]  epsilon Don't know, not my code ;-)
- * \return     true if pseudo-inverse possible, false otherwise
-template<typename _Matrix_Type_>
-bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
-epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
-{
-  if(a.rows()<a.cols())
-      return false;
-
-  Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU |
-Eigen::ComputeThinV);
-
-  typename _Matrix_Type_::Scalar tolerance = epsilon * std::max(a.cols(),
-a.rows()) * svd.singularValues().array().abs().maxCoeff();
-
-  result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() >
-tolerance).select(svd.singularValues().
-      array().inverse(), 0) ).asDiagonal() * svd.matrixU().adjoint();
-      
-  return true;
-}
-*/
 
 
 double FunctionApproximatorGPR::covarianceFunction(const VectorXd& input1, const VectorXd& input2, double maximum_covariance, double length) {
