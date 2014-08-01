@@ -1,0 +1,31 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  - BUILD_TYPE=Debug
+  - BUILD_TYPE=Release
+
+before_install:
+## Dependencies to download here
+## Install Eigen 3.2.x
+  - sudo apt-get install -qq cmake doxygen libboost-dev
+  - wget http://bitbucket.org/eigen/eigen/get/3.2.1.tar.gz 
+  - tar xf 3.2.1.tar.gz
+  - cd eigen-eigen-6b38706d90a9/
+  - mkdir build;cd build
+  - cmake .. && sudo make install
+  - cd ..
+
+before_script:
+  - sudo apt-get install -qq libboost-filesystem-dev libboost-system-dev libboost-serialization-dev graphviz 
+  
+script:
+  # compile and install
+  - mkdir build;cd build
+  - cmake ..
+  - make -j$(nproc)
+  - make -j$(nproc) Docs
+  - sudo make install
