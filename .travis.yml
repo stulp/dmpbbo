@@ -5,10 +5,11 @@ compiler:
   - clang
 
 env:
-  - BUILD_TYPE=Debug
-  - BUILD_TYPE=Release
-  - SHARED = ON
-  - SHARED = OFF
+  - BUILD_TYPE=Debug SHARED=ON
+  - BUILD_TYPE=Debug SHARED=OFF
+  - BUILD_TYPE=Release SHARED=ON
+  - BUILD_TYPE=Release SHARED=OFF
+
 
 install:
 ## Dependencies to download here
