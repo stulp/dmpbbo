@@ -1,9 +1,21 @@
+# States that CMake required version must be greater than 2.6
+cmake_minimum_required(VERSION 2.6)
+# Project name is not mandatory, but you should use it
+project(OO_DMP_BBO)
 ###############################################################################
 # General settings
 
 # Some settings related to building/installing libraries and header files
 # Set this to STATIC if you want to build static libraries instead.
+option(BUILD_SHARED_LIBS "Enable this option to build shared libraries" OFF)
+
+if(BUILD_SHARED_LIBS)
+set(SHARED_OR_STATIC "SHARED")
+else()
 set(SHARED_OR_STATIC "STATIC")
+endif()
+
+
 set(LIB_INSTALL_DIR /usr/local/lib)
 set(INCLUDE_INSTALL_DIR /usr/local/include)
 
@@ -12,11 +24,7 @@ set(INCLUDE_INSTALL_DIR /usr/local/include)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-# Project name is not mandatory, but you should use it
-project(OO_DMP_BBO)
 
-# States that CMake required version must be greater than 2.6
-cmake_minimum_required(VERSION 2.6)
 
 # Some flags for CXX
 set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
