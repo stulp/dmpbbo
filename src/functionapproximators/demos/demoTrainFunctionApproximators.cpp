@@ -117,7 +117,8 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
-
+  delete meta_parameters_lwr;
+    
   // Weighted Least Squares
   // LWR with only one basis function
   vector<VectorXd> centers_per_dim(1);
@@ -137,7 +138,7 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
-
+  delete meta_parameters_lwr;
 
   
   // IRFRLS
@@ -157,6 +158,7 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
+  delete meta_parameters_irfrls;
   
   
   
@@ -175,6 +177,7 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
+  delete meta_parameters_gmr;
 
   
     // Locally Weighted Projection Regression
@@ -198,6 +201,7 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
+  delete meta_parameters_lwpr;
 #endif // USE_LWPR
 
   // Radial Basis Function Network
@@ -216,6 +220,9 @@ int main(int n_args, char** args)
   fa->predict(inputs,outputs);
   meanAbsoluteErrorPerOutputDimension(targets,outputs);
   cout << endl << endl;
+
+  delete fa;
+  delete meta_parameters_rbfn;
   
   // Gaussian Process Regression
   double maximum_covariance = 3;
@@ -231,8 +238,9 @@ int main(int n_args, char** args)
   fa->predict(inputs,outputs);
   meanAbsoluteErrorPerOutputDimension(targets,outputs);
   cout << endl << endl;
-  
+
   delete fa;
+  delete meta_parameters_gpr;
  
   return 0;
 }

@@ -96,7 +96,8 @@ int main(int n_args, char** args)
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
   // And train it. Passing the save_directory will make sure the results are saved to file.
-  dmp->train(trajectory,save_directory);
+  bool overwrite = true;
+  dmp->train(trajectory,save_directory,overwrite);
 
   
   // INTEGRATE DMP TO GET REPRODUCED TRAJECTORY
@@ -113,9 +114,6 @@ int main(int n_args, char** args)
 
   
   // WRITE THINGS TO FILE
-  
-  bool overwrite = true;
-  
   trajectory.saveToFile(save_directory,"demonstration_traj.txt",overwrite);
   traj_reproduced.saveToFile(save_directory,"reproduced_traj.txt",overwrite);
     

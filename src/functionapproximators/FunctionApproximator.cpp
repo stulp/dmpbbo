@@ -45,24 +45,28 @@ using namespace Eigen;
 namespace DmpBbo { 
 
 /******************************************************************************/
-FunctionApproximator::FunctionApproximator(MetaParameters *meta_parameters, ModelParameters *model_parameters) 
+FunctionApproximator::FunctionApproximator(const MetaParameters *const meta_parameters, const ModelParameters *const model_parameters) 
 {
-  assert(meta_parameters!=NULL);
+  // At least one of them should not be NULL
+  assert(meta_parameters!=NULL || model_parameters!=NULL); 
   
-  meta_parameters_  = meta_parameters->clone();
-  if (model_parameters!=NULL)
-  {
-    model_parameters_ = model_parameters->clone();
-    assert(model_parameters_->getExpectedInputDim()==meta_parameters_->getExpectedInputDim());
-  }
+  if (meta_parameters==NULL)
+    meta_parameters_ = NULL;
   else
-  {
+    meta_parameters_ = meta_parameters->clone();
+  
+  if (model_parameters==NULL)
     model_parameters_ = NULL;
-  }
+  else
+    model_parameters_ = model_parameters->clone();
 
+  // If both meta- and model-parameters were set, check if they have the same expected input dim.
+  if (meta_parameters_!=NULL && model_parameters_!=NULL)
+    assert(model_parameters_->getExpectedInputDim()==meta_parameters_->getExpectedInputDim());
+  
 }
 
-FunctionApproximator::FunctionApproximator(ModelParameters *model_parameters) 
+FunctionApproximator::FunctionApproximator(const ModelParameters *const model_parameters) 
 {
   assert(model_parameters!=NULL);
   meta_parameters_  = NULL;

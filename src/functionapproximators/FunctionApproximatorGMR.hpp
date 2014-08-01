@@ -44,19 +44,20 @@ class ModelParametersGMR;
 class FunctionApproximatorGMR : public FunctionApproximator
 {
 public:
-  /** Initialize a function approximator with meta- and optionally model-parameters
+  /** Initialize a function approximator with meta- and model-parameters
    *  \param[in] meta_parameters  The training algorithm meta-parameters
    *  \param[in] model_parameters The parameters of the trained model. If this parameter is not
    *                              passed, the function approximator is initialized as untrained. 
    *                              In this case, you must call FunctionApproximator::train() before
    *                              being able to call FunctionApproximator::predict().
+   * Either meta_parameters XOR model-parameters can passed as NULL, but not both.
    */
-  FunctionApproximatorGMR(MetaParametersGMR* meta_parameters, ModelParametersGMR* model_parameters=NULL);
-  
+  FunctionApproximatorGMR(const MetaParametersGMR *const meta_parameters, const ModelParametersGMR *const model_parameters=NULL);  
+
   /** Initialize a function approximator with model parameters
    *  \param[in] model_parameters The parameters of the (previously) trained model.
    */
-	FunctionApproximatorGMR(ModelParametersGMR* model_parameters);
+  FunctionApproximatorGMR(const ModelParametersGMR *const model_parameters);
 
 	virtual FunctionApproximator* clone(void) const;
 	

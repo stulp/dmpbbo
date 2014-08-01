@@ -44,7 +44,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(MetaParametersRBFN *meta_parameters, ModelParametersRBFN *model_parameters) 
+FunctionApproximatorRBFN::FunctionApproximatorRBFN(const MetaParametersRBFN *const meta_parameters, const ModelParametersRBFN *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
@@ -52,7 +52,7 @@ FunctionApproximatorRBFN::FunctionApproximatorRBFN(MetaParametersRBFN *meta_para
   cerr << "FunctionApproximatorRBFN is still under development! No guarantees on functionality..." << endl;
 }
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN *model_parameters) 
+FunctionApproximatorRBFN::FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
@@ -62,50 +62,12 @@ FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN *model_pa
 
 
 FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
-
-  MetaParametersRBFN*  meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersRBFN*>(getMetaParameters()->clone());
-
-  ModelParametersRBFN* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersRBFN*>(getModelParameters()->clone());
-
-  if (meta_params==NULL)
-    return new FunctionApproximatorRBFN(model_params);
-  else
-    return new FunctionApproximatorRBFN(meta_params,model_params);
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  return new FunctionApproximatorRBFN(
+    dynamic_cast<const MetaParametersRBFN*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersRBFN*>(getModelParameters())
+    );
 };
-
-
-
-/** Compute Moore-Penrose pseudo-inverse. 
- * Taken from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
- * \param[in]  a       The matrix to be inversed.
- * \param[out] result  The pseudo-inverse of the matrix.
- * \param[in]  epsilon Don't know, not my code ;-)
- * \return     true if pseudo-inverse possible, false otherwise
- */
-template<typename _Matrix_Type_>
-bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
-epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
-{
-  if(a.rows()<a.cols())
-      return false;
-
-  Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU |
-Eigen::ComputeThinV);
-
-  typename _Matrix_Type_::Scalar tolerance = epsilon * std::max(a.cols(),
-a.rows()) * svd.singularValues().array().abs().maxCoeff();
-
-  result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() >
-tolerance).select(svd.singularValues().
-      array().inverse(), 0) ).asDiagonal() * svd.matrixU().adjoint();
-      
-  return true;
-}
-
 
 void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& targets)
 {

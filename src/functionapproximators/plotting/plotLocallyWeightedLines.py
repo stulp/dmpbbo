@@ -85,8 +85,11 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
     except IOError:
       return False;
       
-    lines  = numpy.loadtxt(directory+'/lines.txt')                         
-    
+    try:
+        lines  = numpy.loadtxt(directory+'/lines.txt')                         
+    except IOError:
+        lines = [];
+        
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims>2):
         sys.exit('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')

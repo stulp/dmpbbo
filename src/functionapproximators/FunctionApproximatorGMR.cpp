@@ -47,34 +47,29 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorGMR::FunctionApproximatorGMR(MetaParametersGMR* meta_parameters, ModelParametersGMR* model_parameters)
+FunctionApproximatorGMR::FunctionApproximatorGMR(const MetaParametersGMR *const meta_parameters, const ModelParametersGMR *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
   // TODO : find a more appropriate place for rand initialization
-  srand(unsigned(time(0)));
+  //srand(unsigned(time(0)));
 }
 
-FunctionApproximatorGMR::FunctionApproximatorGMR(ModelParametersGMR* model_parameters)
+FunctionApproximatorGMR::FunctionApproximatorGMR(const ModelParametersGMR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
 }
 
+
 FunctionApproximator* FunctionApproximatorGMR::clone(void) const {
-  MetaParametersGMR* meta_params  = NULL;
-  if (getMetaParameters()!=NULL)
-    meta_params = dynamic_cast<MetaParametersGMR*>(getMetaParameters()->clone());
-
-  ModelParametersGMR* model_params = NULL;
-  if (getModelParameters()!=NULL)
-    model_params = dynamic_cast<ModelParametersGMR*>(getModelParameters()->clone());
-
-  if (meta_params==NULL)
-    return new FunctionApproximatorGMR(model_params);
-  else
-    return new FunctionApproximatorGMR(meta_params,model_params);
+  // All error checking and cloning is left to the FunctionApproximator constructor.
+  return new FunctionApproximatorGMR(
+    dynamic_cast<const MetaParametersGMR*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersGMR*>(getModelParameters())
+    );
 };
+
 
 void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targets)
 {

@@ -55,13 +55,14 @@ public:
    *                              passed, the function approximator is initialized as untrained. 
    *                              In this case, you must call FunctionApproximator::train() before
    *                              being able to call FunctionApproximator::predict().
+   * Either meta_parameters XOR model-parameters can passed as NULL, but not both.
    */
-  FunctionApproximator(MetaParameters *meta_parameters, ModelParameters *model_parameters=NULL);
+  FunctionApproximator(const MetaParameters *const meta_parameters, const ModelParameters *const model_parameters=NULL);
   
   /** Initialize a function approximator with model-parameters
    *  \param[in] model_parameters The parameters of the trained model.
    */
-  FunctionApproximator(ModelParameters *model_parameters);
+  FunctionApproximator(const ModelParameters *const model_parameters);
 
   virtual ~FunctionApproximator(void);
   
