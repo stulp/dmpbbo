@@ -1,0 +1,65 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+env:
+  - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=ON
+  - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=OFF
+  - DMP_BUILD_TYPE=Release BUILD_SHARED_LIBS=ON
+  - DMP_BUILD_TYPE=Release BUILD_SHARED_LIBS=OFF
+
+# Setup repos etc before installation
+before_install:
+  # g++4.8.1
+  - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
+
+  # clang 3.4
+  - if [ "$CXX" == "clang++" ]; then sudo add-apt-repository -y ppa:h-rayflood/llvm; fi
+
+  - sudo apt-get update -qq
+  
+
+install:
+## Install 2014 compiler (taken from http://stackoverflow.com/questions/22111549/travis-ci-with-clang-3-4-and-c11)
+  # g++4.8.1
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+
+  # clang 3.4
+  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
+  - if [ "$CXX" == "clang++" ]; then cwd=$(pwd); fi
+
+  # install libc++
+  - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-std=c++0x -stdlib=libc++"; fi
+  - if [ "$CXX" == "clang++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
+
+  - if [ "$CXX" == "clang++" ]; then cd libcxx/lib && bash buildit; fi
+  - if [ "$CXX" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
+  - if [ "$CXX" == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
+  - if [ "$CXX" == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
+  - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
+  - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
+
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4" CC="clang-3.4"; fi
+  
+## Dependencies to download here
+## Install Eigen 3.2.x
+  - sudo apt-get install -qq cmake doxygen libboost1.48-all-dev graphviz
+  - wget http://bitbucket.org/eigen/eigen/get/3.2.1.tar.gz 
+  - tar xf 3.2.1.tar.gz
+  - cd eigen-eigen-6b38706d90a9/
+  - mkdir build;cd build
+  - cmake .. && sudo make install
+  - cd ../../
+  - rm -rf 3.2.1.tar.gz eigen-eigen-6b38706d90a9/
+  
+script:
+  # compile and install
+  - $CXX --version
+  - mkdir build;cd build
+  - cmake -DCMAKE_BUILD_TYPE=$DMP_BUILD_TYPE -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS ..
+  - make VERBOSE=1
+  - make Docs
+  - sudo make install
