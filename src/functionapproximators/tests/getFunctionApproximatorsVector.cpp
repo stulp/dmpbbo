@@ -115,31 +115,36 @@ FunctionApproximator* getFunctionApproximatorByName(string name, int input_dim)
 {
   
   MetaParameters* meta_parameters = getMetaParametersByName(name, input_dim);
-  
+  FunctionApproximator* fa = NULL;
   if (name.compare("LWR")==0)
-    return new FunctionApproximatorLWR(dynamic_cast<MetaParametersLWR*>(meta_parameters));
+    fa = new FunctionApproximatorLWR(dynamic_cast<MetaParametersLWR*>(meta_parameters));
 
   if (name.compare("LWPR")==0)
   {
     // Locally Weighted Projection Regression
 #ifdef USE_LWPR
-    return new FunctionApproximatorLWPR(dynamic_cast<MetaParametersLWPR*>(meta_parameters));
+    fa = new FunctionApproximatorLWPR(dynamic_cast<MetaParametersLWPR*>(meta_parameters));
 #else
     cerr << __FILE__ << ":" << __LINE__ << ":";
     cerr << "Sorry, LWPR is not available. Is it installed? Returning NULL." << endl;
-    return NULL;
 #endif // USE_LWPR
   }
 
   if (name.compare("GMR")==0)
-    return new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
+    fa = new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
   
   if (name.compare("IRFRLS")==0)
-    return new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
+    fa = new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
   
-  cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "No function approximator with name '" << name << "' is known. Returning NULL." << endl;
-  return NULL;
+  if (fa==NULL)
+  {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "No function approximator with name '" << name << "' is known. Returning NULL." << endl;
+  }
+  
+  delete meta_parameters;
+  
+  return fa;
 }
 
 }
