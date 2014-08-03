@@ -1,9 +1,9 @@
 file(GLOB SOURCES *.cpp) 
 add_library(dynamicalsystems ${SHARED_OR_STATIC} ${SOURCES})
 
-install(TARGETS dynamicalsystems DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS dynamicalsystems DESTINATION lib)
 file(GLOB HEADERS *.hpp)
-install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/dynamicalsystems/)
+install(FILES ${HEADERS} DESTINATION include/dynamicalsystems/)
 
 add_subdirectory(demos)
 IF(CMAKE_BUILD_TYPE MATCHES Debug)

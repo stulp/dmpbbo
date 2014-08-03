@@ -4,3 +4,6 @@ build_dir*
 bin/
 bin_test/
 thirdparty/
+*.kdev4
+.kdev4/
+build/

@@ -1,9 +1,9 @@
 file(GLOB SOURCES *.cpp updaters/*.cpp) 
 add_library(bbo ${SHARED_OR_STATIC} ${SOURCES})
 
-install(TARGETS bbo DESTINATION ${LIB_INSTALL_DIR})
+install(TARGETS bbo DESTINATION lib)
 file(GLOB HEADERS *.hpp)
-install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/bbo)
+install(FILES ${HEADERS} DESTINATION include/bbo)
 
 add_subdirectory(updaters)
 
