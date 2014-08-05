@@ -1,6 +1,6 @@
 /**
- * @file   ModelParametersRBFN.hpp
- * @brief  ModelParametersRBFN class header file.
+ * @file   ModelParametersUnified.hpp
+ * @brief  ModelParametersUnified class header file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef MODELPARAMETERSRBFN_H
-#define MODELPARAMETERSRBFN_H
+#ifndef MODELPARAMETERSUNIFIED_H
+#define MODELPARAMETERSUNIFIED_H
 
 #include "functionapproximators/ModelParameters.hpp"
 
@@ -33,25 +33,24 @@
 
 namespace DmpBbo {
 
-  // Forward declaration
-class ModelParametersUnified;
-
-
-/** \brief Model parameters for the Radial Basis Function Network (RBFN) function approximator
+/** \brief Model parameters for the Locally Weighted Regression (LWR) function approximator
  * \ingroup FunctionApproximators
- * \ingroup RBFN
+ * \ingroup LWR
  */
-class ModelParametersRBFN : public ModelParameters
+class ModelParametersUnified : public ModelParameters
 {
-  friend class FunctionApproximatorRBFN;
+  friend class FunctionApproximatorLWR;
   
 public:
   /** Constructor for the model parameters of the LWPR function approximator.
    *  \param[in] centers Centers of the basis functions
    *  \param[in] widths  Widths of the basis functions. 
-   *  \param[in] weights Weight of each basis function
+   *  \param[in] slopes  Slopes of the line segments. 
+   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights);
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
   
   std::string toString(void) const;
   
@@ -66,23 +65,43 @@ public:
    * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims)
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
+   * \param[in] normalized_basis_functions Whether to normalize the basis functions
    */
-  static void kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations);
-  
+  static void kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
+  	
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    */
   void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
   
-  /** Compute the sum of weighted basis functions. 
+  /** Get the output of each linear model (unweighted) for the given inputs.
+   * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
+   * \param[out] lines The output of the linear models (size: n_samples X n_output_dim) 
+   */
+  void getLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& lines) const;
+  
+  /** Compute the sum of the locally weighted lines. 
    * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
    * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
    *
    */
-  void weightedBasisFunctions(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
+  void locallyWeightedLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
+  
+  /** Set whether the offsets should be adapted so that the line segments pivot around the mode of
+   * the basis function, rather than the intersection with the y-axis.
+   * \param[in] lines_pivot_at_max_activation Whether to pivot around the mode or not.
+   *
+   */
+  void set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation);
+
+  /** Whether to return slopes as angles or slopes in ModelParametersUnified::getParameterVectorAll()
+   * \param[in] slopes_as_angles Whether to return as slopes (true) or angles (false)
+   * \todo Implement and document
+   */
+  void set_slopes_as_angles(bool slopes_as_angles);
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
   void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
@@ -92,7 +111,7 @@ public:
     return all_values_vector_size_;
   }
   
-  bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
@@ -100,12 +119,16 @@ protected:
 private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims
-  Eigen::VectorXd weights_; //         1 X n_dims
+  Eigen::MatrixXd slopes_;  // n_centers X n_dims
+  Eigen::VectorXd offsets_; //         1 X n_dims
 
+  bool normalized_basis_functions_;
+  bool lines_pivot_at_max_activation_;
+  bool slopes_as_angles_;
   int  all_values_vector_size_;
 
 public:
-	/** Turn caching for the function kernelActivations() on or off.
+	/** Turn caching for the function normalizedKernelActivations() on or off.
 	 * Turning this on should lead to substantial improvements in execution time if the centers and
 	 * widths of the kernels do not change often AND you call normalizedKernelActivations with the
 	 * same inputs over and over again.
@@ -135,16 +158,8 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  ModelParametersRBFN(void) {};
+  ModelParametersUnified(void) {};
 
-  /** 
-   * Convert these LWPR model parameters to unified model parameters.
-   * \return model_parameters_lwr Unified model parameter representation
-   * \remarks Currently only works if input and output dimensionality are 1
-   * \todo Convert for input dim >1
-   */
-  ModelParametersUnified* toModelParametersUnified(void) const;
-  
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   
@@ -162,10 +177,10 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersRBFN, "ModelParametersRBFN")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersUnified, "ModelParametersUnified")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersRBFN,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersUnified,boost::serialization::object_serializable);
 
-#endif        //  #ifndef MODELPARAMETERSRBFN_H
+#endif        //  #ifndef MODELPARAMETERSUNIFIED_H
 

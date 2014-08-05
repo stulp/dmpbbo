@@ -104,6 +104,12 @@ void FunctionApproximator::setModelParameters(ModelParameters* model_parameters)
   model_parameters_ = model_parameters;
 }
 
+ModelParametersUnified* FunctionApproximator::getModelParametersUnified(void) const
+{
+  return model_parameters_->toModelParametersUnified();
+}
+
+
 int FunctionApproximator::getExpectedInputDim(void) const
 {
   if (model_parameters_!=NULL)

@@ -40,6 +40,7 @@ namespace DmpBbo {
 // Forward declarations
 class MetaParameters;
 class ModelParameters;
+class ModelParametersUnified;
 
 /** \brief Base class for all function approximators.
  *  \ingroup FunctionApproximators
@@ -165,7 +166,7 @@ public:
   void getParameterVectorAll(Eigen::VectorXd& values) const;
   void setParameterVectorAll(const Eigen::VectorXd& values);
 
-
+  ModelParametersUnified* getModelParametersUnified(void) const;
   
   /** Print to output stream. 
    *

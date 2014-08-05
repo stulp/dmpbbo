@@ -34,6 +34,8 @@
 
 namespace DmpBbo {
 
+class ModelParametersUnified;
+  
 /** \brief Base class for all model parameters of function approximators
  * \ingroup FunctionApproximators
  */
@@ -72,6 +74,10 @@ public:
    */
   virtual int getExpectedInputDim(void) const  = 0;
   
+  virtual ModelParametersUnified* toModelParametersUnified(void) const
+  {
+    return NULL;
+  }
   
 public:
   /** Generate a grid of inputs, and output the response of the basis functions and line segments

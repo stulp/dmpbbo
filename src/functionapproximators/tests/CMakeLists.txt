@@ -14,6 +14,10 @@ add_executable(testModelParameterValues testModelParameterValues.cpp)
 target_link_libraries(testModelParameterValues functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS testModelParameterValues  DESTINATION bin_test)
 
+add_executable(testToModelParametersUnified testToModelParametersUnified.cpp getFunctionApproximatorsVector.cpp)
+target_link_libraries(testToModelParametersUnified functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS testToModelParametersUnified  DESTINATION bin_test)
+
 
 ################################################################################
 # LWR
