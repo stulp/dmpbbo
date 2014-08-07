@@ -1,3 +1,9 @@
+# Note
+
+This is a fork of this repository: https://github.com/stulp/dmpbbo
+
+Here we are implementing python bindings for it (python branch). This repo is not necessarily up-to-date, please check the original one if you want the latest version of the C++ code.
+
 # What?
 
 This repository provides an implementation of dynamical systems, 
