@@ -28,6 +28,10 @@
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
+#include "functionapproximators/MetaParametersGPR.hpp"
+#include "functionapproximators/FunctionApproximatorGPR.hpp"
+#include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #ifdef USE_LWPR
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
@@ -49,6 +53,8 @@ void getFunctionApproximatorsVector(int input_dim, std::vector<FunctionApproxima
   names.push_back("LWPR");
   names.push_back("GMR");
   names.push_back("IRFRLS");
+  names.push_back("RBFN");
+  names.push_back("GPR");
 
   for (unsigned int i_name=0; i_name<names.size(); i_name++)
   {
@@ -104,9 +110,28 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
     double gamma=10;
     return new MetaParametersIRFRLS(input_dim,number_of_basis_functions,lambda,gamma);
   }
+
+
+  if (name.compare("RBFN")==0)
+  {
+    // Radial Basis Function Network
+    double intersection = 0.7;
+    int n_rfs = 9;
+    if (input_dim==2) n_rfs = 5;
+    VectorXi num_rfs_per_dim = VectorXi::Constant(input_dim,n_rfs);
+    return new MetaParametersRBFN(input_dim,num_rfs_per_dim,intersection);
+  }
+    
+  if (name.compare("GPR")==0)
+  {
+    // Gaussian Process Regression
+    double maximum_covariance = 3;
+    double length = 0.1;
+    return new MetaParametersGPR(input_dim,maximum_covariance,length);
+  }
   
   cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "No meta parameters with name '" << name << "' is known. Returning NULL." << endl;
+  cerr << "Meta-parameters with name '" << name << "' is unknown. Returning NULL." << endl;
   return NULL;
 }
 
@@ -118,6 +143,14 @@ FunctionApproximator* getFunctionApproximatorByName(string name, int input_dim)
   FunctionApproximator* fa = NULL;
   if (name.compare("LWR")==0)
     fa = new FunctionApproximatorLWR(dynamic_cast<MetaParametersLWR*>(meta_parameters));
+  if (name.compare("GMR")==0)
+    fa = new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
+  if (name.compare("IRFRLS")==0)
+    fa = new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
+  if (name.compare("RBFN")==0)
+    fa = new FunctionApproximatorRBFN(dynamic_cast<MetaParametersRBFN*>(meta_parameters));
+  if (name.compare("GPR")==0)
+    fa = new FunctionApproximatorGPR(dynamic_cast<MetaParametersGPR*>(meta_parameters));
 
   if (name.compare("LWPR")==0)
   {
@@ -130,16 +163,12 @@ FunctionApproximator* getFunctionApproximatorByName(string name, int input_dim)
 #endif // USE_LWPR
   }
 
-  if (name.compare("GMR")==0)
-    fa = new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
-  
-  if (name.compare("IRFRLS")==0)
-    fa = new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
+
   
   if (fa==NULL)
   {
     cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "No function approximator with name '" << name << "' is known. Returning NULL." << endl;
+    cerr << "Function approximator with name '" << name << "' is unknown. Returning NULL." << endl;
   }
   
   delete meta_parameters;

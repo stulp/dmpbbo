@@ -45,7 +45,12 @@ public:
    *  \return Pointer to a deep copy
    */
 	virtual MetaParameters* clone(void) const = 0;
+
 	
+  /** Virtual destructor, because this is a base class. 
+   */
+  virtual ~MetaParameters(void);
+  
   /** The expected dimensionality of the input data.
    * \return Expected dimensionality of the input data
    */

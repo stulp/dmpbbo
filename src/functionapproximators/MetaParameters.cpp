@@ -42,6 +42,10 @@ MetaParameters::MetaParameters(int expected_input_dim)
 {
   assert(expected_input_dim_>0);
 }
+                                                                          
+MetaParameters::~MetaParameters(void) 
+{
+}
 
 ostream& operator<<(ostream& output, const MetaParameters& meta_parameters) {
   output << meta_parameters.toString();
