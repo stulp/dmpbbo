@@ -27,7 +27,11 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 
 # Some flags for CXX
-set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
+if(APPLE)
+  set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -stdlib=libc++")
+else()
+  set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
+endif(APPLE)
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 
