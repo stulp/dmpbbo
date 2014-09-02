@@ -1,5 +1,10 @@
 # States that CMake required version must be greater than 2.6
+if(APPLE)
+# RPATH support for Dynamic libs
+cmake_minimum_required(VERSION 2.8.12)
+else()
 cmake_minimum_required(VERSION 2.6)
+endif()
 # Project name is not mandatory, but you should use it
 project(OO_DMP_BBO)
 ###############################################################################
@@ -29,6 +34,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 # Some flags for CXX
 if(APPLE)
   set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -stdlib=libc++")
+  set(CMAKE_MACOSX_RPATH 1)
 else()
   set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
 endif(APPLE)
