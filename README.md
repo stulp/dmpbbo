@@ -89,7 +89,7 @@ For our own use, the aims of coding this were the following:
 + Running dynamical movement primitives on real robots.
 
 ### Build Status
-
-[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
-
-
+#### Ubuntu
+[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/ahoarau/dmpbbo)
+#### OSX
+[![Build Status](https://travis-ci.org/ahoarau/dmpbbo.svg?branch=osx)](https://travis-ci.org/ahoarau/dmpbbo)
