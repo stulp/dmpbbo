@@ -91,5 +91,5 @@ For our own use, the aims of coding this were the following:
 ### Build Status
 
 Ubuntu | OSX
-----
+:---: | :---:
 [![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/ahoarau/dmpbbo) | [![Build Status](https://travis-ci.org/ahoarau/dmpbbo.svg?branch=osx)](https://travis-ci.org/ahoarau/dmpbbo)
