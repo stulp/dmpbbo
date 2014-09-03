@@ -46,7 +46,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 set(CMAKE_MODULE_PATH ${oo_dmp_bbo_SOURCE_DIR}/cmake/modules "${CMAKE_SOURCE_DIR}/src/functionapproximators/" ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
-link_directories(${CMAKE_SOURCE_DIR}/lib)
+###link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   SET(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR} CACHE PATH "Comment" FORCE)
@@ -62,7 +62,7 @@ endif()
 ###############################################################################
 # Find boost packages
 find_package( Boost 1.34 COMPONENTS filesystem system serialization REQUIRED)
-link_directories ( ${Boost_LIBRARY_DIRS} )
+###link_directories ( ${Boost_LIBRARY_DIRS} )
 include_directories ( ${Boost_INCLUDE_DIRS} )
 
 ###############################################################################
@@ -132,7 +132,7 @@ SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "This repository provides an implementatio
 SET(CPACK_PACKAGE_VENDOR "Ensta ParisTech, Inria")
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Antoine Hoarau <hoarau.robotics@gmail.com>")
 SET(CPACK_PACKAGE_CONTACT "Freek Stulp <stulp@ensta.fr>")
-set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/dmpbbo/dmpbbo")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/stulp/dmpbbo")
 SET(CPACK_PACKAGE_VERSION_MAJOR "${MAJOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_MINOR "${MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${PATCH_VERSION}")
