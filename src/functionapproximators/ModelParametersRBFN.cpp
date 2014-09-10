@@ -46,7 +46,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersRBFN::ModelParametersRBFN(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& weights) 
+ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights) 
 :
   centers_(centers),
   widths_(widths),
@@ -73,7 +73,7 @@ ModelParameters* ModelParametersRBFN::clone(void) const {
   return new ModelParametersRBFN(centers_,widths_,weights_); 
 }
 
-void ModelParametersRBFN::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
+void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   if (caching_)
   {
@@ -122,7 +122,7 @@ void ModelParametersRBFN::weightedBasisFunctions(const MatrixXd& inputs, MatrixX
     
 }
 
-void ModelParametersRBFN::kernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
+void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations)
 {
   bool asymmetric_kernels=false;
   

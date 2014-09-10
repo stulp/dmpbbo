@@ -48,7 +48,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(MatrixXd train_inputs, VectorXd train_targets, MatrixXd gram, double maximum_covariance, double length)
+ModelParametersGPR::ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::VectorXd train_targets, Eigen::MatrixXd gram, double maximum_covariance, double length)
 :
   train_inputs_(train_inputs),
   train_targets_(train_targets),

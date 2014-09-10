@@ -34,7 +34,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DmpContextual::DmpContextual(int n_dims_dmp, vector<FunctionApproximator*> function_approximators, DmpType dmp_type) 
+DmpContextual::DmpContextual(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, DmpType dmp_type) 
 :  Dmp(n_dims_dmp, function_approximators, dmp_type)
 {
    
@@ -44,20 +44,20 @@ DmpContextual::DmpContextual(int n_dims_dmp, vector<FunctionApproximator*> funct
 // virtual void  train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory, bool overwrite) = 0;
 
 
-void  DmpContextual::train(const vector<Trajectory>& trajectories, const vector<MatrixXd>& task_parameters, string save_directory)
+void  DmpContextual::train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory)
 {
   bool overwrite = false;
   train(trajectories, task_parameters, save_directory, overwrite);
 }
 
-void  DmpContextual::train(const vector<Trajectory>& trajectories, const vector<MatrixXd>& task_parameters)
+void  DmpContextual::train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters)
 {
   bool overwrite=false;
   string save_directory("");
   train(trajectories, task_parameters, save_directory, overwrite);
 }
 
-void  DmpContextual::train(const vector<Trajectory>& trajectories, string save_directory, bool overwrite)
+void  DmpContextual::train(const std::vector<Trajectory>& trajectories, std::string save_directory, bool overwrite)
 {
   vector<MatrixXd> task_parameters(trajectories.size());
   for (unsigned int i_traj=0; i_traj<trajectories.size(); i_traj++)
@@ -70,13 +70,13 @@ void  DmpContextual::train(const vector<Trajectory>& trajectories, string save_d
   train(trajectories, task_parameters, save_directory, overwrite);
 }
 
-void  DmpContextual::train(const vector<Trajectory>& trajectories, string save_directory)
+void  DmpContextual::train(const std::vector<Trajectory>& trajectories, std::string save_directory)
 {
   bool overwrite=false;
   train(trajectories, save_directory, overwrite);
 }
 
-void  DmpContextual::train(const vector<Trajectory>& trajectories)
+void  DmpContextual::train(const std::vector<Trajectory>& trajectories)
 {
   bool overwrite=false;
   string save_directory("");

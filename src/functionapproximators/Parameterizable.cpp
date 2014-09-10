@@ -83,7 +83,7 @@ void Parameterizable::getParameterVectorSelected(Eigen::VectorXd& values, bool n
 }
 
 
-void Parameterizable::setParameterVectorSelected(const VectorXd& values_arg, bool normalized)
+void Parameterizable::setParameterVectorSelected(const Eigen::VectorXd& values_arg, bool normalized)
 {
   // If the initial parameter vector is still empty, get it now, before changing its value.
   if (parameter_vector_all_initial_.size()==0)
@@ -242,7 +242,7 @@ void Parameterizable::getParameterVectorSelectedMinMax(Eigen::VectorXd& min_vec,
 */
 
 
-void Parameterizable::getParameterVectorSelected(vector<VectorXd>& vector_values, bool normalized) const
+void Parameterizable::getParameterVectorSelected(std::vector<Eigen::VectorXd>& vector_values, bool normalized) const
 {
   VectorXd values;
   getParameterVectorSelected(values,normalized);
@@ -266,7 +266,7 @@ void Parameterizable::getParameterVectorSelected(vector<VectorXd>& vector_values
 
 }
 
-void Parameterizable::setParameterVectorSelected(const vector<VectorXd>& vector_values, bool normalized)
+void Parameterizable::setParameterVectorSelected(const std::vector<Eigen::VectorXd>& vector_values, bool normalized)
 {
   if (lengths_per_dimension_.size()==0)
   {

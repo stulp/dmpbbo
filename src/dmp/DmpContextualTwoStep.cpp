@@ -38,7 +38,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DmpContextualTwoStep::DmpContextualTwoStep(int n_dims_dmp, vector<FunctionApproximator*> function_approximators, FunctionApproximator* policy_parameter_function, DmpType dmp_type) 
+DmpContextualTwoStep::DmpContextualTwoStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, FunctionApproximator* policy_parameter_function, DmpType dmp_type) 
 :  DmpContextual(n_dims_dmp, function_approximators, dmp_type)
 {
   policy_parameter_function_ = vector<vector<FunctionApproximator*> >(dim_orig());

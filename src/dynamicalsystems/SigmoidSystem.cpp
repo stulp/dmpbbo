@@ -43,7 +43,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate, double inflection_point_time, string name)
+SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time, std::string name)
 : DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size()), name),
   max_rate_(max_rate),
   inflection_point_time_(inflection_point_time)

@@ -37,7 +37,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-UpdaterCovarDecay::UpdaterCovarDecay(double eliteness, double covar_decay_factor, string weighting_method)
+UpdaterCovarDecay::UpdaterCovarDecay(double eliteness, double covar_decay_factor, std::string weighting_method)
 : UpdaterMean(eliteness, weighting_method), 
   covar_decay_factor_(covar_decay_factor)
 {

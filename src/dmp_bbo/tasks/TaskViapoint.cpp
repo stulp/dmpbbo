@@ -45,7 +45,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
+TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius), 
   goal_(VectorXd::Zero(viapoint.size())), goal_time_(-1),
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(0.0)
@@ -53,7 +53,7 @@ TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time, doub
   assert(viapoint_radius_>=0.0);
 }
 
-TaskViapoint::TaskViapoint(const VectorXd& viapoint, double  viapoint_time, const VectorXd& goal,  double goal_time)
+TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal,  double goal_time)
 : viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(0.0),
   goal_(goal), goal_time_(goal_time),
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(1.0)

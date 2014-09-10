@@ -48,7 +48,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const vector<VectorXd>& centers_per_dim, double intersection_height, bool asymmetric_kernels)
+MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height, bool asymmetric_kernels)
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Zero(0)),
@@ -62,7 +62,7 @@ MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const vector<Vector
   assert(intersection_height_>0 && intersection_height_<1);
 }
   
-MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const VectorXi& n_bfs_per_dim, double intersection_height, bool asymmetric_kernels) 
+MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, bool asymmetric_kernels) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(n_bfs_per_dim),

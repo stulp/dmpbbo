@@ -46,7 +46,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
     
-ExponentialSystem::ExponentialSystem(double tau, VectorXd y_init, VectorXd y_attr, double alpha, string name)
+ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name)
   : DynamicalSystem(1, tau, y_init, y_attr, name),
   alpha_(alpha)
 {

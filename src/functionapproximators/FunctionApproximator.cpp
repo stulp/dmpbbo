@@ -112,14 +112,14 @@ int FunctionApproximator::getExpectedInputDim(void) const
     return meta_parameters_->getExpectedInputDim();
 }
 
-void FunctionApproximator::reTrain(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets)
 {
   delete model_parameters_;
   model_parameters_ = NULL;
   train(inputs,targets);
 }
 
-void FunctionApproximator::reTrain(const MatrixXd& inputs, const MatrixXd& targets, string save_directory, bool overwrite)
+void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite)
 {
   delete model_parameters_;
   model_parameters_ = NULL;
@@ -253,7 +253,7 @@ void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const 
 }
 
 
-void FunctionApproximator::train(const MatrixXd& inputs, const MatrixXd& targets, string save_directory, bool overwrite)
+void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite)
 {
   train(inputs,targets);
   

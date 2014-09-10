@@ -48,7 +48,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const vector<VectorXd>& centers_per_dim, double intersection_height)
+MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height)
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Zero(0)),
@@ -61,7 +61,7 @@ MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const vector<Vect
   assert(intersection_height_>0 && intersection_height_<1);
 }
   
-MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const VectorXi& n_bfs_per_dim, double intersection_height) 
+MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(n_bfs_per_dim),

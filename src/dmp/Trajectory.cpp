@@ -40,7 +40,7 @@ Trajectory::Trajectory(void)
 {
 }
 
-Trajectory::Trajectory(const VectorXd& ts, const MatrixXd& ys,  const MatrixXd& yds,  const MatrixXd& ydds, const Eigen::MatrixXd& misc)
+Trajectory::Trajectory(const Eigen::VectorXd& ts, const Eigen::MatrixXd& ys,  const Eigen::MatrixXd& yds,  const Eigen::MatrixXd& ydds, const Eigen::MatrixXd& misc)
 : ts_(ts), ys_(ys), yds_(yds), ydds_(ydds), misc_(misc)
 {
   int n_time_steps = ts_.rows();

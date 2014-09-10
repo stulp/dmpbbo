@@ -35,7 +35,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DmpContextualOneStep::DmpContextualOneStep(int n_dims_dmp, vector<FunctionApproximator*> function_approximators,
+DmpContextualOneStep::DmpContextualOneStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
   DmpType dmp_type) 
 :  DmpContextual(n_dims_dmp, function_approximators, dmp_type)
 {

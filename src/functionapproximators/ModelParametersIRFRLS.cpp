@@ -42,7 +42,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-ModelParametersIRFRLS::ModelParametersIRFRLS(MatrixXd linear_models, MatrixXd cosines_periodes, VectorXd cosines_phase)
+ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::MatrixXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
 :
   linear_models_(linear_models),
   cosines_periodes_(cosines_periodes),

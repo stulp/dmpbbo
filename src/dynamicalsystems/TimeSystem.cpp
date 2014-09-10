@@ -42,7 +42,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TimeSystem::TimeSystem(double tau, bool count_down, string name)
+TimeSystem::TimeSystem(double tau, bool count_down, std::string name)
 : 
   DynamicalSystem(1, tau, VectorXd::Zero(1), VectorXd::Ones(1), name),
   count_down_(count_down)

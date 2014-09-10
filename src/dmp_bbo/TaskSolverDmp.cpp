@@ -52,7 +52,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-TaskSolverDmp::TaskSolverDmp(Dmp* dmp, set<string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
+TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)
 {
   dmp_->setSelectedParameters(optimize_parameters);

@@ -43,7 +43,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-SpringDamperSystem::SpringDamperSystem(double tau, VectorXd y_init, VectorXd y_attr, double damping_coefficient, double spring_constant, double mass, string name)
+SpringDamperSystem::SpringDamperSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double damping_coefficient, double spring_constant, double mass, std::string name)
   : DynamicalSystem(2, tau, y_init, y_attr, name),
   damping_coefficient_(damping_coefficient),spring_constant_(spring_constant),mass_(mass)
 {
@@ -61,7 +61,7 @@ DynamicalSystem* SpringDamperSystem::clone(void) const
                         damping_coefficient_,spring_constant_,mass_,name());
 }
 
-void SpringDamperSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void SpringDamperSystem::differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const
 {
   // Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
   // After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z; 

@@ -37,7 +37,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-UpdaterMean::UpdaterMean(double eliteness, string weighting_method)
+UpdaterMean::UpdaterMean(double eliteness, std::string weighting_method)
 : eliteness_(eliteness), weighting_method_(weighting_method)
 {
 }
