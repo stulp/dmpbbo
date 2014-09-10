@@ -73,6 +73,7 @@ inline bool loadMatrix(std::string filename, Eigen::Matrix<Scalar,RowsAtCompileT
 }
 
 /** Save an Eigen matrix to an ASCII file.
+ * \param[in] directory Name of the directory to which to save the matrix
  * \param[in] filename Name of the file to which to save the matrix
  * \param[in] matrix The matrix to save to file
  * \param[in] overwrite Whether to overwrite any existing files
@@ -102,7 +103,6 @@ inline bool saveMatrix(std::string directory, std::string filename, Eigen::Matri
 }
 
 /** Save an Eigen matrix to an ASCII file.
- * \param[in] directory Name of the directory to which to save the matrix
  * \param[in] filename Name of the file to which to save the matrix
  * \param[in] matrix The matrix to save to file
  * \param[in] overwrite Whether to overwrite any existing files
