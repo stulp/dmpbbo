@@ -229,7 +229,7 @@ Trajectory Trajectory::generatePolynomialTrajectoryThroughViapoint(const VectorX
 }
 
 
-ostream& operator<<(ostream& output, const Trajectory& trajectory) {
+ostream& operator<<(std::ostream& output, const Trajectory& trajectory) {
   MatrixXd traj_matrix(trajectory.length(),1+3*trajectory.dim()+trajectory.dim_misc());
   traj_matrix << trajectory.ts_, trajectory.ys_, trajectory.yds_, trajectory.ydds_, trajectory.misc_; 
   output << traj_matrix << endl;

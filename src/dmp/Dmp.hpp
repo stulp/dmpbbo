@@ -301,6 +301,12 @@ public:
    */
   virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
   
+  /** Add a perturbation to the forcing term when computing the analytical solution.
+   * This is only relevant for off-line experiments, i.e. not on a robot, for testing how
+   * the system responds to perturbations. Does not affect the output of Dmp::differentialEquation(), only of Dmp::analyticalSolution().
+   * \param[in] perturbation_standard_deviation Standard deviation of the normal distribution from which perturbations will be sampled.
+   * 
+   */
   void set_perturbation_analytical_solution(double perturbation_standard_deviation)
   {
     if (perturbation_standard_deviation>0.0)

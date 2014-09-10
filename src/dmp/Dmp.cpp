@@ -492,9 +492,11 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eig
     localspring_system_.differentialEquation(xs.row(tt).SPRING, xd_spring);
     xds.row(tt).SPRING = xd_spring;
     
+    // If necessary add a perturbation. May be useful for some off-line tests.
     RowVectorXd perturbation = RowVectorXd::Constant(dim_orig(),0.0);
     if (analytical_solution_perturber_!=NULL)
       for (int i_dim=0; i_dim<dim_orig(); i_dim++)
+        // Sample perturbation from a normal Gaussian distribution
         perturbation(i_dim) = (*analytical_solution_perturber_)();
       
     // Add forcing term to the acceleration of the spring state
