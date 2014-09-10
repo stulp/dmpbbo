@@ -6,6 +6,10 @@ function approximators,
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
+A PDF tutorial on these topics (generated with Doxygen) is available at https://github.com/stulp/dmpbbo/blob/master/docs/tutorial.pdf
+
+The complete HTML doxygen documentation is at: http://perso.ensta-paristech.fr/~stulp/dmpbbo/
+
 # For whom?
 
 This library may be useful for you if you
