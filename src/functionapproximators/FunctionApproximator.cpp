@@ -127,7 +127,7 @@ void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::M
 }
 
 
-void FunctionApproximator::getParameterVectorSelectedMinMax(VectorXd& min, VectorXd& max) const
+void FunctionApproximator::getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const
 {
   if (model_parameters_==NULL)
   {

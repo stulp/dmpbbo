@@ -36,13 +36,15 @@ namespace DmpBbo {
 /**
  * Task for passing through a viapoint with minimal acceleration.
  * There are three components that this task penalizes:
- * \li The distance to a viapoint
- * <ul>
- * \li  if viapoint_radius > 0, the penalty is the distance minus the radius (and not smaller than 0)
- * \li if the viapoint_time is set, the trajectory must pass through the viapoint at a certain time. If not the shortest distance to the viapoint along the trajectory is used.
- * </ul>
- * \li The squared accelerations at each time step
- * \li Not being at the goal after a certain time
+ <ul>
+ <li> The distance to a viapoint
+ <ul>
+ <li>  if viapoint_radius > 0, the penalty is the distance minus the radius (and not smaller than 0)
+ <li> if the viapoint_time is set, the trajectory must pass through the viapoint at a certain time. If not the shortest distance to the viapoint along the trajectory is used.
+ </ul>
+ <li> The squared accelerations at each time step
+ <li> Not being at the goal after a certain time
+ </ul>
  * The relative weights of these cost components are also member variables
  */
 class TaskViapoint : public TaskWithTrajectoryDemonstrator

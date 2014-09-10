@@ -107,15 +107,26 @@ protected:
   
 
   /** The probability density function (PDF) of the multi-variate normal distribution
-   * \param[in] data A vector
    * \param[in] mu The mean of the normal distribution
-   * \param[in] covar The covariance of the normal distribution 
-   * \return the probability
+   * \param[in] covar The covariance matrix of the normal distribution 
+   * \param[in] input The input data vector for which the PDF will be computed.
+   * \return The PDF value for the input
    */
   static double normalPDF(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input);
  
+  /** The probability density function (PDF) of the multi-variate normal distribution
+   * \param[in] mu The mean of the normal distribution
+   * \param[in] covar_inverse Inverse of the covariance matrix of the normal distribution 
+   * \param[in] input The input data vector for which the PDF will be computed.
+   * \return The PDF value for the input
+   */
   static double normalPDFWithInverseCovar(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar_inverse, const Eigen::VectorXd& input);
 
+  /** Compute the probabilities that a certain input belongs to each Gaussian in the Gaussian mixture model.
+   * \param[in] gmm The Gaussian mixture model
+   * \param[in] input The input data vector for which the probabilities will be computed.
+   * \param[out] h The probabilities
+   */
   void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h) const;
 
 private:

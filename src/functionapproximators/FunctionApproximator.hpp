@@ -155,6 +155,11 @@ public:
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
   void setSelectedParameters(const std::set<std::string>& selected_values_labels);
+  /**
+   * Get the minimum and maximum of the selected parameters in one vector.
+   * \param[out] min The minimum of the selected parameters concatenated in one vector
+   * \param[out] max The minimum of the selected parameters concatenated in one vector
+   */
   void getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const;
   int getParameterVectorSelectedSize(void) const;
   void setParameterVectorSelected(const Eigen::VectorXd& values, bool normalized=false);
@@ -198,7 +203,6 @@ public:
   const ModelParameters* getModelParameters(void) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
-  
   
   static void generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_test);
   

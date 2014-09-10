@@ -52,7 +52,6 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] n_basis_functions_per_dim  Number of basis functions
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
-   * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not (to be documented, default is false)
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()
@@ -65,7 +64,6 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Since this constructor is for 1-D input data only, we simply check if this argument is equal to 1.
    *  \param[in] n_basis_functions  Number of basis functions for the one dimension
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
-   * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not (to be documented, default is false)
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()

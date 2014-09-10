@@ -41,11 +41,6 @@ class ModelParametersGMR : public ModelParameters
   
 public:
   /** Constructor for the model parameters of the GMR function approximator.
-   *  \param[in] centers A list (std::vector) of nb_gaussian center vector (nb_in_dim)
-   *  \param[in] priors A list (std::vector) of nb_gaussian prior
-   *  \param[in] slopes A list (std::vector) of nb_gaussian associated slope matrix (nb_out_dim x nb_in_dim)
-   *  \param[in] biases A list (std::vector) of nb_gaussian associated bias vector (nb_out_dim)
-   *  \param[in] inverseCovarsL A list (std::vector) of nb_gaussian matrix. Each matrix is the inverse of the L part of the LLT decomposition of the covariance matrix (nb_in_dim x nb_in_dim)
    */
   ModelParametersGMR(std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
@@ -57,7 +52,10 @@ public:
 
   ModelParameters* clone(void) const;
 
-  /** @todo Determine which parameters should be modifiable in GMR. */
+  /** Return all the names of the parameter types that can be selected.
+   * \param[out] selected_values_labels Names of the parameter types that can be selected
+   * @todo Determine which parameters should be modifiable in GMR.
+   */
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
   void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
   void getParameterVectorAll(Eigen::VectorXd& all_values) const;

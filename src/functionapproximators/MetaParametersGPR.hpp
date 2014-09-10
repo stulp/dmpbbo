@@ -42,6 +42,7 @@ class MetaParametersGPR : public MetaParameters
 public:
   
   /** Constructor for the algorithmic meta-parameters of the GPR function approximator.
+   * \param[in] expected_input_dim Expected input dimensionality. Useful for debugging.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
    *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
    */
@@ -51,7 +52,13 @@ public:
 
 	std::string toString(void) const;
 	
+	/** Return the maximum covariance of the covariance function. 
+	 * \return Maximum covariance
+	 */
 	double maximum_covariance() const { return maximum_covariance_; }
+	/** Return the length parameter of the covariance function. 
+	 * \return Length parameter covariance function.
+	 */
 	double length() const { return length_; }
 
 private:
