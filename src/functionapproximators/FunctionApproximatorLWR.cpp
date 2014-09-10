@@ -68,33 +68,31 @@ FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
 
 
 
-/** Compute Moore-Penrose pseudo-inverse. 
- * Taken from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
- * \param[in]  a       The matrix to be inversed.
- * \param[out] result  The pseudo-inverse of the matrix.
- * \param[in]  epsilon Don't know, not my code ;-)
- * \return     true if pseudo-inverse possible, false otherwise
-template<typename _Matrix_Type_>
-bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
-epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
-{
-  if(a.rows()<a.cols())
-      return false;
-
-  Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU |
-Eigen::ComputeThinV);
-
-  typename _Matrix_Type_::Scalar tolerance = epsilon * std::max(a.cols(),
-a.rows()) * svd.singularValues().array().abs().maxCoeff();
-
-  result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() >
-tolerance).select(svd.singularValues().
-      array().inverse(), 0) ).asDiagonal() * svd.matrixU().adjoint();
-      
-  return true;
-}
- */
-
+///** Compute Moore-Penrose pseudo-inverse. 
+// * Taken from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
+// * \param[in]  a       The matrix to be inversed.
+// * \param[out] result  The pseudo-inverse of the matrix.
+// * \param[in]  epsilon Don't know, not my code ;-)
+// * \return     true if pseudo-inverse possible, false otherwise
+//template<typename _Matrix_Type_>
+//bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
+//epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
+//{
+//  if(a.rows()<a.cols())
+//      return false;
+//
+//  Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU |
+//Eigen::ComputeThinV);
+//
+//  typename _Matrix_Type_::Scalar tolerance = epsilon * std::max(a.cols(),
+//a.rows()) * svd.singularValues().array().abs().maxCoeff();
+//
+//  result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() >
+//tolerance).select(svd.singularValues().
+//      array().inverse(), 0) ).asDiagonal() * svd.matrixU().adjoint();
+//      
+//  return true;
+//}
 
 void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targets)
 {
