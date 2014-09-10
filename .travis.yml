@@ -61,5 +61,4 @@ script:
   - mkdir build;cd build
   - cmake -DCMAKE_BUILD_TYPE=$DMP_BUILD_TYPE -DBUILD_SHARED_LIBS=$BUILD_SHARED_LIBS ..
   - make VERBOSE=1
-  - make Docs
   - sudo make install
