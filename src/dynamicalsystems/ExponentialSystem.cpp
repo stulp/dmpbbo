@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dynamicalsystems/ExponentialSystem.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ExponentialSystem);
 
 #include <boost/serialization/base_object.hpp>

@@ -29,6 +29,7 @@
 #include "functionapproximators/ModelParametersGPR.hpp"
 #include "functionapproximators/FunctionApproximatorGPR.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
 #include "dmpbbo_io/EigenFileIO.hpp"

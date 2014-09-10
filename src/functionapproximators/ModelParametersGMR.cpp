@@ -30,6 +30,7 @@
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"

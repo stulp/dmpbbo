@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "bbo/updaters/UpdaterMean.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UpdaterMean);
 
 #include <eigen3/Eigen/Core>
