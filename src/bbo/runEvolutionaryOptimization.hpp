@@ -38,7 +38,7 @@ class Task;
 class TaskSolver;
 class ExperimentBBO;
 
-/** Run an evolutionary optimization process.
+/** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] cost_function The cost function to optimize
  * \param[in] initial_distribution The initial parameter distribution
  * \param[in] updater The Updater used to update the parameters
@@ -58,7 +58,7 @@ void runEvolutionaryOptimization(
   bool overwrite=false,
   bool only_learning_curve=false);
 
-/** Run an evolutionary optimization process.
+/** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] task The Task to optimize
  * \param[in] task_solver The TaskSolver that will solve the task
  * \param[in] initial_distribution The initial parameter distribution
@@ -80,7 +80,7 @@ void runEvolutionaryOptimization(
   bool overwrite=false,
   bool only_learning_curve=false);
 
-/** Run an evolutionary optimization process.
+/** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] experiment The experiment to run, cf. ExperimentBBO
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)

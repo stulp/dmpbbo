@@ -48,7 +48,7 @@ MetaParameters::~MetaParameters(void)
 {
 }
 
-ostream& operator<<(ostream& output, const MetaParameters& meta_parameters) {
+ostream& operator<<(std::ostream& output, const MetaParameters& meta_parameters) {
   output << meta_parameters.toString();
   return output;
 }
