@@ -64,6 +64,10 @@ public:
    */
 	std::string toString(void) const;
 
+  /** Add a perturbation to the forcing term when computing the analytical solution.
+   * \param[in] perturbation_standard_deviation Standard deviation of the normal distribution from which perturbations will be sampled.
+   * 
+   */
   void set_perturbation(double perturbation_standard_deviation);
 
 private:
