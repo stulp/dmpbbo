@@ -43,6 +43,9 @@ class ModelParametersGPR : public ModelParameters
   
 public:
   /** Constructor for the model parameters of the GPR function approximator.
+   *  \param[in] train_inputs The training samples provided (input values) 
+   *  \param[in] train_targets The training samples provided (target values) 
+   *  \param[in] gram The Gram matrix, i.e. the covariances between all combination of input samples 
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
    *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
    */

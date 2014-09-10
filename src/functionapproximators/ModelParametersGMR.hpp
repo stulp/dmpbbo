@@ -64,6 +64,13 @@ public:
     return all_values_vector_size_;
   }
   
+  /** Save a Gaussian mixture model to a directory; useful for debugging.
+   * \param[in] directory Directory to save to
+   * \param[in] centers Centers of the Gaussians
+   * \param[in] covars Covariance matrices of the Gaussians
+   * \param[in] iter Iteration number when running Expectation-Maximization. Allows the GMM to be stored with a different filename (in the same directory) at each iteration.
+   * \return true if successful, false otherwise
+   */
   static bool saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, int iter=-1);
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
