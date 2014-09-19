@@ -39,6 +39,8 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersUnified);
 #include <fstream>
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/SVD>
+#include <eigen3/Eigen/LU>
 
 
 using namespace std;
@@ -56,7 +58,7 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
   assert(n_basis_functions==weights.size());
   
   centers_.resize(n_basis_functions);
-  widths_.resize(n_basis_functions);
+  covars_.resize(n_basis_functions);
   slopes_.resize(n_basis_functions);
   offsets_.resize(n_basis_functions);
   priors_.resize(n_basis_functions);
@@ -64,7 +66,8 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
   for (int i=0; i<n_basis_functions; i++)
   {
     centers_[i] = centers.row(i);
-    widths_[i] = widths.row(i).asDiagonal();
+    covars_[i] = widths.row(i).asDiagonal();
+    covars_[i] = covars_[i].array().square();
     offsets_[i] = weights[i];
     
     slopes_[i] = VectorXd::Zero(n_dims);
@@ -90,7 +93,7 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, c
   assert(n_basis_functions==offsets.size());
   
   centers_.resize(n_basis_functions);
-  widths_.resize(n_basis_functions);
+  covars_.resize(n_basis_functions);
   slopes_.resize(n_basis_functions);
   offsets_.resize(n_basis_functions);
   priors_.resize(n_basis_functions);
@@ -98,7 +101,8 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, c
   for (int i=0; i<n_basis_functions; i++)
   {
     centers_[i] = centers.row(i);
-    widths_[i] = widths.row(i).asDiagonal();
+    covars_[i] = widths.row(i).asDiagonal();
+    covars_[i] = covars_[i].array().square();
     slopes_[i] = slopes.row(i);
     offsets_[i] = offsets[i];
     
@@ -123,7 +127,7 @@ ModelParametersUnified::ModelParametersUnified(
   bool lines_pivot_at_max_activation)
 :
   centers_(centers),
-  widths_(widths),
+  covars_(widths),
   slopes_(slopes), 
   offsets_(offsets),
   priors_(priors), 
@@ -140,7 +144,7 @@ ModelParametersUnified::ModelParametersUnified(
 ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
 :
   centers_(centers),
-  widths_(widths),
+  covars_(widths),
   slopes_(slopes), 
   offsets_(offsets),
   priors_(VectorXd::Ones(centers.rows(),centers.cols())), 
@@ -154,7 +158,7 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
 ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, const VectorXd& priors, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
 :
   centers_(centers),
-  widths_(widths),
+  covars_(widths),
   slopes_(slopes), 
   offsets_(offsets),
   priors_(priors),
@@ -174,7 +178,7 @@ void ModelParametersUnified::initializeAllValuesVectorSize(void)
   if (n_basis_functions>0)
   {
     all_values_vector_size_ += centers_.size()*centers_[0].size();
-    all_values_vector_size_ += widths_.size() *widths_[0].cols();
+    all_values_vector_size_ += covars_.size() *covars_[0].cols();
     all_values_vector_size_ += offsets_.size();
     all_values_vector_size_ += slopes_.size() *slopes_[0].size();  
     all_values_vector_size_ += priors_.size();  
@@ -184,7 +188,7 @@ void ModelParametersUnified::initializeAllValuesVectorSize(void)
 
 
 ModelParameters* ModelParametersUnified::clone(void) const {
-  return new ModelParametersUnified(centers_,widths_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
+  return new ModelParametersUnified(centers_,covars_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
 }
 
 
@@ -257,7 +261,7 @@ void ModelParametersUnified::getLines(const MatrixXd& inputs, MatrixXd& lines) c
   lines.resize(n_time_steps,n_lines);
   for (int i_line=0; i_line<n_lines; i_line++)
   {
-    lines.col(i_line) = inputs*slopes_[i_line].transpose();
+    lines.col(i_line) = inputs*slopes_[i_line];
     lines.col(i_line).array() += offsets_[i_line];
   
     if (lines_pivot_at_max_activation_)
@@ -342,7 +346,7 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
   }
 
   // Cache could not be used, actually do the work
-  kernelActivations(centers_,widths_,inputs,kernel_activations,normalized_basis_functions_);
+  kernelActivations(centers_,covars_,inputs,kernel_activations,normalized_basis_functions_);
 
   if (caching_)
   {
@@ -383,18 +387,19 @@ void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, 
   }  
 
   VectorXd mu,diff,exp_term;
-  MatrixXd covar;
+  MatrixXd covar_inv;
  
+  
   for (unsigned int bb=0; bb<n_basis_functions; bb++)
   {
     mu = centers[bb];
-    covar = widths[bb];
+    covar_inv = widths[bb].inverse();
     for (int tt=0; tt<n_samples; tt++)
     {
       // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
       //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-      diff =  inputs.row(tt);
-      exp_term = (-0.5*diff*covar)*diff.transpose();
+      diff =  inputs.row(tt)-mu.transpose();
+      exp_term = -0.5*diff.transpose()*covar_inv*diff;
       assert(exp_term.size()==1);
       kernel_activations(tt,bb) = exp(exp_term[0]);
     }
@@ -422,7 +427,7 @@ void ModelParametersUnified::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
 
   ar & BOOST_SERIALIZATION_NVP(centers_);
-  ar & BOOST_SERIALIZATION_NVP(widths_);
+  ar & BOOST_SERIALIZATION_NVP(covars_);
   ar & BOOST_SERIALIZATION_NVP(slopes_);
   ar & BOOST_SERIALIZATION_NVP(offsets_);
   ar & BOOST_SERIALIZATION_NVP(priors_);
@@ -465,7 +470,7 @@ void ModelParametersUnified::getParameterVectorMask(const std::set<std::string> 
   offset += size;
   
   // Widths
-  size = widths_.size()*widths_[0].cols();
+  size = covars_.size()*covars_[0].cols();
   if (selected_values_labels.find("widths")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(2);
   offset += size;
@@ -495,7 +500,7 @@ void ModelParametersUnified::getParameterVectorAll(VectorXd& values) const
   for (int i_bfs=0; i_bfs<n_basis_functions; i_bfs++)
   {
     values.segment(offset,n_dims) = centers_[i_bfs];              offset += n_dims;
-    values.segment(offset,n_dims) = widths_[i_bfs].diagonal();    offset += n_dims;
+    values.segment(offset,n_dims) = covars_[i_bfs].diagonal();    offset += n_dims;
     values.segment(offset,n_dims) = slopes_[i_bfs];               offset += n_dims;
     values[offset]                = offsets_[i_bfs];              offset += 1;
     values[offset]                = priors_[i_bfs];               offset += 1;
@@ -548,10 +553,10 @@ void ModelParametersUnified::setParameterVectorAll(const VectorXd& values) {
     VectorXd cur_width = values.segment(offset,n_dims);
     // If the centers change, the cache for normalizedKernelActivations() must be cleared,
     // because this function will return different values for different centers
-    if ( !(widths_[i_bfs].diagonal().array() == cur_width.array()).all() )
+    if ( !(covars_[i_bfs].diagonal().array() == cur_width.array()).all() )
       clearCache();
     
-    widths_[i_bfs].diagonal() = values.segment(offset,n_dims) ;   offset += n_dims;
+    covars_[i_bfs].diagonal() = values.segment(offset,n_dims) ;   offset += n_dims;
     
     
     // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
@@ -578,10 +583,10 @@ void ModelParametersUnified::setParameterVectorAll(const VectorXd& values) {
   {
     // If the centers change, the cache for normalizedKernelActivations() must be cleared,
     // because this function will return different values for different centers
-    if ( !(widths_.col(i_dim).array() == values.segment(offset,size).array()).all() )
+    if ( !(covars_.col(i_dim).array() == values.segment(offset,size).array()).all() )
       clearCache();
     
-    widths_.col(i_dim) = values.segment(offset,size);
+    covars_.col(i_dim) = values.segment(offset,size);
     offset += size;
   }
 
@@ -639,19 +644,14 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   locallyWeightedLines(inputs, weighted_lines);
   
   MatrixXd activations;
-  bool normalized_basis_functions=false;
-  kernelActivations(centers_,widths_,inputs,activations,normalized_basis_functions);
-    
-  MatrixXd normalized_activations;
-  normalized_basis_functions=true;
-  kernelActivations(centers_,widths_,inputs,normalized_activations,normalized_basis_functions);
-    
+  kernelActivations(centers_,covars_,inputs,activations,normalized_basis_functions_);
+
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
   saveMatrix(save_directory,"lines.txt",lines,overwrite);
   saveMatrix(save_directory,"weighted_lines.txt",weighted_lines,overwrite);
   saveMatrix(save_directory,"activations.txt",activations,overwrite);
-  saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
+  saveMatrix(save_directory,"outputs_grid.txt",weighted_lines,overwrite);
   
   return true;
   

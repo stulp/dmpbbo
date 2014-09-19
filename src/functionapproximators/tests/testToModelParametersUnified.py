@@ -26,12 +26,14 @@ if __name__=='__main__':
         print ""
         sys.exit(-1);
     
+    function_approximator_names = ["RBFN","LWR"]
+    
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"
-    subprocess.call([executable, directory])
+    command = [executable,  directory] + function_approximator_names;
+    subprocess.call(command)
     
     # Plot the results in each directory
-    function_approximator_names = ["RBFN"]
     
     fig_number = 1;
     for name in function_approximator_names:
@@ -40,7 +42,7 @@ if __name__=='__main__':
         
         subplot_number = 1;
         for uni_name in ['','Unified']:
-            directory_fa = directory +"/"+ name + uni_name
+            directory_fa = directory +"/"+ name + "1D" + uni_name
             print(directory_fa)
             if (getDataDimFromDirectory(directory_fa)==1):
                 ax = fig.add_subplot(120+subplot_number)
@@ -50,7 +52,7 @@ if __name__=='__main__':
     
             try:
                 plotDataFromDirectory(directory_fa,ax)
-                if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GPR"):
+                if (uni_name=="Unified" or name=="WLS" or name=="LWR" or name=="LWPR" or name=="GPR"):
                     plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
                 elif (name=="RBFN"):
                     plot_normalized=False

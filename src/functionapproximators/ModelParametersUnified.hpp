@@ -154,7 +154,7 @@ protected:
   
 private:
   std::vector<Eigen::VectorXd> centers_; // n_centers X n_dims
-  std::vector<Eigen::MatrixXd> widths_;  // n_centers X n_dims X n_dims
+  std::vector<Eigen::MatrixXd> covars_;  // n_centers X n_dims X n_dims
   std::vector<Eigen::VectorXd> slopes_;  // n_centers X n_dims
   std::vector<double> offsets_;          // n_centers X 1
   std::vector<double> priors_;           // n_centers X 1

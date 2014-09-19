@@ -76,7 +76,11 @@ def plotDataFromDirectory(directory,ax):
     if (n_dims>2):
         sys.exit('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
     targets     = numpy.loadtxt(directory+'/targets.txt')                            
-    predictions = numpy.loadtxt(directory+'/outputs.txt')
+    try:
+      predictions = numpy.loadtxt(directory+'/outputs.txt')
+    except IOError:
+      # Everything's fine: user did not store outputs
+      predictions = [];
         
     # Plotting
     try:
@@ -94,7 +98,8 @@ def plotDataFromDirectory(directory,ax):
       predictions_grid = [];
       
       
-    plotResiduals(inputs,targets,predictions,ax)
+    if len(predictions)>0:
+      plotResiduals(inputs,targets,predictions,ax)
     plotDataTargets(inputs,targets,ax)
     #plotDataPredictions(inputs,predictions,ax)   
     

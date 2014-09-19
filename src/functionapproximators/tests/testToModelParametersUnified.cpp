@@ -55,54 +55,87 @@ using namespace DmpBbo;
  */
 int main(int n_args, char** args)
 {
-  // First argument may be optional directory to write data to
   string directory, directory_fa;
   if (n_args>1)
     directory = string(args[1]);
   bool overwrite = true;
-
-  // Generate training data 
-  int n_input_dims = 1;
-  VectorXi n_samples_per_dim = VectorXi::Constant(1,25);
-  if (n_input_dims==2) 
-    n_samples_per_dim = VectorXi::Constant(2,25);
-    
-  MatrixXd inputs, targets, outputs;
-  targetFunction(n_samples_per_dim,inputs,targets);
-
-  VectorXd min = inputs.colwise().minCoeff();
-  VectorXd max = inputs.colwise().maxCoeff();
+  
+  for (int n_input_dims = 1; n_input_dims<=2; n_input_dims++)
+  {
+    vector<FunctionApproximator*> function_approximators;
+    if (n_args>2)
+    {
+      // Assume the arguments are names of function approximatores
+      for (int i_arg=2; i_arg<n_args; i_arg++)
+      {
+        FunctionApproximator* fa =  getFunctionApproximatorByName(args[i_arg],n_input_dims);
+        if (fa==NULL)
+          return -1;
+        function_approximators.push_back(fa);
+      }
+    }
+    else
+    {
+      // No name passed, get all function approximators
+      getFunctionApproximatorsVector(n_input_dims,function_approximators);
+    }
+  
+    // Generate training data 
+    VectorXi n_samples_per_dim = VectorXi::Constant(1,25);
+    if (n_input_dims==2) 
+      n_samples_per_dim = VectorXi::Constant(2,25);
       
-  VectorXi n_samples_per_dim_dense = VectorXi::Constant(n_input_dims,100);
-  if (n_input_dims==2)
-    n_samples_per_dim = VectorXi::Constant(n_input_dims,40);
-          
-  FunctionApproximator* fa = getFunctionApproximatorByName("RBFN", n_input_dims);
-
-  cout << "_____________________________________" << endl << fa->getName() << endl;
-  cout << "    Training"  << endl;
-  if (!directory.empty()) 
-    directory_fa =  directory+"/"+fa->getName();
-  fa->train(inputs,targets,directory_fa,overwrite);
-  cout << "    Predicting" << endl;
-  fa->predict(inputs,outputs);
-  cout << endl << endl;
+    MatrixXd inputs, targets, outputs;
+    targetFunction(n_samples_per_dim,inputs,targets);
   
-  ModelParametersUnified* mp_unified =  fa->getModelParametersUnified();
-  //cout << mp_unified->toString() << endl;
-  mp_unified->saveGridData(min, max, n_samples_per_dim_dense, directory_fa+"Unified",overwrite);
-
-  const ModelParametersRBFN* mp =  dynamic_cast<const ModelParametersRBFN*>(fa->getModelParameters());
-  //cout << mp_unified->toString() << endl;
-  mp->saveGridData(min, max, n_samples_per_dim_dense, directory_fa,overwrite);
-
-  saveMatrix(directory_fa+"Unified","inputs.txt",inputs,overwrite);
-  saveMatrix(directory_fa+"Unified","targets.txt",targets,overwrite);
-  saveMatrix(directory_fa+"Unified","outputs.txt",outputs,overwrite);
-  
-  delete fa;
-  delete mp_unified;
- 
+    VectorXd min = inputs.colwise().minCoeff();
+    VectorXd max = inputs.colwise().maxCoeff();
+        
+    VectorXi n_samples_per_dim_dense = VectorXi::Constant(n_input_dims,100);
+    if (n_input_dims==2)
+      n_samples_per_dim = VectorXi::Constant(n_input_dims,40);
+            
+    
+    
+    for (unsigned int dd=0; dd<function_approximators.size(); dd++)
+    {
+      
+      FunctionApproximator* fa = function_approximators[dd]; 
+    
+      cout << "_____________________________________" << endl << fa->getName() << endl;
+      cout << "    Training"  << endl;
+      if (!directory.empty()) {
+        directory_fa =  directory+"/"+fa->getName();
+        if (n_input_dims==1)
+          directory_fa = directory_fa+"1D";
+        else
+          directory_fa = directory_fa+"2D";
+      }
+        
+      fa->train(inputs,targets,directory_fa,overwrite);
+      fa->predict(inputs,outputs);
+      
+      ModelParametersUnified* mp_unified =  fa->getModelParametersUnified();
+      if (mp_unified!=NULL)
+      {
+        //cout << mp_unified->toString() << endl;
+        mp_unified->saveGridData(min, max, n_samples_per_dim_dense, directory_fa+"Unified",overwrite);
+      
+        const ModelParameters* mp =  fa->getModelParameters();
+        //cout << mp_unified->toString() << endl;
+        mp->saveGridData(min, max, n_samples_per_dim_dense, directory_fa,overwrite);
+      
+        saveMatrix(directory_fa+"Unified","inputs.txt",inputs,overwrite);
+        saveMatrix(directory_fa+"Unified","targets.txt",targets,overwrite);
+        //saveMatrix(directory_fa+"Unified","outputs.txt",outputs,overwrite);
+      }
+      
+      delete fa;
+      fa = NULL;
+      delete mp_unified;
+    }
+  }
+     
   return 0;
 }
 
