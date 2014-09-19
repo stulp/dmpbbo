@@ -84,6 +84,8 @@ public:
    */
   void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variance) const;
   
+  ModelParametersUnified* toModelParametersUnified(void) const;
+  
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   

@@ -32,6 +32,8 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
+#include "functionapproximators/ModelParametersUnified.hpp"
+
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -187,6 +189,19 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
   */
   
   return true;
+  
+}
+
+ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
+{
+  cout << "ModelParametersGPR::toModelParametersUnified" << endl;
+
+  MatrixXd centers = train_inputs_;
+  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length_);
+  MatrixXd weights = gram_inv_targets_*maximum_covariance_;
+  bool normalized_basis_functions = false;
+
+  return new ModelParametersUnified(centers, widths, weights, normalized_basis_functions); 
   
 }
 
