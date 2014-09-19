@@ -164,7 +164,7 @@ bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& cente
     string filename = stream.str();
     if (!saveMatrix(directory, filename,  centers[i_gau],  true))
       return false;
-    cout << "  filename=" << filename << endl;
+    //cout << "  filename=" << filename << endl;
     
     stringstream stream2;
     stream2 << "gmm";
@@ -172,7 +172,7 @@ bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& cente
       stream2 << "_iter" << setw(2) << setfill('0') << iter;
     stream2  << "_covar" << setw(3) << setfill('0') << i_gau << ".txt";
     filename = stream2.str();
-    cout << "  filename=" << filename << endl;
+    //cout << "  filename=" << filename << endl;
     if (!saveMatrix(directory, filename,  covars[i_gau],  true))
       return false;    
   }

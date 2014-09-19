@@ -609,10 +609,8 @@ void ModelParametersUnified::setParameterVectorAll(const VectorXd& values) {
 bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
   if (save_directory.empty())
-    return true;
-  
-  cout << "        Saving ModelParametersUnified grid data to: " << save_directory << "." << endl;
-  
+    return true;  
+ 
   int n_dims = min.size();
   assert(n_dims==max.size());
   assert(n_dims==n_samples_per_dim.size());
