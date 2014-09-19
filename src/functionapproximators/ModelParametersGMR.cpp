@@ -385,7 +385,7 @@ ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
   
 
   bool normalized_basis_functions = true;
-  bool lines_pivot_at_max_activation = true;
+  bool lines_pivot_at_max_activation = false;
 
   return new ModelParametersUnified(centers, widths, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
   

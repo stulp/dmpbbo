@@ -26,7 +26,7 @@ if __name__=='__main__':
         print ""
         sys.exit(-1);
     
-    function_approximator_names = ["RBFN","LWR"]
+    function_approximator_names = ["RBFN","LWR","GPR","GMR"]
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"

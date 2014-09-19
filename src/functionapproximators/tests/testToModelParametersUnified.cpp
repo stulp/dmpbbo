@@ -60,7 +60,7 @@ int main(int n_args, char** args)
     directory = string(args[1]);
   bool overwrite = true;
   
-  for (int n_input_dims = 1; n_input_dims<=2; n_input_dims++)
+  for (int n_input_dims = 1; n_input_dims<=1; n_input_dims++)
   {
     vector<FunctionApproximator*> function_approximators;
     if (n_args>2)

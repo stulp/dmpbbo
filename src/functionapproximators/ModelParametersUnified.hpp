@@ -97,7 +97,7 @@ public:
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    * \param[in] normalized_basis_functions Whether to normalize the basis functions
    */
-  static void kernelActivations(const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
+  static void kernelActivations(const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& widths, std::vector<double> priors, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
   	
   
   /** Get the kernel activations for given inputs

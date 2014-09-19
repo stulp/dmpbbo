@@ -119,7 +119,7 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, c
 
 ModelParametersUnified::ModelParametersUnified(
   const std::vector<Eigen::VectorXd>& centers, // n_centers X n_dims
-  const std::vector<Eigen::MatrixXd>& widths,  // n_centers X n_dims X n_dims
+  const std::vector<Eigen::MatrixXd>& covars,  // n_centers X n_dims X n_dims
   const std::vector<Eigen::VectorXd>& slopes, // n_centers X n_dims
   const std::vector<double>& offsets,          // n_centers X 1
   const std::vector<double>& priors,           // n_centers X 1              
@@ -127,7 +127,7 @@ ModelParametersUnified::ModelParametersUnified(
   bool lines_pivot_at_max_activation)
 :
   centers_(centers),
-  covars_(widths),
+  covars_(covars),
   slopes_(slopes), 
   offsets_(offsets),
   priors_(priors), 
@@ -346,7 +346,7 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
   }
 
   // Cache could not be used, actually do the work
-  kernelActivations(centers_,covars_,inputs,kernel_activations,normalized_basis_functions_);
+  kernelActivations(centers_,covars_,priors_,inputs,kernel_activations,normalized_basis_functions_);
 
   if (caching_)
   {
@@ -357,7 +357,7 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
   
 }
 
-void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, const vector<MatrixXd>& widths, const MatrixXd& inputs, MatrixXd& kernel_activations, bool normalized_basis_functions)
+void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, const vector<MatrixXd>& widths, vector<double> priors, const MatrixXd& inputs, MatrixXd& kernel_activations, bool normalized_basis_functions)
 {
 
   unsigned int n_basis_functions = centers.size();
@@ -388,12 +388,13 @@ void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, 
 
   VectorXd mu,diff,exp_term;
   MatrixXd covar_inv;
- 
+  double prior;
   
   for (unsigned int bb=0; bb<n_basis_functions; bb++)
   {
     mu = centers[bb];
     covar_inv = widths[bb].inverse();
+    prior = priors[bb];
     for (int tt=0; tt<n_samples; tt++)
     {
       // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
@@ -401,7 +402,7 @@ void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, 
       diff =  inputs.row(tt)-mu.transpose();
       exp_term = -0.5*diff.transpose()*covar_inv*diff;
       assert(exp_term.size()==1);
-      kernel_activations(tt,bb) = exp(exp_term[0]);
+      kernel_activations(tt,bb) = prior*exp(exp_term[0]);
     }
   }
   
@@ -644,7 +645,7 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   locallyWeightedLines(inputs, weighted_lines);
   
   MatrixXd activations;
-  kernelActivations(centers_,covars_,inputs,activations,normalized_basis_functions_);
+  kernelActivations(centers_,covars_,priors_,inputs,activations,normalized_basis_functions_);
 
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
