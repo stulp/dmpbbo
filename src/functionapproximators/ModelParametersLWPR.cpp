@@ -34,7 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWPR);
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
-#include "functionapproximators/ModelParametersLWR.hpp"
+#include "functionapproximators/ModelParametersUnified.hpp"
 
 
 #include "lwpr.hh"
@@ -225,16 +225,16 @@ void ModelParametersLWPR::setParameterVectorAll(const VectorXd& values) {
 };
 
 
-ModelParametersLWR* ModelParametersLWPR::toModelParametersLWR(void) const
+ModelParametersUnified* ModelParametersLWPR::toModelParametersUnified(void) const
 {
   if (lwpr_object_->nIn()!=1)
   {
-    //cout << "Warning: Can only call toModelParametersLWR() when input dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toModelParametersUnified() when input dim of LWPR is 1" << endl;
     return NULL;
   }
   if (lwpr_object_->model.nOut!=1)
   {
-    //cout << "Warning: Can only call toModelParametersLWR() when output dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toModelParametersUnified() when output dim of LWPR is 1" << endl;
     return NULL;
   }
   
@@ -287,21 +287,21 @@ ModelParametersLWR* ModelParametersLWPR::toModelParametersLWR(void) const
   //cout << "  offsets=" << offsets.transpose() << endl;
   //cout << "  slopes=" << slopes.transpose() << endl;
 
-  bool asymmetric_kernels=false;
+  //bool asymmetric_kernels=false;
   bool lines_pivot_at_max_activation=true;
 
-  return new ModelParametersLWR(centers,widths,slopes,offsets,
-                                           asymmetric_kernels,lines_pivot_at_max_activation);
+  return new ModelParametersUnified(centers,widths,slopes,offsets,
+                                           lines_pivot_at_max_activation);
 }
 
 bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
   
-  ModelParametersLWR* mp_lwr = toModelParametersLWR();
-  if (mp_lwr==NULL)
+  ModelParametersUnified* mp_unified = toModelParametersUnified();
+  if (mp_unified==NULL)
     return false;
 
-  return mp_lwr->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
+  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
 }
 
 
