@@ -66,7 +66,7 @@ option(BUILD_DOCUMENTATION "Use Doxygen to create the HTML based API documentati
 if(BUILD_DOCUMENTATION)
   FIND_PACKAGE(Doxygen)
   if (NOT DOXYGEN_FOUND)
-    message(FATAL_ERROR 
+    message(WARNING 
       "Doxygen is needed to build the documentation. Please install it correctly")
   endif()
   #-- Configure the Template Doxyfile for our specific project
