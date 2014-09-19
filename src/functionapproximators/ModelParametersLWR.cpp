@@ -534,7 +534,7 @@ void ModelParametersLWR::setParameterVectorModifierPrivate(std::string modifier,
 
 ModelParametersUnified* ModelParametersLWR::toModelParametersUnified(void) const
 {
-  cout << "ModelParametersLWR::toModelParametersUnified" << endl;
+
   // LWR uses normalized basis functions
   bool normalized_basis_functions = true;
   return new ModelParametersUnified(centers_, widths_, slopes_, offsets_, normalized_basis_functions); 

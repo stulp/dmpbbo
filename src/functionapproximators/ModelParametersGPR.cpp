@@ -194,8 +194,7 @@ bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, 
 
 ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
 {
-  cout << "ModelParametersGPR::toModelParametersUnified" << endl;
-
+ 
   MatrixXd centers = train_inputs_;
   MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length_);
   MatrixXd weights = gram_inv_targets_*maximum_covariance_;

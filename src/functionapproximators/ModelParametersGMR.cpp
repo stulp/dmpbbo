@@ -363,14 +363,12 @@ void ModelParametersGMR::setParameterVectorAll(const VectorXd& values)
 
 ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
 {
-  cout << "ModelParametersGMR::toModelParametersUnified" << endl;
-
   int n_gaussians = means_x_.size();
     
   // This copying is not necessary. It is just done to show which variable in GMR relates to which
   // variable in the unified model. 
   vector<VectorXd> centers = means_x_;
-  vector<MatrixXd> widths  = covars_x_;
+  vector<MatrixXd> covars  = covars_x_;
 
   vector<VectorXd> slopes(n_gaussians);
   vector<double> offsets(n_gaussians);
@@ -387,7 +385,7 @@ ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
   bool normalized_basis_functions = true;
   bool lines_pivot_at_max_activation = false;
 
-  return new ModelParametersUnified(centers, widths, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
+  return new ModelParametersUnified(centers, covars, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
   
 }
 
