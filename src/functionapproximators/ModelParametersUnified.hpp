@@ -42,52 +42,64 @@ class ModelParametersUnified : public ModelParameters
   friend class FunctionApproximatorLWR;
   
 public:
-  /** Constructor for the model parameters of the LWPR function approximator.
-   *  \param[in] centers Centers of the basis functions
-   *  \param[in] widths  Widths of the basis functions. 
-   *  \param[in] weights Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+  /** Constructor for the unified model parameters. This version is used by for example RBFN and GPR. 
+   *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] weights Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
   ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
-  
-  /** Constructor for the model parameters of the LWPR function approximator.
-   *  \param[in] centers Centers of the basis functions
-   *  \param[in] widths  Widths of the basis functions. 
-   *  \param[in] slopes  Slopes of the line segments. 
-   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+
+  /** Constructor for the unified model parameters. This version is used by for example LWR and LWPR 
+   *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] slopes  Slopes of the line segments (n_bfs X n_input_dims)
+   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
   ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
 
-  /** Constructor for the model parameters of the LWPR function approximator.
-   *  \param[in] centers Centers of the basis functions
-   *  \param[in] widths  Widths of the basis functions. 
-   *  \param[in] slopes  Slopes of the line segments. 
-   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+  /** Constructor for the unified model parameters. This version is used by for example GMR. 
+   *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
+   *  \param[in] slopes  Slopes of the line segments (n_bfs X n_input_dims)
+   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, const Eigen::VectorXd& priors, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+  ModelParametersUnified(
+    const std::vector<Eigen::VectorXd>& centers, // n_centers X n_dims
+    const std::vector<Eigen::MatrixXd>& widths,  // n_centers X n_dims X n_dims
+    const std::vector<Eigen::VectorXd>& slopes, // n_centers X n_dims
+    const std::vector<double>& offsets,          // n_centers X 1
+    const std::vector<double>& priors,           // n_centers X 1              
+    bool normalized_basis_functions=false, 
+    bool lines_pivot_at_max_activation=false);
+  
   
   std::string toString(void) const;
   
 	ModelParameters* clone(void) const;
 	
   int getExpectedInputDim(void) const  {
-    return centers_.cols();
+    if (centers_.size()>0)
+      return centers_[0].size();
+    else
+      return 0;
   };
   
   /** Get the kernel activations for given centers, widths and inputs
    * \param[in] centers The center of the basis function (size: n_basis_functions X n_dims)
-   * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims)
+   * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims X n_dims)
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    * \param[in] normalized_basis_functions Whether to normalize the basis functions
    */
-  static void kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
+  static void kernelActivations(const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
   	
+  
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
@@ -132,21 +144,26 @@ public:
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
+	ModelParametersUnified* toModelParametersUnified(void) const
+  {
+    return static_cast<ModelParametersUnified*>(clone());
+  }
+
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
-  void checkDimensions(void);
-  Eigen::MatrixXd centers_; // n_centers X n_dims
-  Eigen::MatrixXd widths_;  // n_centers X n_dims
-  Eigen::MatrixXd slopes_;  // n_centers X n_dims
-  Eigen::VectorXd offsets_; //         1 X n_dims
-  Eigen::VectorXd priors_; //          1 X n_dims
+  std::vector<Eigen::VectorXd> centers_; // n_centers X n_dims
+  std::vector<Eigen::MatrixXd> widths_;  // n_centers X n_dims X n_dims
+  std::vector<Eigen::VectorXd> slopes_;  // n_centers X n_dims
+  std::vector<double> offsets_;          // n_centers X 1
+  std::vector<double> priors_;           // n_centers X 1
 
   bool normalized_basis_functions_;
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
   int  all_values_vector_size_;
+  void initializeAllValuesVectorSize(void);
 
 public:
 	/** Turn caching for the function normalizedKernelActivations() on or off.

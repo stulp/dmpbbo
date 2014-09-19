@@ -137,7 +137,7 @@ private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims
   Eigen::MatrixXd slopes_;  // n_centers X n_dims
-  Eigen::VectorXd offsets_; //         1 X n_dims
+  Eigen::VectorXd offsets_; // n_centers X 1
 
   bool asymmetric_kernels_; // should be const
   bool lines_pivot_at_max_activation_;

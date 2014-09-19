@@ -78,10 +78,7 @@ public:
    * Convert these model parameters to unified model parameters.
    * \return Unified model parameter representation (NULL if not implemented for a particular subclass)
    */
-  virtual ModelParametersUnified* toModelParametersUnified(void) const
-  {
-    return NULL;
-  }
+  virtual ModelParametersUnified* toModelParametersUnified(void) const = 0;
   
 public:
   /** Generate a grid of inputs, and output the response of the basis functions and line segments

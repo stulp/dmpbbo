@@ -33,6 +33,8 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
+#include "functionapproximators/ModelParametersUnified.hpp"
+
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -357,5 +359,36 @@ void ModelParametersGMR::setParameterVectorAll(const VectorXd& values)
   // assert(offset == getParameterVectorAllSize());
 
 };
+
+
+ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
+{
+  cout << "ModelParametersGMR::toModelParametersUnified" << endl;
+
+  int n_gaussians = means_x_.size();
+    
+  // This copying is not necessary. It is just done to show which variable in GMR relates to which
+  // variable in the unified model. 
+  vector<VectorXd> centers = means_x_;
+  vector<MatrixXd> widths  = covars_x_;
+
+  vector<VectorXd> slopes(n_gaussians);
+  vector<double> offsets(n_gaussians);
+  VectorXd offset_as_vector;
+  for (int i_gau=0; i_gau<n_gaussians; i_gau++)
+  {
+    slopes[i_gau] = covars_y_x_[i_gau] * covars_x_inv_[i_gau];
+    offset_as_vector = means_y_[i_gau] - slopes[i_gau]*means_x_[i_gau];
+    assert(offset_as_vector.size()==1);
+    offsets[i_gau] = offset_as_vector[0];
+  }
+  
+
+  bool normalized_basis_functions = true;
+  bool lines_pivot_at_max_activation = true;
+
+  return new ModelParametersUnified(centers, widths, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
+  
+}
 
 }
