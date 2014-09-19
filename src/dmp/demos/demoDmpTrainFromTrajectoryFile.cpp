@@ -41,6 +41,11 @@ using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
 
+/** Main function
+ * \param[in] n_args Number of arguments
+ * \param[in] args Arguments themselves
+ * \return Success of exection. 0 if successful.
+ */
 int main(int n_args, char** args)
 {
   string input_txt_file("trajectory.txt");

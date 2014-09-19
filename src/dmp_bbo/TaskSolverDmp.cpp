@@ -34,6 +34,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskSolverDmp);
 
 #include <boost/serialization/base_object.hpp>
@@ -52,7 +53,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-TaskSolverDmp::TaskSolverDmp(Dmp* dmp, set<string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
+TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)
 {
   dmp_->setSelectedParameters(optimize_parameters);

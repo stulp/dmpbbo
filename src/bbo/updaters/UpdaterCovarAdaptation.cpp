@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "bbo/updaters/UpdaterCovarAdaptation.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UpdaterCovarAdaptation);
 
 #include <iomanip>
@@ -38,7 +39,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-UpdaterCovarAdaptation::UpdaterCovarAdaptation(double eliteness, string weighting_method, const VectorXd& base_level, bool diag_only, double learning_rate)
+UpdaterCovarAdaptation::UpdaterCovarAdaptation(double eliteness, std::string weighting_method, const Eigen::VectorXd& base_level, bool diag_only, double learning_rate)
 : UpdaterMean(eliteness, weighting_method), 
   diag_only_(diag_only),
   learning_rate_(learning_rate),

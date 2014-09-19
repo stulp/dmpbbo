@@ -29,6 +29,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dmp/Dmp.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::Dmp);
 
 #include <cmath>
@@ -53,24 +54,36 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
+/** Extracts all variables of the spring-damper system from a state vector, e.g. state.SPRING */ 
 #define SPRING    segment(0*dim_orig()+0,2*dim_orig())
+/** Extracts first order variables of the spring-damper system from a state vector, e.g. state.SPRINGM_Y */ 
 #define SPRING_Y  segment(0*dim_orig()+0,dim_orig())
+/** Extracts second order variables of the spring-damper system from a state vector, e.g. state.SPRING_Z */ 
 #define SPRING_Z  segment(1*dim_orig()+0,dim_orig())
+/** Extracts all variables of the goal from a state vector, e.g. state.GOAL */ 
 #define GOAL      segment(2*dim_orig()+0,dim_orig())
+/** Extracts the phase variable (1-D) from a state vector, e.g. state.PHASE */ 
 #define PHASE     segment(3*dim_orig()+0,       1)
+/** Extracts all variables of the gating system from a state vector, e.g. state.GATING */ 
 #define GATING    segment(3*dim_orig()+1,       1)
 
+/** Extracts first T (time steps) state vectors of the spring-damper system , e.g. states.SPRING(100) */ 
 #define SPRINGM(T)    block(0,0*dim_orig()+0,T,2*dim_orig())
+/** Extracts first T (time steps) state vectors of the spring-damper system , e.g. states.SPRINGM_Y(100) */ 
 #define SPRINGM_Y(T)  block(0,0*dim_orig()+0,T,dim_orig())
+/** Extracts first T (time steps) state vectors of the spring-damper system , e.g. states.SPRINGM_Z(100) */ 
 #define SPRINGM_Z(T)  block(0,1*dim_orig()+0,T,dim_orig())
+/** Extracts first T (time steps) state vectors of the goal system, e.g. states.GOALM(100) */ 
 #define GOALM(T)      block(0,2*dim_orig()+0,T,dim_orig())
+/** Extracts first T (time steps) states of the phase system, e.g. states.PHASEM(100) */ 
 #define PHASEM(T)     block(0,3*dim_orig()+0,T,       1)
+/** Extracts first T (time steps) state vectors of the gating system, e.g. states.GATINGM(100) */ 
 #define GATINGM(T)    block(0,3*dim_orig()+1,T,       1)
 
 boost::mt19937 Dmp::rng = boost::mt19937(getpid() + time(0));
 
-Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr, 
-         vector<FunctionApproximator*> function_approximators,
+Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
+         std::vector<FunctionApproximator*> function_approximators,
          double alpha_spring_damper, 
          DynamicalSystem* goal_system,
          DynamicalSystem* phase_system, 
@@ -84,7 +97,7 @@ Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr,
 }
 
   
-Dmp::Dmp(int n_dims_dmp, vector<FunctionApproximator*> function_approximators, 
+Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
    double alpha_spring_damper, DynamicalSystem* goal_system,
    DynamicalSystem* phase_system, DynamicalSystem* gating_system)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
@@ -95,8 +108,8 @@ Dmp::Dmp(int n_dims_dmp, vector<FunctionApproximator*> function_approximators,
   initFunctionApproximators(function_approximators);
 }
     
-Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr, 
-         vector<FunctionApproximator*> function_approximators, 
+Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
+         std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type)
   : DynamicalSystem(1, tau, y_init, y_attr, "name")
 {  
@@ -105,7 +118,7 @@ Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr,
 }
   
 Dmp::Dmp(int n_dims_dmp, 
-         vector<FunctionApproximator*> function_approximators, 
+         std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name")
 {
@@ -113,7 +126,7 @@ Dmp::Dmp(int n_dims_dmp,
   initFunctionApproximators(function_approximators);
 }
 
-Dmp::Dmp(double tau, VectorXd y_init, VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
+Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
   : DynamicalSystem(1, tau, y_init, y_attr, "name")
 {
   
@@ -348,7 +361,7 @@ void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
 
 }
 
-void Dmp::statesAsTrajectory(const MatrixXd& x_in, const MatrixXd& xd_in, MatrixXd& y_out, MatrixXd& yd_out, MatrixXd& ydd_out) const
+void Dmp::statesAsTrajectory(const Eigen::MatrixXd& x_in, const Eigen::MatrixXd& xd_in, Eigen::MatrixXd& y_out, Eigen::MatrixXd& yd_out, Eigen::MatrixXd& ydd_out) const
 {
   int n_time_steps = x_in.rows(); 
   y_out  = x_in.SPRINGM_Y(n_time_steps);
@@ -363,7 +376,7 @@ void Dmp::statesAsTrajectory(const MatrixXd& x_in, const MatrixXd& xd_in, Matrix
 }
 
 
-void Dmp::statesAsTrajectory(const VectorXd& ts, const MatrixXd& x_in, const MatrixXd& xd_in, Trajectory& trajectory) const {
+void Dmp::statesAsTrajectory(const Eigen::VectorXd& ts, const Eigen::MatrixXd& x_in, const Eigen::MatrixXd& xd_in, Trajectory& trajectory) const {
   int n_time_steps = ts.rows();
 #ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_dims       = x_in.cols();
@@ -387,7 +400,7 @@ void Dmp::statesAsTrajectory(const VectorXd& ts, const MatrixXd& x_in, const Mat
   
 }
 
-void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_outputs) const
+void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_outputs) const
 {
   int n_time_steps = ts.size();
   assert(n_time_steps>0);
@@ -479,9 +492,11 @@ void Dmp::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds, Ei
     localspring_system_.differentialEquation(xs.row(tt).SPRING, xd_spring);
     xds.row(tt).SPRING = xd_spring;
     
+    // If necessary add a perturbation. May be useful for some off-line tests.
     RowVectorXd perturbation = RowVectorXd::Constant(dim_orig(),0.0);
     if (analytical_solution_perturber_!=NULL)
       for (int i_dim=0; i_dim<dim_orig(); i_dim++)
+        // Sample perturbation from a normal Gaussian distribution
         perturbation(i_dim) = (*analytical_solution_perturber_)();
       
     // Add forcing term to the acceleration of the spring state
@@ -551,7 +566,7 @@ void Dmp::train(const Trajectory& trajectory)
   train(trajectory,"");
 }
 
-void Dmp::train(const Trajectory& trajectory, string save_directory, bool overwrite)
+void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool overwrite)
 {
   
   // Set tau, initial_state and attractor_state from the trajectory 

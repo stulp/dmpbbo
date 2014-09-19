@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SigmoidSystem);
 
 #include <cmath>
@@ -43,7 +44,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-SigmoidSystem::SigmoidSystem(double tau, const VectorXd& x_init, double max_rate, double inflection_point_time, string name)
+SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time, std::string name)
 : DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size()), name),
   max_rate_(max_rate),
   inflection_point_time_(inflection_point_time)

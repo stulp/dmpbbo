@@ -45,14 +45,14 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-  
+
 void runEvolutionaryOptimization(
   const CostFunction* const cost_function, 
   const DistributionGaussian* const initial_distribution, 
   const Updater* const updater, 
   int n_updates, 
   int n_samples_per_update, 
-  string save_directory,
+  std::string save_directory,
   bool overwrite,
   bool only_learning_curve)
 {
@@ -112,7 +112,7 @@ void runEvolutionaryOptimization(
   const Updater* const updater, 
   int n_updates, 
   int n_samples_per_update, 
-  string save_directory, 
+  std::string save_directory, 
   bool overwrite,
   bool only_learning_curve)
 {
@@ -173,7 +173,7 @@ void runEvolutionaryOptimization(
 
 }
 
-void runEvolutionaryOptimization(ExperimentBBO* experiment, string save_directory, bool overwrite,   bool only_learning_curve)
+void runEvolutionaryOptimization(ExperimentBBO* experiment, std::string save_directory, bool overwrite,   bool only_learning_curve)
 {
  if (experiment->cost_function!=NULL)
  {

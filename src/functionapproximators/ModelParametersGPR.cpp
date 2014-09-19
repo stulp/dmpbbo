@@ -29,6 +29,7 @@
 #include "functionapproximators/ModelParametersGPR.hpp"
 #include "functionapproximators/FunctionApproximatorGPR.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -48,7 +49,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(MatrixXd train_inputs, VectorXd train_targets, MatrixXd gram, double maximum_covariance, double length)
+ModelParametersGPR::ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::VectorXd train_targets, Eigen::MatrixXd gram, double maximum_covariance, double length)
 :
   train_inputs_(train_inputs),
   train_targets_(train_targets),

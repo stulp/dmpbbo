@@ -40,11 +40,11 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-bool saveTask(string save_directory, Task* task, TaskSolver* task_solver, bool overwrite=false);
+//bool saveTask(string save_directory, Task* task, TaskSolver* task_solver, bool overwrite=false);
 
-bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite=false);
+//bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite=false);
 
-void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, string save_directory, bool overwrite, bool only_learning_curve)
+void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory, bool overwrite, bool only_learning_curve)
 {  
   // Some variables
   int n_parallel = distributions.size();

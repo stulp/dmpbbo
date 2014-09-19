@@ -156,6 +156,11 @@ public:
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
   void setSelectedParameters(const std::set<std::string>& selected_values_labels);
+  /**
+   * Get the minimum and maximum of the selected parameters in one vector.
+   * \param[out] min The minimum of the selected parameters concatenated in one vector
+   * \param[out] max The minimum of the selected parameters concatenated in one vector
+   */
   void getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const;
   int getParameterVectorSelectedSize(void) const;
   void setParameterVectorSelected(const Eigen::VectorXd& values, bool normalized=false);
@@ -200,8 +205,18 @@ public:
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   
-  
-  static void generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_test);
+  /** Generate a input samples that lie on a grid (much like Matlab's meshgrid)
+   * For instance, if min = [2 6], and max = [3 8], and n_samples_per_dim = [3 5]
+   * then this function first makes linearly spaces samples along each dimension, e.g.
+   * samples_dim1 = [2 2.5 3] and samples_dim2 = [6 6.5 7 7.5 8]
+   * and then combine the combination of samples along all dimensions: 
+   * inputs_grid = [2 6; 2 6.5; 2 7; 2 7.5 2 8; 2.5 6; 2.5 6.5; 2.5 7; 2.5 7.5 2.5 8; 3 6; 3 6.5; 3 7; 3 7.5 3 8;
+   * \param[in] min Minimum values in the grid along each dimension 
+   * \param[in] max Maximum values in the grid along each dimension
+   * \param[in] n_samples_per_dim Number of samples along each dimension in the grid
+   * \param[out] inputs_grid A grid of samples
+   */
+  static void generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_grid);
   
 protected:
 

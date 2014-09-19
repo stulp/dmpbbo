@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/MetaParametersLWPR.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersLWPR);
 
 #include <boost/serialization/base_object.hpp>
@@ -46,9 +47,9 @@ namespace DmpBbo {
 
 MetaParametersLWPR::MetaParametersLWPR(
     int expected_input_dim, 
-    VectorXd init_D, double w_gen, double w_prune,
+    Eigen::VectorXd init_D, double w_gen, double w_prune,
     bool update_D, double init_alpha, double penalty, bool diag_only,
-    bool use_meta, double meta_rate, string kernel_name
+    bool use_meta, double meta_rate, std::string kernel_name
   )
 :
   MetaParameters(expected_input_dim),

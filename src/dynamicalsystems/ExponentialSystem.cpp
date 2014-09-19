@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dynamicalsystems/ExponentialSystem.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ExponentialSystem);
 
 #include <boost/serialization/base_object.hpp>
@@ -46,7 +47,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
     
-ExponentialSystem::ExponentialSystem(double tau, VectorXd y_init, VectorXd y_attr, double alpha, string name)
+ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name)
   : DynamicalSystem(1, tau, y_init, y_attr, name),
   alpha_(alpha)
 {

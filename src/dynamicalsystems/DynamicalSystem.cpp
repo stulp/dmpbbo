@@ -32,7 +32,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DynamicalSystem::DynamicalSystem(int order, double tau, VectorXd initial_state, VectorXd attractor_state, string name)
+DynamicalSystem::DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state, Eigen::VectorXd attractor_state, std::string name)
   : 
   // For 1st order systems, the dimensionality of the state vector 'x' is 'dim'
   // For 2nd order systems, the system is expanded to x = [y z], where 'y' and
@@ -51,13 +51,13 @@ DynamicalSystem::~DynamicalSystem(void)
 {
 }
 
-void DynamicalSystem::integrateStart(const VectorXd& x_init, Ref<VectorXd> x, Ref<VectorXd> xd)
+void DynamicalSystem::integrateStart(const Eigen::VectorXd& x_init, Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd)
 {
   set_initial_state(x_init);
   integrateStart(x,xd);
 }
 
-void DynamicalSystem::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const {
+void DynamicalSystem::integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const {
   // Check size. Leads to faster numerical integration and makes Eigen::Ref easier to deal with   
   assert(x.size()==dim());
   assert(xd.size()==dim());
@@ -72,7 +72,7 @@ void DynamicalSystem::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const {
   differentialEquation(x,xd);
 }
 
-void DynamicalSystem::integrateStep(double dt, const Ref<const VectorXd> x, Ref<VectorXd> x_updated, Ref<VectorXd> xd_updated) const
+void DynamicalSystem::integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated) const
 {
   assert(dt>0.0);
   // Check size. Leads to faster numerical integration and makes Eigen::Ref easier to deal with   

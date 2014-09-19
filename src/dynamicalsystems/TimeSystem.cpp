@@ -28,6 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "dynamicalsystems/TimeSystem.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TimeSystem);
 
 #include <cmath>
@@ -42,7 +43,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TimeSystem::TimeSystem(double tau, bool count_down, string name)
+TimeSystem::TimeSystem(double tau, bool count_down, std::string name)
 : 
   DynamicalSystem(1, tau, VectorXd::Zero(1), VectorXd::Ones(1), name),
   count_down_(count_down)

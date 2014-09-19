@@ -29,6 +29,7 @@
 #include "functionapproximators/ModelParametersIRFRLS.hpp"
 
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersIRFRLS);
 
 #include <iostream>
@@ -42,7 +43,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-ModelParametersIRFRLS::ModelParametersIRFRLS(MatrixXd linear_models, MatrixXd cosines_periodes, VectorXd cosines_phase)
+ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::MatrixXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
 :
   linear_models_(linear_models),
   cosines_periodes_(cosines_periodes),

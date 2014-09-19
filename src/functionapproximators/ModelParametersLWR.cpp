@@ -29,6 +29,7 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
 
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -46,7 +47,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersLWR::ModelParametersLWR(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const MatrixXd& offsets, bool asymmetric_kernels, bool lines_pivot_at_max_activation) 
+ModelParametersLWR::ModelParametersLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels, bool lines_pivot_at_max_activation) 
 :
   centers_(centers),
   widths_(widths),
@@ -80,12 +81,12 @@ ModelParameters* ModelParametersLWR::clone(void) const {
   return new ModelParametersLWR(centers_,widths_,slopes_,offsets_,asymmetric_kernels_,lines_pivot_at_max_activation_); 
 }
 
-void ModelParametersLWR::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
+void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   kernelActivations(centers_,widths_,inputs,kernel_activations,asymmetric_kernels_);  
 }
 
-void ModelParametersLWR::normalizedKernelActivations(const MatrixXd& inputs, MatrixXd& normalized_kernel_activations) const
+void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations) const
 {
   if (caching_)
   {
@@ -249,7 +250,7 @@ void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, con
 }
 */
 
-void ModelParametersLWR::kernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations, bool asymmetric_kernels)
+void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool asymmetric_kernels)
 {
   
   // Check and set sizes
@@ -295,7 +296,7 @@ void ModelParametersLWR::kernelActivations(const MatrixXd& centers, const Matrix
   }
 }
 
-void ModelParametersLWR::normalizedKernelActivations(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& normalized_kernel_activations, bool asymmetric_kernels)
+void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations, bool asymmetric_kernels)
 {
 
   // centers     = n_basis_functions x n_dim

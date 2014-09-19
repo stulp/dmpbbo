@@ -31,6 +31,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/MetaParameters.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParameters);
 
 using namespace std;
@@ -47,7 +48,7 @@ MetaParameters::~MetaParameters(void)
 {
 }
 
-ostream& operator<<(ostream& output, const MetaParameters& meta_parameters) {
+ostream& operator<<(std::ostream& output, const MetaParameters& meta_parameters) {
   output << meta_parameters.toString();
   return output;
 }
