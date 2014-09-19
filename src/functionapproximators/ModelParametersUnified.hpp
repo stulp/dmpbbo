@@ -45,12 +45,31 @@ public:
   /** Constructor for the model parameters of the LWPR function approximator.
    *  \param[in] centers Centers of the basis functions
    *  \param[in] widths  Widths of the basis functions. 
+   *  \param[in] weights Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
+   */
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+  
+  /** Constructor for the model parameters of the LWPR function approximator.
+   *  \param[in] centers Centers of the basis functions
+   *  \param[in] widths  Widths of the basis functions. 
    *  \param[in] slopes  Slopes of the line segments. 
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+
+  /** Constructor for the model parameters of the LWPR function approximator.
+   *  \param[in] centers Centers of the basis functions
+   *  \param[in] widths  Widths of the basis functions. 
+   *  \param[in] slopes  Slopes of the line segments. 
+   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
+   */
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, const Eigen::VectorXd& priors, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
   
   std::string toString(void) const;
   
@@ -117,10 +136,12 @@ protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
+  void checkDimensions(void);
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims
   Eigen::MatrixXd slopes_;  // n_centers X n_dims
   Eigen::VectorXd offsets_; //         1 X n_dims
+  Eigen::VectorXd priors_; //          1 X n_dims
 
   bool normalized_basis_functions_;
   bool lines_pivot_at_max_activation_;

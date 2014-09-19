@@ -45,15 +45,51 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const MatrixXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
+ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
+:
+  centers_(centers),
+  widths_(widths),
+  slopes_(MatrixXd::Zero(centers.rows(),centers.cols())), 
+  offsets_(weights),
+  priors_(VectorXd::Ones(centers.rows(),centers.cols())), 
+  normalized_basis_functions_(normalized_basis_functions),
+  lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
+  slopes_as_angles_(false)
+{
+  checkDimensions();
+};
+
+
+ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
 :
   centers_(centers),
   widths_(widths),
   slopes_(slopes), 
   offsets_(offsets),
+  priors_(VectorXd::Ones(centers.rows(),centers.cols())), 
   normalized_basis_functions_(normalized_basis_functions),
   lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
   slopes_as_angles_(false)
+{
+  checkDimensions();
+};
+
+ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, const VectorXd& priors, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
+:
+  centers_(centers),
+  widths_(widths),
+  slopes_(slopes), 
+  offsets_(offsets),
+  priors_(priors),
+  normalized_basis_functions_(normalized_basis_functions),
+  lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
+  slopes_as_angles_(false)
+{
+  checkDimensions();
+};
+
+
+void ModelParametersUnified::checkDimensions(void)
 {
 #ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_basis_functions = centers.rows();
@@ -65,14 +101,18 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
   assert(n_dims           ==slopes_.cols());
   assert(n_basis_functions==offsets_.rows());
   assert(1                ==offsets_.cols());
+  assert(n_basis_functions==priors_.rows());
+  assert(1                ==priors_.cols());
   
   all_values_vector_size_ = 0;
   all_values_vector_size_ += centers_.rows()*centers_.cols();
   all_values_vector_size_ += widths_.rows() *widths_.cols();
   all_values_vector_size_ += offsets_.rows()*offsets_.cols();
-  all_values_vector_size_ += slopes_.rows() *slopes_.cols();
+  all_values_vector_size_ += slopes_.rows() *slopes_.cols();  
+  all_values_vector_size_ += priors_.rows() *priors_.cols();  
+}
 
-};
+
 
 ModelParameters* ModelParametersUnified::clone(void) const {
   return new ModelParametersUnified(centers_,widths_,slopes_,offsets_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
@@ -321,6 +361,7 @@ void ModelParametersUnified::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(widths_);
   ar & BOOST_SERIALIZATION_NVP(slopes_);
   ar & BOOST_SERIALIZATION_NVP(offsets_);
+  ar & BOOST_SERIALIZATION_NVP(priors_);
   ar & BOOST_SERIALIZATION_NVP(normalized_basis_functions_);
   ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
   ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
@@ -340,6 +381,7 @@ void ModelParametersUnified::getSelectableParameters(set<string>& selected_value
   selected_values_labels.insert("widths");
   selected_values_labels.insert("offsets");
   selected_values_labels.insert("slopes");
+  selected_values_labels.insert("priors");
 }
 
 

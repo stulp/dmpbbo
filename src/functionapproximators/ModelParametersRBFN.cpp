@@ -323,11 +323,9 @@ void ModelParametersRBFN::setParameterVectorModifierPrivate(std::string modifier
 ModelParametersUnified* ModelParametersRBFN::toModelParametersUnified(void) const
 {
   cout << "ModelParametersRBFN::toModelParametersUnified" << endl;
-  // RBFN uses degenerate line models, i.e. with zero slopes
-  MatrixXd slopes = MatrixXd::Zero(centers_.rows(),centers_.cols());
   // RBFN does not use normalized basis functions
   bool normalized_basis_functions = false;
-  return new ModelParametersUnified(centers_, widths_, slopes, weights_,normalized_basis_functions); 
+  return new ModelParametersUnified(centers_, widths_, weights_,normalized_basis_functions); 
   
 }
 

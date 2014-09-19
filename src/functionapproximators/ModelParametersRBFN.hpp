@@ -137,12 +137,6 @@ private:
    */
   ModelParametersRBFN(void) {};
 
-  /** 
-   * Convert these LWPR model parameters to unified model parameters.
-   * \return model_parameters_lwr Unified model parameter representation
-   * \remarks Currently only works if input and output dimensionality are 1
-   * \todo Convert for input dim >1
-   */
   ModelParametersUnified* toModelParametersUnified(void) const;
   
   /** Give boost serialization access to private members. */  

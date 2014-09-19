@@ -74,6 +74,10 @@ public:
    */
   virtual int getExpectedInputDim(void) const  = 0;
   
+  /** 
+   * Convert these model parameters to unified model parameters.
+   * \return Unified model parameter representation (NULL if not implemented for a particular subclass)
+   */
   virtual ModelParametersUnified* toModelParametersUnified(void) const
   {
     return NULL;

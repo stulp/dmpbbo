@@ -128,6 +128,8 @@ public:
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
+  ModelParametersUnified* toModelParametersUnified(void) const;
+  
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
