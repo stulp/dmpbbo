@@ -33,6 +33,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRBFN);
 
 #include "functionapproximators/ModelParametersRBFN.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -91,7 +92,10 @@ void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& tar
   MatrixXd centers, widths, activations;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
 
-  ModelParametersRBFN::kernelActivations(centers,widths,inputs,activations);
+  bool normalized_basis_functions=false;  
+  bool asymmetric_kernels=false;  
+  BasisFunction::Gaussian::activations(centers,widths,inputs,activations,
+    normalized_basis_functions,asymmetric_kernels);
   
   // The design matrix
   MatrixXd X = activations;

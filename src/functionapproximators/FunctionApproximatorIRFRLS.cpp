@@ -128,11 +128,11 @@ void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output
     return;
   }
   
-  const ModelParametersIRFRLS* model_parameters_irfrls = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
+  const ModelParametersIRFRLS* model = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
 
   MatrixXd proj_inputs;
-  proj(input, model_parameters_irfrls->cosines_periodes_, model_parameters_irfrls->cosines_phase_, proj_inputs);
-  output = proj_inputs * model_parameters_irfrls->linear_models_;
+  proj(input, model->cosines_periodes_, model->cosines_phase_, proj_inputs);
+  output = proj_inputs * model->weights_;
 }
 
 /** Cosinus function. Used to select correct overload version of cos in FunctionApproximatorIRFRLS::proj

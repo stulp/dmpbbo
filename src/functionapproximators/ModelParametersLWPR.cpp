@@ -288,10 +288,11 @@ ModelParametersUnified* ModelParametersLWPR::toModelParametersUnified(void) cons
   //cout << "  slopes=" << slopes.transpose() << endl;
 
   //bool asymmetric_kernels=false;
+  bool normalized_basis_functions=true;
   bool lines_pivot_at_max_activation=true;
 
   return new ModelParametersUnified(centers,widths,slopes,offsets,
-                                           lines_pivot_at_max_activation);
+                                    normalized_basis_functions, lines_pivot_at_max_activation);
 }
 
 bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const

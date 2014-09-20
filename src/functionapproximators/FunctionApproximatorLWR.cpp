@@ -33,6 +33,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorLWR);
 
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
+#include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -114,8 +115,9 @@ void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targ
   
   MatrixXd centers, widths, activations;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
+  bool normalize_activations = true; 
   bool asym_kernels = meta_parameters_lwr->asymmetric_kernels(); 
-  ModelParametersLWR::normalizedKernelActivations(centers,widths,inputs,activations,asym_kernels);
+  BasisFunction::Gaussian::activations(centers,widths,inputs,activations,normalize_activations,asym_kernels);
   
   // Make the design matrix
   MatrixXd X = MatrixXd::Ones(inputs.rows(),inputs.cols()+1);

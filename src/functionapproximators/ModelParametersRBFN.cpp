@@ -35,6 +35,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRBFN);
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
+#include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/ModelParametersUnified.hpp"
 
 #include <iostream>
@@ -94,7 +95,10 @@ void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen
   }
 
   // Cache could not be used, actually do the work
-  kernelActivations(centers_,widths_,inputs,kernel_activations);
+  bool normalized_basis_functions=false;  
+  bool asymmetric_kernels=false;
+  BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
+    normalized_basis_functions,asymmetric_kernels);
 
   if (caching_)
   {
@@ -122,53 +126,6 @@ void ModelParametersRBFN::weightedBasisFunctions(const MatrixXd& inputs, MatrixX
   // Sum over weighed basis functions
   output = activations.rowwise().sum();
     
-}
-
-void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations)
-{
-  bool asymmetric_kernels=false;
-  
-  // Check and set sizes
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  int n_dims            = centers.cols();
-  assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
-  assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
-  kernel_activations.resize(n_samples,n_basis_functions);  
-
-  double c,w,x;
-  for (int bb=0; bb<n_basis_functions; bb++)
-  {
-
-    // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
-    //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-    // Because Sigma is diagonal in our case, this simplifies to
-    //   activation = exp(\sum_d=1^D [-0.5*(x_d-mu_d)^2/Sigma_(d,d)]) 
-    //              = \prod_d=1^D exp(-0.5*(x_d-mu_d)^2/Sigma_(d,d)) 
-    // This last product is what we compute below incrementally
-    
-    kernel_activations.col(bb).fill(1.0);
-    for (int i_dim=0; i_dim<n_dims; i_dim++)
-    {
-      c = centers(bb,i_dim);
-      for (int i_s=0; i_s<n_samples; i_s++)
-      {
-        x = inputs(i_s,i_dim);
-        w = widths(bb,i_dim);
-        
-        if (asymmetric_kernels && x<c && bb>0)
-          // Get the width of the previous basis function
-          // This is the part that makes it assymetric
-          w = widths(bb-1,i_dim);
-          
-        kernel_activations(i_s,bb) *= exp(-0.5*pow(x-c,2)/(w*w));
-      }
-    }
-  }
 }
 
 template<class Archive>

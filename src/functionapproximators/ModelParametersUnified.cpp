@@ -31,6 +31,8 @@
 
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersUnified);
 
+#include "functionapproximators/BasisFunction.hpp"
+
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -346,77 +348,13 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
   }
 
   // Cache could not be used, actually do the work
-  kernelActivations(centers_,covars_,priors_,inputs,kernel_activations,normalized_basis_functions_);
+  BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,kernel_activations,normalized_basis_functions_);
 
   if (caching_)
   {
     // Cache the current results now.  
     inputs_cached_ = inputs;
     kernel_activations_cached_ = kernel_activations;
-  }
-  
-}
-
-void ModelParametersUnified::kernelActivations(const vector<VectorXd>& centers, const vector<MatrixXd>& widths, vector<double> priors, const MatrixXd& inputs, MatrixXd& kernel_activations, bool normalized_basis_functions)
-{
-
-  unsigned int n_basis_functions = centers.size();
-  int n_samples         = inputs.rows();
-
-  assert(n_basis_functions>0); 
-  assert(n_basis_functions==widths.size());
-#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
-  int n_dims = centers[0].size();
-#endif  
-  assert(n_dims==widths[0].cols());
-  assert(n_dims==widths[0].rows());
-  assert(n_dims==inputs.cols());
-
-  kernel_activations.resize(n_samples,n_basis_functions);  
-
-  if (normalized_basis_functions && n_basis_functions==1)
-  {
-    // Locally Weighted Regression with only one basis function is pretty odd.
-    // Essentially, you are taking the "Locally Weighted" part out of the regression, and it becomes
-    // standard least squares 
-    // Anyhow, for those that still want to "abuse" LWR as R (i.e. without LW), we explicitly
-    // set the normalized kernels to 1 here, to avoid numerical issues in the normalization below.
-    // (normalizing a Gaussian basis function with itself leads to 1 everywhere).
-    kernel_activations.fill(1.0);
-    return;
-  }  
-
-  VectorXd mu,diff,exp_term;
-  MatrixXd covar_inv;
-  double prior;
-  
-  for (unsigned int bb=0; bb<n_basis_functions; bb++)
-  {
-    mu = centers[bb];
-    covar_inv = widths[bb].inverse();
-    prior = priors[bb];
-    for (int tt=0; tt<n_samples; tt++)
-    {
-      // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
-      //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-      diff =  inputs.row(tt)-mu.transpose();
-      exp_term = -0.5*diff.transpose()*covar_inv*diff;
-      assert(exp_term.size()==1);
-      kernel_activations(tt,bb) = prior*exp(exp_term[0]);
-    }
-  }
-  
-  if (normalized_basis_functions)
-  {
-    // Compute sum for each row (each value in input_vector)
-    MatrixXd sum_kernel_activations = kernel_activations.rowwise().sum(); // n_samples x 1
-  
-    // Add small number to avoid division by zero. Not full-proof...  
-    if ((sum_kernel_activations.array()==0).any())
-      sum_kernel_activations.array() += sum_kernel_activations.maxCoeff()/100000.0;
-    
-    // Normalize for each row (each value in input_vector)  
-    kernel_activations = kernel_activations.array()/sum_kernel_activations.replicate(1,n_basis_functions).array();
   }
   
 }
@@ -643,7 +581,7 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   locallyWeightedLines(inputs, weighted_lines);
   
   MatrixXd activations;
-  kernelActivations(centers_,covars_,priors_,inputs,activations,normalized_basis_functions_);
+  BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,activations,normalized_basis_functions_);
 
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);

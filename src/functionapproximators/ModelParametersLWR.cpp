@@ -33,6 +33,9 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
 
+
+#include "functionapproximators/BasisFunction.hpp"
+
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -84,7 +87,9 @@ ModelParameters* ModelParametersLWR::clone(void) const {
 
 void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
-  kernelActivations(centers_,widths_,inputs,kernel_activations,asymmetric_kernels_);  
+  bool normalized_basis_functions=true;  
+  BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
+    normalized_basis_functions,asymmetric_kernels_);  
 }
 
 void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations) const
@@ -106,7 +111,8 @@ void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inpu
   }
 
   // Cache could not be used, actually do the work
-  normalizedKernelActivations(centers_,widths_,inputs,normalized_kernel_activations,asymmetric_kernels_);
+  bool normalize_activations = true;
+  BasisFunction::Gaussian::activations(centers_,widths_,inputs,normalized_kernel_activations,normalize_activations,asymmetric_kernels_);
 
   if (caching_)
   {
@@ -250,91 +256,6 @@ void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, con
   }
 }
 */
-
-void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool asymmetric_kernels)
-{
-  
-  // Check and set sizes
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  int n_dims            = centers.cols();
-  assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
-  assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
-  kernel_activations.resize(n_samples,n_basis_functions);  
-
-  double c,w,x;
-  for (int bb=0; bb<n_basis_functions; bb++)
-  {
-
-    // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
-    //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
-    // Because Sigma is diagonal in our case, this simplifies to
-    //   activation = exp(\sum_d=1^D [-0.5*(x_d-mu_d)^2/Sigma_(d,d)]) 
-    //              = \prod_d=1^D exp(-0.5*(x_d-mu_d)^2/Sigma_(d,d)) 
-    // This last product is what we compute below incrementally
-    
-    kernel_activations.col(bb).fill(1.0);
-    for (int i_dim=0; i_dim<n_dims; i_dim++)
-    {
-      c = centers(bb,i_dim);
-      for (int i_s=0; i_s<n_samples; i_s++)
-      {
-        x = inputs(i_s,i_dim);
-        w = widths(bb,i_dim);
-        
-        if (asymmetric_kernels && x<c && bb>0)
-          // Get the width of the previous basis function
-          // This is the part that makes it assymetric
-          w = widths(bb-1,i_dim);
-          
-        kernel_activations(i_s,bb) *= exp(-0.5*pow(x-c,2)/(w*w));
-      }
-    }
-  }
-}
-
-void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations, bool asymmetric_kernels)
-{
-
-  // centers     = n_basis_functions x n_dim
-  // widths      = n_basis_functions x n_dim
-  // inputs      = n_samples         x n_dim
-  // activations = n_samples         x n_basis_functions
-  int n_basis_functions = centers.rows();
-  int n_samples         = inputs.rows();
-  normalized_kernel_activations.resize(n_samples,n_basis_functions);  
-  
-  if (n_basis_functions==1)
-  {
-    // Locally Weighted Regression with only one basis function is pretty odd.
-    // Essentially, you are taking the "Locally Weighted" part out of the regression, and it becomes
-    // standard least squares 
-    // Anyhow, for those that still want to "abuse" LWR as R (i.e. without LW), we explicitly
-    // set the normalized kernels to 1 here, to avoid numerical issues in the normalization below.
-    // (normalizing a Gaussian basis function with itself leads to 1 everywhere).
-    normalized_kernel_activations.fill(1.0);
-    return;
-  }  
-
-  // Get activations of kernels
-  // Note that these are not normalized yet, even though they are called
-  // 'normalized_kernel_activations'. This is just to save allocating extra memory.
-  kernelActivations(centers,widths,inputs,normalized_kernel_activations,asymmetric_kernels);
-  
-  // Compute sum for each row (each value in input_vector)
-  MatrixXd sum_kernel_activations = normalized_kernel_activations.rowwise().sum(); // n_samples x 1
-
-  // Add small number to avoid division by zero. Not full-proof...  
-  if ((sum_kernel_activations.array()==0).any())
-    sum_kernel_activations.array() += sum_kernel_activations.maxCoeff()/100000.0;
-  
-  // Normalize for each row (each value in input_vector)  
-  normalized_kernel_activations = normalized_kernel_activations.array()/sum_kernel_activations.replicate(1,n_basis_functions).array();
-}
 
 template<class Archive>
 void ModelParametersLWR::serialize(Archive & ar, const unsigned int version)

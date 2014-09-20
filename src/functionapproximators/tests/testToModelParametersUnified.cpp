@@ -115,6 +115,7 @@ int main(int n_args, char** args)
       fa->train(inputs,targets,directory_fa,overwrite);
       fa->predict(inputs,outputs);
       
+      cout << "    Converting to ModelParametersUnified"  << endl;
       ModelParametersUnified* mp_unified =  fa->getModelParametersUnified();
       if (mp_unified!=NULL)
       {

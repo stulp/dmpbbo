@@ -26,7 +26,7 @@ if __name__=='__main__':
         print ""
         sys.exit(-1);
     
-    function_approximator_names = ["RBFN","LWR","GPR","GMR"]
+    function_approximator_names = ["RBFN","LWR","GPR","GMR","LWPR","IRFRLS"]
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"
@@ -43,7 +43,6 @@ if __name__=='__main__':
         subplot_number = 1;
         for uni_name in ['','Unified']:
             directory_fa = directory +"/"+ name + "1D" + uni_name
-            print(directory_fa)
             if (getDataDimFromDirectory(directory_fa)==1):
                 ax = fig.add_subplot(120+subplot_number)
             else:

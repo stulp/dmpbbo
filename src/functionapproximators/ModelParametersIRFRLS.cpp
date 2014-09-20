@@ -43,28 +43,28 @@ using namespace std;
 
 namespace DmpBbo {
 
-ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::MatrixXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
+ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::VectorXd weights, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
 :
-  linear_models_(linear_models),
+  weights_(weights),
   cosines_periodes_(cosines_periodes),
   cosines_phase_(cosines_phase)
 {
 
   assert(cosines_phase.size() == cosines_periodes.rows());
-  assert(linear_models.rows() == cosines_periodes.rows());
+  assert(weights.rows() == cosines_periodes.rows());
 
   nb_in_dim_ = cosines_periodes.cols();
-  // int nb_output_dim = linear_models.cols();
+  // int nb_output_dim = weights.cols();
   
   all_values_vector_size_ = 0;
-  all_values_vector_size_ += linear_models_.rows() * linear_models_.cols();
+  all_values_vector_size_ += weights_.rows() * weights_.cols();
   all_values_vector_size_ += cosines_phase_.size();
   all_values_vector_size_ += cosines_periodes_.rows() * cosines_periodes_.cols();
 };
 
 ModelParameters* ModelParametersIRFRLS::clone(void) const 
 {
-  return new ModelParametersIRFRLS(linear_models_, cosines_periodes_, cosines_phase_); 
+  return new ModelParametersIRFRLS(weights_, cosines_periodes_, cosines_phase_); 
 }
 
 int ModelParametersIRFRLS::getExpectedInputDim(void) const  
@@ -78,7 +78,7 @@ void ModelParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
 
-  ar & BOOST_SERIALIZATION_NVP(linear_models_);
+  ar & BOOST_SERIALIZATION_NVP(weights_);
   ar & BOOST_SERIALIZATION_NVP(cosines_periodes_);
   ar & BOOST_SERIALIZATION_NVP(cosines_phase_);
   ar & BOOST_SERIALIZATION_NVP(nb_in_dim_);
@@ -107,7 +107,7 @@ void ModelParametersIRFRLS::getParameterVectorMask(const std::set<std::string> s
   int offset = 0;
   int size;
   
-  size = linear_models_.rows() * linear_models_.cols();
+  size = weights_.rows() * weights_.cols();
   if (selected_values_labels.find("linear_model")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(1);
   offset += size;
@@ -130,10 +130,10 @@ void ModelParametersIRFRLS::getParameterVectorAll(VectorXd& values) const
   values.resize(getParameterVectorAllSize());
   int offset = 0;
   
-  for (int c = 0; c < linear_models_.cols(); c++)
+  for (int c = 0; c < weights_.cols(); c++)
   {
-    values.segment(offset, linear_models_.rows()) = linear_models_.col(c);
-    offset += linear_models_.rows();
+    values.segment(offset, weights_.rows()) = weights_.col(c);
+    offset += weights_.rows();
   }
 
   values.segment(offset, cosines_phase_.size()) = cosines_phase_;
@@ -158,10 +158,10 @@ void ModelParametersIRFRLS::setParameterVectorAll(const VectorXd& values)
   }
   
   int offset = 0;
-  for (int c = 0; c < linear_models_.cols(); c++)
+  for (int c = 0; c < weights_.cols(); c++)
   {
-    linear_models_.col(c) = values.segment(offset, linear_models_.rows());
-    offset += linear_models_.rows();
+    weights_.col(c) = values.segment(offset, weights_.rows());
+    offset += weights_.rows();
   }
   
   cosines_phase_ = values.segment(offset, cosines_phase_.size());

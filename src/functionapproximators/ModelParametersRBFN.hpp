@@ -61,13 +61,6 @@ public:
     return centers_.cols();
   };
   
-  /** Get the kernel activations for given centers, widths and inputs
-   * \param[in] centers The center of the basis function (size: n_basis_functions X n_dims)
-   * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims)
-   * \param[in] inputs The input data (size: n_samples X n_dims)
-   * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
-   */
-  static void kernelActivations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations);
   
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)

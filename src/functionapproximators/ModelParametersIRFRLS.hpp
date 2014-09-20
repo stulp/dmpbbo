@@ -44,7 +44,7 @@ public:
    *  \param[in] cosines_periodes Matrix of periode for each cosine for each input dimension (nb_cos x nb_in_dim). 
    *  \param[in] cosines_phase Vector of periode (nb_cos).
    */
-  ModelParametersIRFRLS(Eigen::MatrixXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase);
+  ModelParametersIRFRLS(Eigen::VectorXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase);
 	
 	int getExpectedInputDim(void) const;
 	
@@ -71,7 +71,7 @@ protected:
   
 private:
   
-  Eigen::MatrixXd linear_models_;
+  Eigen::VectorXd weights_;
   Eigen::MatrixXd cosines_periodes_;
   Eigen::VectorXd cosines_phase_;
 

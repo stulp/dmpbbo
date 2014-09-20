@@ -90,16 +90,6 @@ public:
       return 0;
   };
   
-  /** Get the kernel activations for given centers, widths and inputs
-   * \param[in] centers The center of the basis function (size: n_basis_functions X n_dims)
-   * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims X n_dims)
-   * \param[in] inputs The input data (size: n_samples X n_dims)
-   * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
-   * \param[in] normalized_basis_functions Whether to normalize the basis functions
-   */
-  static void kernelActivations(const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& widths, std::vector<double> priors, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions=false);
-  	
-  
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
@@ -159,6 +149,7 @@ private:
   std::vector<double> offsets_;          // n_centers X 1
   std::vector<double> priors_;           // n_centers X 1
 
+  bool cosine_basis_functions_;
   bool normalized_basis_functions_;
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
