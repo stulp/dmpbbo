@@ -61,10 +61,7 @@ public:
     return all_values_vector_size_;
   }
 
-  ModelParametersUnified* toModelParametersUnified(void) const
-  {
-    return NULL;
-  }
+  ModelParametersUnified* toModelParametersUnified(void) const;
   
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

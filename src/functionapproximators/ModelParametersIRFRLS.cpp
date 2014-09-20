@@ -34,6 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersIRFRLS);
 
 #include <iostream>
 
+#include "functionapproximators/ModelParametersUnified.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
@@ -176,4 +177,12 @@ void ModelParametersIRFRLS::setParameterVectorAll(const VectorXd& values)
   assert(offset == getParameterVectorAllSize());   
 };
 
+ModelParametersUnified* ModelParametersIRFRLS::toModelParametersUnified(void) const
+{
+  return NULL;
+  //return new ModelParametersUnified(cosines_periodes_, cosines_phase_, weights_); 
 }
+
+}
+
+
