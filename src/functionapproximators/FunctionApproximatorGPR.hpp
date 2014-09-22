@@ -71,15 +71,7 @@ public:
     return std::string("GPR");  
   };
   
-  /** Covariance function, or kernel, for the Gaussian process. Implements an isotropic Gaussian function. 
-   * \param[in] input1 First input vector
-   * \param[in] input2 Second input vector
-   * \param[in] maximum_covariance Maximum possible covariance
-   * \param[in] length Lenght parameter of the isotropic Gaussian function  
-   * \return Covariance between input1 and input2
-   */
-  static double covarianceFunction(const Eigen::VectorXd& input1, const   Eigen::VectorXd& input2, double maximum_covariance, double length);
-
+private:
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

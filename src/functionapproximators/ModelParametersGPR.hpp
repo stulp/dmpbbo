@@ -68,6 +68,8 @@ public:
     return 0;
   }
   
+  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+
   ModelParametersUnified* toModelParametersUnified(void) const;
   
   const Eigen::MatrixXd& train_inputs(void) const { return train_inputs_; };

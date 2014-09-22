@@ -1,6 +1,10 @@
 ________________________________________________________________________________
 rename ModelParametersUnified to UnifiedModel (keep evaluate)
 
+BasisFunction::Gaussian::activations(centers,LENGTH,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
+
+covar_diag for non-isotropic GPR
+
 ________________________________________________________________________________
 Put basis function caching in ModelParameters base class
 

@@ -34,6 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
 #include "functionapproximators/ModelParametersUnified.hpp"
 
+#include "functionapproximators/BasisFunction.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -72,6 +73,19 @@ ModelParametersGPR::ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::Vect
 
 ModelParameters* ModelParametersGPR::clone(void) const {
   return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,length_); 
+}
+
+void ModelParametersGPR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+{
+  
+  MatrixXd centers = train_inputs_;
+  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length_);
+
+  bool normalize_activations = false;
+  bool asymmetric_kernels = false;
+  BasisFunction::Gaussian::activations(centers,widths,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
+  
+  kernel_activations *= maximum_covariance_;
 }
 
 template<class Archive>

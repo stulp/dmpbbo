@@ -33,6 +33,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGPR);
 
 #include "functionapproximators/ModelParametersGPR.hpp"
 #include "functionapproximators/MetaParametersGPR.hpp"
+#include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -69,15 +70,6 @@ FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
     );
 };
 
-
-
-double FunctionApproximatorGPR::covarianceFunction(const VectorXd& input1, const VectorXd& input2, double maximum_covariance, double length) {
-  double norm_2 = (input1-input2).squaredNorm();
-  return maximum_covariance*exp(-0.5*norm_2/(length*length)); 
-}
-
-
-
 void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targets)
 {
   if (isTrained())  
@@ -96,14 +88,19 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
   double max_covar = meta_parameters_gpr->maximum_covariance();
   double length = meta_parameters_gpr->length();
   
+  
+  // Compute the gram matrix
+  // In a gram matrix, every input point is itself a center
+  MatrixXd centers = inputs;
+  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length);
+
   MatrixXd gram(inputs.rows(),inputs.rows());
-  for (int ii=0; ii<inputs.rows(); ii++)
-  {
-    for (int jj=0; jj<inputs.rows(); jj++)
-    {
-      gram(ii,jj) = covarianceFunction(inputs.row(ii),inputs.row(jj),max_covar,length);
-    }
-  }
+  bool normalize_activations = false;
+  bool asymmetric_kernels = false;
+  BasisFunction::Gaussian::activations(centers,widths,inputs,gram,normalize_activations,asymmetric_kernels);
+  
+  gram *= max_covar;
+
   setModelParameters(new ModelParametersGPR(inputs,targets,gram,max_covar,length));
   
 }
@@ -118,25 +115,17 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 
   const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
   
-  MatrixXd train_inputs = model_parameters_gpr->train_inputs();
-  double maximum_covariance = model_parameters_gpr->maximum_covariance();
-  double length = model_parameters_gpr->length();
-  VectorXd weights = model_parameters_gpr->weights();
-  
   assert(inputs.cols()==getExpectedInputDim());
   unsigned int n_samples = inputs.rows();
-  unsigned int n_samples_train = train_inputs.rows();
   
   outputs.resize(n_samples,1);
   
-  RowVectorXd k(n_samples_train);
+  MatrixXd ks;
+  model_parameters_gpr->kernelActivations(inputs, ks);
+  
+  VectorXd weights = model_parameters_gpr->weights();
   for (unsigned int ii=0; ii<n_samples; ii++)
-  {
-    for (unsigned int jj=0; jj<n_samples_train; jj++)
-      k(jj) = covarianceFunction(inputs.row(ii),train_inputs.row(jj),maximum_covariance,length);
-
-    outputs(ii) = k*weights;
-  }
+    outputs(ii) = ks.row(ii).dot(weights);
   
 }
 
@@ -150,36 +139,27 @@ void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& 
 
   const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
   
-  MatrixXd train_inputs = model_parameters_gpr->train_inputs();
-  double maximum_covariance = model_parameters_gpr->maximum_covariance();
-  double length = model_parameters_gpr->length();
-  VectorXd weights = model_parameters_gpr->weights();
-  MatrixXd gram_inv = model_parameters_gpr->gram_inv();
   
   assert(inputs.cols()==getExpectedInputDim());
-  unsigned int n_samples = inputs.rows();
-  unsigned int n_samples_train = train_inputs.rows();
   
+  unsigned int n_samples = inputs.rows();
   variances.resize(n_samples,1);
   
-  VectorXd k(n_samples_train);
+  MatrixXd ks;
+  model_parameters_gpr->kernelActivations(inputs, ks);  
+
+  double maximum_covariance = model_parameters_gpr->maximum_covariance();
+  MatrixXd gram_inv = model_parameters_gpr->gram_inv();
+  
+  VectorXd rest;
   for (unsigned int ii=0; ii<n_samples; ii++)
   {
-    // Covariance with the input itself
-    double k_self =  FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),inputs.row(ii),maximum_covariance,length);
-    
-    // Covariance of input with all target inputs
-    for (unsigned int jj=0; jj<n_samples_train; jj++)
-      k(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs.row(jj),maximum_covariance,length);
-    
-    VectorXd rest = k.transpose()*gram_inv*k;
-    //cout << "k=" << k.rows() << " X " << k.cols() << endl;
-    //cout << "gram_inv_=" << gram_inv_.rows() << " X " << gram_inv_.cols() << endl;
-    //cout << "rest=" << rest.rows() << " X " << rest.cols() << endl;
+    rest = ks.row(ii)*gram_inv*ks.row(ii).transpose();
     assert(rest.rows()==1);
     assert(rest.cols()==1);
-    variances(ii) = k_self - rest(0);
+    variances(ii) = maximum_covariance - rest(0);
   }
+
 }
 
 template<class Archive>
