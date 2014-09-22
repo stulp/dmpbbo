@@ -74,6 +74,11 @@ int main(int n_args, char** args)
       if (fa_names[i_name].compare("GMR")==0)
         if (n_input_dims==2)
           continue;
+        
+      // GPR on 2D too slow
+      if (fa_names[i_name].compare("GPR")==0)
+        if (n_input_dims==2)
+          continue;
       
       FunctionApproximator* cur_fa = getFunctionApproximatorByName(fa_names[i_name],n_input_dims);
       if (cur_fa==NULL)
