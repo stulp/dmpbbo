@@ -119,12 +119,9 @@ int main(int n_args, char** args)
       ModelParametersUnified* mp_unified =  fa->getModelParametersUnified();
       if (mp_unified!=NULL)
       {
-        //cout << mp_unified->toString() << endl;
         mp_unified->saveGridData(min, max, n_samples_per_dim_dense, directory_fa+"Unified",overwrite);
       
-        const ModelParameters* mp =  fa->getModelParameters();
-        //cout << mp_unified->toString() << endl;
-        mp->saveGridData(min, max, n_samples_per_dim_dense, directory_fa,overwrite);
+        fa->saveGridData(min, max, n_samples_per_dim_dense, directory_fa,overwrite);
       
         saveMatrix(directory_fa+"Unified","inputs.txt",inputs,overwrite);
         saveMatrix(directory_fa+"Unified","targets.txt",targets,overwrite);

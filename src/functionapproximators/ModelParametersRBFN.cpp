@@ -32,7 +32,6 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRBFN);
 
-#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "functionapproximators/BasisFunction.hpp"
@@ -107,25 +106,6 @@ void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen
     kernel_activations_cached_ = kernel_activations;
   }
   
-}
-
-void ModelParametersRBFN::weightedBasisFunctions(const MatrixXd& inputs, MatrixXd& output) const
-{  
-  output.resize(inputs.rows(),1); // Fix this
-  // Assert that memory has been pre-allocated.
-  assert(inputs.rows()==output.rows());
-  
-  // Get the basis function activations  
-  MatrixXd activations; // todo avoid allocation
-  kernelActivations(inputs,activations);
-    
-  // Weight the basis function activations  
-  for (int b=0; b<activations.cols(); b++)
-    activations.col(b).array() *= weights_(b);
-
-  // Sum over weighed basis functions
-  output = activations.rowwise().sum();
-    
 }
 
 template<class Archive>
@@ -223,7 +203,7 @@ void ModelParametersRBFN::setParameterVectorAll(const VectorXd& values) {
   int n_dims = centers_.cols();
   for (int i_dim=0; i_dim<n_dims; i_dim++)
   {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
+    // If the centers change, the cache for kernelActivations() must be cleared,
     // because this function will return different values for different centers
     if ( !(centers_.col(i_dim).array() == values.segment(offset,size).array()).all() )
       clearCache();
@@ -233,7 +213,7 @@ void ModelParametersRBFN::setParameterVectorAll(const VectorXd& values) {
   }
   for (int i_dim=0; i_dim<n_dims; i_dim++)
   {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
+    // If the centers change, the cache for kernelActivations() must be cleared,
     // because this function will return different values for different centers
     if ( !(widths_.col(i_dim).array() == values.segment(offset,size).array()).all() )
       clearCache();
@@ -248,30 +228,6 @@ void ModelParametersRBFN::setParameterVectorAll(const VectorXd& values) {
 
   assert(offset == getParameterVectorAllSize());   
 };
-
-bool ModelParametersRBFN::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  MatrixXd inputs;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-      
-  MatrixXd activations;
-  kernelActivations(inputs, activations);
-    
-  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"activations.txt",activations,overwrite);
-
-  // Weight the basis function activations  
-  for (int b=0; b<activations.cols(); b++)
-    activations.col(b).array() *= weights_(b);
-  saveMatrix(save_directory,"activations_weighted.txt",activations,overwrite);
-  
-  return true;
-  
-}
 
 void ModelParametersRBFN::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
 {

@@ -109,7 +109,7 @@ public:
    * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
    *
    */
-  void locallyWeightedLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
+  void evaluate(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   

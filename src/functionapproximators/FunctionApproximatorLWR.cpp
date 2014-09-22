@@ -35,6 +35,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorLWR);
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
+#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
@@ -247,8 +248,46 @@ void FunctionApproximatorLWR::predict(const MatrixXd& inputs, MatrixXd& output)
   // There, ~30 lines of comment for one line of code ;-) 
   //                                            (mostly for me to remember why it is like this) 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
+
+  MatrixXd lines;
+  model_parameters_lwr->getLines(inputs, lines);
+
+  // Weight the values for each line with the normalized basis function activations  
+  MatrixXd activations;
+  model_parameters_lwr->kernelActivations(inputs,activations);
   
-  model_parameters_lwr->locallyWeightedLines(inputs, output);
+  output = (lines.array()*activations.array()).rowwise().sum();
+  
+}
+
+bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  if (save_directory.empty())
+    return true;
+  
+  MatrixXd inputs;
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+
+  const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
+  
+  MatrixXd lines;
+  model_parameters_lwr->getLines(inputs, lines);
+  
+  MatrixXd unnormalized_activations;
+  model_parameters_lwr->unnormalizedKernelActivations(inputs, unnormalized_activations);
+
+  MatrixXd activations;
+  model_parameters_lwr->kernelActivations(inputs, activations);
+
+  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
+  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
+  saveMatrix(save_directory,"lines.txt",lines,overwrite);
+  saveMatrix(save_directory,"activations.txt",unnormalized_activations,overwrite);
+  saveMatrix(save_directory,"activations_normalized.txt",activations,overwrite);
+
+  
+  return true;
+  
 }
 
 template<class Archive>

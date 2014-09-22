@@ -25,6 +25,7 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 #include "functionapproximators/MetaParameters.hpp"
+#include "functionapproximators/ModelParametersUnified.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -258,6 +259,23 @@ void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const 
   }
 }
 
+bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  if (save_directory.empty())
+    return true;
+  
+  //MatrixXd inputs;
+  //FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+
+  if (model_parameters_==NULL)
+    return false;
+  ModelParametersUnified* mp_unified = model_parameters_->toModelParametersUnified();
+  if (mp_unified==NULL)
+    return false;
+
+  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
+  
+}
 
 void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite)
 {
@@ -298,7 +316,7 @@ void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::Mat
       saveMatrix(save_directory,"variances_grid.txt",variances_grid,overwrite);
     }
     
-    model_parameters_->saveGridData(min, max, n_samples_per_dim_vec, save_directory, overwrite);
+    saveGridData(min, max, n_samples_per_dim_vec, save_directory, overwrite);
     
   }
 

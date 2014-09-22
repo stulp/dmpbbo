@@ -1,6 +1,10 @@
 ________________________________________________________________________________
-IRFRLS
-  Make conversion to ModelParametersUnified
+rename ModelParametersUnified to UnifiedModel (keep evaluate)
+
+________________________________________________________________________________
+Put basis function caching in ModelParameters base class
+
+Python should plot unnormalizedactionvations/actionvations
 ________________________________________________________________________________
 Gaussian Mixture Regression
   plot covariance matrices in Python

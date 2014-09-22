@@ -60,30 +60,23 @@ public:
     return centers_.cols();
   };
     	
-  /** Get the kernel activations for given inputs
+  /** Get the unnormalized kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    */
-  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void unnormalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
 
   /** Get the normalized kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
-   * \param[out] normalized_kernel_activations The normalized kernel activations, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
+   * \param[out] kernel_activations The normalized kernel activations, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
    */
-  void normalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations) const;
+  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
   
   /** Get the output of each linear model (unweighted) for the given inputs.
    * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
    * \param[out] lines The output of the linear models (size: n_samples X n_output_dim) 
    */
   void getLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& lines) const;
-  
-  /** Compute the sum of the locally weighted lines. 
-   * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
-   * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
-   *
-   */
-  void locallyWeightedLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   
@@ -108,8 +101,6 @@ public:
     return all_values_vector_size_;
   }
   
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
-
   ModelParametersUnified* toModelParametersUnified(void) const;
   
 protected:
@@ -143,12 +134,12 @@ public:
 private:
   
   mutable Eigen::MatrixXd inputs_cached_;
-  mutable Eigen::MatrixXd normalized_kernel_activations_cached_;
+  mutable Eigen::MatrixXd kernel_activations_cached_;
   bool caching_;
   inline void clearCache(void) 
   {
     inputs_cached_.resize(0,0);
-    normalized_kernel_activations_cached_.resize(0,0);
+    kernel_activations_cached_.resize(0,0);
   }
   
   /**

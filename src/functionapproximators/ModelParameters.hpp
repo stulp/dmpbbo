@@ -81,22 +81,6 @@ public:
   virtual ModelParametersUnified* toModelParametersUnified(void) const = 0;
   
 public:
-  /** Generate a grid of inputs, and output the response of the basis functions and line segments
-   * for these inputs.
-   * This function is not pure virtual, because this might not make sense for every model parameters
-   * class.
-   *
-   * \param[in] min Minimum values for the grid (one for each dimension)
-   * \param[in] max Maximum values for the grid (one for each dimension)
-   * \param[in] n_samples_per_dim Number of samples in the grid along each dimension
-   * \param[in] directory Directory to which to save the results to.
-   * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
-   * \return Whether saving the data was successful.
-   */
-	virtual bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const
-  {
-    return true;
-  };
   
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;

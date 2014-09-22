@@ -295,45 +295,6 @@ ModelParametersUnified* ModelParametersLWPR::toModelParametersUnified(void) cons
                                     normalized_basis_functions, lines_pivot_at_max_activation);
 }
 
-bool ModelParametersLWPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  
-  ModelParametersUnified* mp_unified = toModelParametersUnified();
-  if (mp_unified==NULL)
-    return false;
-
-  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
-}
-
-
-/*
-ModelParametersLWPR* ModelParametersLWPR::deserialize(istream& input_stream)
-{
-  bool remove_white_space = true;
-  string json_string = getJSONString(input_stream,remove_white_space);
-  
-  if (json_string.empty())
-    return NULL;
-  
-  string lwpr_object_xml_string;
-  
-  lwpr_object_xml_string = getJSONValue(json_string,"lwpr_object_xml_string");
-  
-  // We now have the LWPR object as an XML string.
-  // Save this XML string to a temporary file, and call the LWPR_Object constructor with 
-  // the filename. This constructs the LWPR_Object from the XML.
-  
-  string filename("/tmp/lpwrfile_deserialize.xml");
-  ofstream temp(filename);
-  temp << lwpr_object_xml_string;
-        
-  LWPR_Object* lwpr_object = new LWPR_Object(filename.c_str());
-  return new ModelParametersLWPR(lwpr_object);
-
-  return NULL;
-}
-*/
-
 template<class Archive>
 void ModelParametersLWPR::serialize(Archive & ar, const unsigned int version)
 {

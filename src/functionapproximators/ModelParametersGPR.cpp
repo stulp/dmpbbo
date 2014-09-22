@@ -74,54 +74,6 @@ ModelParameters* ModelParametersGPR::clone(void) const {
   return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,length_); 
 }
 
-void ModelParametersGPR::predictMean(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) const
-{
-  assert(inputs.cols()==getExpectedInputDim());
-  unsigned int n_samples = inputs.rows();
-  unsigned int n_samples_train = train_inputs_.rows();
-  
-  outputs.resize(n_samples,1);
-  
-  RowVectorXd k(n_samples_train);
-  for (unsigned int ii=0; ii<n_samples; ii++)
-  {
-    for (unsigned int jj=0; jj<n_samples_train; jj++)
-      k(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
-
-    outputs(ii) = k*gram_inv_targets_;
-  }
-  
-}
-
-
-void ModelParametersGPR::predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variance) const
-{
-  assert(inputs.cols()==getExpectedInputDim());
-  unsigned int n_samples = inputs.rows();
-  unsigned int n_samples_train = train_inputs_.rows();
-  
-  variance.resize(n_samples,1);
-  
-  VectorXd k(n_samples_train);
-  for (unsigned int ii=0; ii<n_samples; ii++)
-  {
-    // Covariance with the input itself
-    double k_self =  FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),inputs.row(ii),maximum_covariance_,length_);
-    
-    // Covariance of input with all target inputs
-    for (unsigned int jj=0; jj<n_samples_train; jj++)
-      k(jj) = FunctionApproximatorGPR::covarianceFunction(inputs.row(ii),train_inputs_.row(jj),maximum_covariance_,length_);
-    
-    VectorXd rest = k.transpose()*gram_inv_*k;
-    //cout << "k=" << k.rows() << " X " << k.cols() << endl;
-    //cout << "gram_inv_=" << gram_inv_.rows() << " X " << gram_inv_.cols() << endl;
-    //cout << "rest=" << rest.rows() << " X " << rest.cols() << endl;
-    assert(rest.rows()==1);
-    assert(rest.cols()==1);
-    variance(ii) = k_self - rest(0);
-  }
-}
-
 template<class Archive>
 void ModelParametersGPR::serialize(Archive & ar, const unsigned int version)
 {
@@ -159,22 +111,6 @@ void ModelParametersGPR::getParameterVectorAll(VectorXd& values) const
 
 void ModelParametersGPR::setParameterVectorAll(const VectorXd& values) {
 };
-
-bool ModelParametersGPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  MatrixXd inputs;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-
-  ModelParametersUnified* mp_unified = toModelParametersUnified();
-  if (mp_unified==NULL)
-    return false;
-
-  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
-  
-}
 
 ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
 {

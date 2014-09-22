@@ -35,6 +35,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRBFN);
 #include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
+#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
@@ -115,9 +116,51 @@ void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
     return;
   }
 
-  const ModelParametersRBFN* model_parameters_lwr = static_cast<const ModelParametersRBFN*>(getModelParameters());
+  const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
   
-  model_parameters_lwr->weightedBasisFunctions(inputs, output);
+  output.resize(inputs.rows(),1); // Fix this
+  // Assert that memory has been pre-allocated.
+  assert(inputs.rows()==output.rows());
+  
+  // Get the basis function activations  
+  MatrixXd activations; // todo avoid allocation
+  model_parameters_rbfn->kernelActivations(inputs,activations);
+    
+  // Weight the basis function activations  
+  VectorXd weights = model_parameters_rbfn->weights();
+  for (int b=0; b<activations.cols(); b++)
+    activations.col(b).array() *= weights(b);
+
+  // Sum over weighed basis functions
+  output = activations.rowwise().sum();
+    
+}
+
+bool FunctionApproximatorRBFN::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  if (save_directory.empty())
+    return true;
+  
+  MatrixXd inputs;
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+      
+  const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
+  
+  MatrixXd activations;
+  model_parameters_rbfn->kernelActivations(inputs, activations);
+    
+  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
+  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
+  saveMatrix(save_directory,"activations.txt",activations,overwrite);
+
+  // Weight the basis function activations  
+  VectorXd weights = model_parameters_rbfn->weights();
+  for (int b=0; b<activations.cols(); b++)
+    activations.col(b).array() *= weights(b);
+  saveMatrix(save_directory,"activations_weighted.txt",activations,overwrite);
+  
+  return true;
+  
 }
 
 template<class Archive>

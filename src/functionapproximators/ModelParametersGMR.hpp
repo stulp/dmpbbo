@@ -73,9 +73,10 @@ public:
    */
   static bool saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, int iter=-1);
   
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+  /** \todo overwrite not functional yet. */
+  bool saveGMM(std::string directory, bool overwrite) const;
 
-	 ModelParametersUnified* toModelParametersUnified(void) const;
+  ModelParametersUnified* toModelParametersUnified(void) const;
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

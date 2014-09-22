@@ -289,7 +289,7 @@ void ModelParametersUnified::getLines(const MatrixXd& inputs, MatrixXd& lines) c
   //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 }
   
-void ModelParametersUnified::locallyWeightedLines(const MatrixXd& inputs, MatrixXd& output) const
+void ModelParametersUnified::evaluate(const MatrixXd& inputs, MatrixXd& output) const
 {
   
   MatrixXd lines;
@@ -602,7 +602,7 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   getLines(inputs, lines);
   
   MatrixXd weighted_lines;
-  locallyWeightedLines(inputs, weighted_lines);
+  evaluate(inputs, weighted_lines);
   
   MatrixXd activations;
   kernelActivations(inputs, activations);

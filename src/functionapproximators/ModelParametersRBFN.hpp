@@ -68,13 +68,6 @@ public:
    */
   void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
   
-  /** Compute the sum of weighted basis functions. 
-   * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
-   * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
-   *
-   */
-  void weightedBasisFunctions(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
-  
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
@@ -85,7 +78,7 @@ public:
     return all_values_vector_size_;
   }
   
-  bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+  const Eigen::VectorXd& weights(void) const { return weights_; }  
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
@@ -111,6 +104,8 @@ public:
 	  if (!caching_) clearCache();
 	}
 	
+  ModelParametersUnified* toModelParametersUnified(void) const;
+  
 private:
   
   mutable Eigen::MatrixXd inputs_cached_;
@@ -130,7 +125,6 @@ private:
    */
   ModelParametersRBFN(void) {};
 
-  ModelParametersUnified* toModelParametersUnified(void) const;
   
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;

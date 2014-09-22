@@ -68,23 +68,13 @@ public:
     return 0;
   }
   
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
-
-  /** Predict the mean outputs for these train_inputs. 
-   * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
-   * \param[out] output The mean of the output random variable (size: n_samples X n_output_dim) 
-   *
-   */
-  void predictMean(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
-
-  /** Predict the variance of the outputs for these train_inputs. 
-   * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
-   * \param[out] variance The variance of the output random variable (size: n_samples X n_output_dim) 
-   *
-   */
-  void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variance) const;
-  
   ModelParametersUnified* toModelParametersUnified(void) const;
+  
+  const Eigen::MatrixXd& train_inputs(void) const { return train_inputs_; };
+  double maximum_covariance(void) const { return maximum_covariance_; } ;
+  double length(void) const { return length_; } ;
+  const Eigen::VectorXd& weights(void) const { return gram_inv_targets_; };
+  const Eigen::MatrixXd& gram_inv(void) const { return gram_inv_; };
   
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

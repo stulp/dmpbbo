@@ -69,6 +69,9 @@ public:
     return std::string("LWR");  
   };
   
+	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+
+private:  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

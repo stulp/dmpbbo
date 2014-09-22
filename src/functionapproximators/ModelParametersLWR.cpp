@@ -36,7 +36,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
 
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+//#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -85,14 +85,14 @@ ModelParameters* ModelParametersLWR::clone(void) const {
   return new ModelParametersLWR(centers_,widths_,slopes_,offsets_,asymmetric_kernels_,lines_pivot_at_max_activation_); 
 }
 
-void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   bool normalized_basis_functions=true;  
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels_);  
 }
 
-void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& normalized_kernel_activations) const
+void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   if (caching_)
   {
@@ -104,7 +104,7 @@ void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inpu
       if ( (inputs.array()==inputs_cached_.array()).all() )
       {
         // Then you can return the cached values
-        normalized_kernel_activations = normalized_kernel_activations_cached_;
+        kernel_activations = kernel_activations_cached_;
         return;
       }
     }
@@ -112,13 +112,13 @@ void ModelParametersLWR::normalizedKernelActivations(const Eigen::MatrixXd& inpu
 
   // Cache could not be used, actually do the work
   bool normalize_activations = true;
-  BasisFunction::Gaussian::activations(centers_,widths_,inputs,normalized_kernel_activations,normalize_activations,asymmetric_kernels_);
+  BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,normalize_activations,asymmetric_kernels_);
 
   if (caching_)
   {
     // Cache the current results now.  
     inputs_cached_ = inputs;
-    normalized_kernel_activations_cached_ = normalized_kernel_activations;
+    kernel_activations_cached_ = kernel_activations;
   }
   
 }
@@ -176,8 +176,6 @@ void ModelParametersLWR::set_slopes_as_angles(bool slopes_as_angles)
 }
 
 
-
-
 void ModelParametersLWR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
 {
   int n_time_steps = inputs.rows();
@@ -205,19 +203,6 @@ void ModelParametersLWR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
   //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 }
   
-void ModelParametersLWR::locallyWeightedLines(const MatrixXd& inputs, MatrixXd& output) const
-{
-  
-  MatrixXd lines;
-  getLines(inputs, lines);
-
-  // Weight the values for each line with the normalized basis function activations  
-  MatrixXd activations;
-  normalizedKernelActivations(inputs,activations);
-  
-  output = (lines.array()*activations.array()).rowwise().sum();
-}
-
 /*
 void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
 {
@@ -410,38 +395,6 @@ void ModelParametersLWR::setParameterVectorAll(const VectorXd& values) {
 
   assert(offset == getParameterVectorAllSize());   
 };
-
-bool ModelParametersLWR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  MatrixXd inputs;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-
-  MatrixXd lines;
-  getLines(inputs, lines);
-  
-  MatrixXd activations;
-  kernelActivations(inputs, activations);
-    
-  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"lines.txt",lines,overwrite);
-  saveMatrix(save_directory,"activations.txt",activations,overwrite);
-
-  // Save normalized kernel activations, but only if there is more than 1 basis function
-  // (normalizing with only 1 basis function doesn't make sense)
-  if (centers_.rows()>1)
-  {
-    MatrixXd normalized_activations;
-    normalizedKernelActivations(inputs, normalized_activations);
-    saveMatrix(save_directory,"activations_normalized.txt",normalized_activations,overwrite);
-  }
-  
-  return true;
-  
-}
 
 void ModelParametersLWR::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
 {

@@ -69,7 +69,6 @@ public:
   {
     return  n_centers_ + n_widths_ + n_slopes_ + n_offsets_;
   }
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite) const;
   
   /** 
    * Convert these LWPR model parameters to unified model parameters.

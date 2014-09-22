@@ -114,7 +114,8 @@ int main(int n_args, char** args)
           
         string cur_save_directory = save_directory + "/perturbation" + to_string(i_perturbation);
         
-        model_parameters_lwr->saveGridData(min, max, n_samples_per_dim, cur_save_directory, overwrite);
+        FunctionApproximatorLWR fa(model_parameters_lwr);
+        fa.saveGridData(min, max, n_samples_per_dim, cur_save_directory, overwrite);
       }
 
       double scale = 0.05;
