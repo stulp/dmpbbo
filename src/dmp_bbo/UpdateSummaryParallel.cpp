@@ -1,6 +1,6 @@
 /**
- * @file   UpdateSummaryParallel.hpp
- * @brief  UpdateSummaryParallel class header file.
+ * @file   UpdateSummaryParallel.cpp
+ * @brief  UpdateSummaryParallel class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 

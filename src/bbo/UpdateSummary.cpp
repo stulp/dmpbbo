@@ -1,6 +1,6 @@
 /**
- * @file   UpdateSummary.hpp
- * @brief  UpdateSummary class header file.
+ * @file   UpdateSummary.cpp
+ * @brief  UpdateSummary class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 

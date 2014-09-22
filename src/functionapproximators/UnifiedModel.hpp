@@ -33,9 +33,16 @@
 
 namespace DmpBbo {
 
-/** \brief Model parameters for the Locally Weighted Regression (LWR) function approximator
+/** \page page_unified_model Unified Model
+ * 
+Whilst coding this library and numerous discussion with Olivier Sigaud, it became apparent that the latent function representations of all the function approximators in this library all use the same generic model. Each specific model (i.e. as used in GPR, GMR, LWR, etc.) is a special case of the Unified Model. We discuss this in a forthcoming paper titled: "Many Regression Algorithms, One Unified Model - A Review, Freek Stulp and Olivier Sigaud", which you should be able to find in an on-line search.
+ *
+ */
+
+/** \brief The unified model, which can be used to represent the model of all other function approximators.
+ *
+ * Also see the page on the \ref page_unified_model
  * \ingroup FunctionApproximators
- * \ingroup LWR
  */
 class UnifiedModel : public Parameterizable
 {
@@ -46,7 +53,7 @@ public:
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
    *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
    *  \param[in] weights Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
-   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] normalized_basis_functions Whether to use normalized basis functions
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
   UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
@@ -56,7 +63,7 @@ public:
    *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
    *  \param[in] slopes  Slopes of the line segments (n_bfs X n_input_dims)
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
-   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] normalized_basis_functions Whether to use normalized basis functions or not
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
   UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
@@ -68,7 +75,7 @@ public:
    *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
    *  \param[in] slopes  Slopes of the line segments (n_bfs X n_input_dims)
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
-   * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
+   * \param[in] normalized_basis_functions Whether to use normalized basis functions or not
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
   UnifiedModel(
