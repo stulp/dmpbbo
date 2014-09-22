@@ -24,7 +24,7 @@
 #ifndef UNIFIEDMODEL_H
 #define UNIFIEDMODEL_H
 
-#include "functionapproximators/ModelParameters.hpp"
+#include "functionapproximators/Parameterizable.hpp"
 
 #include <iosfwd>
 #include <vector>
@@ -37,7 +37,7 @@ namespace DmpBbo {
  * \ingroup FunctionApproximators
  * \ingroup LWR
  */
-class UnifiedModel : public ModelParameters
+class UnifiedModel : public Parameterizable
 {
   friend class FunctionApproximatorLWR;
   
@@ -83,7 +83,7 @@ public:
   
   std::string toString(void) const;
   
-	ModelParameters* clone(void) const;
+	UnifiedModel* clone(void) const;
 	
   int getExpectedInputDim(void) const  {
     if (centers_.size()>0)
@@ -135,11 +135,6 @@ public:
   }
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
-
-	UnifiedModel* toUnifiedModel(void) const
-  {
-    return static_cast<UnifiedModel*>(clone());
-  }
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

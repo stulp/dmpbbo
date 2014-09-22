@@ -201,7 +201,7 @@ void UnifiedModel::initializeAllValuesVectorSize(void)
 
 
 
-ModelParameters* UnifiedModel::clone(void) const {
+UnifiedModel* UnifiedModel::clone(void) const {
   return new UnifiedModel(centers_,covars_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
 }
 
@@ -387,7 +387,7 @@ template<class Archive>
 void UnifiedModel::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
+  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
 
   ar & BOOST_SERIALIZATION_NVP(centers_);
   ar & BOOST_SERIALIZATION_NVP(covars_);
