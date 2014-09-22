@@ -68,13 +68,18 @@ public:
    * \param[in] directory Directory to save to
    * \param[in] centers Centers of the Gaussians
    * \param[in] covars Covariance matrices of the Gaussians
+   * \param[in] overwrite Whether to overwrite existing files or not.
    * \param[in] iter Iteration number when running Expectation-Maximization. Allows the GMM to be stored with a different filename (in the same directory) at each iteration.
    * \return true if successful, false otherwise
    */
-  static bool saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, int iter=-1);
+  static bool saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, bool overwrite=false, int iter=-1);
   
-  /** \todo overwrite not functional yet. */
-  bool saveGMM(std::string directory, bool overwrite) const;
+  /** Save a Gaussian mixture model to a directory; useful for debugging.
+   * \param[in] directory Directory to save to
+   * \param[in] overwrite Whether to overwrite existing files or not.
+   * \return true if successful, false otherwise
+   */
+  bool saveGMM(std::string directory, bool overwrite=false) const;
 
   UnifiedModel* toUnifiedModel(void) const;
 

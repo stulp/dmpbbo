@@ -47,10 +47,17 @@ public:
    *  \param[in] train_targets The training samples provided (target values) 
    *  \param[in] gram The Gram matrix, i.e. the covariances between all combination of input samples 
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
-   *  \param[in] length             Length 'l' of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
+   *  \param[in] length             Length 'l' of the isotropic Gaussian covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
    */
    ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, double length);
 
+  /** Constructor for the model parameters of the GPR function approximator.
+   *  \param[in] train_inputs The training samples provided (input values) 
+   *  \param[in] train_targets The training samples provided (target values) 
+   *  \param[in] gram The Gram matrix, i.e. the covariances between all combination of input samples 
+   *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
+   *  \param[in] sigmas Standard deviations, i.e. on the diagonal of the covariance matrices of the Gaussian covariance function.
+   */
    ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const Eigen::VectorXd& sigmas);
    
   std::string toString(void) const;
@@ -70,12 +77,29 @@ public:
     return 0;
   }
   
+  /** Get the normalized kernel activations for given inputs
+   * \param[in] inputs The input data (size: n_samples X n_dims)
+   * \param[out] kernel_activations The normalized kernel activations, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
+   */
   void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
 
   UnifiedModel* toUnifiedModel(void) const;
   
+  /** Get the maximum covariance value of the covariance function.
+   * \return Maximum covariance  
+   */
   double maximum_covariance(void) const { return maximum_covariance_; } ;
+  
+  /**
+   * Return the weights, which is equivalent to \f$ \mathbf{G}^-1\mathfb{y} \f$, where G is the Gram matrix, and y is the target data.
+   * \return Weights
+   */
   const Eigen::VectorXd& weights(void) const { return gram_inv_targets_; };
+  
+  /**
+   * Return the inverse of the Gram matrix
+   * \return Gram matrix
+   */
   const Eigen::MatrixXd& gram_inv(void) const { return gram_inv_; };
   
 protected:

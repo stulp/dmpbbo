@@ -71,7 +71,7 @@ ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, cons
 
 }
 
-ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const VectorXd& sigmas)
+ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const Eigen::VectorXd& sigmas)
 :
   train_inputs_(train_inputs),
   train_targets_(train_targets),

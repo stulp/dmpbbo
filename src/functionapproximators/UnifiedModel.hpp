@@ -52,7 +52,7 @@ public:
   /** Constructor for the unified model parameters. This version is used by for example RBFN and GPR. 
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
    *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
-   *  \param[in] weights Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
+   *  \param[in] weights Weights of each basis function (n_bfs X 1)
    * \param[in] normalized_basis_functions Whether to use normalized basis functions
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
@@ -68,6 +68,11 @@ public:
    */
   UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
+  /** Constructor for the unified model parameters. This version is used by for example IRFRLS 
+   *  \param[in] angular_frequencies Angular frequency for each dimension and each cosine basis function  (n_bfs X n_input_dims)
+   *  \param[in] phases  Phase of each cosine basis function (n_bfs X 1)
+   *  \param[in] weights Weights of each basis function (n_bfs X 1)
+   */
   UnifiedModel(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights);
 
   /** Constructor for the unified model parameters. This version is used by for example GMR. 
@@ -75,6 +80,7 @@ public:
    *  \param[in] widths  Widths of the basis functions (n_bfs X n_input_dims)
    *  \param[in] slopes  Slopes of the line segments (n_bfs X n_input_dims)
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis (n_bfs X 1)
+   *  \param[in] priors Prior of each basis function (n_bfs X 1)
    * \param[in] normalized_basis_functions Whether to use normalized basis functions or not
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
@@ -88,10 +94,19 @@ public:
     bool lines_pivot_at_max_activation=false);
   
   
+  /** Returns a string representation of the object.
+   * \return A string representation of the object.
+   */
   std::string toString(void) const;
   
+  /** Return a pointer to a deep copy of the object.
+   *  \return Pointer to a deep copy
+   */
 	UnifiedModel* clone(void) const;
 	
+  /** The expected dimensionality of the input data.
+   * \return Expected dimensionality of the input data
+   */
   int getExpectedInputDim(void) const  {
     if (centers_.size()>0)
       return centers_[0].size();
@@ -141,6 +156,18 @@ public:
     return all_values_vector_size_;
   }
   
+  /** Generate a grid of inputs, and output the response of the basis functions and line segments
+   * for these inputs.
+   * This function is not pure virtual, because this might not make sense for every model parameters
+   * class.
+   *
+   * \param[in] min Minimum values for the grid (one for each dimension)
+   * \param[in] max Maximum values for the grid (one for each dimension)
+   * \param[in] n_samples_per_dim Number of samples in the grid along each dimension
+   * \param[in] directory Directory to which to save the results to.
+   * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
+   * \return Whether saving the data was successful.
+   */
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
 protected:

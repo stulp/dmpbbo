@@ -29,6 +29,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/UnifiedModel.hpp"
 
+/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UnifiedModel);
 
 #include "functionapproximators/BasisFunction.hpp"
@@ -50,7 +51,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-UnifiedModel::UnifiedModel(const MatrixXd& centers, const MatrixXd& widths, const VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
+UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
 {
   int n_basis_functions = centers.rows();
   int n_dims = centers.cols();

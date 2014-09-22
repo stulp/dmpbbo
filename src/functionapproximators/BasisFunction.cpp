@@ -179,7 +179,7 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
 
 void Cosine::activations(
     const std::vector<Eigen::MatrixXd>& angular_frequencies,
-    const std::vector<VectorXd>& phases,
+    const std::vector<Eigen::VectorXd>& phases,
     const Eigen::MatrixXd& inputs, 
     Eigen::MatrixXd& activations)
 {

@@ -39,7 +39,7 @@ using namespace Eigen;
 namespace DmpBbo {
 
 
-bool saveToDirectory(const UpdateSummaryParallel& summary, string directory, bool overwrite)
+  bool saveToDirectory(const UpdateSummaryParallel& summary, std::string directory, bool overwrite)
 {
 
   // Make directory if it doesn't already exist
@@ -91,7 +91,7 @@ bool saveToDirectory(const UpdateSummaryParallel& summary, string directory, boo
   
 }
 
-bool saveToDirectory(const vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
+bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
 {
   
   // Save the learning curve

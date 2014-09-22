@@ -38,7 +38,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-bool saveToDirectory(const UpdateSummary& summary, string directory, bool overwrite)
+bool saveToDirectory(const UpdateSummary& summary, std::string directory, bool overwrite)
 {
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
@@ -74,7 +74,7 @@ bool saveToDirectory(const UpdateSummary& summary, string directory, bool overwr
   
 }
 
-bool saveToDirectory(const vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
+bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::string directory, bool overwrite, bool only_learning_curve)
 {
   
   // Save the learning curve

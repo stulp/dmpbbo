@@ -152,7 +152,7 @@ string ModelParametersGMR::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGMR");
 };
 
-bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& centers, const vector<MatrixXd>& covars, int iter)
+bool ModelParametersGMR::saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, bool overwrite, int iter)
 {
   for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
   {
@@ -162,7 +162,7 @@ bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& cente
       stream << "_iter" << setw(2) << setfill('0') << iter;
     stream  << "_mu" << setw(3) << setfill('0') << i_gau << ".txt";
     string filename = stream.str();
-    if (!saveMatrix(directory, filename,  centers[i_gau],  true))
+    if (!saveMatrix(directory, filename,  centers[i_gau],  overwrite))
       return false;
     //cout << "  filename=" << filename << endl;
     
@@ -173,13 +173,13 @@ bool ModelParametersGMR::saveGMM(string directory, const vector<VectorXd>& cente
     stream2  << "_covar" << setw(3) << setfill('0') << i_gau << ".txt";
     filename = stream2.str();
     //cout << "  filename=" << filename << endl;
-    if (!saveMatrix(directory, filename,  covars[i_gau],  true))
+    if (!saveMatrix(directory, filename,  covars[i_gau],  overwrite))
       return false;    
   }
   return true;
 }
 
-bool ModelParametersGMR::saveGMM(string save_directory, bool overwrite) const
+bool ModelParametersGMR::saveGMM(std::string save_directory, bool overwrite) const
 {
   if (save_directory.empty())
     return true;
@@ -210,7 +210,7 @@ bool ModelParametersGMR::saveGMM(string save_directory, bool overwrite) const
     covars[i_gau].block(0, n_dims_in, n_dims_in, n_dims_out) = covars_y_x_[i_gau].transpose();
   }
   
-  saveGMM(save_directory,means,covars);
+  saveGMM(save_directory,means,covars,overwrite);
  
   
   return true;  

@@ -171,6 +171,10 @@ public:
   void getParameterVectorAll(Eigen::VectorXd& values) const;
   void setParameterVectorAll(const Eigen::VectorXd& values);
 
+  /** Return a representation of this function approximator's model as a unified model. 
+   * See also the page on \ref page_unified_model 
+   * \return Unified model representation of this function approximator's model.
+   */
   UnifiedModel* getUnifiedModel(void) const;
   
   /** Print to output stream. 

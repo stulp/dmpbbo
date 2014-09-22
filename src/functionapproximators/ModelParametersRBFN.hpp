@@ -78,6 +78,9 @@ public:
     return all_values_vector_size_;
   }
   
+  /** Return the weights of the basis functions.
+   * \return weights of the basis functions.
+   */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
 
 protected:
