@@ -1,16 +1,19 @@
 ________________________________________________________________________________
-Implement BasisFunction::Gaussian::activations(centers,LENGTH,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
-
-Remove all occurences of inverse()
-
+Plotting
+  Python should plot unnormalizedactionvations/actionvations
 ________________________________________________________________________________
-Put basis function caching in ModelParameters base class
-
-Python should plot unnormalizedactionvations/actionvations
+Gaussian Process Regression
+  Implement BasisFunction::Gaussian::activations(centers,LENGTH,inputs,...);
+  Implement MetaParameters with sigmas instead of length (for non-isotropic)
+________________________________________________________________________________
+Optimizations
+  Remove all occurences of inverse()
+  Put basis function caching in ModelParameters base class  
 ________________________________________________________________________________
 Gaussian Mixture Regression
   plot covariance matrices in Python
   parameterizable: mu and priors, but not covars
+
 ________________________________________________________________________________
 For compatibility with making a package
   cd src ; mkdir dmpbbo ; mv * dmpbbo/
