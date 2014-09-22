@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import sys
 
 from plotData import getDataDimFromDirectory
+from plotData import plotDataPredictionsGrid
 
 def plotBasisFunctions(inputs,activations,ax,n_samples_per_dim):
     """Plot basis functions activations, whilst being smart about the dimensionality of input data."""
@@ -35,34 +36,49 @@ def plotBasisFunctions(inputs,activations,ax,n_samples_per_dim):
     return lines
 
 
-def plotBasisFunctionsFromDirectory(directory,ax,plot_normalized=True):
+def plotBasisFunctionsFromDirectory(directory,ax):
     """Read activations from file, and plot them."""
   
+    # Relevant files
+    #   n_samples_per_dim.txt
+    #   inputs_grid.txt
+    #   activations_grid.txt
+    #   activations_weighted_grid.txt
+    #   predictions_grid.txt
+
     inputs   = numpy.loadtxt(directory+'/inputs_grid.txt')    
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims>2):
         sys.exit('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
     
-    if (plot_normalized):
-      activations  = numpy.loadtxt(directory+'/activations_normalized.txt')
-    else:
-      activations  = numpy.loadtxt(directory+'/activations.txt')                            
-    
+
     try:
         n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt')                             
     except IOError:
         # Assume data is 1D
         n_samples_per_dim = len(inputs)
         
-    lines_bfs = plotBasisFunctions(inputs,activations,ax,n_samples_per_dim) 
+    try:
+        predictions  = numpy.loadtxt(directory+'/predictions_grid.txt')
+        plotDataPredictionsGrid(inputs,predictions,ax,n_samples_per_dim)
+    except IOError:
+        predictions = [];
+        
+    try:
+        activations  = numpy.loadtxt(directory+'/activations_grid.txt')
+        lines_bfs = plotBasisFunctions(inputs,activations,ax,n_samples_per_dim) 
+    except IOError:
+        activations = [];
+        lines_bfs = [];
 
     try:
-        activations_weighted = numpy.loadtxt(directory+'/activations_weighted.txt')                             
+        activations_weighted  = numpy.loadtxt(directory+'/activations_weighted_grid.txt')
         lines_bfs_weighted = plotBasisFunctions(inputs,activations_weighted,ax,n_samples_per_dim) 
         plt.setp(lines_bfs,color='#aaffaa')
         plt.setp(lines_bfs_weighted,color='green')
-        
     except IOError:
+        activations_weighted_grid = [];
+        lines_bfs_weighted = [];
         plt.setp(lines_bfs,color='green')
         
 

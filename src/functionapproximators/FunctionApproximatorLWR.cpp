@@ -279,11 +279,14 @@ bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& 
   MatrixXd activations;
   model_parameters_lwr->kernelActivations(inputs, activations);
 
+  MatrixXd predictions = (lines.array()*activations.array()).rowwise().sum();
+  
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"lines.txt",lines,overwrite);
-  saveMatrix(save_directory,"activations.txt",unnormalized_activations,overwrite);
-  saveMatrix(save_directory,"activations_normalized.txt",activations,overwrite);
+  saveMatrix(save_directory,"lines_grid.txt",lines,overwrite);
+  saveMatrix(save_directory,"activations_unnormalized_grid.txt",unnormalized_activations,overwrite);
+  saveMatrix(save_directory,"activations_grid.txt",activations,overwrite);
+  saveMatrix(save_directory,"predictions_grid.txt",predictions,overwrite);
 
   
   return true;

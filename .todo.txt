@@ -2,10 +2,6 @@ ________________________________________________________________________________
 Plotting
   Python should plot unnormalizedactionvations/actionvations
 ________________________________________________________________________________
-Gaussian Process Regression
-  Implement BasisFunction::Gaussian::activations(centers,LENGTH,inputs,...);
-  Implement MetaParameters with sigmas instead of length (for non-isotropic)
-________________________________________________________________________________
 Optimizations
   Remove all occurences of inverse()
   Put basis function caching in ModelParameters base class  

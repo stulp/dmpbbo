@@ -137,23 +137,27 @@ bool FunctionApproximatorRBFN::saveGridData(const VectorXd& min, const VectorXd&
   if (save_directory.empty())
     return true;
   
-  MatrixXd inputs;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+  MatrixXd inputs_grid;
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs_grid);
       
   const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
   
-  MatrixXd activations;
-  model_parameters_rbfn->kernelActivations(inputs, activations);
-    
+  MatrixXd activations_grid;
+  model_parameters_rbfn->kernelActivations(inputs_grid, activations_grid);
+  
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"activations.txt",activations,overwrite);
+  saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
+  saveMatrix(save_directory,"activations_grid.txt",activations_grid,overwrite);
 
   // Weight the basis function activations  
   VectorXd weights = model_parameters_rbfn->weights();
-  for (int b=0; b<activations.cols(); b++)
-    activations.col(b).array() *= weights(b);
-  saveMatrix(save_directory,"activations_weighted.txt",activations,overwrite);
+  for (int b=0; b<activations_grid.cols(); b++)
+    activations_grid.col(b).array() *= weights(b);
+  saveMatrix(save_directory,"activations_weighted_grid.txt",activations_grid,overwrite);
+  
+  // Sum over weighed basis functions
+  MatrixXd predictions_grid = activations_grid.rowwise().sum();
+  saveMatrix(save_directory,"predictions_grid.txt",predictions_grid,overwrite);
   
   return true;
   

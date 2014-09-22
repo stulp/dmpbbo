@@ -98,9 +98,15 @@ public:
   
   /**
    * Return the inverse of the Gram matrix
-   * \return Gram matrix
+   * \return Inverse of the Gram matrix
    */
   const Eigen::MatrixXd& gram_inv(void) const { return gram_inv_; };
+
+  /**
+   * Return the Gram matrix
+   * \return Gram matrix
+   */
+  const Eigen::MatrixXd& gram(void) const { return gram_; };
   
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

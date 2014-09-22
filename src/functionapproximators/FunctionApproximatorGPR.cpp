@@ -36,6 +36,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorGPR);
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
 #include <eigen3/Eigen/SVD>
@@ -158,6 +159,37 @@ void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& 
     variances(ii) = maximum_covariance - rest(0);
   }
 
+}
+
+bool FunctionApproximatorGPR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+{
+  if (save_directory.empty())
+    return true;
+  
+  MatrixXd inputs_grid;
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs_grid);
+      
+  const ModelParametersGPR* model_parameters_gpr = static_cast<const ModelParametersGPR*>(getModelParameters());
+
+  MatrixXd activations_grid;
+  model_parameters_gpr->kernelActivations(inputs_grid, activations_grid);
+  
+  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
+  saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
+  saveMatrix(save_directory,"activations_grid.txt",activations_grid,overwrite);
+
+  // Weight the basis function activations  
+  VectorXd weights = model_parameters_gpr->weights();
+  for (int b=0; b<activations_grid.cols(); b++)
+    activations_grid.col(b).array() *= weights(b);
+  saveMatrix(save_directory,"activations_weighted_grid.txt",activations_grid,overwrite);
+  
+  // Sum over weighed basis functions
+  MatrixXd predictions_grid = activations_grid.rowwise().sum();
+  saveMatrix(save_directory,"predictions_grid.txt",predictions_grid,overwrite);
+  
+  return true;
+  
 }
 
 template<class Archive>

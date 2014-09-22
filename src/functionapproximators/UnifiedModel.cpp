@@ -32,6 +32,7 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UnifiedModel);
 
+#include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -579,41 +580,35 @@ bool UnifiedModel::saveGridData(const VectorXd& min, const VectorXd& max, const 
   assert(n_dims==n_samples_per_dim.size());
   
   MatrixXd inputs;
-  if (n_dims==1)
-  {
-    inputs  = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-  }
-  else if (n_dims==2)
-  {
-    int n_samples = n_samples_per_dim[0]*n_samples_per_dim[1];
-    inputs = MatrixXd::Zero(n_samples, n_dims);
-    VectorXd x1 = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-    VectorXd x2 = VectorXd::LinSpaced(n_samples_per_dim[1], min[1], max[1]);
-    for (int ii=0; ii<x1.size(); ii++)
-    {
-      for (int jj=0; jj<x2.size(); jj++)
-      {
-        inputs(ii*x2.size()+jj,0) = x1[ii];
-        inputs(ii*x2.size()+jj,1) = x2[jj];
-      }
-    }
-  }  
-      
+  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
+
   MatrixXd lines;
   getLines(inputs, lines);
   
-  MatrixXd weighted_lines;
-  evaluate(inputs, weighted_lines);
-  
   MatrixXd activations;
-  kernelActivations(inputs, activations);
-
+  if (cosine_basis_functions_)
+  {
+    BasisFunction::Cosine::activations(covars_,centers_,inputs,activations);
+  }
+  else
+  {
+    BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,activations,normalized_basis_functions_);
+    if (normalized_basis_functions_)
+    {
+      MatrixXd unnormalized_activations;
+      BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,unnormalized_activations,false);
+      saveMatrix(save_directory,"activations_unnormalized_grid.txt",unnormalized_activations,overwrite);
+    }
+  }
+    
+  MatrixXd predictions;
+  evaluate(inputs,predictions);
+  
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"lines.txt",lines,overwrite);
-  saveMatrix(save_directory,"weighted_lines.txt",weighted_lines,overwrite);
-  saveMatrix(save_directory,"activations.txt",activations,overwrite);
-  saveMatrix(save_directory,"outputs_grid.txt",weighted_lines,overwrite);
+  saveMatrix(save_directory,"lines_grid.txt",lines,overwrite);
+  saveMatrix(save_directory,"activations_grid.txt",activations,overwrite);
+  saveMatrix(save_directory,"predictions_grid.txt",predictions,overwrite);
   
   return true;
   

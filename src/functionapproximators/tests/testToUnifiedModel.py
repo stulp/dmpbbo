@@ -17,7 +17,7 @@ from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
 from plotBasisFunctions import plotBasisFunctionsFromDirectory
 
 if __name__=='__main__':
-    executable = "../../../bin_test/testToModelParametersUnified"
+    executable = "../../../bin_test/testToUnifiedModel"
     
     if (not os.path.isfile(executable)):
         print ""
@@ -26,7 +26,7 @@ if __name__=='__main__':
         print ""
         sys.exit(-1);
     
-    function_approximator_names = ["RBFN","LWR","GPR","GMR","LWPR","IRFRLS"]
+    function_approximator_names = ["LWR","RBFN","GPR"] #"GPR","GMR","LWPR","IRFRLS"]
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"
@@ -50,12 +50,11 @@ if __name__=='__main__':
             subplot_number = subplot_number+1
     
             try:
-                plotDataFromDirectory(directory_fa,ax)
-                if (uni_name=="Unified" or name=="WLS" or name=="LWR" or name=="LWPR" or name=="GPR"):
+                if (uni_name=="Unified" or name=="LWR" or name=="LWPR" or name=="GPR"):
                     plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
                 elif (name=="RBFN"):
-                    plot_normalized=False
-                    plotBasisFunctionsFromDirectory(directory_fa,ax,plot_normalized)
+                    plotBasisFunctionsFromDirectory(directory_fa,ax)
+                plotDataFromDirectory(directory_fa,ax)
                 ax.set_ylim(-1.0,1.5)
             except IOError:
                 print "WARNING: Could not find data for function approximator "+name

@@ -87,7 +87,7 @@ ModelParameters* ModelParametersLWR::clone(void) const {
 
 void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
-  bool normalized_basis_functions=true;  
+  bool normalized_basis_functions=false;  
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels_);  
 }
