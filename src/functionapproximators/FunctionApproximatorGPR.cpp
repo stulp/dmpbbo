@@ -50,15 +50,12 @@ FunctionApproximatorGPR::FunctionApproximatorGPR(const MetaParametersGPR *const 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
-  cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;}
+}
 
 FunctionApproximatorGPR::FunctionApproximatorGPR(const ModelParametersGPR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
-  cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "FunctionApproximatorGPR is still under development! No guarantees on functionality..." << endl;
 }
 
 
