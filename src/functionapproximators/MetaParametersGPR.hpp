@@ -44,9 +44,16 @@ public:
   /** Constructor for the algorithmic meta-parameters of the GPR function approximator.
    * \param[in] expected_input_dim Expected input dimensionality. Useful for debugging.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
-   *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
+   *  \param[in] sigma    Standard deviation in the isotropic covariance function, i.e.  \$f e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\$f, with \$f \mathbf{W} = \sigma^2 * \mathbf{I} \$f
    */
-  MetaParametersGPR(int expected_input_dim, double maximum_covariance, double length);
+  MetaParametersGPR(int expected_input_dim, double maximum_covariance, double sigma);
+  
+  /** Constructor for the algorithmic meta-parameters of the GPR function approximator.
+   * \param[in] expected_input_dim Expected input dimensionality. Useful for debugging.
+   *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
+   *  \param[in] sigmas    Standard deviation in the isotropic covariance function, i.e.  \$f e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\$f, with \$f \mathbf{W} = sigmas.asDiagonal()\$f
+   */
+  MetaParametersGPR(int expected_input_dim, double maximum_covariance, const Eigen::VectorXd& sigmas);
 		 
 	MetaParametersGPR* clone(void) const;
 
@@ -56,14 +63,17 @@ public:
 	 * \return Maximum covariance
 	 */
 	double maximum_covariance() const { return maximum_covariance_; }
-	/** Return the length parameter of the covariance function. 
-	 * \return Length parameter covariance function.
+	
+	/** Return the sqrt of the diagonal of the covariance matrix in the Gaussian covariance function. 
+	 * \return sqrt of the diagonal of the covariance matrix in the Gaussian covariance function
 	 */
-	double length() const { return length_; }
+  const Eigen::VectorXd& sigmas() const { return sigmas_; }
 
 private:
+  
   double maximum_covariance_;
-  double length_;
+  
+  Eigen::VectorXd sigmas_;
 
   /**
    * Default constructor.

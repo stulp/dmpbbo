@@ -62,7 +62,7 @@ int main(int n_args, char** args)
     
     VectorXi n_samples_per_dim = VectorXi::Constant(1,30);
     if (n_input_dims==2) 
-      n_samples_per_dim = VectorXi::Constant(2,25);
+      n_samples_per_dim = VectorXi::Constant(2,20);
     
     MatrixXd inputs, targets, outputs;
     targetFunction(n_samples_per_dim,inputs,targets);
@@ -72,11 +72,6 @@ int main(int n_args, char** args)
     {
       // GMR on 2D too slow
       if (fa_names[i_name].compare("GMR")==0)
-        if (n_input_dims==2)
-          continue;
-        
-      // GPR on 2D too slow
-      if (fa_names[i_name].compare("GPR")==0)
         if (n_input_dims==2)
           continue;
       

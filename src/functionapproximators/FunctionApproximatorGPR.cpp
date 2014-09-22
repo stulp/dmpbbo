@@ -83,13 +83,14 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
     dynamic_cast<const MetaParametersGPR*>(getMetaParameters());
   
   double max_covar = meta_parameters_gpr->maximum_covariance();
-  double length = meta_parameters_gpr->length();
+  VectorXd sigmas = meta_parameters_gpr->sigmas();
   
   
   // Compute the gram matrix
   // In a gram matrix, every input point is itself a center
   MatrixXd centers = inputs;
-  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length);
+  // Replicate sigmas, because they are the same for each data point/center
+  MatrixXd widths = sigmas.transpose().colwise().replicate(centers.rows()); 
 
   MatrixXd gram(inputs.rows(),inputs.rows());
   bool normalize_activations = false;
@@ -98,7 +99,7 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
   
   gram *= max_covar;
 
-  setModelParameters(new ModelParametersGPR(inputs,targets,gram,max_covar,length));
+  setModelParameters(new ModelParametersGPR(inputs,targets,gram,max_covar,sigmas));
   
 }
 

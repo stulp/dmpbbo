@@ -82,7 +82,7 @@ ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, cons
   assert(gram_.rows()==gram_.cols());
   assert(train_inputs_.rows()==gram_.rows());
   assert(train_inputs_.rows()==train_targets_.rows());
-  assert(sigmas_.rows()==train_targets_.cols());
+  assert(sigmas_.size()==train_inputs_.cols());
   assert(maximum_covariance_>0);
   
   gram_inv_ = gram_.inverse();

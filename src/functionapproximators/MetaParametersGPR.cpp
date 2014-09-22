@@ -53,15 +53,25 @@ MetaParametersGPR::MetaParametersGPR(int expected_input_dim, double maximum_cova
 :
   MetaParameters(expected_input_dim),
   maximum_covariance_(maximum_covariance),
-  length_(length)
+  sigmas_(VectorXd::Constant(expected_input_dim,length))
 {
   assert(maximum_covariance_>0);
-  assert(length_>0);
+  assert(length>0);
+}
+  
+MetaParametersGPR::MetaParametersGPR(int expected_input_dim, double maximum_covariance, const Eigen::VectorXd& sigmas)
+:
+  MetaParameters(expected_input_dim),
+  maximum_covariance_(maximum_covariance),
+  sigmas_(sigmas)
+{
+  assert(maximum_covariance_>0);
+  assert(sigmas.size()==expected_input_dim);
 }
   
 MetaParametersGPR* MetaParametersGPR::clone(void) const
 {
-  return new MetaParametersGPR(getExpectedInputDim(),maximum_covariance_,length_);
+  return new MetaParametersGPR(getExpectedInputDim(),maximum_covariance_,sigmas_);
 }
 
 template<class Archive>
@@ -71,7 +81,7 @@ void MetaParametersGPR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
 
   ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);
-  ar & BOOST_SERIALIZATION_NVP(length_);
+  ar & BOOST_SERIALIZATION_NVP(sigmas_);
 }
 
 string MetaParametersGPR::toString(void) const
