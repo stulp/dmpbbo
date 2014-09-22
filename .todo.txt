@@ -1,0 +1,10 @@
+________________________________________________________________________________
+IRFRLS
+  Make conversion to ModelParametersUnified
+________________________________________________________________________________
+Gaussian Mixture Regression
+  plot covariance matrices in Python
+  parameterizable: mu and priors, but not covars
+________________________________________________________________________________
+For compatibility with making a package
+  cd src ; mkdir dmpbbo ; mv * dmpbbo/

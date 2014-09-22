@@ -177,6 +177,36 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
 
 }
 
+void Cosine::activations(
+    const std::vector<Eigen::MatrixXd>& angular_frequencies,
+    const std::vector<VectorXd>& phases,
+    const Eigen::MatrixXd& inputs, 
+    Eigen::MatrixXd& activations)
+{
+  unsigned int n_basis_functions = angular_frequencies.size();
+  int n_dims                     = inputs.cols();
+  int n_samples                  = inputs.rows();
+  
+  assert(n_basis_functions>0);
+  assert(phases.size()==n_basis_functions);
+  assert(phases[0].size()==1);
+  assert(angular_frequencies[0].size()==n_dims);
+
+  
+  activations.resize(n_samples,n_basis_functions);  
+  
+  double cosine_input;
+  for (unsigned int bb=0; bb<n_basis_functions; bb++)
+  {
+    for (int i_s=0; i_s<n_samples; i_s++)
+    {
+      cosine_input = angular_frequencies[bb].row(0).dot(inputs.row(i_s)) + phases[bb][0];
+      activations(i_s,bb) = cos(cosine_input);
+    }
+  }
+  
+}
+
 
 } // namespace BasisFunction
 

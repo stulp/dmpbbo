@@ -179,8 +179,7 @@ void ModelParametersIRFRLS::setParameterVectorAll(const VectorXd& values)
 
 ModelParametersUnified* ModelParametersIRFRLS::toModelParametersUnified(void) const
 {
-  return NULL;
-  //return new ModelParametersUnified(cosines_periodes_, cosines_phase_, weights_); 
+  return new ModelParametersUnified(cosines_periodes_, cosines_phase_, weights_); 
 }
 
 }

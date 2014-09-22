@@ -79,6 +79,8 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
   normalized_basis_functions_ = normalized_basis_functions;
   lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
   slopes_as_angles_ = false;
+ 
+  cosine_basis_functions_ = false;
   
   initializeAllValuesVectorSize();
 };
@@ -115,9 +117,49 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, c
   lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
   slopes_as_angles_ = false;
   
+  cosine_basis_functions_ = false;
+
   initializeAllValuesVectorSize();  
 }
 
+
+ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights)
+{
+  int n_basis_functions = angular_frequencies.rows();
+  int n_dims = angular_frequencies.cols();
+  
+  assert(n_basis_functions==phases.size());
+  assert(n_basis_functions==weights.size());
+  
+  centers_.resize(n_basis_functions); // phase
+  covars_.resize(n_basis_functions);  // angular_frequencies
+  slopes_.resize(n_basis_functions);  
+  offsets_.resize(n_basis_functions); // weights
+  priors_.resize(n_basis_functions);  
+  
+  for (int i=0; i<n_basis_functions; i++)
+  {
+    centers_[i] = VectorXd(1);
+    centers_[i][0] = phases[i];
+    
+    covars_[i] = MatrixXd(1,n_dims);
+    covars_[i] = angular_frequencies.row(i);
+
+    offsets_[i] = weights[i];
+    
+    slopes_[i] = VectorXd::Zero(n_dims);
+    priors_[i] = 1.0;
+  }
+
+  // These aren't relevant for cosing basis functions
+  normalized_basis_functions_ = false;
+  lines_pivot_at_max_activation_ = false;
+  slopes_as_angles_ = false;
+  
+  cosine_basis_functions_ = true;
+  
+  initializeAllValuesVectorSize();
+}
 
 ModelParametersUnified::ModelParametersUnified(
   const std::vector<Eigen::VectorXd>& centers, // n_centers X n_dims
@@ -137,40 +179,10 @@ ModelParametersUnified::ModelParametersUnified(
   lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
   slopes_as_angles_(false)
 {
+  cosine_basis_functions_ = false;
+
   initializeAllValuesVectorSize();
 }
-
-
-
-/*
-ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
-:
-  centers_(centers),
-  covars_(widths),
-  slopes_(slopes), 
-  offsets_(offsets),
-  priors_(VectorXd::Ones(centers.rows(),centers.cols())), 
-  normalized_basis_functions_(normalized_basis_functions),
-  lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
-  slopes_as_angles_(false)
-{
-  initializeAllValuesVectorSize();
-};
-
-ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& slopes, const VectorXd& offsets, const VectorXd& priors, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
-:
-  centers_(centers),
-  covars_(widths),
-  slopes_(slopes), 
-  offsets_(offsets),
-  priors_(priors),
-  normalized_basis_functions_(normalized_basis_functions),
-  lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
-  slopes_as_angles_(false)
-{
-  initializeAllValuesVectorSize();
-};
-*/
 
 void ModelParametersUnified::initializeAllValuesVectorSize(void)
 {
@@ -348,7 +360,19 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
   }
 
   // Cache could not be used, actually do the work
-  BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,kernel_activations,normalized_basis_functions_);
+  if (cosine_basis_functions_)
+  {
+    // centers_.resize(n_basis_functions); // phase
+    // covars_.resize(n_basis_functions);  // angular_frequencies
+    // slopes_.resize(n_basis_functions);  
+    // offsets_.resize(n_basis_functions); // weights
+    // priors_.resize(n_basis_functions);  
+    BasisFunction::Cosine::activations(covars_,centers_,inputs,kernel_activations);
+  }
+  else
+  {
+    BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,kernel_activations,normalized_basis_functions_);
+  }
 
   if (caching_)
   {
@@ -581,7 +605,7 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   locallyWeightedLines(inputs, weighted_lines);
   
   MatrixXd activations;
-  BasisFunction::Gaussian::activations(centers_,covars_,priors_,inputs,activations,normalized_basis_functions_);
+  kernelActivations(inputs, activations);
 
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);

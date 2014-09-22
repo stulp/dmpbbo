@@ -49,7 +49,7 @@ public:
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
   /** Constructor for the unified model parameters. This version is used by for example LWR and LWPR 
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
@@ -59,7 +59,9 @@ public:
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions=false, bool lines_pivot_at_max_activation=false);
+  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
+
+  ModelParametersUnified(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights);
 
   /** Constructor for the unified model parameters. This version is used by for example GMR. 
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
