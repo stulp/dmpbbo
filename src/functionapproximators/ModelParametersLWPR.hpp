@@ -34,7 +34,7 @@ class LWPR_Object;
 
 namespace DmpBbo {
 
-class ModelParametersUnified; // Required for conversion to ModelParametersUnified
+class UnifiedModel; // Required for conversion to UnifiedModel
 
 /** \brief Model parameters for the Locally Weighted Projection Regression (LWPR) function approximator
  * \ingroup FunctionApproximators
@@ -76,7 +76,7 @@ public:
    * \remarks Currently only works if input and output dimensionality are 1
    * \todo Convert for input dim >1
    */
-  ModelParametersUnified* toModelParametersUnified(void) const;
+  UnifiedModel* toUnifiedModel(void) const;
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

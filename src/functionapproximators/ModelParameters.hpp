@@ -34,7 +34,7 @@
 
 namespace DmpBbo {
 
-class ModelParametersUnified;
+class UnifiedModel;
   
 /** \brief Base class for all model parameters of function approximators
  * \ingroup FunctionApproximators
@@ -78,7 +78,7 @@ public:
    * Convert these model parameters to unified model parameters.
    * \return Unified model parameter representation (NULL if not implemented for a particular subclass)
    */
-  virtual ModelParametersUnified* toModelParametersUnified(void) const = 0;
+  virtual UnifiedModel* toUnifiedModel(void) const = 0;
   
 public:
   

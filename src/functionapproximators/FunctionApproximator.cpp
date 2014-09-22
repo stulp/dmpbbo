@@ -25,7 +25,7 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 #include "functionapproximators/MetaParameters.hpp"
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -105,9 +105,9 @@ void FunctionApproximator::setModelParameters(ModelParameters* model_parameters)
   model_parameters_ = model_parameters;
 }
 
-ModelParametersUnified* FunctionApproximator::getModelParametersUnified(void) const
+UnifiedModel* FunctionApproximator::getUnifiedModel(void) const
 {
-  return model_parameters_->toModelParametersUnified();
+  return model_parameters_->toUnifiedModel();
 }
 
 
@@ -269,7 +269,7 @@ bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max
 
   if (model_parameters_==NULL)
     return false;
-  ModelParametersUnified* mp_unified = model_parameters_->toModelParametersUnified();
+  UnifiedModel* mp_unified = model_parameters_->toUnifiedModel();
   if (mp_unified==NULL)
     return false;
 

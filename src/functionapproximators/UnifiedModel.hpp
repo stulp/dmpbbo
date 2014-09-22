@@ -1,6 +1,6 @@
 /**
- * @file   ModelParametersUnified.hpp
- * @brief  ModelParametersUnified class header file.
+ * @file   UnifiedModel.hpp
+ * @brief  UnifiedModel class header file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef MODELPARAMETERSUNIFIED_H
-#define MODELPARAMETERSUNIFIED_H
+#ifndef UNIFIEDMODEL_H
+#define UNIFIEDMODEL_H
 
 #include "functionapproximators/ModelParameters.hpp"
 
@@ -37,7 +37,7 @@ namespace DmpBbo {
  * \ingroup FunctionApproximators
  * \ingroup LWR
  */
-class ModelParametersUnified : public ModelParameters
+class UnifiedModel : public ModelParameters
 {
   friend class FunctionApproximatorLWR;
   
@@ -49,7 +49,7 @@ public:
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
+  UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
   /** Constructor for the unified model parameters. This version is used by for example LWR and LWPR 
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
@@ -59,9 +59,9 @@ public:
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
+  UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
-  ModelParametersUnified(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights);
+  UnifiedModel(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights);
 
   /** Constructor for the unified model parameters. This version is used by for example GMR. 
    *  \param[in] centers Centers of the basis functions (n_bfs X n_input_dims)
@@ -71,7 +71,7 @@ public:
    * \param[in] normalized_basis_functions Whether to use asymmetric kernels or not, cf MetaParametersLWR::normalized_basis_functions()
    * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  ModelParametersUnified(
+  UnifiedModel(
     const std::vector<Eigen::VectorXd>& centers, // n_centers X n_dims
     const std::vector<Eigen::MatrixXd>& widths,  // n_centers X n_dims X n_dims
     const std::vector<Eigen::VectorXd>& slopes, // n_centers X n_dims
@@ -120,7 +120,7 @@ public:
    */
   void set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation);
 
-  /** Whether to return slopes as angles or slopes in ModelParametersUnified::getParameterVectorAll()
+  /** Whether to return slopes as angles or slopes in UnifiedModel::getParameterVectorAll()
    * \param[in] slopes_as_angles Whether to return as slopes (true) or angles (false)
    * \todo Implement and document
    */
@@ -136,9 +136,9 @@ public:
   
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
-	ModelParametersUnified* toModelParametersUnified(void) const
+	UnifiedModel* toUnifiedModel(void) const
   {
-    return static_cast<ModelParametersUnified*>(clone());
+    return static_cast<UnifiedModel*>(clone());
   }
 
 protected:
@@ -189,7 +189,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  ModelParametersUnified(void) {};
+  UnifiedModel(void) {};
 
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -208,10 +208,10 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersUnified, "ModelParametersUnified")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::UnifiedModel, "UnifiedModel")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersUnified,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::UnifiedModel,boost::serialization::object_serializable);
 
-#endif        //  #ifndef MODELPARAMETERSUNIFIED_H
+#endif        //  #ifndef UNIFIEDMODEL_H
 

@@ -33,7 +33,7 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
@@ -361,7 +361,7 @@ void ModelParametersGMR::setParameterVectorAll(const VectorXd& values)
 };
 
 
-ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
+UnifiedModel* ModelParametersGMR::toUnifiedModel(void) const
 {
   int n_gaussians = means_x_.size();
     
@@ -385,7 +385,7 @@ ModelParametersUnified* ModelParametersGMR::toModelParametersUnified(void) const
   bool normalized_basis_functions = true;
   bool lines_pivot_at_max_activation = false;
 
-  return new ModelParametersUnified(centers, covars, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
+  return new UnifiedModel(centers, covars, slopes, offsets, priors_,  normalized_basis_functions,lines_pivot_at_max_activation); 
   
 }
 

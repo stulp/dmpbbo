@@ -76,7 +76,7 @@ public:
   /** \todo overwrite not functional yet. */
   bool saveGMM(std::string directory, bool overwrite) const;
 
-  ModelParametersUnified* toModelParametersUnified(void) const;
+  UnifiedModel* toUnifiedModel(void) const;
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

@@ -34,7 +34,7 @@
 namespace DmpBbo {
 
   // Forward declaration
-class ModelParametersUnified;
+class UnifiedModel;
 
 
 /** \brief Model parameters for the Radial Basis Function Network (RBFN) function approximator
@@ -104,7 +104,7 @@ public:
 	  if (!caching_) clearCache();
 	}
 	
-  ModelParametersUnified* toModelParametersUnified(void) const;
+  UnifiedModel* toUnifiedModel(void) const;
   
 private:
   

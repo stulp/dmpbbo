@@ -72,7 +72,7 @@ public:
   
   void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
 
-  ModelParametersUnified* toModelParametersUnified(void) const;
+  UnifiedModel* toUnifiedModel(void) const;
   
   double maximum_covariance(void) const { return maximum_covariance_; } ;
   const Eigen::VectorXd& weights(void) const { return gram_inv_targets_; };

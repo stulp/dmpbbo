@@ -1,5 +1,5 @@
 /**
- * \file testToModelParametersUnified.cpp
+ * \file testToUnifiedModel.cpp
  * \author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -37,7 +37,7 @@
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/ModelParametersRBFN.hpp"
 
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 #include "../demos/targetFunction.hpp"
 #include "getFunctionApproximatorsVector.hpp"
@@ -115,8 +115,8 @@ int main(int n_args, char** args)
       fa->train(inputs,targets,directory_fa,overwrite);
       fa->predict(inputs,outputs);
       
-      cout << "    Converting to ModelParametersUnified"  << endl;
-      ModelParametersUnified* mp_unified =  fa->getModelParametersUnified();
+      cout << "    Converting to UnifiedModel"  << endl;
+      UnifiedModel* mp_unified =  fa->getUnifiedModel();
       if (mp_unified!=NULL)
       {
         mp_unified->saveGridData(min, max, n_samples_per_dim_dense, directory_fa+"Unified",overwrite);

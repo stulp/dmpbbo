@@ -32,7 +32,7 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
 
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 #include "functionapproximators/BasisFunction.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -147,7 +147,7 @@ void ModelParametersGPR::getParameterVectorAll(VectorXd& values) const
 void ModelParametersGPR::setParameterVectorAll(const VectorXd& values) {
 };
 
-ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
+UnifiedModel* ModelParametersGPR::toUnifiedModel(void) const
 {
  
   MatrixXd centers = train_inputs_;
@@ -157,7 +157,7 @@ ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
   MatrixXd weights = gram_inv_targets_*maximum_covariance_;
   bool normalized_basis_functions = false;
 
-  return new ModelParametersUnified(centers, widths, weights, normalized_basis_functions); 
+  return new UnifiedModel(centers, widths, weights, normalized_basis_functions); 
   
 }
 

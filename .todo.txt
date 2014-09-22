@@ -1,9 +1,5 @@
 ________________________________________________________________________________
-rename ModelParametersUnified to UnifiedModel (keep evaluate)
-
-BasisFunction::Gaussian::activations(centers,LENGTH,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
-
-covar_diag for non-isotropic GPR
+Implement BasisFunction::Gaussian::activations(centers,LENGTH,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
 
 Remove all occurences of inverse()
 

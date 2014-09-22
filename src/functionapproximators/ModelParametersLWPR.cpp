@@ -34,7 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWPR);
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 
 #include "lwpr.hh"
@@ -225,16 +225,16 @@ void ModelParametersLWPR::setParameterVectorAll(const VectorXd& values) {
 };
 
 
-ModelParametersUnified* ModelParametersLWPR::toModelParametersUnified(void) const
+UnifiedModel* ModelParametersLWPR::toUnifiedModel(void) const
 {
   if (lwpr_object_->nIn()!=1)
   {
-    //cout << "Warning: Can only call toModelParametersUnified() when input dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toUnifiedModel() when input dim of LWPR is 1" << endl;
     return NULL;
   }
   if (lwpr_object_->model.nOut!=1)
   {
-    //cout << "Warning: Can only call toModelParametersUnified() when output dim of LWPR is 1" << endl;
+    //cout << "Warning: Can only call toUnifiedModel() when output dim of LWPR is 1" << endl;
     return NULL;
   }
   
@@ -291,7 +291,7 @@ ModelParametersUnified* ModelParametersLWPR::toModelParametersUnified(void) cons
   bool normalized_basis_functions=true;
   bool lines_pivot_at_max_activation=true;
 
-  return new ModelParametersUnified(centers,widths,slopes,offsets,
+  return new UnifiedModel(centers,widths,slopes,offsets,
                                     normalized_basis_functions, lines_pivot_at_max_activation);
 }
 

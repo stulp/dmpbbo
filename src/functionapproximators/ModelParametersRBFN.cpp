@@ -35,7 +35,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRBFN);
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "functionapproximators/BasisFunction.hpp"
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -233,11 +233,11 @@ void ModelParametersRBFN::setParameterVectorModifierPrivate(std::string modifier
 {
 }
 
-ModelParametersUnified* ModelParametersRBFN::toModelParametersUnified(void) const
+UnifiedModel* ModelParametersRBFN::toUnifiedModel(void) const
 {
   // RBFN does not use normalized basis functions
   bool normalized_basis_functions = false;
-  return new ModelParametersUnified(centers_, widths_, weights_,normalized_basis_functions); 
+  return new UnifiedModel(centers_, widths_, weights_,normalized_basis_functions); 
 }
 
 }

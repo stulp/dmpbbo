@@ -1,6 +1,6 @@
 /**
- * @file   ModelParametersUnified.cpp
- * @brief  ModelParametersUnified class source file.
+ * @file   UnifiedModel.cpp
+ * @brief  UnifiedModel class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -27,9 +27,9 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersUnified);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UnifiedModel);
 
 #include "functionapproximators/BasisFunction.hpp"
 
@@ -50,7 +50,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const MatrixXd& widths, const VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
+UnifiedModel::UnifiedModel(const MatrixXd& centers, const MatrixXd& widths, const VectorXd& weights, bool normalized_basis_functions, bool lines_pivot_at_max_activation) 
 {
   int n_basis_functions = centers.rows();
   int n_dims = centers.cols();
@@ -85,7 +85,7 @@ ModelParametersUnified::ModelParametersUnified(const MatrixXd& centers, const Ma
   initializeAllValuesVectorSize();
 };
 
-ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation)
+UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation)
 {
   int n_basis_functions = centers.rows();
   int n_dims = centers.cols();
@@ -123,7 +123,7 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& centers, c
 }
 
 
-ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights)
+UnifiedModel::UnifiedModel(const Eigen::MatrixXd& angular_frequencies, const Eigen::VectorXd& phases, const Eigen::VectorXd& weights)
 {
   int n_basis_functions = angular_frequencies.rows();
   int n_dims = angular_frequencies.cols();
@@ -161,7 +161,7 @@ ModelParametersUnified::ModelParametersUnified(const Eigen::MatrixXd& angular_fr
   initializeAllValuesVectorSize();
 }
 
-ModelParametersUnified::ModelParametersUnified(
+UnifiedModel::UnifiedModel(
   const std::vector<Eigen::VectorXd>& centers, // n_centers X n_dims
   const std::vector<Eigen::MatrixXd>& covars,  // n_centers X n_dims X n_dims
   const std::vector<Eigen::VectorXd>& slopes, // n_centers X n_dims
@@ -184,7 +184,7 @@ ModelParametersUnified::ModelParametersUnified(
   initializeAllValuesVectorSize();
 }
 
-void ModelParametersUnified::initializeAllValuesVectorSize(void)
+void UnifiedModel::initializeAllValuesVectorSize(void)
 {
   
   all_values_vector_size_ = 0;
@@ -201,12 +201,12 @@ void ModelParametersUnified::initializeAllValuesVectorSize(void)
 
 
 
-ModelParameters* ModelParametersUnified::clone(void) const {
-  return new ModelParametersUnified(centers_,covars_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
+ModelParameters* UnifiedModel::clone(void) const {
+  return new UnifiedModel(centers_,covars_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
 }
 
 
-void ModelParametersUnified::set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation)
+void UnifiedModel::set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation)
 {
   // If no change, just return
   if (lines_pivot_at_max_activation_ == lines_pivot_at_max_activation)
@@ -249,7 +249,7 @@ void ModelParametersUnified::set_lines_pivot_at_max_activation(bool lines_pivot_
   lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
 }
 
-void ModelParametersUnified::set_slopes_as_angles(bool slopes_as_angles)
+void UnifiedModel::set_slopes_as_angles(bool slopes_as_angles)
 {
   slopes_as_angles_ = slopes_as_angles;
   cerr << __FILE__ << ":" << __LINE__ << ":";
@@ -260,7 +260,7 @@ void ModelParametersUnified::set_slopes_as_angles(bool slopes_as_angles)
 
 
 
-void ModelParametersUnified::getLines(const MatrixXd& inputs, MatrixXd& lines) const
+void UnifiedModel::getLines(const MatrixXd& inputs, MatrixXd& lines) const
 {
   int n_time_steps = inputs.rows();
 
@@ -289,7 +289,7 @@ void ModelParametersUnified::getLines(const MatrixXd& inputs, MatrixXd& lines) c
   //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 }
   
-void ModelParametersUnified::evaluate(const MatrixXd& inputs, MatrixXd& output) const
+void UnifiedModel::evaluate(const MatrixXd& inputs, MatrixXd& output) const
 {
   
   MatrixXd lines;
@@ -303,7 +303,7 @@ void ModelParametersUnified::evaluate(const MatrixXd& inputs, MatrixXd& output) 
 }
 
 /*
-void ModelParametersUnified::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
+void UnifiedModel::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
 {
   cout << __FILE__ << ":" << __LINE__ << ":Here" << endl;
   // Check and set sizes
@@ -341,7 +341,7 @@ void ModelParametersUnified::kernelActivationsSymmetric(const MatrixXd& centers,
 }
 */
 
-void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
+void UnifiedModel::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
 {
   if (caching_)
   {
@@ -384,7 +384,7 @@ void ModelParametersUnified::kernelActivations(const MatrixXd& inputs, MatrixXd&
 }
 
 template<class Archive>
-void ModelParametersUnified::serialize(Archive & ar, const unsigned int version)
+void UnifiedModel::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
@@ -401,12 +401,12 @@ void ModelParametersUnified::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(caching_);
 }
 
-string ModelParametersUnified::toString(void) const
+string UnifiedModel::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersUnified");
+  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("UnifiedModel");
 }
 
-void ModelParametersUnified::getSelectableParameters(set<string>& selected_values_labels) const 
+void UnifiedModel::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
   selected_values_labels.insert("centers");
@@ -417,7 +417,7 @@ void ModelParametersUnified::getSelectableParameters(set<string>& selected_value
 }
 
 
-void ModelParametersUnified::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
+void UnifiedModel::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
 {
 
   selected_mask.resize(getParameterVectorAllSize());
@@ -453,7 +453,7 @@ void ModelParametersUnified::getParameterVectorMask(const std::set<std::string> 
   assert(offset == getParameterVectorAllSize());   
 }
 
-void ModelParametersUnified::getParameterVectorAll(VectorXd& values) const
+void UnifiedModel::getParameterVectorAll(VectorXd& values) const
 {
   values.resize(getParameterVectorAllSize());
   int offset = 0;
@@ -491,7 +491,7 @@ void ModelParametersUnified::getParameterVectorAll(VectorXd& values) const
   assert(offset == getParameterVectorAllSize());   
 };
 
-void ModelParametersUnified::setParameterVectorAll(const VectorXd& values) {
+void UnifiedModel::setParameterVectorAll(const VectorXd& values) {
 
   if (all_values_vector_size_ != values.size())
   {
@@ -568,7 +568,7 @@ void ModelParametersUnified::setParameterVectorAll(const VectorXd& values) {
   assert(offset == getParameterVectorAllSize());   
 };
 
-bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+bool UnifiedModel::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
   if (save_directory.empty())
     return true;  
@@ -618,7 +618,7 @@ bool ModelParametersUnified::saveGridData(const VectorXd& min, const VectorXd& m
   
 }
 
-void ModelParametersUnified::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
+void UnifiedModel::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
 {
   if (modifier.compare("lines_pivot_at_max_activation")==0)
     set_lines_pivot_at_max_activation(new_value);

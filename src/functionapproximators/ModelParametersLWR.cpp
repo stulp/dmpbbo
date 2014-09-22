@@ -28,7 +28,7 @@
 #include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/ModelParametersUnified.hpp"
+#include "functionapproximators/UnifiedModel.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
@@ -406,12 +406,12 @@ void ModelParametersLWR::setParameterVectorModifierPrivate(std::string modifier,
   
 }
 
-ModelParametersUnified* ModelParametersLWR::toModelParametersUnified(void) const
+UnifiedModel* ModelParametersLWR::toUnifiedModel(void) const
 {
 
   // LWR uses normalized basis functions
   bool normalized_basis_functions = true;
-  return new ModelParametersUnified(centers_, widths_, slopes_, offsets_, normalized_basis_functions); 
+  return new UnifiedModel(centers_, widths_, slopes_, offsets_, normalized_basis_functions); 
   
 }
 
