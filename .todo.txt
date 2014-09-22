@@ -5,6 +5,8 @@ BasisFunction::Gaussian::activations(centers,LENGTH,inputs,kernel_activations,no
 
 covar_diag for non-isotropic GPR
 
+Remove all occurences of inverse()
+
 ________________________________________________________________________________
 Put basis function caching in ModelParameters base class
 

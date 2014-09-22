@@ -47,9 +47,11 @@ public:
    *  \param[in] train_targets The training samples provided (target values) 
    *  \param[in] gram The Gram matrix, i.e. the covariances between all combination of input samples 
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
-   *  \param[in] length             Length of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
+   *  \param[in] length             Length 'l' of the covariance function, i.e. sigma^2 exp(-(x-x')^2/2l^2)
    */
-   ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::VectorXd train_targets, Eigen::MatrixXd gram, double maximum_covariance, double length);
+   ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, double length);
+
+   ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const Eigen::VectorXd& sigmas);
    
   std::string toString(void) const;
   
@@ -72,9 +74,7 @@ public:
 
   ModelParametersUnified* toModelParametersUnified(void) const;
   
-  const Eigen::MatrixXd& train_inputs(void) const { return train_inputs_; };
   double maximum_covariance(void) const { return maximum_covariance_; } ;
-  double length(void) const { return length_; } ;
   const Eigen::VectorXd& weights(void) const { return gram_inv_targets_; };
   const Eigen::MatrixXd& gram_inv(void) const { return gram_inv_; };
   
@@ -86,7 +86,7 @@ private:
   Eigen::MatrixXd train_targets_;
   Eigen::MatrixXd gram_;
   double maximum_covariance_;
-  double length_;
+  Eigen::VectorXd sigmas_;
 
   // Cached variables, computed only in the constructor
   Eigen::VectorXd gram_inv_targets_;

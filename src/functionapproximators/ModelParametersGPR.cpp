@@ -52,35 +52,56 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ModelParametersGPR::ModelParametersGPR(Eigen::MatrixXd train_inputs, Eigen::VectorXd train_targets, Eigen::MatrixXd gram, double maximum_covariance, double length)
+ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, double length)
 :
   train_inputs_(train_inputs),
   train_targets_(train_targets),
   gram_(gram),
   maximum_covariance_(maximum_covariance),
-  length_(length)
+  sigmas_(MatrixXd::Constant(train_inputs_.cols(),train_inputs_.cols(),length))
 {
   assert(gram_.rows()==gram_.cols());
   assert(train_inputs_.rows()==gram_.rows());
   assert(train_inputs_.rows()==train_targets_.rows());
+  assert(maximum_covariance_>0);
+  assert(length>0);
   
   gram_inv_ = gram_.inverse();
   gram_inv_targets_ = gram_inv_ * train_targets_.col(0);
 
+}
+
+ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const VectorXd& sigmas)
+:
+  train_inputs_(train_inputs),
+  train_targets_(train_targets),
+  gram_(gram),
+  maximum_covariance_(maximum_covariance),
+  sigmas_(sigmas)
+{
+  assert(gram_.rows()==gram_.cols());
+  assert(train_inputs_.rows()==gram_.rows());
+  assert(train_inputs_.rows()==train_targets_.rows());
+  assert(sigmas_.rows()==train_targets_.cols());
   assert(maximum_covariance_>0);
-  assert(length_>0);
+  
+  gram_inv_ = gram_.inverse();
+  gram_inv_targets_ = gram_inv_ * train_targets_.col(0);
+
 }
 
 ModelParameters* ModelParametersGPR::clone(void) const {
-  return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,length_); 
+  return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,sigmas_); 
 }
 
 void ModelParametersGPR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   
   MatrixXd centers = train_inputs_;
-  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length_);
-
+  int n_basis_functions = centers.rows();
+  // All basis functions have the same width
+  MatrixXd widths  = sigmas_.colwise().replicate(n_basis_functions); 
+  
   bool normalize_activations = false;
   bool asymmetric_kernels = false;
   BasisFunction::Gaussian::activations(centers,widths,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
@@ -97,7 +118,7 @@ void ModelParametersGPR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(train_inputs_);
   ar & BOOST_SERIALIZATION_NVP(gram_inv_targets_);
   ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);            
-  ar & BOOST_SERIALIZATION_NVP(length_);     
+  ar & BOOST_SERIALIZATION_NVP(sigmas_);     
                                     
 }
 
@@ -130,7 +151,9 @@ ModelParametersUnified* ModelParametersGPR::toModelParametersUnified(void) const
 {
  
   MatrixXd centers = train_inputs_;
-  MatrixXd widths  = MatrixXd::Constant(centers.rows(),centers.cols(),length_);
+  int n_basis_functions = centers.rows();
+  // All basis functions have the same width
+  MatrixXd widths  = sigmas_.colwise().replicate(n_basis_functions); 
   MatrixXd weights = gram_inv_targets_*maximum_covariance_;
   bool normalized_basis_functions = false;
 
