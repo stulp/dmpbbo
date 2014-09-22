@@ -479,6 +479,33 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
     for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
       covars[i_gau] += MatrixXd::Identity(covars[i_gau].rows(), covars[i_gau].cols()) * 1e-5f;
   }
+  
+  /*
+  Here's a hacky Matlab script for plotting the EM procedure above (if you cann saveGMM)
+  directory = '/tmp/demoTrainFunctionApproximators/GMR/';
+  inputs = load([directory '/inputs.txt']);
+  targets = load([directory '/targets.txt']);
+  outputs = load([directory '/outputs.txt']);
+   
+  
+  plot(inputs,targets,'.k')
+  hold on
+  plot(inputs,outputs,'.r')
+  
+  max_iter = 5;
+  for iter=0:max_iter
+    color = 0.2+(0.8-iter/max_iter)*[1 1 1];
+    for bfs=0:2
+      center = load(sprintf('%s/gmm_iter%02d_mu%03d.txt',directory,iter,bfs));
+      %plot(center(1),center(2))
+      covar = load(sprintf('%s/gmm_iter%02d_covar%03d.txt',directory,iter,bfs));
+      h = error_ellipse(covar,center,'conf',0.95);
+      set(h,'Color',color,'LineWidth',1+iter/max_iter)
+    end
+  end
+  hold off
+  */
+  
 }
 
 template<class Archive>
