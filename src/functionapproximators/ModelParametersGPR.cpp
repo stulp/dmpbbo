@@ -58,7 +58,7 @@ ModelParametersGPR::ModelParametersGPR(const Eigen::MatrixXd& train_inputs, cons
   train_targets_(train_targets),
   gram_(gram),
   maximum_covariance_(maximum_covariance),
-  sigmas_(MatrixXd::Constant(train_inputs_.cols(),train_inputs_.cols(),length))
+  sigmas_(VectorXd::Constant(train_inputs_.cols(),length))
 {
   assert(gram_.rows()==gram_.cols());
   assert(train_inputs_.rows()==gram_.rows());
@@ -100,7 +100,7 @@ void ModelParametersGPR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen:
   MatrixXd centers = train_inputs_;
   int n_basis_functions = centers.rows();
   // All basis functions have the same width
-  MatrixXd widths  = sigmas_.colwise().replicate(n_basis_functions); 
+  MatrixXd widths  = sigmas_.transpose().colwise().replicate(n_basis_functions); 
   
   bool normalize_activations = false;
   bool asymmetric_kernels = false;
@@ -153,7 +153,7 @@ UnifiedModel* ModelParametersGPR::toUnifiedModel(void) const
   MatrixXd centers = train_inputs_;
   int n_basis_functions = centers.rows();
   // All basis functions have the same width
-  MatrixXd widths  = sigmas_.colwise().replicate(n_basis_functions); 
+  MatrixXd widths  = sigmas_.transpose().colwise().replicate(n_basis_functions); 
   MatrixXd weights = gram_inv_targets_*maximum_covariance_;
   bool normalized_basis_functions = false;
 
