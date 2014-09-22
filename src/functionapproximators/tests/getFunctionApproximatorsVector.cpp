@@ -125,7 +125,7 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   if (name.compare("GPR")==0)
   {
     // Gaussian Process Regression
-    double maximum_covariance = 3;
+    double maximum_covariance = 1.1;
     double length = 0.1;
     return new MetaParametersGPR(input_dim,maximum_covariance,length);
   }

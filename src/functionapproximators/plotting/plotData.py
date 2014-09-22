@@ -83,19 +83,19 @@ def plotDataFromDirectory(directory,ax):
       predictions = [];
         
     # Plotting
-    #try:
-    #  inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
-    #  predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
-    #  plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
-    #  try:
-    #    variances_grid = numpy.loadtxt(directory+'/variances_grid.txt')
-    #    plotDataVariance(inputs_grid,predictions_grid,variances_grid,ax)
-    #  except IOError:
-    #    # Everything's fine: user did not store grid predictions
-    #    variances_grid = [];
-    #except IOError:
-    #  # Everything's fine: user did not store grid predictions
-    #  predictions_grid = [];
+    try:
+      inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
+      predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
+      plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
+      try:
+        variances_grid = numpy.loadtxt(directory+'/variances_grid.txt')
+        plotDataVariance(inputs_grid,predictions_grid,variances_grid,ax)
+      except IOError:
+        # Everything's fine: user did not store grid predictions
+        variances_grid = [];
+    except IOError:
+      # Everything's fine: user did not store grid predictions
+      predictions_grid = [];
       
       
     if len(predictions)>0:

@@ -26,7 +26,7 @@ if __name__=='__main__':
         print ""
         sys.exit(-1);
     
-    function_approximator_names = ["LWR","RBFN","GPR"] #"GPR","GMR","LWPR","IRFRLS"]
+    function_approximator_names = ["LWR","RBFN","GPR","GMR","LWPR","IRFRLS"]
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"
@@ -50,9 +50,9 @@ if __name__=='__main__':
             subplot_number = subplot_number+1
     
             try:
-                if (uni_name=="Unified" or name=="LWR" or name=="LWPR" or name=="GPR"):
+                if (uni_name=="Unified" or name=="LWR" or name=="LWPR"):
                     plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
-                elif (name=="RBFN"):
+                elif (name=="RBFN" or name=="GPR"):
                     plotBasisFunctionsFromDirectory(directory_fa,ax)
                 plotDataFromDirectory(directory_fa,ax)
                 ax.set_ylim(-1.0,1.5)
