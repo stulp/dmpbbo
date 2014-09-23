@@ -7,6 +7,7 @@ from plotData import getDataDimFromDirectory
 from plotData import plotDataFromDirectory
 from plotData import plotDataPredictionsGrid
 from plotBasisFunctions import plotBasisFunctions
+from plotBasisFunctions import plotBasisFunctionsFromDirectory
 
 def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,activations_unnormalized=None):
     """Plots locally weighted lines, whilst being smart about the dimensionality of input data."""
@@ -14,14 +15,6 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
     line_handles = []
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims==1):
-        
-        #line_handles = ax.plot(inputs,lines, '-', color='#cccccc')
-        #line_handles = ax.plot(inputs,lines_weighted, '-', color='lightblue')
-
-        #y_lim_min = min(lines_weighted) - 0.2*(max(lines_weighted)-min(lines_weighted))
-        #y_lim_max = max(lines_weighted) + 0.2*(max(lines_weighted)-min(lines_weighted))
-        #ax.set_ylim(y_lim_min,y_lim_max)
-        
         
         if not activations is None:
             ax_two = ax.twinx()
@@ -33,16 +26,16 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
             for tl in ax_two.get_yticklabels():
                 tl.set_color('green')
             
-        ax_two.set_ylim(-2.0,3.0)
-        
-        n_basis_functions =  len(numpy.atleast_1d(activations[0]));
-        if n_basis_functions==1:
-          active = activations>(max(activations)*0.001)
-          line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth='1')
-        else:
-          for ii in xrange(n_basis_functions):
-              active = activations[:,ii]>(max(activations[:,ii])*0.001)
-              line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
+            ax_two.set_ylim(-2.0,3.0)
+            
+            n_basis_functions =  len(numpy.atleast_1d(activations[0]));
+            if n_basis_functions==1:
+              active = activations>(max(activations)*0.001)
+              line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth='1')
+            else:
+              for ii in xrange(n_basis_functions):
+                  active = activations[:,ii]>(max(activations[:,ii])*0.001)
+                  line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
     
     elif (n_dims==2):
         return []
@@ -73,9 +66,16 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
     return line_handles
 
 
-def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
+def plotLocallyWeightedLinesFromDirectory(directory,ax):
     """Read activations from file, and plot them."""
   
+    try:
+        lines  = numpy.loadtxt(directory+'/lines_grid.txt')                         
+    except IOError:
+        # If there are no lines, assume this to be a weighted sum of basis functions instead
+        return plotBasisFunctionsFromDirectory(directory,ax)
+    
+    
     try:
       inputs = numpy.loadtxt(directory+'/inputs_grid.txt')                             
     except IOError:
@@ -98,12 +98,6 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
         predictions = [];
 
     try:
-        lines  = numpy.loadtxt(directory+'/lines_grid.txt')                         
-    except IOError:
-        lines = [];
-        
-        
-    try:
         activations_unnormalized = numpy.loadtxt(directory+'/activations_unnormalized_grid.txt')
     except IOError:
         activations_unnormalized = None
@@ -113,6 +107,7 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax,plot_normalized=True):
     except IOError:
         activations = None
       
+        
     plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations,activations_unnormalized) 
 
     if (n_dims==1):
