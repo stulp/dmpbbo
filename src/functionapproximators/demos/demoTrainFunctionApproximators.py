@@ -46,12 +46,12 @@ if __name__=='__main__':
         fig_number += 1;
     
         try:
-            plotDataFromDirectory(directory_fa,ax)
-            if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GPR"):
+            if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GMR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
-            elif (name=="RBFN"):
+            elif (name=="RBFN" or name=="GPR" or name=="IRFRLS"):
                 plot_normalized=False
-                plotBasisFunctionsFromDirectory(directory_fa,ax,plot_normalized)
+                plotBasisFunctionsFromDirectory(directory_fa,ax)
+            plotDataFromDirectory(directory_fa,ax)
             ax.set_ylim(-1.0,1.5)
         except IOError:
             print "WARNING: Could not find data for function approximator "+name
