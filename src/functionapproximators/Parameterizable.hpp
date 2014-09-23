@@ -45,6 +45,10 @@ namespace DmpBbo {
 class Parameterizable {
   
 public: 
+  
+  /** Destructor */
+  virtual ~Parameterizable(void) {};
+  
   /** Get the size of the vector of selected parameters, as returned by getParameterVectorSelected(
    * \return The size of the vector representation of the selected parameters.
    */
