@@ -33,16 +33,16 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
             for tl in ax_two.get_yticklabels():
                 tl.set_color('green')
             
-        ax_two.set_ylim(-2.0,3.0)
-        
-        n_basis_functions =  len(numpy.atleast_1d(activations[0]));
-        if n_basis_functions==1:
-          active = activations>(max(activations)*0.001)
-          line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth='1')
-        else:
-          for ii in xrange(n_basis_functions):
-              active = activations[:,ii]>(max(activations[:,ii])*0.001)
-              line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
+            ax_two.set_ylim(-2.0,3.0)
+            
+            n_basis_functions =  len(numpy.atleast_1d(activations[0]));
+            if n_basis_functions==1:
+              active = activations>(max(activations)*0.001)
+              line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth='1')
+            else:
+              for ii in xrange(n_basis_functions):
+                  active = activations[:,ii]>(max(activations[:,ii])*0.001)
+                  line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth='1')
     
     elif (n_dims==2):
         return []
