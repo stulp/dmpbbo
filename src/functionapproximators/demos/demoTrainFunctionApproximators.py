@@ -49,7 +49,6 @@ if __name__=='__main__':
             if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GMR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
             elif (name=="RBFN" or name=="GPR" or name=="IRFRLS"):
-                plot_normalized=False
                 plotBasisFunctionsFromDirectory(directory_fa,ax)
             plotDataFromDirectory(directory_fa,ax)
             ax.set_ylim(-1.0,1.5)

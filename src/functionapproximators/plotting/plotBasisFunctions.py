@@ -90,7 +90,7 @@ def plotBasisFunctionsFromDirectory(directory,ax):
       ax.set_ylabel('input_2');
       ax.set_zlabel('activation');
       
-    
+    return True
 
 if __name__=='__main__':
     """Pass a directory argument, read inputs, targets and predictions from that directory, and plot."""

@@ -34,7 +34,7 @@ if __name__=='__main__':
     fig_number = 1;     
     directory = "/tmp/testFunctionApproximatorTraining/"
     
-    fa_names = ["LWR", "LWPR", "GMR", "IRFRLS","RBFN","GPR"] 
+    fa_names = ["LWR" , "LWPR", "GMR", "IRFRLS","RBFN","GPR"] 
     for fa_name in fa_names:
       
         # Call the executable with the directory to which results should be written
@@ -42,19 +42,19 @@ if __name__=='__main__':
         #print command
         subprocess.call(command, shell=True)
         
-        #for dim in [1]:
-        #    fig = plt.figure(fig_number)
-        #    fig_number = fig_number+1
-        #    
-        #    cur_directory = directory+fa_name+"_"+str(dim)+"D";
-        #    if (getDataDimFromDirectory(cur_directory)==1):
-        #      ax = fig.gca()
-        #    else:
-        #      ax = Axes3D(fig)
-        #      
-        #    plotFunctionApproximatorTrainingFromDirectory(cur_directory,ax)
-        #    ax.set_title(fa_name+" ("+str(dim)+"D data)")
+        for dim in [1]:
+            fig = plt.figure(fig_number)
+            fig_number = fig_number+1
+            
+            cur_directory = directory+fa_name+"_"+str(dim)+"D";
+            if (getDataDimFromDirectory(cur_directory)==1):
+                ax = fig.gca()
+            else:
+                ax = Axes3D(fig)
+            plotFunctionApproximatorTrainingFromDirectory(cur_directory,ax)
+            ax.set_title(fa_name+" ("+str(dim)+"D data)")
+              
           
-    #plt.show()
+    plt.show()
 
 
