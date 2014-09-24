@@ -1,14 +1,12 @@
 ________________________________________________________________________________
-Bugfix
-  Variance is dotty, and also plotted when 0
+More coherent structure  
+  IRFRLS, rename proj to basisFunctionActivations
+  
 ________________________________________________________________________________
 Optimizations
   Remove all occurences of inverse()
   Put basis function caching in ModelParameters base class  
   
-________________________________________________________________________________
-More coherent structure  
-  IRFRLS, rename proj to basisFunctionActivations
 ________________________________________________________________________________
 Gaussian Mixture Regression
   plot covariance matrices in Python
