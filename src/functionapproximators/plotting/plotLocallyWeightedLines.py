@@ -89,16 +89,15 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax):
     """Read activations from file, and plot them."""
   
     try:
+      inputs = numpy.loadtxt(directory+'/inputs_grid.txt')                             
+    except IOError:
+      return False;
+      
+    try:
         lines  = numpy.loadtxt(directory+'/lines_grid.txt')                         
     except IOError:
         # If there are no lines, assume this to be a weighted sum of basis functions instead
         return plotBasisFunctionsFromDirectory(directory,ax)
-    
-    
-    try:
-      inputs = numpy.loadtxt(directory+'/inputs_grid.txt')                             
-    except IOError:
-      return False;
       
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims>2):
