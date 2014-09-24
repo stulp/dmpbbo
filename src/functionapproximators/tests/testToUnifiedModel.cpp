@@ -60,7 +60,7 @@ int main(int n_args, char** args)
     directory = string(args[1]);
   bool overwrite = true;
   
-  for (int n_input_dims = 1; n_input_dims<=1; n_input_dims++)
+  for (int n_input_dims = 1; n_input_dims<=2; n_input_dims++)
   {
     vector<FunctionApproximator*> function_approximators;
     if (n_args>2)
@@ -83,7 +83,7 @@ int main(int n_args, char** args)
     // Generate training data 
     VectorXi n_samples_per_dim = VectorXi::Constant(1,25);
     if (n_input_dims==2) 
-      n_samples_per_dim = VectorXi::Constant(2,25);
+      n_samples_per_dim = VectorXi::Constant(2,10);
       
     MatrixXd inputs, targets, outputs;
     targetFunction(n_samples_per_dim,inputs,targets);
@@ -103,7 +103,7 @@ int main(int n_args, char** args)
       FunctionApproximator* fa = function_approximators[dd]; 
     
       cout << "_____________________________________" << endl << fa->getName() << endl;
-      cout << "    Training"  << endl;
+      cout << "    Training (with " << n_input_dims << "D data)"<< endl;
       if (!directory.empty()) {
         directory_fa =  directory+"/"+fa->getName();
         if (n_input_dims==1)
