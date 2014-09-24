@@ -150,14 +150,8 @@ void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& 
   double maximum_covariance = model_parameters_gpr->maximum_covariance();
   MatrixXd gram_inv = model_parameters_gpr->gram_inv();
   
-  VectorXd rest;
   for (unsigned int ii=0; ii<n_samples; ii++)
-  {
-    rest = ks.row(ii)*gram_inv*ks.row(ii).transpose();
-    assert(rest.rows()==1);
-    assert(rest.cols()==1);
-    variances(ii) = maximum_covariance - rest(0);
-  }
+    variances(ii) = maximum_covariance - (ks.row(ii)*gram_inv).dot(ks.row(ii).transpose());
 
 }
 
