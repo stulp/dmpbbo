@@ -62,7 +62,7 @@ int main(int n_args, char** args)
     
     VectorXi n_samples_per_dim = VectorXi::Constant(1,30);
     if (n_input_dims==2) 
-      n_samples_per_dim = VectorXi::Constant(2,20);
+      n_samples_per_dim = VectorXi::Constant(2,10);
     
     MatrixXd inputs, targets, outputs;
     targetFunction(n_samples_per_dim,inputs,targets);
@@ -70,10 +70,6 @@ int main(int n_args, char** args)
     
     for (unsigned int i_name=0; i_name<fa_names.size(); i_name++)
     {
-      // GMR on 2D too slow
-      if (fa_names[i_name].compare("GMR")==0)
-        if (n_input_dims==2)
-          continue;
       
       FunctionApproximator* cur_fa = getFunctionApproximatorByName(fa_names[i_name],n_input_dims);
       if (cur_fa==NULL)

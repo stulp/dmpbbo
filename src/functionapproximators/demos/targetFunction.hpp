@@ -40,7 +40,7 @@ inline void targetFunction(Eigen::VectorXi n_samples_per_dim, Eigen::MatrixXd& i
         inputs(ii*x2.size()+jj,1) = x2[jj];
       }
     }
-    targets = inputs.col(0).array()*exp(-inputs.col(0).array().pow(2) - inputs.col(1).array().pow(2));
+    targets = 2.5*inputs.col(0).array()*exp(-inputs.col(0).array().pow(2) - inputs.col(1).array().pow(2));
     
   }
 }

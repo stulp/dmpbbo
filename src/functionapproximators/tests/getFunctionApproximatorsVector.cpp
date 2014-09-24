@@ -71,9 +71,11 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   {
     // Locally Weighted Regression
     double intersection = 0.6;
-    int n_rfs = 9;
-    if (input_dim==2) n_rfs = 5;
-    VectorXi num_rfs_per_dim = VectorXi::Constant(input_dim,n_rfs);
+    VectorXi num_rfs_per_dim = VectorXi::Constant(input_dim,9);
+    if (input_dim==2) {
+      num_rfs_per_dim[0] = 7;
+      num_rfs_per_dim[1] = 5;
+    }
     return new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection);
   } 
 
@@ -99,15 +101,17 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   {
     // Gaussian Mixture Regression  
     int number_of_gaussians = 10;
+    if (input_dim==2) number_of_gaussians = 10;
     return new MetaParametersGMR(input_dim,number_of_gaussians);
   }
   
   if (name.compare("IRFRLS")==0)
   {
     // IRFRLS
-    int number_of_basis_functions=9;
+    int number_of_basis_functions=18;
+    if (input_dim==2) number_of_basis_functions = 50;
     double lambda=0.2;
-    double gamma=10;
+    double gamma=5;
     return new MetaParametersIRFRLS(input_dim,number_of_basis_functions,lambda,gamma);
   }
 
@@ -125,8 +129,13 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   if (name.compare("GPR")==0)
   {
     // Gaussian Process Regression
-    double maximum_covariance = 1.1;
+    double maximum_covariance = 1.1*1.1;
     double length = 0.1;
+    if (input_dim==2) 
+    {
+      maximum_covariance = 0.1*0.1;
+      length = 0.2;
+    }
     return new MetaParametersGPR(input_dim,maximum_covariance,length);
   }
   
