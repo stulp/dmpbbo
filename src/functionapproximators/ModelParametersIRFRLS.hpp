@@ -63,6 +63,11 @@ public:
 
   UnifiedModel* toUnifiedModel(void) const;
   
+  /** Return the weights of the basis functions.
+   * \return weights of the basis functions.
+   */
+  const Eigen::VectorXd& weights(void) const { return weights_; }  
+  
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   
