@@ -9,55 +9,79 @@ def plotData(inputs,outputs,ax):
     """Plot outputs against inputs, whilst being smart about the dimensionality of inputs."""
     n_dims = len(numpy.atleast_1d(inputs[0]))
     if (n_dims==1):
-        lines = ax.plot(inputs,outputs, '.')
+        return ax.plot(inputs,outputs,'.')
     elif (n_dims==2):
-        lines = ax.plot(inputs[:,0],inputs[:,1],outputs, '.')
+        return ax.plot(inputs[:,0],inputs[:,1],outputs,'.')
     else:
         print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
-        lines = []
-        
-    return lines
+        return []
 
 
 def plotDataTargets(inputs,target,ax):
     """Plot outputs against targets, and apply default style for targets."""
-    lines = plotData(inputs,target,ax)
-    plt.setp(lines, linestyle='.', label='targets', color='black',markersize=7)                  
-    return lines
+    list_of_lines = plotData(inputs,target,ax)
+    plt.setp(list_of_lines, label='targets', color='black',markersize=7)                  
+    return list_of_lines
 
 
-def plotDataPredictions(inputs,predictions,ax,n_samples_per_dim=[]):
+def plotDataPredictions(inputs,predictions,ax):
     """Plot outputs against targets, and apply default style for predictions."""
-    lines = plotData(inputs,predictions,ax)
-    plt.setp(lines, marker='.', label='predictions', color='red')
-    return lines
+    list_of_lines = plotData(inputs,predictions,ax)
+    plt.setp(list_of_lines, label='predictions', color='red')
+    return list_of_lines
 
-def plotDataVariance(inputs,predictions,variances,ax):
-    #lines = plotData(inputs,predictions+math.sqrt(abs(variances)),ax)
-    lines = plotData(inputs,predictions+2*((variances)),ax)
-    plt.setp(lines, linestyle='-',marker='None', label='variance', color='lightblue')
-    lines = plotData(inputs,predictions-2*((variances)),ax)
-    plt.setp(lines, linestyle='-',marker='None', label='variance', color='lightblue')
-    return lines
-    
-def plotResiduals(inputs,targets,predictions,ax):
-    lines = []
+def plotDataResiduals(inputs,targets,predictions,ax):
+
     n_dims = len(numpy.atleast_1d(inputs[0]))
-    if (n_dims>2):
+        
+    list_of_lines = []
+    if (n_dims==1):
+        for ii in range(len(inputs)):
+            l = ax.plot([inputs[ii], inputs[ii]],[targets[ii], predictions[ii] ])
+            list_of_lines.append(l)
+    elif (n_dims==2):
+        for ii in range(len(inputs)):
+            l = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ])
+            list_of_lines.append(l)
+    else:
         print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
-        return lines
-    for ii in range(len(inputs)):
-        if (n_dims==1):
-            lines = ax.plot([inputs[ii], inputs[ii]],[targets[ii], predictions[ii] ], '-r',linewidth=2,label='residuals')
-        elif (n_dims==2):
-            lines = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ], '-r',linewidth=2,label='residuals')
 
+    plt.setp(list_of_lines, label='predictions', color='red', linewidth=2)
+    return list_of_lines
+
+def plotGrid(inputs,outputs,ax,n_samples_per_dim):
+    """Plot outputs against inputs, whilst being smart about the dimensionality of inputs."""
+    list_of_lines = []
+    n_dims = len(numpy.atleast_1d(inputs[0]))
+    if (n_dims==1):
+        list_of_lines = ax.plot(inputs,outputs,'-')
+    elif (n_dims==2):
+        inputs_0_on_grid = numpy.reshape(inputs[:,0],n_samples_per_dim)
+        inputs_1_on_grid = numpy.reshape(inputs[:,1],n_samples_per_dim)
+        outputs_on_grid = numpy.reshape(outputs,n_samples_per_dim)
+        list_of_lines = ax.plot_wireframe(inputs_0_on_grid,inputs_1_on_grid,outputs_on_grid,rstride=1, cstride=1)
+    else:
+        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        
+    return list_of_lines
     
-def plotDataPredictionsGrid(inputs,predictions,ax,n_samples_per_dim=[]):
+def plotGridPredictions(inputs,predictions,ax,n_samples_per_dim):
     """Plot outputs against targets, and apply default style for predictions."""
-    lines = plotData(inputs,predictions,ax)
-    plt.setp(lines, linestyle='-', marker=None, label='latent function', color='lightblue',linewidth=3)
-    return lines
+    list_of_lines = plotGrid(inputs,predictions,ax,n_samples_per_dim)
+    n_dims = len(numpy.atleast_1d(n_samples_per_dim))
+    if (n_dims==1):
+        plt.setp(list_of_lines, label='latent function', color='#9999ff',linewidth=3)
+    else:
+        plt.setp(list_of_lines, label='latent function', color='#5555ff',linewidth=1)
+    return list_of_lines
+    
+def plotGridVariance(inputs,predictions,variances,ax,n_samples_per_dim=None):
+    list_of_lines1 = plotGrid(inputs,predictions+2*(numpy.sqrt(variances)),ax,n_samples_per_dim)
+    list_of_lines2 = plotGrid(inputs,predictions-2*(numpy.sqrt(variances)),ax,n_samples_per_dim)
+    list_of_lines = [list_of_lines1, list_of_lines2]
+    plt.setp(list_of_lines, linewidth=0.5, label='variance', color='#aaaaff')
+    return list_of_lines
+    
     
 def getDataDimFromDirectory(directory):
     try:
@@ -82,14 +106,19 @@ def plotDataFromDirectory(directory,ax):
       # Everything's fine: user did not store outputs
       predictions = [];
         
+    try:
+        n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt')                             
+    except IOError:
+        n_samples_per_dim = None
+      
     # Plotting
     try:
       inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
       predictions_grid = numpy.loadtxt(directory+'/outputs_grid.txt')
-      plotDataPredictionsGrid(inputs_grid,predictions_grid,ax)   
+      plotGridPredictions(inputs_grid,predictions_grid,ax,n_samples_per_dim)   
       try:
         variances_grid = numpy.loadtxt(directory+'/variances_grid.txt')
-        plotDataVariance(inputs_grid,predictions_grid,variances_grid,ax)
+        plotGridVariance(inputs_grid,predictions_grid,variances_grid,ax,n_samples_per_dim)
       except IOError:
         # Everything's fine: user did not store grid predictions
         variances_grid = [];
@@ -99,7 +128,7 @@ def plotDataFromDirectory(directory,ax):
       
       
     if len(predictions)>0:
-      plotResiduals(inputs,targets,predictions,ax)
+      plotDataResiduals(inputs,targets,predictions,ax)
     plotDataTargets(inputs,targets,ax)
     #plotDataPredictions(inputs,predictions,ax)   
     

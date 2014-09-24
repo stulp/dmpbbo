@@ -11,9 +11,13 @@ from plotData import plotDataFromDirectory
 from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
 
 
-def plotFunctionApproximatorTrainingFromDirectory(directory,ax):
+def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
     """Load data related to function approximator training from a directory and plot it."""
-    plotLocallyWeightedLinesFromDirectory(directory,ax)
+    if ax2 != None:
+        plotLocallyWeightedLinesFromDirectory(directory,ax2)
+    else:
+        plotLocallyWeightedLinesFromDirectory(directory,ax)
+        
     plotDataFromDirectory(directory,ax)
     
         
@@ -34,25 +38,31 @@ if __name__=='__main__':
     fig_number = 1;     
     directory = "/tmp/testFunctionApproximatorTraining/"
     
-    fa_names = ["LWR" , "LWPR", "GMR", "IRFRLS","RBFN","GPR"] 
+    fa_names = ["RBFN","GPR","IRFRLS","LWR", "LWPR", "GMR"] 
     for fa_name in fa_names:
       
         # Call the executable with the directory to which results should be written
         command = executable+" "+directory+" "+fa_name
         #print command
         subprocess.call(command, shell=True)
-        
-        for dim in [1]:
-            fig = plt.figure(fig_number)
-            fig_number = fig_number+1
+    
+    for fa_name in fa_names:
+        print("Plotting "+fa_name+" results")
+        fig = plt.figure(fig_number,figsize=(15,5))
+        fig_number = fig_number+1
+        for dim in [1, 2]:
             
             cur_directory = directory+fa_name+"_"+str(dim)+"D";
             if (getDataDimFromDirectory(cur_directory)==1):
-                ax = fig.gca()
+                ax = fig.add_subplot(1, 3, 1)
+                ax2 = None
             else:
-                ax = Axes3D(fig)
-            plotFunctionApproximatorTrainingFromDirectory(cur_directory,ax)
+                ax = fig.add_subplot(1, 3, 2, projection='3d')
+                ax2 = fig.add_subplot(1, 3, 3, projection='3d')
+            plotFunctionApproximatorTrainingFromDirectory(cur_directory,ax,ax2)
             ax.set_title(fa_name+" ("+str(dim)+"D data)")
+            if ax2 != None:
+                ax2.set_title(fa_name+" ("+str(dim)+"D basis functions)")
               
           
     plt.show()
