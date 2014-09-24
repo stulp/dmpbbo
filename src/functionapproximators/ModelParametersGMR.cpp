@@ -372,13 +372,13 @@ UnifiedModel* ModelParametersGMR::toUnifiedModel(void) const
 
   vector<VectorXd> slopes(n_gaussians);
   vector<double> offsets(n_gaussians);
-  VectorXd offset_as_vector;
+  VectorXd rest;
   for (int i_gau=0; i_gau<n_gaussians; i_gau++)
   {
-    slopes[i_gau] = covars_y_x_[i_gau] * covars_x_inv_[i_gau];
-    offset_as_vector = means_y_[i_gau] - slopes[i_gau]*means_x_[i_gau];
-    assert(offset_as_vector.size()==1);
-    offsets[i_gau] = offset_as_vector[0];
+    slopes[i_gau] = (covars_y_x_[i_gau] * covars_x_inv_[i_gau]).transpose();
+    
+    assert(means_y_[i_gau].size()==1); // Only works for 1D y output for now
+    offsets[i_gau] = means_y_[i_gau][0] - slopes[i_gau].dot(means_x_[i_gau]);
   }
   
 
