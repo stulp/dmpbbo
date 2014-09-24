@@ -69,6 +69,8 @@ public:
     return std::string("IRFRLS");  
   };
 
+	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+	
 protected:
   /** Project data with cosines features
    * \param[in] vecs The vector to be projected
@@ -76,7 +78,7 @@ protected:
    * \param[in] phases phases of the cosines
    * \param[out] projected the projected values of vecs
    */
-  void proj(const Eigen::MatrixXd& vecs, const Eigen::MatrixXd& periods, const Eigen::VectorXd& phases, Eigen::MatrixXd& projected);
+  static void proj(const Eigen::MatrixXd& vecs, const Eigen::MatrixXd& periods, const Eigen::VectorXd& phases, Eigen::MatrixXd& projected);
   
 private:
 
