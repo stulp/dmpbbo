@@ -4,6 +4,10 @@ compiler:
   - gcc
   - clang
 
+branches:
+  only:
+    - master
+
 env:
   - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=ON
   - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=OFF
