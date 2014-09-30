@@ -2,7 +2,8 @@ ________________________________________________________________________________
 INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
 (for manual installation see "MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES" below) 
 
-sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev sudo apt-get install doxygen graphviz 
+sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev 
+sudo apt-get install doxygen graphviz 
 
 "sudo apt-get eigen3" currently (February 2014) installs version 3.1.2. However, DmpBbo
 requires version >= 3.2. To get the latest Eigen version:
