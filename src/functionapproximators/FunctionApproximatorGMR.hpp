@@ -127,7 +127,7 @@ protected:
    * \param[in] input The input data vector for which the probabilities will be computed.
    * \param[out] h The probabilities
    */
-  void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h) const;
+  static void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h);
 
 private:
   /**

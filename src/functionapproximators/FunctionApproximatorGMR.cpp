@@ -180,21 +180,17 @@ double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& co
   return FunctionApproximatorGMR::normalPDFWithInverseCovar(mu,covar.inverse(),input);
 }
 
-void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h) const
+void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h)
 {
-  int n_gaussians = gmm->means_x_.size();
-  h.resize(n_gaussians);
-  VectorXd prior_times_gauss(n_gaussians);
+  assert((int)gmm->priors_.size()==h.size());
   
   // Compute gaussian pdf and multiply it with prior probability
-  for (int i_gau=0; i_gau<n_gaussians; i_gau++)
-  {
-    double gauss = normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
-    prior_times_gauss(i_gau) = gmm->priors_[i_gau]*gauss;
-  }
+  // This yields the unnormalized probabilities (normalization done below)
+  for (unsigned int i_gau=0; i_gau<gmm->priors_.size(); i_gau++)
+    h(i_gau) = gmm->priors_[i_gau] * normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
 
   // Normalize to get h
-  h = prior_times_gauss/prior_times_gauss.sum();
+  h /= h.sum();
 }
 
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
