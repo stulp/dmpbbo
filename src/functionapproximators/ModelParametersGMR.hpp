@@ -46,7 +46,23 @@ public:
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
     std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
 
-	int getExpectedInputDim(void) const;
+  inline unsigned int getNumberOfGaussians(void) const 
+  {
+    return priors_.size();
+  }
+  
+  inline unsigned int getExpectedOutputDim(void) const 
+  {
+	  assert(means_y_.size()>0); // This is also checked in the constructor
+    return means_y_[0].size();
+  }
+  
+	inline int getExpectedInputDim(void) const
+	{
+	  assert(means_x_.size()>0); // This is also checked in the constructor
+	  return means_x_[0].size();
+	};
+
 	
 	std::string toString(void) const;
 

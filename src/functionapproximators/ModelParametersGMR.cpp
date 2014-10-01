@@ -126,11 +126,6 @@ ModelParameters* ModelParametersGMR::clone(void) const
   return new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x); 
 }
 
-int ModelParametersGMR::getExpectedInputDim(void) const  {
-  assert(means_x_.size()>0); // This is also checked in the constructor
-  return means_x_[0].size();
-};
-
 template<class Archive>
 void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
 {

@@ -127,7 +127,7 @@ protected:
    * \param[in] input The input data vector for which the probabilities will be computed.
    * \param[out] h The probabilities
    */
-  void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h) const;
+  static void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h);
 
 private:
   /**
@@ -149,6 +149,8 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
 
+  /** This is a cached variable whose memory is allocated once during construction. */
+  Eigen::VectorXd probabilities_cached_;
 };
 
 }
