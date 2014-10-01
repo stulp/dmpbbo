@@ -31,6 +31,7 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorIRFRLS);
 
+#include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/MetaParametersIRFRLS.hpp"
 #include "functionapproximators/ModelParametersIRFRLS.hpp"
 
@@ -110,8 +111,8 @@ void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& t
       cosines_phase(r) = genPhases();
 
   MatrixXd proj_inputs;
-  proj(inputs, cosines_periodes, cosines_phase, proj_inputs);
-
+  BasisFunction::Cosine::activations(cosines_periodes,cosines_phase,inputs,proj_inputs);
+  
   // Compute linear model analatically
   double lambda = meta_parameters_irfrls->lambda_;
   MatrixXd toInverse = lambda * MatrixXd::Identity(nb_cos, nb_cos) + proj_inputs.transpose() * proj_inputs;
@@ -132,14 +133,14 @@ void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output
   const ModelParametersIRFRLS* model = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
 
   MatrixXd proj_inputs;
-  proj(input, model->cosines_periodes_, model->cosines_phase_, proj_inputs);
+  model->cosineActivations(input,proj_inputs);
+  
   output = proj_inputs * model->weights_;
 }
 
 /** Cosinus function. Used to select correct overload version of cos in FunctionApproximatorIRFRLS::proj
  * \param[in]  x A decimal number
  * \return The cosinus of x
- */
 double double_cosine(double x)
 {
   return cos(x);
@@ -151,6 +152,7 @@ void FunctionApproximatorIRFRLS::proj(const MatrixXd& vecs, const MatrixXd& peri
   projected.rowwise() += phases.transpose();
   projected = projected.unaryExpr(ptr_fun(double_cosine));
 }
+*/
 
 bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
@@ -163,8 +165,7 @@ bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorX
   const ModelParametersIRFRLS* model_parameters_irfrls = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
   
   MatrixXd activations_grid;
-  //model_parameters_irfrls->kernelActivations(inputs_grid, activations_grid);
-  proj(inputs_grid, model_parameters_irfrls->cosines_periodes_, model_parameters_irfrls->cosines_phase_, activations_grid);
+  model_parameters_irfrls->cosineActivations(inputs_grid, activations_grid);
   
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);

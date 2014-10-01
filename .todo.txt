@@ -1,19 +1,19 @@
 ________________________________________________________________________________
 More coherent structure  
-  IRFRLS, rename proj to basisFunctionActivations
-  
+  Move all kernelActivation functions from ModelParameters to FunctionApproximator
+  Move caching to FunctionApproximator  
 ________________________________________________________________________________
 Optimizations
+  IRFRLS::proj faster than BasisFunction::Cosine::activations
   Remove all occurences of inverse()
-  Put basis function caching in ModelParameters base class  
   
+________________________________________________________________________________
+Should FunctionApproximators be friends with their ModelParameters?
+
 ________________________________________________________________________________
 Gaussian Mixture Regression
   plot covariance matrices in Python
   parameterizable: mu and priors, but not covars
-
-________________________________________________________________________________
-Should FunctionApproximators be friends with their ModelParameters?
 
 ________________________________________________________________________________
 For compatibility with making a package

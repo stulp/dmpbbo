@@ -83,6 +83,18 @@ namespace Cosine {
     const Eigen::MatrixXd& inputs, 
     Eigen::MatrixXd& activations);
 
+    /** Get the kernel activations for given angular frequencies and phases
+   * \param[in] angular_frequencies Angular frequency for each dimension and each cosine basis function  (n_bfs X n_input_dims)
+   * \param[in] phases  Phase of each cosine basis function (n_bfs X 1)
+   * \param[in] inputs The input data (size: n_samples X n_dims)
+   * \param[out] activations The activations of the cosine functions, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
+   */
+  void activations(
+    const Eigen::MatrixXd& angular_frequencies,
+    const Eigen::VectorXd& phases,
+    const Eigen::MatrixXd& inputs, 
+    Eigen::MatrixXd& activations);
+
 }
 
 }
