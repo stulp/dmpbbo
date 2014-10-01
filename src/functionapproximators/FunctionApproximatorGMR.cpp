@@ -52,7 +52,6 @@ FunctionApproximatorGMR::FunctionApproximatorGMR(const MetaParametersGMR *const 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
-  probabilities_cached_ = VectorXd::Zero(model_parameters->getNumberOfGaussians());
   // TODO : find a more appropriate place for rand initialization
   //srand(unsigned(time(0)));
 }
@@ -93,6 +92,8 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   int n_dims_in = inputs.cols();
   int n_dims_out = targets.cols();
   int n_dims_gmm = n_dims_in + n_dims_out;
+
+  probabilities_cached_ = VectorXd::Zero(n_gaussians);
   
   // Initialize the means, priors and covars
   std::vector<VectorXd> means(n_gaussians);
@@ -133,7 +134,6 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
     covars_y[i_gau]   = covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
     covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
-
 
   setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x));
 
@@ -223,12 +223,13 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
     // Compute output, given probabilities of each Gaussian
     for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
     {
+      
       // Here comes the formula: h * (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
       // It has been condensed into one line to avoid allocations for real-time execution
       outputs.row(i_input) += 
         probabilities_cached_[i_gau] * (gmm->means_y_[i_gau] +    // h * (mu_y +
           (gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] *  //   ( C_y_x * inv(C_x) *
-            (inputs.row(i_input) - gmm->means_x_[i_gau])) );      //      (input-mu_x) ) )
+            (inputs.row(i_input).transpose() - gmm->means_x_[i_gau])) ); // (input-mu_x) ) )
     }
   }
 }
@@ -246,7 +247,7 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
   // Number of Gaussians must be at least one
   assert(gmm->getNumberOfGaussians()>0);
   // Dimensionality of input must be same as of the gmm inputs  
-  assert(gmm->getExpectedInputDim()==variances.cols());
+  assert(gmm->getExpectedInputDim()==inputs.cols());
 
   // outputs must have the right size
   // the right size is n_input_samples X n_dims_out
