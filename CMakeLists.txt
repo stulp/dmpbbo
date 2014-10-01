@@ -7,7 +7,7 @@ project(OO_DMP_BBO)
 
 # Some settings related to building/installing libraries and header files
 # Set this to STATIC if you want to build static libraries instead.
-option(BUILD_SHARED_LIBS "Enable this option to build shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Enable this option to build shared libraries" ON)
 
 if(BUILD_SHARED_LIBS)
 set(SHARED_OR_STATIC "SHARED")
@@ -27,7 +27,7 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 
 # Some flags for CXX
-set(CMAKE_CXX_FLAGS "-Wall -std=c++0x")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++0x -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
 

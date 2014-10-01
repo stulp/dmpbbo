@@ -175,9 +175,24 @@ double FunctionApproximatorGMR::normalPDFWithInverseCovar(const VectorXd& mu, co
   return output;
 }
 
+void FunctionApproximatorGMR::normalPDFWithInverseCovarDot(const VectorXd& mu, const MatrixXd& covar_inverse, const VectorXd& input, double& output, double& output_dot)
+{ 
+  VectorXd diff = input-mu;
+  output = exp(-2*diff.transpose()*covar_inverse*diff);
+  // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
+  double det = 1.0/covar_inverse.determinant();
+  output *= pow(pow(2*M_PI,mu.size())*det,-0.5);   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
+  output_dot = - output * covar_inverse(0.0) * diff(0); // HACK
+}
+
 double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
 {
   return FunctionApproximatorGMR::normalPDFWithInverseCovar(mu,covar.inverse(),input);
+}
+
+void FunctionApproximatorGMR::normalPDFDot(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input, double& output, double& output_dot)
+{
+  FunctionApproximatorGMR::normalPDFWithInverseCovarDot(mu,covar.inverse(),input, output, output_dot);
 }
 
 void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h) const
@@ -195,6 +210,34 @@ void FunctionApproximatorGMR::computeProbabilities(const ModelParametersGMR* gmm
 
   // Normalize to get h
   h = prior_times_gauss/prior_times_gauss.sum();
+}
+
+void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h, VectorXd& h_dot) const
+{
+  
+  assert(input.size() == 1); // HACK We are doing the dervate only along time/phase!
+  
+  int n_gaussians = gmm->means_x_.size();
+  h.resize(n_gaussians);
+  h_dot.resize(n_gaussians);
+  VectorXd prior_times_gauss(n_gaussians);
+  VectorXd prior_times_gauss_dot(n_gaussians);
+  double gauss;
+  double gauss_dot;
+  
+  // Compute gaussian pdf and multiply it with prior probability
+  for (int i_gau=0; i_gau<n_gaussians; i_gau++)
+  {
+    //double gauss = normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
+    //double gauss_dot = normalPDFDot(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
+    normalPDFDot(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input,gauss,gauss_dot);
+    prior_times_gauss(i_gau) = gmm->priors_[i_gau]*gauss;
+    prior_times_gauss_dot(i_gau) = gmm->priors_[i_gau]*gauss_dot;
+  }
+
+  // Normalize to get h and h_dot
+  h = prior_times_gauss/prior_times_gauss.sum();
+  h_dot = (prior_times_gauss_dot * prior_times_gauss.sum() - prior_times_gauss * prior_times_gauss_dot.sum())/pow(prior_times_gauss.sum(),2);
 }
 
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
@@ -236,6 +279,55 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
       VectorXd diff = input-gmm->means_x_[i_gau];
       VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] * diff;
       outputs.row(i_input) += h[i_gau] * (gmm->means_y_[i_gau]+projected);
+    }
+  }
+}
+
+void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
+{
+  if (!isTrained())  
+  {
+    cerr << "WARNING: You may not call FunctionApproximatorGMR::predict if you have not trained yet. Doing nothing." << endl;
+    return;
+  }
+  
+  const ModelParametersGMR* gmm = static_cast<const ModelParametersGMR*>(getModelParameters());
+
+  // Dimensionality of input must be same as of the gmm inputs  
+  assert(gmm->means_x_[0].size()==inputs.cols());
+  
+  int n_gaussians = gmm->priors_.size();
+  assert(n_gaussians>0);
+  int n_dims_out = gmm->means_y_[0].size();
+  int n_inputs = inputs.rows();
+
+  // Make outputs of the right size
+  outputs.resize(n_inputs, n_dims_out);
+  outputs.fill(0);
+  outputs_dot.resize(n_inputs, n_dims_out);
+  outputs_dot.fill(0);
+  
+  // Pre-allocate some memory
+  VectorXd h(n_gaussians);
+  VectorXd h_dot(n_gaussians);
+  for (int i_input=0; i_input<n_inputs; i_input++)
+  {
+    // Compute output for this input
+    VectorXd input = inputs.row(i_input);
+
+    // Compute probalities that each Gaussian would generate this input    
+    //computeProbabilities(gmm, input, h);
+    computeProbabilitiesDot(gmm, input, h, h_dot);
+    
+    // Compute output, given probabilities of each Gaussian
+    for (int i_gau=0; i_gau<n_gaussians; i_gau++)
+    {
+      VectorXd diff = input-gmm->means_x_[i_gau];
+      VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] * diff;
+      outputs.row(i_input) += h[i_gau] * (gmm->means_y_[i_gau]+projected);
+      
+      VectorXd projected_dot =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau];
+      outputs_dot.row(i_input) += h_dot(i_gau) * (gmm->means_y_[i_gau]+projected) + h[i_gau] * (projected_dot);;
     }
   }
 }
