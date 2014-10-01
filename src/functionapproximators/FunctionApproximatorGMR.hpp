@@ -133,15 +133,11 @@ protected:
    * \param[in] input The input data vector for which the probabilities will be computed.
    * \param[out] h The probabilities
    */
-<<<<<<< HEAD
-  void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h) const;
+
+  static void computeProbabilitiesDot(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h, Eigen::VectorXd& h_dot);
   
-  void computeProbabilitiesDot(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h, Eigen::VectorXd& h_dot) const;
-  
-=======
   static void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h);
 
->>>>>>> 2d78eff3a6677229ee99b13615be066e575323e1
 private:
   /**
    * Default constructor.
@@ -164,6 +160,7 @@ private:
 
   /** This is a cached variable whose memory is allocated once during construction. */
   Eigen::VectorXd probabilities_cached_;
+  Eigen::VectorXd probabilities_dot_cached_;
 };
 
 }
