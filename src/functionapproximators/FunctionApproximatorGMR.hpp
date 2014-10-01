@@ -149,6 +149,8 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
 
+  /** This is a cached variable whose memory is allocated once during construction. */
+  Eigen::VectorXd probabilities_cached_;
 };
 
 }
