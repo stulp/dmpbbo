@@ -24,6 +24,8 @@
 
 #include "BasisFunction.hpp"
 
+#include <iostream>
+
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/LU>
 
@@ -184,24 +186,22 @@ void Cosine::activations(
     Eigen::MatrixXd& activations)
 {
   unsigned int n_basis_functions = angular_frequencies.size();
-  int n_dims                     = inputs.cols();
   int n_samples                  = inputs.rows();
   
   assert(n_basis_functions>0);
   assert(phases.size()==n_basis_functions);
   assert(phases[0].size()==1);
-  assert(angular_frequencies[0].size()==n_dims);
+  // input_cols is input dim
+  assert(angular_frequencies[0].size()==inputs.cols());
 
   
   activations.resize(n_samples,n_basis_functions);  
   
-  double cosine_input;
   for (unsigned int bb=0; bb<n_basis_functions; bb++)
   {
     for (int i_s=0; i_s<n_samples; i_s++)
     {
-      cosine_input = angular_frequencies[bb].row(0).dot(inputs.row(i_s)) + phases[bb][0];
-      activations(i_s,bb) = cos(cosine_input);
+      activations(i_s,bb) = cos(angular_frequencies[bb].row(0).dot(inputs.row(i_s)) + phases[bb][0]);
     }
   }
   
@@ -213,26 +213,11 @@ void Cosine::activations(
   const Eigen::MatrixXd& inputs, 
   Eigen::MatrixXd& activations)
 {
-  unsigned int n_basis_functions = angular_frequencies.rows();
-  int n_dims                     = inputs.cols();
-  int n_samples                  = inputs.rows();
-  
-  assert(n_basis_functions>0);
-  assert(phases.size()==(int)n_basis_functions);
-  assert(angular_frequencies.cols()==n_dims);
-
-  activations.resize(n_samples,n_basis_functions);  
-  
-  double cosine_input;
-  for (unsigned int bb=0; bb<n_basis_functions; bb++)
-  {
-    for (int i_s=0; i_s<n_samples; i_s++)
-    {
-      cosine_input = angular_frequencies.row(bb).dot(inputs.row(i_s)) + phases[bb];
-      activations(i_s,bb) = cos(cosine_input);
-    }
-  }
-  
+  // Activations for each basis function are computed with:
+  //   activation(bb) = cos(inputs(bb)*freqs(bb).transpose() + phase(bb)) 
+  activations = inputs * angular_frequencies.transpose();
+  activations.rowwise() += phases.transpose();
+  activations = activations.array().cos();
 }
 
 
