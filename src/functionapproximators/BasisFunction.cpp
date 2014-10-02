@@ -207,6 +207,34 @@ void Cosine::activations(
   
 }
 
+void Cosine::activations(
+  const Eigen::MatrixXd& angular_frequencies,
+  const Eigen::VectorXd& phases,
+  const Eigen::MatrixXd& inputs, 
+  Eigen::MatrixXd& activations)
+{
+  unsigned int n_basis_functions = angular_frequencies.rows();
+  int n_dims                     = inputs.cols();
+  int n_samples                  = inputs.rows();
+  
+  assert(n_basis_functions>0);
+  assert(phases.size()==(int)n_basis_functions);
+  assert(angular_frequencies.cols()==n_dims);
+
+  activations.resize(n_samples,n_basis_functions);  
+  
+  double cosine_input;
+  for (unsigned int bb=0; bb<n_basis_functions; bb++)
+  {
+    for (int i_s=0; i_s<n_samples; i_s++)
+    {
+      cosine_input = angular_frequencies.row(bb).dot(inputs.row(i_s)) + phases[bb];
+      activations(i_s,bb) = cos(cosine_input);
+    }
+  }
+  
+}
+
 
 } // namespace BasisFunction
 

@@ -70,15 +70,6 @@ public:
   };
 
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
-	
-protected:
-  /** Project data with cosines features
-   * \param[in] vecs The vector to be projected
-   * \param[in] periods Periods of the cosines
-   * \param[in] phases phases of the cosines
-   * \param[out] projected the projected values of vecs
-   */
-  static void proj(const Eigen::MatrixXd& vecs, const Eigen::MatrixXd& periods, const Eigen::VectorXd& phases, Eigen::MatrixXd& projected);
   
 private:
 

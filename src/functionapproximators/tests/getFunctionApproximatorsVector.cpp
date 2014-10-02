@@ -109,7 +109,7 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
   {
     // IRFRLS
     int number_of_basis_functions=18;
-    if (input_dim==2) number_of_basis_functions = 50;
+    if (input_dim==2) number_of_basis_functions = 100;
     double lambda=0.2;
     double gamma=5;
     return new MetaParametersIRFRLS(input_dim,number_of_basis_functions,lambda,gamma);

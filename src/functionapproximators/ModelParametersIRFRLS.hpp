@@ -67,6 +67,8 @@ public:
    * \return weights of the basis functions.
    */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
+
+  void cosineActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& cosine_activations) const;
   
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
@@ -80,6 +82,31 @@ private:
   int nb_in_dim_;
 
   int  all_values_vector_size_;
+  
+public:
+	/** Turn caching for the function cosineActivations() on or off.
+	 * Turning this on should lead to substantial improvements in execution time if the periods and
+	 * phases of the cosine functions do not change often AND you call cosineActivations with the
+	 * same inputs over and over again.
+	 * \param[in] caching Whether to turn caching on or off
+	 * \remarks In the constructor, caching is set to true, so by default it is on.
+	 */
+	inline void set_caching(bool caching)
+	{
+	  caching_ = caching;
+	  if (!caching_) clearCache();
+	}
+	
+private:
+  
+  mutable Eigen::MatrixXd inputs_cached_;
+  mutable Eigen::MatrixXd cosine_activations_cached_;
+  bool caching_;
+  inline void clearCache(void) 
+  {
+    inputs_cached_.resize(0,0);
+    cosine_activations_cached_.resize(0,0);
+  }
   
   /**
    * Default constructor.

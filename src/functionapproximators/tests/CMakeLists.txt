@@ -19,6 +19,7 @@ target_link_libraries(testToUnifiedModel functionapproximators ${LWPR_LIBRARIES}
 install(TARGETS testToUnifiedModel  DESTINATION bin_test)
 
 
+
 ################################################################################
 # LWR
 add_executable(testMetaParametersLWR testMetaParametersLWR.cpp)
@@ -32,3 +33,11 @@ install(TARGETS testPerturbModelParameterLWR  DESTINATION bin_test)
 add_executable(testBasisFunctionsLWR testBasisFunctionsLWR.cpp)
 target_link_libraries(testBasisFunctionsLWR functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS testBasisFunctionsLWR  DESTINATION bin_test)
+
+
+################################################################################
+# GMR
+add_executable(testSaveGMMMatrix testSaveGMMMatrix.cpp)
+target_link_libraries(testSaveGMMMatrix functionapproximators ${Boost_LIBRARIES})
+install(TARGETS testSaveGMMMatrix  DESTINATION bin_test)
+

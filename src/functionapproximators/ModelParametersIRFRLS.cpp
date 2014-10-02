@@ -34,6 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersIRFRLS);
 
 #include <iostream>
 
+#include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
@@ -66,6 +67,35 @@ ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::VectorXd weights, Eigen::Mat
 ModelParameters* ModelParametersIRFRLS::clone(void) const 
 {
   return new ModelParametersIRFRLS(weights_, cosines_periodes_, cosines_phase_); 
+}
+
+void ModelParametersIRFRLS::cosineActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& cosine_activations) const
+{
+  if (caching_)
+  {
+    // If the cached inputs matrix has the same size as the one now requested
+    //     (this also takes care of the case when inputs_cached is empty and need to be initialized)
+    if ( inputs.rows()==inputs_cached_.rows() && inputs.cols()==inputs_cached_.cols() )
+    {
+      // And they have the same values
+      if ( (inputs.array()==inputs_cached_.array()).all() )
+      {
+        // Then you can return the cached values
+        cosine_activations = cosine_activations_cached_;
+        return;
+      }
+    }
+  }
+
+  BasisFunction::Cosine::activations(cosines_periodes_,cosines_phase_,inputs,cosine_activations);
+  
+  if (caching_)
+  {
+    // Cache the current results now.  
+    inputs_cached_ = inputs;
+    cosine_activations_cached_ = cosine_activations;
+  }
+  
 }
 
 int ModelParametersIRFRLS::getExpectedInputDim(void) const  
