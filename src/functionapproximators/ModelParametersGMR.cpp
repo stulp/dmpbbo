@@ -48,6 +48,54 @@ using namespace std;
 namespace DmpBbo {
 
 ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
+  std::vector<Eigen::VectorXd> means, 
+  std::vector<Eigen::MatrixXd> covars, int n_dims_out)
+{
+  size_t n_gaussians = priors.size();
+  assert(n_gaussians>0);
+  int n_dims_gmm = means[0].size();
+  int n_dims_in = n_dims_gmm - n_dims_out;
+
+#ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings
+  assert(n_dims_out>0);
+  assert(n_dims_in>0);
+  assert(means.size() == n_gaussians);
+  assert(covars.size() == n_gaussians);
+  for (size_t i = 0; i < n_gaussians; i++)
+  {
+    assert(means[i].size() == n_dims_gmm);
+    assert(covars[i].cols() == n_dims_gmm);
+    assert(covars[i].rows() == n_dims_gmm);
+  }
+#endif
+
+  priors_ = priors;
+  
+  means_x_.resize(n_gaussians);
+  means_y_.resize(n_gaussians);
+  covars_x_.resize(n_gaussians);
+  covars_y_.resize(n_gaussians);
+  covars_y_x_.resize(n_gaussians);
+
+  for (size_t i = 0; i < n_gaussians; i++)
+  {
+    means_x_[i] = means[i].segment(0,n_dims_in);
+    means_y_[i] = means[i].segment(n_dims_in,n_dims_out);
+    
+    covars_x_[i] = covars[i].block(0,0,n_dims_in,n_dims_in);
+    covars_y_[i] = covars[i].block(n_dims_in,n_dims_in,n_dims_out,n_dims_out);
+    covars_y_x_[i] = covars[i].block(n_dims_in, 0, n_dims_out, n_dims_in);
+    
+  }
+
+
+  for (unsigned int i=0; i<n_gaussians; i++)
+    covars_x_inv_.push_back(covars_x_[i].inverse());
+
+  all_values_vector_size_ = 0;  
+}
+
+ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   std::vector<Eigen::VectorXd> means_x, std::vector<Eigen::VectorXd> means_y,
   std::vector<Eigen::MatrixXd> covars_x, std::vector<Eigen::MatrixXd> covars_y,
   std::vector<Eigen::MatrixXd> covars_y_x)
@@ -209,6 +257,101 @@ bool ModelParametersGMR::saveGMM(std::string save_directory, bool overwrite) con
  
   
   return true;  
+}
+
+void ModelParametersGMR::toMatrix(Eigen::MatrixXd& gmm_as_matrix) const
+{
+  int n_gaussians = means_x_.size();
+  assert(n_gaussians>0);
+  int n_dims_in = means_x_[0].size();
+  int n_dims_out = means_y_[0].size();
+  int n_dims_gmm = n_dims_in + n_dims_out;
+  
+  int n_rows = 1; // First row contains n_gaussians, n_output_dims
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  {
+    n_rows += 1; // Add one row for the prior (only first entry used)
+    n_rows += 1; // Add one row for the mean
+    n_rows += n_dims_gmm; // For the covariance matrix 
+  }
+  
+  gmm_as_matrix = MatrixXd::Zero(n_rows,n_dims_gmm);
+  
+  gmm_as_matrix(0,0) = n_gaussians;
+  gmm_as_matrix(0,1) = n_dims_out;
+  
+  VectorXd mean = VectorXd(n_dims_gmm);
+  MatrixXd covar = MatrixXd(n_dims_gmm,n_dims_gmm);
+  int cur_row = 1;
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  {
+    mean.segment(0, n_dims_in) = means_x_[i_gau];
+    mean.segment(n_dims_in, n_dims_out) = means_y_[i_gau];
+
+    covar.block(0, 0, n_dims_in, n_dims_in) = covars_x_[i_gau]; 
+    covar.block(n_dims_in, n_dims_in, n_dims_out, n_dims_out) = covars_y_[i_gau]; 
+    covar.block(n_dims_in, 0, n_dims_out, n_dims_in) = covars_y_x_[i_gau];
+    covar.block(0, n_dims_in, n_dims_in, n_dims_out) = covars_y_x_[i_gau].transpose();
+    
+    gmm_as_matrix(cur_row  ,0) = priors_[i_gau];
+    gmm_as_matrix.row(cur_row+1) = mean;
+    gmm_as_matrix.block(cur_row+2,0,n_dims_gmm,n_dims_gmm) = covar;
+    
+    cur_row += 1 + 1 + n_dims_gmm;
+  }  
+}
+
+ModelParametersGMR* ModelParametersGMR::fromMatrix(const MatrixXd& gmm_matrix)
+{
+  int n_dims_gmm = gmm_matrix.cols();
+  int n_rows = gmm_matrix.rows();
+  assert(n_dims_gmm>1);
+  assert(n_rows>0);
+  
+  int n_gaussians = gmm_matrix(0,0);
+  int n_dims_out = gmm_matrix(0,1); 
+  assert(n_rows == (1+ (n_gaussians*(1+1+n_dims_gmm))));
+  
+  vector<double> priors(n_gaussians);
+  vector<VectorXd> means(n_gaussians);
+  vector<MatrixXd> covars(n_gaussians);
+  
+  int cur_row = 1;
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  {
+    priors[i_gau] = gmm_matrix(cur_row,0);
+    
+    means[i_gau] = gmm_matrix.row(cur_row+1);
+   
+    covars[i_gau] = gmm_matrix.block(cur_row+2,0,n_dims_gmm,n_dims_gmm);
+    
+    cur_row += 1 + 1 + n_dims_gmm;
+  }
+    
+  return new ModelParametersGMR(priors,means,covars,n_dims_out);
+}
+
+bool ModelParametersGMR::saveGMMToMatrix(std::string filename, bool overwrite) const
+{
+  if (filename.empty())
+    return true;
+
+  MatrixXd gmm_as_matrix;
+  toMatrix(gmm_as_matrix);
+  
+  if (!saveMatrix(filename, gmm_as_matrix,  overwrite))
+    return false;    
+    
+  return true;  
+}
+
+ModelParametersGMR* ModelParametersGMR::loadGMMFromMatrix(std::string filename)
+{
+  MatrixXd gmm_matrix;
+  if (!loadMatrix(filename, gmm_matrix))
+    return NULL;
+  
+  return ModelParametersGMR::fromMatrix(gmm_matrix);
 }
 
 void ModelParametersGMR::getSelectableParameters(set<string>& selected_values_labels) const 

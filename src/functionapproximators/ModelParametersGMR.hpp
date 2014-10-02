@@ -40,6 +40,11 @@ class ModelParametersGMR : public ModelParameters
   friend class FunctionApproximatorGMR;
   
 public:
+  
+  ModelParametersGMR(std::vector<double> priors,
+    std::vector<Eigen::VectorXd> means, 
+    std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);
+
   /** Constructor for the model parameters of the GMR function approximator.
    */
   ModelParametersGMR(std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
@@ -97,6 +102,36 @@ public:
    */
   bool saveGMM(std::string directory, bool overwrite=false) const;
 
+  /** This function represents the Gaussian Mixture Model as one big matrix.
+   * This matrix contains the following rows (example for two Gaussians, with dimensionality 3)
+   * 
+\verbatim
+ 0. meta_data  (n_gaussians and n_output_dims)
+ __________________________
+ 1. prior1     (only column 0 contains the prior, the rest is zero)
+ 2. mean1      (size: 3)
+ 3. covar1     (row1 of covar matrix)
+ 4. covar1     (row2 of covar matrix)
+ 5. covar1     (row3 of covar matrix)
+ __________________________
+ 6. prior2     (only column 0 contains the prior, the rest is zero) 
+ 7. mean2      (size: 3)
+ 8. covar2     (row1 of covar matrix)
+ 9. covar2     (row2 of covar matrix)
+10. covar2     (row3 of covar matrix)
+\endverbatim
+   *
+   * Thus, the number of rows in the Matrix is 1 (for meta-data) + n_gaussians * (1+1+n_dims)
+   *
+   * In combination with ModelParametersGMR::saveGMMToMatrix and ModelParametersGMR::loadGMMToMatrix, this hacky function allowed for easier exchange with some Matlab code we wrote.
+   */
+  void toMatrix(Eigen::MatrixXd& gmm_as_matrix) const;
+  static ModelParametersGMR* fromMatrix(const Eigen::MatrixXd& gmm_matrix);
+  
+  bool saveGMMToMatrix(std::string filename, bool overwrite=false) const;  
+  static ModelParametersGMR* loadGMMFromMatrix(std::string filename);
+
+  
   UnifiedModel* toUnifiedModel(void) const;
 
 protected:
