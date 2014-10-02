@@ -138,22 +138,6 @@ void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output
   output = proj_inputs * model->weights_;
 }
 
-/** Cosinus function. Used to select correct overload version of cos in FunctionApproximatorIRFRLS::proj
- * \param[in]  x A decimal number
- * \return The cosinus of x
-double double_cosine(double x)
-{
-  return cos(x);
-}
-
-void FunctionApproximatorIRFRLS::proj(const MatrixXd& vecs, const MatrixXd& periods, const VectorXd& phases, Eigen::MatrixXd& projected)
-{
-  projected = vecs * periods.transpose();
-  projected.rowwise() += phases.transpose();
-  projected = projected.unaryExpr(ptr_fun(double_cosine));
-}
-*/
-
 bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
   if (save_directory.empty())
