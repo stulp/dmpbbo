@@ -230,12 +230,11 @@ void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* 
   
   // Compute gaussian pdf and multiply it with prior probability
   // This yields the unnormalized probabilities (normalization done below)
-  double gauss, gauss_dot; // FIXME
   for (unsigned int i_gau=0; i_gau<gmm->priors_.size(); i_gau++)
   {
-    normalPDFWithInverseCovarDot(gmm->means_x_[i_gau],gmm->covars_x_inv_[i_gau],input,gauss,gauss_dot);
-    h(i_gau) = gmm->priors_[i_gau] * gauss;
-    h_dot(i_gau) = gmm->priors_[i_gau] * gauss_dot;
+    normalPDFWithInverseCovarDot(gmm->means_x_[i_gau],gmm->covars_x_inv_[i_gau],input,gauss_,gauss_dot_);
+    h(i_gau) = gmm->priors_[i_gau] * gauss_;
+    h_dot(i_gau) = gmm->priors_[i_gau] * gauss_dot_;
   }
   // Normalize to get h and h_dot
   h /= h.sum();
