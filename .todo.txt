@@ -1,7 +1,8 @@
 ________________________________________________________________________________
 More coherent structure  
-  Move all kernelActivation functions from ModelParameters to FunctionApproximator
-  Move caching to FunctionApproximator  
+  void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& predictions);
+  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& predictions, Matrix variances) = 0;
+  
 ________________________________________________________________________________
 Optimizations
   IRFRLS::proj faster than BasisFunction::Cosine::activations

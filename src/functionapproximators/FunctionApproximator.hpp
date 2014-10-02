@@ -355,4 +355,12 @@ model_parameters.getParameterVectorSelected(values);
 The rationale behind this implementation is that optimizers (such as evolution strategies) should not have to care about whether a particular set of model parameters contains centers, widths or slopes. Therefore, these different types of parameters are provided in one vector without semantics, and the generic interface is provided by the Parameterizable class.
 
 Classes that inherit from Parameterizable (such as all ModelParameters and FunctionApproximator subclasses, must implement the pure virtual methods Parameterizable::getParameterVectorAll Parameterizable::setParameterVectorAll and Parameterizable::getParameterVectorMask. Which gets/sets all the possible parameters in one vector, and a mask specifying the semantics of each value in the vector. The work of setting/getting the selected parameters (and normalizing them) is done in the Parameterizable class itself. This approach is a slightly longer run-time than doing the work in the subclasses, but it leads to more legible and robust code (less code duplication).
+
+\subsection sec_caching_basisfunctions Caching of basis functions
+
+If the parameters of the basis functions (centers and widths of the kernels) do not change often, you can cache the basis function activations by calling ModelParameters::set_caching(true). This can lead to speed improvements because the activations are not computed over and over again. This function only makes senses if the inputs remain the same, i.e. this is not the case when running on a real robot. 
+
+The reason why caching is implemented in ModelParameters, and not in FunctionApproximator is because ModelParameters knows which parts of the ModelParameters change the basis function activations, and which do not (for instance in RBFN, the widths and centers change the basis function activations, but the weights do not).
+
+
  */
