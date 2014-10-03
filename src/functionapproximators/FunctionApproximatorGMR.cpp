@@ -327,7 +327,8 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
   // HACK I commented out to avoid a transpose out of here
   // outputs must have the right size
   // the right size is n_input_samples X n_dims_out
-  //outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
+  outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
+  outputs_dot.resize(inputs.rows(),gmm->getExpectedOutputDim());
   outputs.fill(0);
   outputs_dot.fill(0);
   
