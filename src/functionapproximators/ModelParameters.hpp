@@ -74,6 +74,15 @@ public:
    */
   virtual int getExpectedInputDim(void) const  = 0;
   
+  /** The expected dimensionality of the output data.
+   * For now, we only consider 1-dimensional output by default.
+   * \return Expected dimensionality of the output data
+   */
+  virtual int getExpectedOutputDim(void) const
+  {
+    return 1;
+  }
+  
   /** 
    * Convert these model parameters to unified model parameters.
    * \return Unified model parameter representation (NULL if not implemented for a particular subclass)

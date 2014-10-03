@@ -119,6 +119,14 @@ int FunctionApproximator::getExpectedInputDim(void) const
     return meta_parameters_->getExpectedInputDim();
 }
 
+int FunctionApproximator::getExpectedOutputDim(void) const
+{
+  if (model_parameters_!=NULL)
+    return model_parameters_->getExpectedOutputDim();
+  else
+    return meta_parameters_->getExpectedOutputDim();
+}
+
 void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets)
 {
   delete model_parameters_;
