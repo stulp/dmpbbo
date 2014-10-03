@@ -92,6 +92,7 @@ int main(int n_args, char** args)
       
     
     ModelParametersGMR* gmm_new = ModelParametersGMR::loadGMMFromMatrix(filename);
+    FunctionApproximatorGMR* fa_new = new FunctionApproximatorGMR(gmm_new);
 
     MatrixXd gmm_matrix;
     gmm->toMatrix(gmm_matrix);     
