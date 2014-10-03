@@ -161,7 +161,7 @@ private:
   /** This is a cached variable whose memory is allocated once during construction. */
   Eigen::VectorXd probabilities_cached_;
   Eigen::VectorXd probabilities_dot_cached_;
-  double gauss_, gauss_dot_;
+  //double gauss_, gauss_dot_;
 };
 
 }

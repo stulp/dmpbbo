@@ -52,9 +52,6 @@ FunctionApproximatorGMR::FunctionApproximatorGMR(const MetaParametersGMR *const 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
-  probabilities_cached_ = VectorXd::Zero(model_parameters->getNumberOfGaussians());
-  probabilities_dot_cached_ = VectorXd::Zero(model_parameters->getNumberOfGaussians());
-
   // TODO : find a more appropriate place for rand initialization
   //srand(unsigned(time(0)));
 }
@@ -98,6 +95,7 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   int n_dims_gmm = n_dims_in + n_dims_out;
 
   probabilities_cached_ = VectorXd::Zero(n_gaussians);
+  probabilities_dot_cached_ = VectorXd::Zero(n_gaussians);
   
   // Initialize the means, priors and covars
   std::vector<VectorXd> means(n_gaussians);
@@ -230,13 +228,14 @@ void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* 
   assert(h_dot.size()==h.size());
   assert(input.size() == 1); // HACK We are doing the dervate only along time/phase!
   
+  double gauss, gauss_dot;
   // Compute gaussian pdf and multiply it with prior probability
   // This yields the unnormalized probabilities (normalization done below)
   for (unsigned int i_gau=0; i_gau<gmm->priors_.size(); i_gau++)
   {
-    normalPDFWithInverseCovarDot(gmm->means_x_[i_gau],gmm->covars_x_inv_[i_gau],input,gauss_,gauss_dot_);
-    h(i_gau) = gmm->priors_[i_gau] * gauss_;
-    h_dot(i_gau) = gmm->priors_[i_gau] * gauss_dot_;
+    normalPDFWithInverseCovarDot(gmm->means_x_[i_gau],gmm->covars_x_inv_[i_gau],input,gauss,gauss_dot);
+    h(i_gau) = gmm->priors_[i_gau] * gauss;
+    h_dot(i_gau) = gmm->priors_[i_gau] * gauss_dot;
   }
   // Normalize to get h and h_dot
   h /= h.sum();
@@ -325,10 +324,11 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
   // Dimensionality of input must be same as of the gmm inputs  
   assert(gmm->getExpectedInputDim()==inputs.cols());
 
+  // HACK I commented out to avoid a transpose out of here
   // outputs must have the right size
   // the right size is n_input_samples X n_dims_out
-  outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
-  outputs.fill(0);
+  //outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
+  //outputs.fill(0);
   
   for (int i_input=0; i_input<inputs.rows(); i_input++)
   {
