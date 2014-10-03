@@ -127,7 +127,7 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
     assert(covars_y_x_[i].cols() == n_dims_in);
   }
 
-  int n_dims_out = means_y_[0].size();
+  int n_dims_out = getExpectedOutputDim();
   for (size_t i = 0; i < n_gaussians; i++)
   {
     assert(covars_y_[i].rows() == n_dims_out);
@@ -165,9 +165,9 @@ ModelParameters* ModelParametersGMR::clone(void) const
   {
     priors.push_back(priors_[i]);
     means_x.push_back(VectorXd(means_x_[i]));
-    means_y.push_back(VectorXd(means_x_[i]));
-    covars_x.push_back(MatrixXd(means_x_[i]));
-    covars_y.push_back(MatrixXd(means_y_[i]));
+    means_y.push_back(VectorXd(means_y_[i]));
+    covars_x.push_back(MatrixXd(covars_x_[i]));
+    covars_y.push_back(MatrixXd(covars_y_[i]));
     covars_y_x.push_back(MatrixXd(covars_y_x_[i]));
   }
 
