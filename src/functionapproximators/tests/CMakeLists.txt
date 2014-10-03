@@ -41,3 +41,7 @@ add_executable(testSaveGMMMatrix testSaveGMMMatrix.cpp)
 target_link_libraries(testSaveGMMMatrix functionapproximators ${Boost_LIBRARIES})
 install(TARGETS testSaveGMMMatrix  DESTINATION bin_test)
 
+add_executable(testMultiDimOutput testMultiDimOutput.cpp getFunctionApproximatorsVector.cpp)
+target_link_libraries(testMultiDimOutput functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+install(TARGETS testMultiDimOutput  DESTINATION bin_test)
+
