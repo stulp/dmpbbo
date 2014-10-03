@@ -328,7 +328,8 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
   // outputs must have the right size
   // the right size is n_input_samples X n_dims_out
   //outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
-  //outputs.fill(0);
+  outputs.fill(0);
+  outputs_dot.fill(0);
   
   for (int i_input=0; i_input<inputs.rows(); i_input++)
   {
