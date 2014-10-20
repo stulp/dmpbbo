@@ -1,2 +1,2 @@
 file(GLOB HEADERS *.hpp)
-install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/bbo/updaters)
+install(FILES ${HEADERS} DESTINATION include/bbo/updaters)
