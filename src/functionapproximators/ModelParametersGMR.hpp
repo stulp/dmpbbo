@@ -56,13 +56,13 @@ public:
     return priors_.size();
   }
   
-  inline unsigned int getExpectedOutputDim(void) const 
+  inline virtual int getExpectedOutputDim(void) const 
   {
 	  assert(means_y_.size()>0); // This is also checked in the constructor
     return means_y_[0].size();
   }
   
-	inline int getExpectedInputDim(void) const
+	inline virtual int getExpectedInputDim(void) const
 	{
 	  assert(means_x_.size()>0); // This is also checked in the constructor
 	  return means_x_[0].size();

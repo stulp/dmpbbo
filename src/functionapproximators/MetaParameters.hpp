@@ -59,6 +59,15 @@ public:
     return expected_input_dim_;  
   }
   
+  /** The expected dimensionality of the output data.
+   * For now, we only consider 1-dimensional output by default.
+   * \return Expected dimensionality of the output data
+   */
+  virtual int getExpectedOutputDim(void) const
+  {
+    return 1;
+  }
+  
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */

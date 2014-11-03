@@ -1,3 +1,5 @@
+"virtual int getExpectedOutputDim(void) const" should be pure virtual
+
 ________________________________________________________________________________
 More coherent structure  
   void predict(const MatrixXd& inputs, MatrixXd& predictions)

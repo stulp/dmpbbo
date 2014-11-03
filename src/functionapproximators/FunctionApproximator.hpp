@@ -141,13 +141,9 @@ public:
   int getExpectedInputDim(void) const;
   
   /** The expected dimensionality of the output data.
-   * For now, we only consider 1-dimensional output.
    * \return Expected dimensionality of the output data
    */
-  int getOutputDim(void) const 
-  {
-    return 1;
-  }
+  int getExpectedOutputDim(void) const;
   
   /** Get the name of this function approximator
    *  \return Name of this function approximator
