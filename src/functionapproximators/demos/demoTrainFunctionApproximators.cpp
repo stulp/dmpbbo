@@ -91,7 +91,7 @@ int main(int n_args, char** args)
   if (n_input_dims==2) 
     n_samples_per_dim = VectorXi::Constant(2,25);
     
-  MatrixXd inputs, targets, outputs, outputs_dot;
+  MatrixXd inputs, targets, outputs;
   targetFunction(n_samples_per_dim,inputs,targets);
   
   // Add some noise
@@ -165,29 +165,21 @@ int main(int n_args, char** args)
   // Gaussian Mixture Regression (GMR)
   int number_of_gaussians = pow(5,n_input_dims);
   MetaParametersGMR* meta_parameters_gmr = new MetaParametersGMR(n_input_dims,number_of_gaussians);
-  FunctionApproximatorGMR* fa_gmr = new FunctionApproximatorGMR(meta_parameters_gmr);
+  fa = new FunctionApproximatorGMR(meta_parameters_gmr);
     
-  cout << "_____________________________________" << endl << fa_gmr->getName() << endl;
+  cout << "_____________________________________" << endl << fa->getName() << endl;
   cout << "    Training"  << endl;
-  if (!directory.empty()) directory_fa =  directory+"/"+fa_gmr->getName();
-  fa_gmr->train(inputs,targets);
+  if (!directory.empty()) directory_fa =  directory+"/"+fa->getName();
+  fa->train(inputs,targets,directory_fa,overwrite);
   cout << "    Predicting" << endl;
-  //fa->predict(inputs,outputs);
-  fa_gmr->predictDot(inputs,outputs,outputs_dot);
+  fa->predict(inputs,outputs);
   meanAbsoluteErrorPerOutputDimension(targets,outputs);
-  
-  
-  std::cout<<outputs.size()<<std::endl;
-  std::cout<<"****"<<std::endl;
-  std::cout<<outputs_dot.size()<<std::endl;
-  std::cout<<"****"<<std::endl;
-  std::cout<<inputs.size()<<std::endl;
-  
   cout << endl << endl;
   
-  delete fa_gmr;
+  delete fa;
   delete meta_parameters_gmr;
 
+  
     // Locally Weighted Projection Regression
 #ifdef USE_LWPR
     double   w_gen=0.2;
