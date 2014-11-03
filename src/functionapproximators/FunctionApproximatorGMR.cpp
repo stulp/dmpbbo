@@ -430,16 +430,6 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
     // Compute output, given probabilities of each Gaussian
     for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
     {
-      
-      /*cout<<"****"<<std::endl;
-      cout<<gmm->covars_y_[i_gau]<<std::endl;
-      cout<<"****"<<std::endl;
-      cout<<gmm->covars_y_x_[i_gau]<<std::endl;
-      cout<<"****"<<endl;
-      cout<<gmm->covars_x_inv_[i_gau]<<endl;
-      cout<<"****"<<endl;
-      std::cout<<(gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose())<<std::endl;*/
-      
       // Here comes the formula: h^2 * (S_y- S_y_x * inv(S_x) * S_y_x^T) 
       // It has been condensed into one line to avoid allocations for real-time execution
       variances.row(i_input) += probabilities_cached_[i_gau]*probabilities_cached_[i_gau] * (gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose()).diagonal();
