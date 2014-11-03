@@ -65,8 +65,6 @@ public:
   
 	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
 	
-	void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
-
 	void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances);
 	
 	std::string getName(void) const {
@@ -107,7 +105,6 @@ protected:
   void expectationMaximization(const Eigen::MatrixXd& data, std::vector<Eigen::VectorXd>& means, std::vector<double>& priors,
     std::vector<Eigen::MatrixXd>& covars, int n_max_iter=50);
   
-
   /** The probability density function (PDF) of the multi-variate normal distribution
    * \param[in] mu The mean of the normal distribution
    * \param[in] covar The covariance matrix of the normal distribution 
@@ -115,8 +112,6 @@ protected:
    * \return The PDF value for the input
    */
   static double normalPDF(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input);
- 
-  static void normalPDFDot(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input, double& output, double& output_dot);
   
   /** The probability density function (PDF) of the multi-variate normal distribution
    * \param[in] mu The mean of the normal distribution
@@ -126,17 +121,56 @@ protected:
    */
   static double normalPDFWithInverseCovar(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar_inverse, const Eigen::VectorXd& input);
 
-  static void normalPDFWithInverseCovarDot(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar_inverse, const Eigen::VectorXd& input, double& output, double& output_dot);
-  
   /** Compute the probabilities that a certain input belongs to each Gaussian in the Gaussian mixture model.
    * \param[in] gmm The Gaussian mixture model
    * \param[in] input The input data vector for which the probabilities will be computed.
    * \param[out] h The probabilities
    */
-
-  static void computeProbabilitiesDot(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h, Eigen::VectorXd& h_dot);
-  
   static void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h);
+
+/** @name Derivate of the probability density function
+ *  These methods are used to compute the derivate of the probability density function. They have been tested only when the input dimension is one.
+ */
+ /**@{*/ 
+public:
+   /** Query the function approximator to make a prediction and to compute the derivate of that prediction
+   *  \param[in]  inputs   Input values of the query
+   *  \param[out] outputs  Predicted output values
+   *  \param[out] outputs_dot  Predicted derivate values
+   * 
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * Therefore, this function cannot be const.
+   */
+  void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
+
+protected:
+  /** Derivate of the probability density function (PDF) of the multi-variate normal distribution
+   * \param[in] mu The mean of the normal distribution
+   * \param[in] covar The covariance matrix of the normal distribution 
+   * \param[in] input The input data vector for which the PDF will be computed.
+   * \param[out] output The PDF value for the input
+   * \param[out] output_dot The derivate PDF value for the input
+   */
+  static void normalPDFDot(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input, double& output, double& output_dot);
+  
+  /** The probability density function (PDF) of the multi-variate normal distribution
+   * \param[in] mu The mean of the normal distribution
+   * \param[in] covar_inverse Inverse of the covariance matrix of the normal distribution 
+   * \param[in] input The input data vector for which the PDF will be computed.
+   * \param[out] output The PDF value for the input
+   * \param[out] output_dot The derivate of the PDF for the input
+   */
+  static void normalPDFWithInverseCovarDot(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar_inverse, const Eigen::VectorXd& input, double& output, double& output_dot);
+  
+  /** Compute the probabilities that a certain input belongs to each Gaussian in the Gaussian mixture model and its derivative in respect of the input.
+   * \param[in] gmm The Gaussian mixture model
+   * \param[in] input The input data vector for which the probabilities will be computed.
+   * \param[out] h The probabilities
+   * \param[out] h_dot The derivative of h
+   */
+  static void computeProbabilitiesDot(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h, Eigen::VectorXd& h_dot);
+///@}
 
 private:
   /**
@@ -157,11 +191,10 @@ private:
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
-
+  
   /** This is a cached variable whose memory is allocated once during construction. */
   Eigen::VectorXd probabilities_cached_;
   Eigen::VectorXd probabilities_dot_cached_;
-  //double gauss_, gauss_dot_;
 };
 
 }
