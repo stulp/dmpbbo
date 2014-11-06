@@ -88,10 +88,8 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
     
   }
 
-
-  for (unsigned int i=0; i<n_gaussians; i++)
-    covars_x_inv_.push_back(covars_x_[i].inverse());
-
+  updateCachedMembers();
+  
   all_values_vector_size_ = 0;  
 }
 
@@ -136,8 +134,7 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   }
 #endif
 
-  for (unsigned int i=0; i<n_gaussians; i++)
-    covars_x_inv_.push_back(covars_x_[i].inverse());
+  updateCachedMembers();
 
   all_values_vector_size_ = 0;
   
@@ -151,6 +148,23 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   // all_values_vector_size_ += n_gaussians * n_dims_out * n_dims_out;
   // all_values_vector_size_ += n_gaussians * n_dims_out * n_dims_in;  
 };
+
+void ModelParametersGMR::updateCachedMembers(void)
+{
+  int n_gaussians = getNumberOfGaussians();
+  int n_dims_in = getExpectedInputDim();
+  
+  covars_x_inv_.resize(n_gaussians);
+  mvgd_scale_.resize(n_gaussians);
+  for (int i=0; i<n_gaussians; i++)
+  {
+    covars_x_inv_[i] = covars_x_[i].inverse();
+    
+    // 1/sqrt((2*pi)^k*|Sigma|)
+    double in_sqrt = pow(2*M_PI,n_dims_in)*covars_x_[i].determinant();
+    mvgd_scale_[i] = pow(in_sqrt,-0.5);
+  }
+}
 
 ModelParameters* ModelParametersGMR::clone(void) const
 {
@@ -187,6 +201,7 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(covars_y_);
   ar & BOOST_SERIALIZATION_NVP(covars_y_x_);
   ar & BOOST_SERIALIZATION_NVP(covars_x_inv_);
+  ar & BOOST_SERIALIZATION_NVP(mvgd_scale_);
 }
 
 

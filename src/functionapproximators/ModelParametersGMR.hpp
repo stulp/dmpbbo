@@ -147,8 +147,15 @@ private:
   std::vector<Eigen::MatrixXd> covars_y_;
   std::vector<Eigen::MatrixXd> covars_y_x_;
 
+
+  void updateCachedMembers(void);
+  
   /** This is covars_x_.inverse(). Since we used it often, we cache it here. */
   std::vector<Eigen::MatrixXd> covars_x_inv_;
+  
+  /** This is the scale factor in a multivariate normal distribution
+   * 1/sqrt((2*pi)^k*|Sigma|). Since we used it often, we cache it here. */
+  std::vector<double> mvgd_scale_;
 
   int  all_values_vector_size_;
   
