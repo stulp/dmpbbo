@@ -288,16 +288,27 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
 }
 
 // TODO
-// Add the below function as virtual to FunctionApproximator?
+// Add the below function as virtual to FunctionApproximator? Yes!
 // In predictVariance, why are the variances scalars, and not covariance matrices?
-// Make variance computation real-time safe
-// Add predictDot, which predict should call with empty matrices for the dot matrices
-// In predictDot assert that the output dim is 0
-// Check -msse2 flag
+//   => Add matrix
+
 // Put the whole EIGEN_RUNTIME_NO_MALLOC into a macro
+//    ENTERING_REAL_TIME_CRITICAL_CODE
+//    EXITING_REAL_TIME_CRITICAL_CODE
+//    Put in Parameterizable. Not ideal.
+
+// Add REALTIME compile option: No. Rather:
+//     cmake ../ -DEIGEN_RUNTIME_NO_MALLOC
+
+// Add predictDot, which predict should call with empty matrices for the dot matrices
+// In predictDot assert that the output dim is 1
+
+// Make variance computation real-time safe
+// Check -msse2 flag
 
 void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
 {
+  
   // Entering real-time critical code, forbid dynamic memory allocation in Eigen
 #ifdef EIGEN_RUNTIME_NO_MALLOC
   Eigen::internal::set_is_malloc_allowed(false);
@@ -364,8 +375,11 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
       // A1. Compute the unnormalized pdf of the multi-variate Gaussian distribution
       // formula: exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
       // (we use cached variables and noalias to avoid dynamic allocation)
+      // (x-mu)
       diff_prealloc_ = inputs.row(i_input).transpose() - gmm->means_x_[i_gau];
+      // Sigma^-1 * (x-mu)
       covar_times_diff_prealloc_.noalias() = gmm->covars_x_inv_[i_gau]*diff_prealloc_;
+      // exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
       probabilities_prealloc_[i_gau] = exp(-2*diff_prealloc_.dot(covar_times_diff_prealloc_));
       
       // A2. Normalize the unnormalized pdf (scale factor has been precomputed in the GMM)
