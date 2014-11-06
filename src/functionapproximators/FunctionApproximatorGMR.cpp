@@ -501,7 +501,7 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
       // formula for scale factor: 1/sqrt( (2\pi)^N*|\Sigma| )
       probabilities_prealloc_[i_gau] *= gmm->mvgd_scale_[i_gau];
       
-      probabilities_dot_prealloc_[i_gau] = - probabilities_prealloc_[i_gau] * covar_times_diff_prealloc_(0,0);
+      probabilities_dot_prealloc_[i_gau] *= - probabilities_prealloc_[i_gau] * covar_times_diff_prealloc_(0,0);
       
       // A3. Multiply the normalized pdf with the priors
       probabilities_prealloc_[i_gau] *= gmm->priors_[i_gau];
