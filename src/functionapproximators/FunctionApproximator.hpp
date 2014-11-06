@@ -115,12 +115,48 @@ public:
    * Therefore, this function cannot be const.
    */
   virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) = 0;
+
+  /** Query the function approximator to make a prediction, and also to predict its variance
+   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
+   *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * Therefore, this function cannot be const.
+   */
+  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
+  {
+    predict(inputs, outputs);
+    variances.fill(0);
+  }
+
+  /** Query the function approximator to make a prediction, and also to predict its variance
+   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
+   *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
+   *  \param[out] variances Predicted covariance matrices for the output values. It is is of size  (n_samples X n_dims_out X n_dims_out), which has been implemented as a std::vector of Eigen::MatrixXd.
+   *
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * Therefore, this function cannot be const.
+   */
+  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances)
+  {
+    predict(inputs, outputs);
+    for (unsigned int i=0; i<variances.size(); i++)
+      variances[i].fill(0);
+  }
+
   
   /** Query the function approximator to get the variance of a prediction
    * This function is not implemented by all function approximators. Therefore, the default
    * implementation fills outputs with 0s.
-   *  \param[in]  inputs    Input values of the query
-   *  \param[out] variances Predicted variance for the output values
+   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * Therefore, this function cannot be const.
    */
   virtual void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances)
   {
