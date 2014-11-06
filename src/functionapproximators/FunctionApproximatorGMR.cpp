@@ -80,7 +80,12 @@ void FunctionApproximatorGMR::preallocateMatrices(int n_gaussians, int n_input_d
   diff_prealloc_ = VectorXd::Zero(n_input_dims);
   covar_times_diff_prealloc_ = VectorXd::Zero(n_input_dims);  
   mean_output_prealloc_ = VectorXd::Zero(n_output_dims);  
+  
+  covar_input_times_output_ = MatrixXd::Zero(n_input_dims,n_output_dims);
+  covar_output_prealloc_ = MatrixXd::Zero(n_output_dims,n_output_dims);
+  
   empty_prealloc_ = MatrixXd::Zero(0,0);
+
 }
 
 
@@ -279,12 +284,18 @@ void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* 
 
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  outputs.resize(inputs.rows(),getExpectedOutputDim());
   predict(inputs,outputs,empty_prealloc_);
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  variances.resize(inputs.rows(),getExpectedOutputDim());
   predict(inputs,empty_prealloc_,variances);
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 // TODO
@@ -410,14 +421,16 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
     {
       for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
       {
-        // STILL NEED TO MAKE THE BELOW PART ALLOCATION FREE
-        EXITING_REAL_TIME_CRITICAL_CODE
-       
-        // Here comes the formula: h^2 * (C_y- C_y_x * inv(C_x) * C_y_x^T) 
-        variances.row(i_input) += probabilities_prealloc_[i_gau]*probabilities_prealloc_[i_gau] * (gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose()).diagonal();
-
-        // STILL NEED TO MAKE THE ABOVE PART ALLOCATION FREE
-        ENTERING_REAL_TIME_CRITICAL_CODE
+        // Here comes the formula: h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        
+        // inv(C_x) * C_y_x^T
+        covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
+        // - C_y_x * inv(C_x) * C_y_x^T
+        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        covar_output_prealloc_ += gmm->covars_y_[i_gau];
+        // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        variances.row(i_input) += probabilities_prealloc_[i_gau]*probabilities_prealloc_[i_gau] * ( covar_output_prealloc_ ).diagonal();
         
         // There are cases where we may get slightly negative variances due to numerical issues
         // Avoid them here by setting negative variances to 0.

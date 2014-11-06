@@ -194,6 +194,8 @@ private:
   Eigen::VectorXd diff_prealloc_;
   Eigen::VectorXd covar_times_diff_prealloc_;
   Eigen::VectorXd mean_output_prealloc_;
+  Eigen::MatrixXd covar_input_times_output_;
+  Eigen::MatrixXd covar_output_prealloc_;
   Eigen::VectorXd probabilities_dot_prealloc_;
   Eigen::MatrixXd empty_prealloc_;
 };
