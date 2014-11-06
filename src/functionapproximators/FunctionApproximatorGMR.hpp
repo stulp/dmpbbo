@@ -64,8 +64,10 @@ public:
 	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
   
 	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
-	
+
 	void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances);
+
+	void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances);
 	
 	std::string getName(void) const {
     return std::string("GMR");  
@@ -121,13 +123,6 @@ protected:
    */
   static double normalPDFWithInverseCovar(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar_inverse, const Eigen::VectorXd& input);
 
-  /** Compute the probabilities that a certain input belongs to each Gaussian in the Gaussian mixture model.
-   * \param[in] gmm The Gaussian mixture model
-   * \param[in] input The input data vector for which the probabilities will be computed.
-   * \param[out] h The probabilities
-   */
-  static void computeProbabilities(const ModelParametersGMR* gmm, const Eigen::VectorXd& input, Eigen::VectorXd& h);
-
 /** @name Derivate of the probability density function
  *  These methods are used to compute the derivate of the probability density function. They have been tested only when the input dimension is one.
  */
@@ -145,6 +140,7 @@ public:
   void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
 
 protected:
+
   /** Derivate of the probability density function (PDF) of the multi-variate normal distribution
    * \param[in] mu The mean of the normal distribution
    * \param[in] covar The covariance matrix of the normal distribution 
@@ -192,9 +188,14 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
   
+  void preallocateMatrices(int n_gaussians, int n_input_dims, int n_output_dims);
   /** This is a cached variable whose memory is allocated once during construction. */
-  Eigen::VectorXd probabilities_cached_;
-  Eigen::VectorXd probabilities_dot_cached_;
+  Eigen::VectorXd probabilities_prealloc_;
+  Eigen::VectorXd diff_prealloc_;
+  Eigen::VectorXd covar_times_diff_prealloc_;
+  Eigen::VectorXd mean_output_prealloc_;
+  Eigen::VectorXd probabilities_dot_prealloc_;
+  Eigen::MatrixXd empty_prealloc_;
 };
 
 }
