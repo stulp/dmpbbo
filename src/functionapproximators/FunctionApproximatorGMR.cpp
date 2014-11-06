@@ -193,81 +193,24 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   //delete covars[i];
 }
 
-double FunctionApproximatorGMR::normalPDFWithInverseCovar(const VectorXd& mu, const MatrixXd& covar_inverse, const VectorXd& input)
+
+double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
 {
+  MatrixXd covar_inverse = covar.inverse();
   double output = exp(-2*(input-mu).transpose()*covar_inverse*(input-mu));
   // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
   // Hence the 1.0/covar_inverse.determinant() below
   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
   output *= pow(pow(2*M_PI,mu.size())/covar_inverse.determinant(),-0.5);   
-  
   return output;
 }
 
-void FunctionApproximatorGMR::normalPDFWithInverseCovarDot(const VectorXd& mu, const MatrixXd& covar_inverse, const VectorXd& input, double& output, double& output_dot)
-{
-  output = exp(-2*(input-mu).transpose()*covar_inverse*(input-mu));
-  // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
-  // Hence the 1.0/covar_inverse.determinant() below
-  //  ( (2\pi)^N*|\Sigma| )^(-1/2)
-  output *= pow(pow(2*M_PI,mu.size())/covar_inverse.determinant(),-0.5);
-  output_dot = - output * covar_inverse(0.0) * (input-mu)(0); // HACK we assume 1 dim
-}
-
-/*void FunctionApproximatorGMR::normalPDFWithInverseCovarDot(const VectorXd& mu, const MatrixXd& covar_inverse, const VectorXd& input, double& output, double& output_dot)
-{ 
-  VectorXd diff = input-mu;
-  output = exp(-2*diff.transpose()*covar_inverse*diff);
-  // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
-  double det = 1.0/covar_inverse.determinant();
-  output *= pow(pow(2*M_PI,mu.size())*det,-0.5);   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
-  output_dot = - output * covar_inverse(0.0) * diff(0); // HACK
-}*/
-
-double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
-{
-  return FunctionApproximatorGMR::normalPDFWithInverseCovar(mu,covar.inverse(),input);
-}
-
-void FunctionApproximatorGMR::normalPDFDot(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input, double& output, double& output_dot)
-{
-  FunctionApproximatorGMR::normalPDFWithInverseCovarDot(mu,covar.inverse(),input, output, output_dot);
-}
-
-
-void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h, VectorXd& h_dot)
-{
-  assert((int)gmm->priors_.size()==h.size());
-  assert(h_dot.size()==h.size());
-  assert(input.size() == 1); // HACK We are doing the dervate only along time/phase!
-  
-  double gauss, gauss_dot;
-  // Compute gaussian pdf and multiply it with prior probability
-  // This yields the unnormalized probabilities (normalization done below)
-  for (unsigned int i_gau=0; i_gau<gmm->priors_.size(); i_gau++)
-  {
-    normalPDFWithInverseCovarDot(gmm->means_x_[i_gau],gmm->covars_x_inv_[i_gau],input,gauss,gauss_dot);
-    h(i_gau) = gmm->priors_[i_gau] * gauss;
-    h_dot(i_gau) = gmm->priors_[i_gau] * gauss_dot;
-  }
-  // Normalize to get h and h_dot
-  h /= h.sum();
-  h_dot = (h_dot * h.sum() - h * h_dot.sum())/pow(h.sum(),2);
-}
 
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   outputs.resize(inputs.rows(),getExpectedOutputDim());
   predict(inputs,outputs,empty_prealloc_);
-  EXITING_REAL_TIME_CRITICAL_CODE
-}
-
-void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
-{
-  ENTERING_REAL_TIME_CRITICAL_CODE
-  outputs.resize(inputs.rows(),getExpectedOutputDim());
-  predictDot(inputs,outputs,outputs_dot,empty_prealloc_);
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
@@ -278,11 +221,6 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
   predict(inputs,empty_prealloc_,variances);
   EXITING_REAL_TIME_CRITICAL_CODE
 }
-
-// TODO
-
-// Add predictDot, which predict should call with empty matrices for the dot matrices
-// In predictDot assert that the output dim is 1
 
 void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
 {
@@ -418,6 +356,14 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
     }
   }
   
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
+void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  outputs.resize(inputs.rows(),getExpectedOutputDim());
+  predictDot(inputs,outputs,outputs_dot,empty_prealloc_);
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
