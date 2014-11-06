@@ -501,20 +501,22 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
       // formula for scale factor: 1/sqrt( (2\pi)^N*|\Sigma| )
       probabilities_prealloc_[i_gau] *= gmm->mvgd_scale_[i_gau];
       
+      // A3. This is the derivate of an exponential function, NOTE that we are assuming input dimension equal to one!
       probabilities_dot_prealloc_[i_gau] *= - probabilities_prealloc_[i_gau] * covar_times_diff_prealloc_(0,0);
       
-      // A3. Multiply the normalized pdf with the priors
+      // A4. Multiply the normalized pdf with the priors
       probabilities_prealloc_[i_gau] *= gmm->priors_[i_gau];
       
+      // A5. Repeat the same with the prob. dot
       probabilities_dot_prealloc_[i_gau] *= gmm->priors_[i_gau];
       
     }
     
-    // A4. Normalize the probabilities by dividing by their sum
+    // A5. Normalize the probabilities by dividing by their sum
     probabilities_prealloc_sum_ = probabilities_prealloc_.sum();
     probabilities_prealloc_ /= probabilities_prealloc_sum_;
     
-    // A5. Compute the derivative of the probability
+    // A6. Compute the derivative of the probability
     probabilities_dot_prealloc_sum_ = probabilities_dot_prealloc_.sum();
     probabilities_dot_prealloc_ = (probabilities_dot_prealloc_ * probabilities_prealloc_sum_ - probabilities_prealloc_ * probabilities_dot_prealloc_sum_)/pow(probabilities_prealloc_sum_,2);
 
@@ -525,7 +527,6 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
         
         // B: compute estimated mean of y: (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
         // We will compute it bit by bit (with preallocated matrices) to avoid dynamic allocations.
-        
         // (input-mu_x)
         diff_prealloc_ = inputs.row(i_input).transpose() - gmm->means_x_[i_gau];
         // inv(C_x) * (input-mu_x)
