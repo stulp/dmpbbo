@@ -308,7 +308,7 @@ void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::Mat
     MatrixXd inputs_grid;
     FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim_vec, inputs_grid);
     
-    MatrixXd outputs_grid(inputs_grid.rows(),1);
+    MatrixXd outputs_grid(inputs_grid.rows(),getExpectedOutputDim());
     predict(inputs_grid,outputs_grid);
     
     saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim_vec,overwrite);
@@ -316,7 +316,7 @@ void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::Mat
     saveMatrix(save_directory,"outputs_grid.txt",outputs_grid,overwrite);
 
 
-    MatrixXd variances_grid;
+    MatrixXd variances_grid(inputs_grid.rows(),getExpectedOutputDim());
     predictVariance(inputs_grid,variances_grid);
     if (!variances_grid.size()==0)
     {
@@ -328,7 +328,7 @@ void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::Mat
     
   }
 
-  MatrixXd outputs;
+  MatrixXd outputs(inputs.rows(),getExpectedOutputDim());
   predict(inputs,outputs);
 
     

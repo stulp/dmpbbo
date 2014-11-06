@@ -85,6 +85,7 @@ int main(int n_args, char** args)
 
       
       // Do predictions and compute mean absolute error
+      outputs.resize(inputs.rows(),cur_fa->getExpectedOutputDim());
       cur_fa->predict(inputs,outputs);
 
       MatrixXd abs_error = (targets.array()-outputs.array()).abs();
