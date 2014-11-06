@@ -56,10 +56,14 @@ public:
   
 	ModelParameters* clone(void) const;
 	
-  int getExpectedInputDim(void) const  {
+  inline int getExpectedInputDim(void) const  {
     return centers_.cols();
   };
-    	
+
+  inline int getNumberOfBasisFunctions(void) const  {
+    return centers_.rows();
+  };
+   	
   /** Get the unnormalized kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
