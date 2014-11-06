@@ -288,14 +288,6 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
 }
 
 // TODO
-// Add the below function as virtual to FunctionApproximator? Yes!
-// In predictVariance, why are the variances scalars, and not covariance matrices?
-//   => Add matrix
-
-// Put the whole EIGEN_RUNTIME_NO_MALLOC into a macro
-//    ENTERING_REAL_TIME_CRITICAL_CODE
-//    EXITING_REAL_TIME_CRITICAL_CODE
-//    Put in Parameterizable. Not ideal.
 
 // Add REALTIME compile option: No. Rather:
 //     cmake ../ -DEIGEN_RUNTIME_NO_MALLOC
@@ -308,11 +300,7 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
 
 void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
 {
-  
-  // Entering real-time critical code, forbid dynamic memory allocation in Eigen
-#ifdef EIGEN_RUNTIME_NO_MALLOC
-  Eigen::internal::set_is_malloc_allowed(false);
-#endif
+  ENTERING_REAL_TIME_CRITICAL_CODE
   
   // The reason this function is not pretty and so long (which I usually try to avoid) is to  
   // avoid Eigen making dynamic memory allocations. This would cause trouble in real-time critical
@@ -423,13 +411,13 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
       for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
       {
         // STILL NEED TO MAKE THE BELOW PART ALLOCATION FREE
-        Eigen::internal::set_is_malloc_allowed(true);
-        
+        EXITING_REAL_TIME_CRITICAL_CODE
+       
         // Here comes the formula: h^2 * (C_y- C_y_x * inv(C_x) * C_y_x^T) 
         variances.row(i_input) += probabilities_prealloc_[i_gau]*probabilities_prealloc_[i_gau] * (gmm->covars_y_[i_gau] - gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose()).diagonal();
 
         // STILL NEED TO MAKE THE ABOVE PART ALLOCATION FREE
-        Eigen::internal::set_is_malloc_allowed(false);
+        ENTERING_REAL_TIME_CRITICAL_CODE
         
         // There are cases where we may get slightly negative variances due to numerical issues
         // Avoid them here by setting negative variances to 0.
@@ -442,10 +430,7 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
     }
   }
   
-  // Leaving real-time critical code, allow dynamic memory allocation in Eigen
-#ifdef EIGEN_RUNTIME_NO_MALLOC
-  Eigen::internal::set_is_malloc_allowed(true);
-#endif
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
