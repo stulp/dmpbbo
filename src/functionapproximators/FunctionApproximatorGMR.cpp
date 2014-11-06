@@ -300,14 +300,8 @@ void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& 
 
 // TODO
 
-// Add REALTIME compile option: No. Rather:
-//     cmake ../ -DEIGEN_RUNTIME_NO_MALLOC
-
 // Add predictDot, which predict should call with empty matrices for the dot matrices
 // In predictDot assert that the output dim is 1
-
-// Make variance computation real-time safe
-// Check -msse2 flag
 
 void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
 {
