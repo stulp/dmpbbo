@@ -44,7 +44,16 @@ This is a bug in boost::serialization for versions >=1.44, which can be fixed wi
 Note that the crash happens towards the very end of the program, just before returning from main() when desctructors are called. So it does not affect functionality, but it is just very irritating that boost crashes and sometimes dumps a core (I use boost version 1.48, maybe the issue is fixed in later versions). If I had known things like this would happen, I would have probably used cereal (http://uscilab.github.io/cereal/) rather than boost::serialization... 
 
 
+________________________________________________________________________________    
+REAL-TIME DEBUGGING BUILD
 
+Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. To enable this checking, do:
+
+  cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug
+
+Note that it doesn't make sense to set -DREALTIME_CHECKS=1 without -DCMAKE_BUILD_TYPE=Debug, as asserts are only done in debug mode. 
+When running the code on a real robot, clearly you want to do an optimized build without asserts, i.e. -DCMAKE_BUILD_TYPE=Release
+  
 ________________________________________________________________________________    
 MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES
 

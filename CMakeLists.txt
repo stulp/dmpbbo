@@ -27,9 +27,16 @@ set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
 
 # Some flags for CXX
-set(CMAKE_CXX_FLAGS "-Wall -std=c++0x -fPIC -DEIGEN_RUNTIME_NO_MALLOC")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++0x -fPIC")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+# Define macros to check for real time requirements
+# To activate the EIGEN_MALLOC asserts use: cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug
+if(REALTIME_CHECKS)
+   add_definitions(-DREALTIME_CHECKS)
+endif()
+
 
 # Appends the cmake/modules path inside the MAKE_MODULE_PATH variable which stores the
 # directories of additional CMake modules (ie. MacroOutOfSourceBuild.cmake):
