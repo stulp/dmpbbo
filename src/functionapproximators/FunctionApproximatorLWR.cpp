@@ -249,7 +249,8 @@ void FunctionApproximatorLWR::predict(const MatrixXd& inputs, MatrixXd& output)
   //                                            (mostly for me to remember why it is like this) 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
 
-  MatrixXd lines;
+  // Lines is of size n_samples X n_basis_functions
+  MatrixXd lines(inputs.rows(),model_parameters_lwr->getNumberOfBasisFunctions());
   model_parameters_lwr->getLines(inputs, lines);
 
   // Weight the values for each line with the normalized basis function activations  

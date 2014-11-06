@@ -179,12 +179,8 @@ void ModelParametersLWR::set_slopes_as_angles(bool slopes_as_angles)
 void ModelParametersLWR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
 {
   int n_time_steps = inputs.rows();
-
-  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
-  
+  lines.resize(n_time_steps,getNumberOfBasisFunctions());
+ 
   // Compute values along lines for each time step  
   // Line representation is "y = ax + b"
   lines = inputs*slopes_.transpose() + offsets_.transpose().replicate(n_time_steps,1);
