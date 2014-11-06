@@ -138,7 +138,19 @@ public:
    * Therefore, this function cannot be const.
    */
   void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
-
+  
+  /** Query the function approximator to make a prediction and to compute the derivate of that prediction, and also to predict its variance
+   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
+   *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
+   *  \param[out] outputs_dot  Predicted derivate values
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * Therefore, this function cannot be const.
+   */
+  void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances);
+  
 protected:
 
   /** Derivate of the probability density function (PDF) of the multi-variate normal distribution
@@ -195,9 +207,12 @@ private:
   Eigen::VectorXd covar_times_diff_prealloc_;
   Eigen::VectorXd mean_output_prealloc_;
   Eigen::MatrixXd covar_input_times_output_;
+  Eigen::MatrixXd covar_output_times_input_;
   Eigen::MatrixXd covar_output_prealloc_;
   Eigen::VectorXd probabilities_dot_prealloc_;
   Eigen::MatrixXd empty_prealloc_;
+  double probabilities_prealloc_sum_;
+  double probabilities_dot_prealloc_sum_;
 };
 
 }

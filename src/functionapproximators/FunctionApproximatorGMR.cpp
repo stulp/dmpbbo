@@ -82,6 +82,7 @@ void FunctionApproximatorGMR::preallocateMatrices(int n_gaussians, int n_input_d
   mean_output_prealloc_ = VectorXd::Zero(n_output_dims);  
   
   covar_input_times_output_ = MatrixXd::Zero(n_input_dims,n_output_dims);
+  covar_output_times_input_ = MatrixXd::Zero(n_output_dims,n_input_dims);
   covar_output_prealloc_ = MatrixXd::Zero(n_output_dims,n_output_dims);
   
   empty_prealloc_ = MatrixXd::Zero(0,0);
@@ -254,39 +255,19 @@ void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* 
   h_dot = (h_dot * h.sum() - h * h_dot.sum())/pow(h.sum(),2);
 }
 
-/*void FunctionApproximatorGMR::computeProbabilitiesDot(const ModelParametersGMR* gmm, const VectorXd& input, VectorXd& h, VectorXd& h_dot) const
-{
-  
-  assert(input.size() == 1); // HACK We are doing the dervate only along time/phase!
-  
-  int n_gaussians = gmm->means_x_.size();
-  h.resize(n_gaussians);
-  h_dot.resize(n_gaussians);
-  VectorXd prior_times_gauss(n_gaussians);
-  VectorXd prior_times_gauss_dot(n_gaussians);
-  double gauss;
-  double gauss_dot;
-  
-  // Compute gaussian pdf and multiply it with prior probability
-  for (int i_gau=0; i_gau<n_gaussians; i_gau++)
-  {
-    //double gauss = normalPDF(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
-    //double gauss_dot = normalPDFDot(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input);
-    normalPDFDot(gmm->means_x_[i_gau],gmm->covars_x_[i_gau],input,gauss,gauss_dot);
-    prior_times_gauss(i_gau) = gmm->priors_[i_gau]*gauss;
-    prior_times_gauss_dot(i_gau) = gmm->priors_[i_gau]*gauss_dot;
-  }
-
-  // Normalize to get h and h_dot
-  h = prior_times_gauss/prior_times_gauss.sum();
-  h_dot = (prior_times_gauss_dot * prior_times_gauss.sum() - prior_times_gauss * prior_times_gauss_dot.sum())/pow(prior_times_gauss.sum(),2);
-}*/
-
 void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   outputs.resize(inputs.rows(),getExpectedOutputDim());
   predict(inputs,outputs,empty_prealloc_);
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
+void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  outputs.resize(inputs.rows(),getExpectedOutputDim());
+  predictDot(inputs,outputs,outputs_dot,empty_prealloc_);
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
@@ -440,8 +421,18 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
-void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
+void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot, Eigen::MatrixXd& variances)
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+ 
+  // The reason this function is not pretty and so long (which I usually try to avoid) is to  
+  // avoid Eigen making dynamic memory allocations. This would cause trouble in real-time critical
+  // code. Therefore, I
+  //   * use preallocated matrices (member variables) for intermediate results
+  //   * use noalias() whenever needed (http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html)
+  //   * try to avoid calling other functions (a bit tricky when using Eigen matrices as parameters)
+  // I hope the documentation makes up for the ugliness...
+  
   if (!isTrained())  
   {
     cerr << "WARNING: You may not call FunctionApproximatorGMR::predict if you have not trained yet. Doing nothing." << endl;
@@ -450,89 +441,141 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
   
   const ModelParametersGMR* gmm = static_cast<const ModelParametersGMR*>(getModelParameters());
 
+  // Dimensionality of input must be 1 in order to compute the derivative
+  assert(inputs.cols() == 1); 
   // Number of Gaussians must be at least one
   assert(gmm->getNumberOfGaussians()>0);
   // Dimensionality of input must be same as of the gmm inputs  
   assert(gmm->getExpectedInputDim()==inputs.cols());
 
-  // HACK I commented out to avoid a transpose out of here
-  // outputs must have the right size
-  // the right size is n_input_samples X n_dims_out
-  outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
-  outputs_dot.resize(inputs.rows(),gmm->getExpectedOutputDim());
-  outputs.fill(0);
-  outputs_dot.fill(0);
+  // Only compute the means if the outputs matrix is not empty
+  bool compute_means = false;
+  if (outputs.rows()>0)
+  {
+    outputs.resize(inputs.rows(),gmm->getExpectedOutputDim());
+    outputs_dot.resize(inputs.rows(),gmm->getExpectedOutputDim());
+    outputs.fill(0);
+    outputs_dot.fill(0);
+    compute_means = true;
+  }
   
+  // Only compute the variances if the variances matrix is not empty
+  bool compute_variance = false;
+  if (variances.rows()>0)
+  {
+    compute_variance = true;
+    variances.resize(inputs.rows(),gmm->getExpectedOutputDim());
+    variances.fill(0);
+  }
+
+  // For each input, compute the output  
   for (int i_input=0; i_input<inputs.rows(); i_input++)
   {
-    // Compute probalities that each Gaussian would generate this input    
-    computeProbabilitiesDot(gmm, inputs.row(i_input), probabilities_prealloc_,probabilities_dot_prealloc_);
     
-    // Compute output, given probabilities of each Gaussian
+    // Three main steps
+    // A: compute probability: prior * pdf of the multivariate Gaussian
+    // B: compute estimated mean of y: (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
+    // C: weight the estimated mean with the probability
+    
+    
+    // A: compute probability: prior * pdf of the multivariate Gaussian
+    // Compute probalities that each Gaussian would generate this input in 4 steps
+    // A1. Compute the unnormalized pdf of the multi-variate Gaussian distribution
+    // A2. Normalize the unnormalized pdf (scale factor has been precomputed in the GMM)
+    // A3. Multiply the normalized pdf with the priors
+    // A4. Normalize the probabilities by dividing by their sum
+  
     for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
     {
-      // Here comes the formula: h * (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
-      // It has been condensed into one line to avoid allocations for real-time execution
-      outputs.row(i_input) += 
-        probabilities_prealloc_[i_gau] * (gmm->means_y_[i_gau] +    // h * (mu_y +
-          (gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] *  //   ( C_y_x * inv(C_x) *
-            (inputs.row(i_input) - gmm->means_x_[i_gau])) );      //      (input-mu_x) ) )
-            
-      outputs_dot.row(i_input) +=  probabilities_dot_prealloc_[i_gau] * (gmm->means_y_[i_gau] + gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]) 
-	+ probabilities_prealloc_[i_gau] * (gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau]);  
-    }
-  }
-}
-/*
-void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
-{
-  if (!isTrained())  
-  {
-    cerr << "WARNING: You may not call FunctionApproximatorGMR::predict if you have not trained yet. Doing nothing." << endl;
-    return;
-  }
-  
-  const ModelParametersGMR* gmm = static_cast<const ModelParametersGMR*>(getModelParameters());
-
-  // Dimensionality of input must be same as of the gmm inputs  
-  assert(gmm->means_x_[0].size()==inputs.cols());
-  
-  int n_gaussians = gmm->priors_.size();
-  assert(n_gaussians>0);
-  int n_dims_out = gmm->means_y_[0].size();
-  int n_inputs = inputs.rows();
-
-  // Make outputs of the right size
-  outputs.resize(n_inputs, n_dims_out);
-  outputs.fill(0);
-  outputs_dot.resize(n_inputs, n_dims_out);
-  outputs_dot.fill(0);
-  
-  // Pre-allocate some memory
-  VectorXd h(n_gaussians);
-  VectorXd h_dot(n_gaussians);
-  for (int i_input=0; i_input<n_inputs; i_input++)
-  {
-    // Compute output for this input
-    VectorXd input = inputs.row(i_input);
-
-    // Compute probalities that each Gaussian would generate this input    
-    //computeProbabilities(gmm, input, h);
-    computeProbabilitiesDot(gmm, input, h, h_dot);
-    
-    // Compute output, given probabilities of each Gaussian
-    for (int i_gau=0; i_gau<n_gaussians; i_gau++)
-    {
-      VectorXd diff = input-gmm->means_x_[i_gau];
-      VectorXd projected =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau] * diff;
-      outputs.row(i_input) += h[i_gau] * (gmm->means_y_[i_gau]+projected);
+      // A1. Compute the unnormalized pdf of the multi-variate Gaussian distribution
+      // formula: exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
+      // (we use cached variables and noalias to avoid dynamic allocation)
+      // (x-mu)
+      diff_prealloc_ = inputs.row(i_input).transpose() - gmm->means_x_[i_gau];
+      // Sigma^-1 * (x-mu)
+      covar_times_diff_prealloc_.noalias() = gmm->covars_x_inv_[i_gau]*diff_prealloc_;
+      // exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
+      probabilities_prealloc_[i_gau] = exp(-2*diff_prealloc_.dot(covar_times_diff_prealloc_));
       
-      VectorXd projected_dot =  gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau];
-      outputs_dot.row(i_input) += h_dot(i_gau) * (gmm->means_y_[i_gau]+projected) + h[i_gau] * (projected_dot);;
+      // A2. Normalize the unnormalized pdf (scale factor has been precomputed in the GMM)
+      // formula for scale factor: 1/sqrt( (2\pi)^N*|\Sigma| )
+      probabilities_prealloc_[i_gau] *= gmm->mvgd_scale_[i_gau];
+      
+      probabilities_dot_prealloc_[i_gau] = - probabilities_prealloc_[i_gau] * covar_times_diff_prealloc_(0,0);
+      
+      // A3. Multiply the normalized pdf with the priors
+      probabilities_prealloc_[i_gau] *= gmm->priors_[i_gau];
+      
+      probabilities_dot_prealloc_[i_gau] *= gmm->priors_[i_gau];
+      
+    }
+    
+    // A4. Normalize the probabilities by dividing by their sum
+    probabilities_prealloc_sum_ = probabilities_prealloc_.sum();
+    probabilities_prealloc_ /= probabilities_prealloc_sum_;
+    
+    // A5. Compute the derivative of the probability
+    probabilities_dot_prealloc_sum_ = probabilities_dot_prealloc_.sum();
+    probabilities_dot_prealloc_ = (probabilities_dot_prealloc_ * probabilities_prealloc_sum_ - probabilities_prealloc_ * probabilities_dot_prealloc_sum_)/pow(probabilities_prealloc_sum_,2);
+
+    if (compute_means)
+    {
+      for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
+      {
+        
+        // B: compute estimated mean of y: (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
+        // We will compute it bit by bit (with preallocated matrices) to avoid dynamic allocations.
+        
+        // (input-mu_x)
+        diff_prealloc_ = inputs.row(i_input).transpose() - gmm->means_x_[i_gau];
+        // inv(C_x) * (input-mu_x)
+        covar_times_diff_prealloc_.noalias() = gmm->covars_x_inv_[i_gau]*diff_prealloc_;
+        // ( C_y_x * inv(C_x) * (input-mu_x) )
+        mean_output_prealloc_.noalias() = gmm->covars_y_x_[i_gau]*covar_times_diff_prealloc_;
+        // (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
+        mean_output_prealloc_ += gmm->means_y_[i_gau];
+        
+        // C: weight the estimated mean with the probability
+        // probability * (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) )
+        outputs.row(i_input) += probabilities_prealloc_[i_gau] * mean_output_prealloc_; 
+	
+	// D: compute the derivate of the output
+        // (C_y_x * inv(C_x))
+	covar_output_times_input_.noalias() = gmm->covars_y_x_[i_gau] * gmm->covars_x_inv_[i_gau];
+	// probability_dot * (mu_y + ( C_y_x * inv(C_x) * (input-mu_x) ) ) + probability * (C_y_x * inv(C_x))
+	outputs_dot.row(i_input) += probabilities_dot_prealloc_[i_gau] * mean_output_prealloc_ +  probabilities_prealloc_[i_gau] * covar_output_times_input_;
+	
+      }
+    }
+   
+    if (compute_variance)
+    {
+      for (unsigned int i_gau=0; i_gau<gmm->getNumberOfGaussians(); i_gau++)
+      {
+        // Here comes the formula: h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        
+        // inv(C_x) * C_y_x^T
+        covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
+        // - C_y_x * inv(C_x) * C_y_x^T
+        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        covar_output_prealloc_ += gmm->covars_y_[i_gau];
+        // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
+        variances.row(i_input) += probabilities_prealloc_[i_gau]*probabilities_prealloc_[i_gau] * ( covar_output_prealloc_ ).diagonal();
+        
+        // There are cases where we may get slightly negative variances due to numerical issues
+        // Avoid them here by setting negative variances to 0.
+        for (int i_output_dim=0; i_output_dim<gmm->getExpectedOutputDim(); i_output_dim++)
+          if (variances(i_input,i_output_dim)<0.0)
+            variances(i_input,i_output_dim) = 0.0;
+
+
+      }
     }
   }
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
-*/
 
 void FunctionApproximatorGMR::firstDimSlicingInit(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
   std::vector<MatrixXd>& covars)
