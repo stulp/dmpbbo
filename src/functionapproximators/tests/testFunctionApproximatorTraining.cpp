@@ -24,7 +24,7 @@
 #include <iomanip>
 #include <fstream>
 #include <string>
-#include <time.h>
+#include <ctime>
 #include <boost/filesystem.hpp>
 
 #include "functionapproximators/FunctionApproximator.hpp"
@@ -97,9 +97,33 @@ int main(int n_args, char** args)
       cout << ": " << mean_abs_error_per_output_dim.transpose();      
       cout << "   \t(range of target data is " << targets.colwise().maxCoeff().array()-targets.colwise().minCoeff().array() << ")";
       
+#ifdef NDEBUG
+      // Here, we time the predict function on single inputs, i.e. typical usage in a
+      // real-time loop on a robot.
+      
+      // It's better to test this code with -03 instead of -ggdb. That's why its only run 
+      // when NDEBUG is set.
+
+      MatrixXd input = inputs.row(0);
+      MatrixXd output(input.rows(),input.cols());
+      int n_calls = 1000000;
+      clock_t begin = clock();
+      for (int call=0; call<n_calls; call++)
+      {
+        cur_fa->predict(input,output);
+        input(0,0) += 0.1/n_calls;
+      }
+      clock_t end = clock();
+      double time_sec = (double)(end - begin) / static_cast<double>( CLOCKS_PER_SEC );
+      cout << "  time for " << n_calls << " calls of predict: "<< time_sec;
+      double time_per_call = time_sec/n_calls; 
+      cout << " => " << (int)(1.0/(time_per_call*1000)) << "kHz";
+#endif
+
       cout << endl;
       
       delete cur_fa;
+
       
     }
   
