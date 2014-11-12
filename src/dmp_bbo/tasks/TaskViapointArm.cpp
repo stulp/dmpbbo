@@ -86,13 +86,13 @@ void TaskViapointArm::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_p
   int n_time_steps = cost_vars.cols()/n_cost_vars;
   // cost_vars  = n_samples x (n_time_steps*n_cost_vars)
 
-  cout << "__________________________" << endl;
-  cout << "  n_dims=" << n_dims << endl;
-  cout << "  n_dims_viapoint=" << n_dims_viapoint << endl;
-  cout << "  n_samples=" << n_samples << endl;
-  cout << "  n_cost_vars=" << n_cost_vars << endl;
-  cout << "  cost_vars.cols()=" << cost_vars.cols() << endl;  
-  cout << "  n_time_steps=" << n_time_steps << endl;
+  //cout << "__________________________" << endl;
+  //cout << "  n_dims=" << n_dims << endl;
+  //cout << "  n_dims_viapoint=" << n_dims_viapoint << endl;
+  //cout << "  n_samples=" << n_samples << endl;
+  //cout << "  n_cost_vars=" << n_cost_vars << endl;
+  //cout << "  cost_vars.cols()=" << cost_vars.cols() << endl;  
+  //cout << "  n_time_steps=" << n_time_steps << endl;
 
   task_viapoint_->evaluate(cost_vars, task_parameters, costs);  
   
