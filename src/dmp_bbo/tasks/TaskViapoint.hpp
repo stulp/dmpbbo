@@ -28,9 +28,6 @@
 
 #include "dmp_bbo/TaskWithTrajectoryDemonstrator.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
-
 namespace DmpBbo {
 
 /**
@@ -49,18 +46,7 @@ namespace DmpBbo {
  */
 class TaskViapoint : public TaskWithTrajectoryDemonstrator
 {
-private:
-  
-  Eigen::VectorXd viapoint_;
-  double   viapoint_time_;
-  double   viapoint_radius_;
-  
-  Eigen::VectorXd goal_;
-  double   goal_time_;
-  
-  double   viapoint_weight_;
-  double   acceleration_weight_;
-  double   goal_weight_;
+  friend class TaskViapointArm;
   
 public:
   /** If the viapoint_time is set to MINIMUM_DIST, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
@@ -80,6 +66,8 @@ public:
    * \param[in] goal_time The time at which the goal should have been reached
    */
   TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal, double goal_time);
+
+  virtual ~TaskViapoint(void) {}
   
   void evaluate(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const;
   
@@ -105,6 +93,17 @@ public:
   bool savePerformRolloutsPlotScript(std::string directory) const;
 
 private:
+  Eigen::VectorXd viapoint_;
+  double   viapoint_time_;
+  double   viapoint_radius_;
+  
+  Eigen::VectorXd goal_;
+  double   goal_time_;
+  
+  double   viapoint_weight_;
+  double   acceleration_weight_;
+  double   goal_weight_;
+  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this
@@ -122,21 +121,8 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskWithTrajectoryDemonstrator);
-    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
-    ar & BOOST_SERIALIZATION_NVP(goal_);
-    ar & BOOST_SERIALIZATION_NVP(goal_time_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
-    ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
-    ar & BOOST_SERIALIZATION_NVP(goal_weight_);
-  }
-
+  void serialize(Archive & ar, const unsigned int version);
+  
 };
 
 }
