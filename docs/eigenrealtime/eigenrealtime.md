@@ -11,43 +11,43 @@ Having C++ code running on robots means the code should be written to meet real-
 Take the following code, which does nothing useful, but provides a generic template for real-time code, especially in the context of robots. First some non-real-time initialization is done, and afterwards some function is called in a real-time loop. Question: Is Eigen doing dynamic allocations in the update() function? If so, where?
 
 ```c++
-    #include <iostream>
-    #include <eigen3/Eigen/Core>
-    
-    using namespace std;
-    using namespace Eigen;
-    
-    void init(MatrixXd& a, MatrixXd& b, MatrixXd& c, int size)
-    {
-      a = MatrixXd::Ones(size,size);
-      b = MatrixXd::Ones(size,size);
-      c = 0.00001*MatrixXd::Ones(size,size);
-    }
-    
-    void update(MatrixXd& a, MatrixXd& b, MatrixXd& c)
-    {
-      // Pretty random equations to illustrate dynamic memory allocation
-      b += c;
-      a += b*c;
-      c += b*c;
-    }
-    
-    int main(int n_args, char** args)
-    {
-      int size = 3;
-      if (n_args>1)
-        size = atoi(args[1]);
-      
-      // Initialization (not real-time)
-      MatrixXd a,b,c;
-      init(a,b,c,size);
-      
-      // Real-time loop
-      for (float t=0.0; t<0.1; t+=0.01)
-        update(a,b,c);
-      
-      return 0;
-    }
+#include <iostream>
+#include <eigen3/Eigen/Core>
+
+using namespace std;
+using namespace Eigen;
+
+void init(MatrixXd& a, MatrixXd& b, MatrixXd& c, int size)
+{
+  a = MatrixXd::Ones(size,size);
+  b = MatrixXd::Ones(size,size);
+  c = 0.00001*MatrixXd::Ones(size,size);
+}
+
+void update(MatrixXd& a, MatrixXd& b, MatrixXd& c)
+{
+  // Pretty random equations to illustrate dynamic memory allocation
+  b += c;
+  a += b*c;
+  c += b*c;
+}
+
+int main(int n_args, char** args)
+{
+  int size = 3;
+  if (n_args>1)
+    size = atoi(args[1]);
+  
+  // Initialization (not real-time)
+  MatrixXd a,b,c;
+  init(a,b,c,size);
+  
+  // Real-time loop
+  for (float t=0.0; t<0.1; t+=0.01)
+    update(a,b,c);
+  
+  return 0;
+}
 ```
 
 The benign line
@@ -61,7 +61,7 @@ causes a dynamic memory allocation. Because Eigen expands this line, as document
 ```
 These expression are then turned into a bunch of for loops that loop over the individual entries of the matrices. 
     
-Eigen has a way to determine whether it is necessary, or more efficient to use intermediate temporary matrices. For instance, it will use a tmp, and thus dynamically allocated memory, [when its cost model shows that the total cost of an operation is reduced if a sub-expression gets evaluated into a temporary](http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html). So knowing exactly when Eigen will allocated memory requires you to understand the cost function (good luck!), or determine it empirically with EIGEN_RUNTIME_NO_MALLOC.   
+Eigen has a way to determine whether it is necessary, or more efficient to use intermediate temporary matrices. For instance, it will use a tmp, and thus dynamically allocated memory, ["when its cost model shows that the total cost of an operation is reduced if a sub-expression gets evaluated into a temporary"](http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html). So knowing exactly when Eigen will allocated memory requires you to understand the cost function (good luck!), or determine it empirically with EIGEN_RUNTIME_NO_MALLOC (see below).   
   
 ### How can I find where exactly Eigen allocates memory during run-time?
 
@@ -72,6 +72,18 @@ To check where Eigen is making dynamic allocations explicitely, you can add
 *before* including the Eigen headers, as documented [here](http://eigen.tuxfamily.org/index.php?title=FAQ#Where_in_my_program_are_temporary_objects_created.3F). Then the function
     Eigen::internal::set_is_malloc_allowed(boolean)
 allows you to specify in which parts of the code Eigen is not allowed to allocate dynamic memory. Since we don't want this to happen in the update() function, we add set_is_malloc_allowed() the top and the bottom.
+
+```c++
+    void update(MatrixXd& a, MatrixXd& b, MatrixXd& c)
+    {
+      Eigen::internal::set_is_malloc_allowed(false)
+      b += c;
+      a += b*c;
+      c += b*c;
+      Eigen::internal::set_is_malloc_allowed(true)
+    }
+```
+
 
 If you now run
 ```shell

@@ -35,12 +35,12 @@ void update(MatrixXd& a, MatrixXd& b, MatrixXd& c, MatrixXd& tmp)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE  
   b += c;
-  a.noalias() = b*c;
+  a.noalias() += b*c;
   // http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html
   // http://eigen.tuxfamily.org/dox/TopicWritingEfficientProductExpression.html  
   //a.noalias() = b*a; // Compiles, runs, but yields the wrong result!
-  tmp.noalias() = b*a;
-  a = tmp;
+  tmp.noalias() = b*c;
+  c += tmp;
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
@@ -58,11 +58,7 @@ int main(int n_args, char** args)
   
   ENTERING_REAL_TIME_CRITICAL_CODE
   for (float t=0.0; t<0.1; t+=0.01)
-  {
     update(a,b,c,prealloc);
-    cout << "  t=" << t << endl;
-    cout << a << endl; 
-  }
   EXITING_REAL_TIME_CRITICAL_CODE 
 }
 
