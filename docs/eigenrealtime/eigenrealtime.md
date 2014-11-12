@@ -52,12 +52,12 @@ int main(int n_args, char** args)
 
 The benign line
 ```c++
-    a += b*c
+a += b*c
 ```
 causes a dynamic memory allocation. Because Eigen expands this line, as documented [here](http://eigen.tuxfamily.org/dox/TopicWritingEfficientProductExpression.html), to:
 ```c++
-    tmp = b*c
-    a += tmp
+tmp = b*c
+a += tmp
 ```
 These expression are then turned into a bunch of for loops that loop over the individual entries of the matrices. 
     
@@ -67,96 +67,96 @@ Eigen has a way to determine whether it is necessary, or more efficient to use i
 
 To check where Eigen is making dynamic allocations explicitely, you can add 
 ```c++
-    #define EIGEN_RUNTIME_NO_MALLOC
+#define EIGEN_RUNTIME_NO_MALLOC
 ```
 *before* including the Eigen headers, as documented [here](http://eigen.tuxfamily.org/index.php?title=FAQ#Where_in_my_program_are_temporary_objects_created.3F). Then the function
     Eigen::internal::set_is_malloc_allowed(boolean)
 allows you to specify in which parts of the code Eigen is not allowed to allocate dynamic memory. Since we don't want this to happen in the update() function, we add set_is_malloc_allowed() the top and the bottom.
 
 ```c++
-    void update(MatrixXd& a, MatrixXd& b, MatrixXd& c)
-    {
-      Eigen::internal::set_is_malloc_allowed(false)
-      b += c;
-      a += b*c;
-      c += b*c;
-      Eigen::internal::set_is_malloc_allowed(true)
-    }
+void update(MatrixXd& a, MatrixXd& b, MatrixXd& c)
+{
+  Eigen::internal::set_is_malloc_allowed(false)
+  b += c;
+  a += b*c;
+  c += b*c;
+  Eigen::internal::set_is_malloc_allowed(true)
+}
 ```
 
 
 If you now run
 ```shell
-    g++ ggdb realtime.cpp -o realtime
-    ./realtime
+g++ ggdb realtime.cpp -o realtime
+./realtime
 ```
 you will see that the code crashes. Eigen is dynamically allocating memory in the line 
 ```c++
-    a = b*c;
+a += b*c;
 ```
 ### How can I avoid dynamic memory allocation by Eigen?
   
 As mentioned above, the line
 ```c++
-    a += b*c
+a += b*c
 ```
 is [expanded to](http://eigen.tuxfamily.org/dox/TopicWritingEfficientProductExpression.html):
 ```c++
-    tmp = b*c
-    a += tmp
+tmp = b*c
+a += tmp
 ```
 
 To avoid this expansion, you can use the [noalias()](http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#ae77f3c3ccfb21694555dafc92c2da340) function. 
 ```c++
-    a.noalias() += b*c;
+a.noalias() += b*c;
 ```
     
-This will avoid the dynamic memory allocation, because you tell Eigen explicitely not to use the temporary matrix. 
+This will avoid the dynamic memory allocation, because you tell Eigen explicitely not to use the temporary matrix. See [here](http://eigen.tuxfamily.org/dox/TopicWritingEfficientProductExpression.html) and [here](http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html) for further documentation.
 
 ### When noalias() doesn't cut it 
 
 But be careful with noalias()! There is another line where memory is also allocated: 
 ```c++
-    c += b*c
+c += b*c
 ```
 You may be tempted to write 
 ```c++
-    c.noalias() += b*c
+c.noalias() += b*c
 ```
 While this will compile fine and run without allocating memory, it will give you the wrong result! Why? Because you are overwriting elements in c that are needed later to compute other elements in c. So here, you need the temporary expansion
 ```c++
-    tmp = b*c;
-    c += tmp
+tmp = b*c;
+c += tmp
 ```
 but without the memory allocation it implies...
 
 So what do we do? We need to pre-allocate a matrix of the right size before entering the real-time loop, and use that pre-allocated matrix inside the real-time critical code. There are many ways to do this. In the code, I've added a variable prealloc, which is passed to the update function (this may not always be the best solution, but it is in our particular use case on the robot). In the function, we then explicitely write what Eigen would do under the hood
 ```c++
-    prealloc.noalias() = b*c;
-    c = prealloc;
+prealloc.noalias() = b*c;
+c += prealloc;
 ```
 In the context of the function, that looks like this:
 ```c++
-    void update(MatrixXd& a, MatrixXd& b, MatrixXd& c, MatrixXd& prealloc)
-    {
-      Eigen::internal::set_is_malloc_allowed(false)
-      b += c;
-      a.noalias() += b*c;
-      prealloc.noalias() = b*c 
-      c = prealloc;
-      Eigen::internal::set_is_malloc_allowed(true)
-    }
+void update(MatrixXd& a, MatrixXd& b, MatrixXd& c, MatrixXd& prealloc)
+{
+  Eigen::internal::set_is_malloc_allowed(false)
+  b += c;
+  a.noalias() += b*c;
+  prealloc.noalias() = b*c 
+  c += prealloc;
+  Eigen::internal::set_is_malloc_allowed(true)
+}
 ```
 
 ### When noalias() isn't necessary
 
 Note that Eigen was apparently not allocating memory in the line:
 ```c++
-    b += c;
+b += c;
 ```
 That is because this expression can simply be expanded to 
 ```c++
-    for i, for j, b(i,j) = b(i,j) + c(i,j) 
+for i, for j, b(i,j) = b(i,j) + c(i,j) 
 ```
 without requiring extra memory. No need to change it.
 
@@ -206,39 +206,39 @@ If you call real-time functions (with Eigen matrices as arguments) from other re
 To automate things and avoid having to write Eigen::internal::set_is_malloc_allowed(...) all the time, I have the piece of code below in a header file.
 
 ```c++
-    #ifdef REALTIME_CHECKS
-    
-    // If REALTIME_CHECKS is defined, we want to check for dynamic memory allocation.
-    // Make Eigen check for dynamic memory allocation
-    #define EIGEN_RUNTIME_NO_MALLOC
-    // We define ENTERING_REAL_TIME_CRITICAL_CODE and EXITING_REAL_TIME_CRITICAL_CODE to start/stop
-    // checking dynamic memory allocation
-    #define ENTERING_REAL_TIME_CRITICAL_CODE Eigen::internal::set_is_malloc_allowed(false);
-    #define EXITING_REAL_TIME_CRITICAL_CODE Eigen::internal::set_is_malloc_allowed(true);
-    
-    #else // REALTIME_CHECKS
-    
-    // REALTIME_CHECKS is not defined, not need to do any checks on real-time code. Simply set
-    // ENTERING_REAL_TIME_CRITICAL_CODE and EXITING_REAL_TIME_CRITICAL_CODE to empty strings.
-    #define ENTERING_REAL_TIME_CRITICAL_CODE
-    #define EXITING_REAL_TIME_CRITICAL_CODE
+#ifdef REALTIME_CHECKS
+
+// If REALTIME_CHECKS is defined, we want to check for dynamic memory allocation.
+// Make Eigen check for dynamic memory allocation
+#define EIGEN_RUNTIME_NO_MALLOC
+// We define ENTERING_REAL_TIME_CRITICAL_CODE and EXITING_REAL_TIME_CRITICAL_CODE to start/stop
+// checking dynamic memory allocation
+#define ENTERING_REAL_TIME_CRITICAL_CODE Eigen::internal::set_is_malloc_allowed(false);
+#define EXITING_REAL_TIME_CRITICAL_CODE Eigen::internal::set_is_malloc_allowed(true);
+
+#else // REALTIME_CHECKS
+
+// REALTIME_CHECKS is not defined, not need to do any checks on real-time code. Simply set
+// ENTERING_REAL_TIME_CRITICAL_CODE and EXITING_REAL_TIME_CRITICAL_CODE to empty strings.
+#define ENTERING_REAL_TIME_CRITICAL_CODE
+#define EXITING_REAL_TIME_CRITICAL_CODE
 ```    
     
 So that allows you to simply write 
 ```c++
-    void update(MatrixXd& a, MatrixXd& b, MatrixXd& c, MatrixXd& prealloc)
-    {
-      ENTERING_REAL_TIME_CRITICAL_CODE
-      b += c;
-      a.noalias() += b*c;
-      prealloc.noalias() = b*c 
-      c = prealloc;
-      EXITING_REAL_TIME_CRITICAL_CODE
-    }
+void update(MatrixXd& a, MatrixXd& b, MatrixXd& c, MatrixXd& prealloc)
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  b += c;
+  a.noalias() += b*c;
+  prealloc.noalias() = b*c 
+  c = prealloc;
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
 ```
 If I want to check Eigen's dynamic memory allocations, I compile as follows:
 ```shell
-    g++ -DREALTIME_CHECKS -ggdb realtime.cpp -o realtime.cpp
+g++ -DREALTIME_CHECKS -ggdb realtime.cpp -o realtime.cpp
 ```
 
 ## Bottom line
