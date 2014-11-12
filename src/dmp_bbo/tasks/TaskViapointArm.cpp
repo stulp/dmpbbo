@@ -47,27 +47,10 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TaskViapointArm::TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
-: link_lengths_(link_lengths)
+TaskViapointArm::TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time)
+: link_lengths_(link_lengths), viapoint_(viapoint), viapoint_time_(viapoint_time)
 {
   assert(link_lengths.size()>0);
-  task_viapoint_ = new TaskViapoint(viapoint,viapoint_time,viapoint_radius);
-  // acceleration costs are for angles, not enf-effector
-  task_viapoint_->acceleration_weight_ = 0.0;
-}
-
-TaskViapointArm::TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal,  double goal_time)
-: link_lengths_(link_lengths)
-{
-  assert(link_lengths.size()>0);
-  task_viapoint_ = new TaskViapoint(viapoint,viapoint_time,goal,goal_time);
-  // acceleration costs are for angles, not enf-effector
-  task_viapoint_->acceleration_weight_ = 0.0;
-}
-
-TaskViapointArm::~TaskViapointArm(void)
-{
-  delete task_viapoint_;
 }
 
 void TaskViapointArm::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& costs) const
@@ -79,31 +62,67 @@ void TaskViapointArm::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_p
   
   
   int n_samples = cost_vars.rows();
-  int n_dims_viapoint = task_viapoint_->viapoint_.size();
+  int n_dims_viapoint = viapoint_.size();
   
   int n_dims = link_lengths_.size();
   int n_cost_vars = 4*n_dims + 1; // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t forcing_term_1..forcing_term_D
   int n_time_steps = cost_vars.cols()/n_cost_vars;
   // cost_vars  = n_samples x (n_time_steps*n_cost_vars)
 
-  //cout << "__________________________" << endl;
-  //cout << "  n_dims=" << n_dims << endl;
-  //cout << "  n_dims_viapoint=" << n_dims_viapoint << endl;
-  //cout << "  n_samples=" << n_samples << endl;
-  //cout << "  n_cost_vars=" << n_cost_vars << endl;
-  //cout << "  cost_vars.cols()=" << cost_vars.cols() << endl;  
-  //cout << "  n_time_steps=" << n_time_steps << endl;
+  cout << "__________________________" << endl;
+  cout << "  n_dims=" << n_dims << endl;
+  cout << "  n_dims_viapoint=" << n_dims_viapoint << endl;
+  cout << "  n_samples=" << n_samples << endl;
+  cout << "  n_cost_vars=" << n_cost_vars << endl;
+  cout << "  cost_vars.cols()=" << cost_vars.cols() << endl;  
+  cout << "  n_time_steps=" << n_time_steps << endl;
 
-  task_viapoint_->evaluate(cost_vars, task_parameters, costs);  
+  // 2D position of joints over time. Last joint is dummy joint to store end-effector position.
+  MatrixXd x_joints(n_time_steps,n_dims+1);
+  MatrixXd y_joints(n_time_steps,n_dims+1);
   
-  /*
+  
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1
   //  |    |     |     |      |     |     |
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T
   MatrixXd rollout; //(n_time_steps,n_cost_vars);
   MatrixXd my_row(1,n_time_steps*n_cost_vars);
+  for (int k=0; k<n_samples; k++)
+  {
+    my_row = cost_vars.row(k);
+    rollout = (Map<MatrixXd>(my_row.data(),n_cost_vars,n_time_steps)).transpose();   
+    
+    // rollout is of size   n_time_steps x n_cost_vars
+    VectorXd ts = rollout.col(3 * n_dims);
+    
+    x_joints.fill(0);
+    y_joints.fill(0);
+    for (int tt=0; tt<n_time_steps; tt++)
+    {
+      double sum_angles = 0.0;
+      for (int i_dof=0; i_dof<n_dims; i_dof++)
+      {
+        double angle = rollout(tt,i_dof*3);
+        sum_angles = sum_angles + angle;
+        x_joints(tt,i_dof+1) = x_joints(tt,i_dof) + cos(sum_angles)*link_lengths_(i_dof);
+        y_joints(tt,i_dof+1) = y_joints(tt,i_dof) + sin(sum_angles)*link_lengths_(i_dof);
+      }
+    }
+    
+    
+  }
   
+  exit(0);
+
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1
+  //  |    |     |     |      |     |     |
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T
+  MatrixXd rollout; //(n_time_steps,n_cost_vars);
+  MatrixXd my_row(1,n_time_steps*n_cost_vars);
+
+/*  
   for (int k=0; k<n_samples; k++)
   {
     my_row = cost_vars.row(k);
@@ -112,38 +131,6 @@ void TaskViapointArm::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_p
     // rollout is of size   n_time_steps x n_cost_vars
     VectorXd ts = rollout.col(3 * n_dims);
 
-    double dist_to_viapoint = 0.0;
-    if (viapoint_weight_!=0.0)
-    {
-      if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
-      {
-        // Don't compute the distance at some time, but rather get the minimum distance
-        const MatrixXd y = rollout.block(0, 0, rollout.rows(), n_dims);
-        dist_to_viapoint = (y.rowwise() - task_viapoint_->viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
-      }
-      else
-      {
-        // Compute the minimum distance at a specific time
-        
-        // Get the time_step at which viapoint_time_step approx ts[time_step]
-        int viapoint_time_step = 0;
-        while (viapoint_time_step < ts.size() && ts[viapoint_time_step] < viapoint_time_)
-          viapoint_time_step++;
-
-        assert(viapoint_time_step < ts.size());
-
-        VectorXd y_via = rollout.row(viapoint_time_step).segment(0,n_dims);
-        dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
-      }
-      
-      if (viapoint_radius_>0.0)
-      {
-        // The viapoint_radius defines a radius within which the cost is always 0
-        dist_to_viapoint -= viapoint_radius_;
-        if (dist_to_viapoint<0.0)
-          dist_to_viapoint = 0.0;
-      }
-    }
     
     double sum_ydd = 0.0;
     if (acceleration_weight_!=0.0)
@@ -174,11 +161,10 @@ void TaskViapointArm::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_p
   */
 }
 
-void TaskViapointArm::setCostFunctionWeighting(double viapoint_weight, double acceleration_weight, double goal_weight)
+void TaskViapointArm::setCostFunctionWeighting(double viapoint_weight, double acceleration_weight)
 {
+  viapoint_weight_ = viapoint_weight;
   acceleration_weight_ = acceleration_weight;
-  // Why 0.0 below? task_viapoint_ should not compute acceleration costs (costs are for angles, not end-effector accelerations)
-  task_viapoint_->setCostFunctionWeighting(viapoint_weight, 0.0, goal_weight);
 }
 
 string TaskViapointArm::toString(void) const {
@@ -192,9 +178,11 @@ void TaskViapointArm::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Task);
   
   ar & BOOST_SERIALIZATION_NVP(link_lengths_);
-  ar & BOOST_SERIALIZATION_NVP(task_viapoint_);
+  ar & BOOST_SERIALIZATION_NVP(viapoint_);
+  ar & BOOST_SERIALIZATION_NVP(viapoint_time_);
+  ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);
+  ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
 }
-
 
 bool TaskViapointArm::savePerformRolloutsPlotScript(string directory) const
 {

@@ -59,32 +59,19 @@ public:
    * \param[in] link_lengths The lengths of the links of the arm
    * \param[in] viapoint The viapoint to which to pass through.
    * \param[in] viapoint_time The time at which to pass through the viapoint.
-   * \param[in] viapoint_radius The distance to the viapoint within which this cost is 0
    */
-  TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time=TIME_AT_MINIMUM_DIST, double viapoint_radius=0.0);
+  TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time=TIME_AT_MINIMUM_DIST);
   
-  /** Constructor.
-   * \param[in] link_lengths The lengths of the links of the arm
-   * \param[in] viapoint The viapoint to which to pass through.
-   * \param[in] viapoint_time The time at which to pass through the viapoint.
-   * \param[in] goal The goal to reach at the end of the movement
-   * \param[in] goal_time The time at which the goal should have been reached
-   */
-  TaskViapointArm(const Eigen::VectorXd& link_lengths, const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal, double goal_time);
-  
-  ~TaskViapointArm(void);
+  ~TaskViapointArm(void) {};
   
   void evaluate(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const;
   
   /** Set the relative weights of the components of the cost function.
    * \param[in] viapoint_weight Weight for the cost related to not passing through the viapoint
    * \param[in] acceleration_weight Weight for the cost of accelerations
-   * \param[in] goal_weight Weight for the cost of not being at the goal at the end of the movement
    */
-  void setCostFunctionWeighting(double viapoint_weight, double acceleration_weight, double goal_weight=0.0);
-  
-  void generateDemonstration(const Eigen::MatrixXd& task_parameters, const Eigen::VectorXd& ts, Trajectory& demonstration) const;
-  
+  void setCostFunctionWeighting(double viapoint_weight, double acceleration_weight);
+    
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
@@ -99,8 +86,12 @@ public:
 
 private:
   Eigen::VectorXd link_lengths_;
-  TaskViapoint* task_viapoint_;
-  double acceleration_weight_;
+
+  Eigen::VectorXd viapoint_;
+  double   viapoint_time_;
+  
+  double   viapoint_weight_;
+  double   acceleration_weight_;
 
   /**
    * Default constructor.

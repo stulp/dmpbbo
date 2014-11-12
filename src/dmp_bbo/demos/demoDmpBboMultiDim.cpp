@@ -76,12 +76,13 @@ int main(int n_args, char* args[])
   VectorXd y_init = VectorXd::Constant(n_dim,1.0);
   VectorXd y_attr = VectorXd::Constant(n_dim,3.0);
   
+  // Here's another task that you can use
   bool use_arm = true;
   if (use_arm)
   {
-    int n_links = 4;
+    int n_links = 5;
     VectorXd link_lengths = VectorXd::Ones(4)/n_links;
-    n_dim = n_links;
+    n_dim = n_links-1;
     
     int n_dim_viapoint = 2;
     viapoint = 0.5*VectorXd::Ones(n_dim_viapoint); 
