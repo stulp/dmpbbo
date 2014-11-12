@@ -39,9 +39,8 @@ using namespace Eigen;
 namespace DmpBbo {
 
 
-  bool saveToDirectory(const UpdateSummaryParallel& summary, std::string directory, bool overwrite)
+bool saveToDirectory(const UpdateSummaryParallel& summary, std::string directory, bool overwrite)
 {
-
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
   {
@@ -134,7 +133,7 @@ bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries,
     for (int i_update=0; i_update<n_updates; i_update++)
     {
       stringstream stream;
-      stream << directory << "/update" << setw(5) << setfill('0') << i_update+1 << "/";
+      stream << directory << "/update" << setw(5) << setfill('0') << i_update+1;
       if (!saveToDirectory(update_summaries[i_update], stream.str(),overwrite))
         return false;
     }
