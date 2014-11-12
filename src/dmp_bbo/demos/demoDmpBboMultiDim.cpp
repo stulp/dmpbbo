@@ -29,6 +29,7 @@
 
 #include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
+#include "dmp_bbo/tasks/TaskViapointArm.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
 #include "dmp/Dmp.hpp"
@@ -66,17 +67,39 @@ int main(int n_args, char* args[])
   }
 
   // Make the task
+  double tau = 0.6;
   int n_dim=2;
-  
   VectorXd viapoint = VectorXd::LinSpaced(n_dim,1.5,2);
   double viapoint_time = 0.2;
-  TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
-  
-  // Some DMP parameters
-  double tau = 0.6;
+  Task* task = new TaskViapoint(viapoint,viapoint_time);
+
   VectorXd y_init = VectorXd::Constant(n_dim,1.0);
   VectorXd y_attr = VectorXd::Constant(n_dim,3.0);
+  
+  bool use_arm = true;
+  if (use_arm)
+  {
+    int n_links = 4;
+    VectorXd link_lengths = VectorXd::Ones(4)/n_links;
+    n_dim = n_links;
+    
+    int n_dim_viapoint = 2;
+    viapoint = 0.5*VectorXd::Ones(n_dim_viapoint); 
+    viapoint_time = 0.5*tau;
+    
+    delete task;
+    task = NULL;
+    task = new TaskViapointArm(link_lengths,viapoint,viapoint_time);
+
+    y_init = VectorXd::Constant(n_dim,0.0);
+    y_attr = VectorXd::Constant(n_dim,M_PI/n_dim);
+    y_attr[0] = y_attr[0]/2; 
+    
+  }
+  
+  
  
+  // Some DMP parameters
   int n_basis_functions = 4;
   VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0,1);
   VectorXd widths  = VectorXd::Constant(n_basis_functions,0.2);

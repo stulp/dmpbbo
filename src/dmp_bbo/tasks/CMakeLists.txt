@@ -1,5 +1,5 @@
-file(GLOB SOURCES_TASK TaskViapoint.cpp) 
+file(GLOB SOURCES_TASK TaskViapoint.cpp TaskViapointArm.cpp) 
 add_library(taskviapoint ${SHARED_OR_STATIC} ${SOURCES_TASK})
 install(TARGETS taskviapoint DESTINATION ${LIB_INSTALL_DIR})
-file(GLOB HEADERS_TASK TaskViapoint.hpp)
+file(GLOB HEADERS_TASK TaskViapoint.hpp TaskViapointArm.hpp)
 install(FILES ${HEADERS_TASK} DESTINATION ${INCLUDE_INSTALL_DIR}/dmp_bbo/tasks)
