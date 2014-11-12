@@ -123,7 +123,7 @@ You may be tempted to write
 ```c++
     c.noalias() += b*c
 ```
-This while compile and run without allocating memory, but it will give you the wrong result! Why? Because you are overwriting elements in c that are needed later to compute other elements in c. So here, you need the temporary expansion
+While this will compile fine and run without allocating memory, it will give you the wrong result! Why? Because you are overwriting elements in c that are needed later to compute other elements in c. So here, you need the temporary expansion
 ```c++
     tmp = b*c;
     c += tmp
