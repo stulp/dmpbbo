@@ -245,6 +245,8 @@ g++ -DREALTIME_CHECKS -ggdb realtime.cpp -o realtime.cpp
 
 Eigen is a great library, which make C++ code for linear algebra look almost as compact as Matlab/octave. But...  when using Eigen in a real-time context, explicitly avoiding dynamic memory allocation requires great care, and can make the code real ugly and obfuscated. 
 
+## Downloading cpp/hpp files
 
+You can download the demo cpp/hpp files, as well as a Makefile here: https://github.com/stulp/dmpbbo/tree/master/docs/eigenrealtime
 
 
