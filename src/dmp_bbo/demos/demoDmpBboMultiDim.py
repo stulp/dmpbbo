@@ -26,7 +26,7 @@ if __name__=='__main__':
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoDmpBboMultiDim/"
+    directory = "/tmp/demoDmpBboMultiDim"
     command = executable+" "+directory
     print command
     subprocess.call(command, shell=True)
