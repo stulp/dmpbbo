@@ -197,7 +197,7 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
 double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
 {
   MatrixXd covar_inverse = covar.inverse();
-  double output = exp(-2*(input-mu).transpose()*covar_inverse*(input-mu));
+  double output = exp(-0.5*(input-mu).transpose()*covar_inverse*(input-mu));
   // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
   // Hence the 1.0/covar_inverse.determinant() below
   //  ( (2\pi)^N*|\Sigma| )^(-1/2)
@@ -292,7 +292,7 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
       // Sigma^-1 * (x-mu)
       covar_times_diff_prealloc_.noalias() = gmm->covars_x_inv_[i_gau]*diff_prealloc_;
       // exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
-      probabilities_prealloc_[i_gau] = exp(-2*diff_prealloc_.dot(covar_times_diff_prealloc_));
+      probabilities_prealloc_[i_gau] = exp(-0.5*diff_prealloc_.dot(covar_times_diff_prealloc_));
       
       // A2. Normalize the unnormalized pdf (scale factor has been precomputed in the GMM)
       // formula for scale factor: 1/sqrt( (2\pi)^N*|\Sigma| )
@@ -441,7 +441,7 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
       // Sigma^-1 * (x-mu)
       covar_times_diff_prealloc_.noalias() = gmm->covars_x_inv_[i_gau]*diff_prealloc_;
       // exp( -2 * (x-mu)^T * Sigma^-1 * (x-mu) )
-      probabilities_prealloc_[i_gau] = exp(-2*diff_prealloc_.dot(covar_times_diff_prealloc_));
+      probabilities_prealloc_[i_gau] = exp(-0.5*diff_prealloc_.dot(covar_times_diff_prealloc_));
       
       // A2. Normalize the unnormalized pdf (scale factor has been precomputed in the GMM)
       // formula for scale factor: 1/sqrt( (2\pi)^N*|\Sigma| )
