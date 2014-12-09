@@ -250,3 +250,5 @@ Eigen is a great library, which make C++ code for linear algebra look almost as 
 You can download the demo cpp/hpp files, as well as a Makefile here: https://github.com/stulp/dmpbbo/tree/master/docs/eigenrealtime
 
 
+TODO: Of course, simpler solution, if possible: use fixed size matrices.
+
