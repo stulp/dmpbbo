@@ -126,11 +126,8 @@ void UpdaterCovarAdaptation::updateDistribution(const DistributionGaussian& dist
       // (but only if the eigenvalues have changed due to the lower bound)
       if (reconstruct_covar)
       {
-        cout << "________________________" << endl;
-        cout << "  covar_new=\n" << covar_new << endl;
         MatrixXd eigen_vectors  = eigensolver.eigenvectors();
         covar_new = eigen_vectors*eigen_values.asDiagonal()*eigen_vectors.inverse();
-        cout << "  covar_new=\n" << covar_new << endl;
       }
     }
   }
