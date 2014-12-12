@@ -33,19 +33,22 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UpdaterCovarAdaptation);
 
 #include <iomanip>
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Eigenvalues>
 
 using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
   
-UpdaterCovarAdaptation::UpdaterCovarAdaptation(double eliteness, std::string weighting_method, const Eigen::VectorXd& base_level, bool diag_only, double learning_rate)
+UpdaterCovarAdaptation::UpdaterCovarAdaptation(double eliteness, std::string weighting_method, const Eigen::VectorXd& base_level, bool diag_only, double learning_rate, double relative_lower_bound)
 : UpdaterMean(eliteness, weighting_method), 
   diag_only_(diag_only),
   learning_rate_(learning_rate),
-  base_level_as_diagonal_matrix_(base_level.asDiagonal())
+  base_level_diagonal_(base_level),
+  relative_lower_bound_(relative_lower_bound)
 {
   assert(learning_rate_>=0.0 && learning_rate_<=1.0);
+  assert(relative_lower_bound_>=0.0 && relative_lower_bound_<=1.0);
 }
 
 void UpdaterCovarAdaptation::updateDistribution(const DistributionGaussian& distribution, const MatrixXd& samples, const VectorXd& costs, VectorXd& weights, DistributionGaussian& distribution_new) const
@@ -88,11 +91,72 @@ void UpdaterCovarAdaptation::updateDistribution(const DistributionGaussian& dist
   }
   
   // Add a base_level to avoid pre-mature convergence
-  if (base_level_as_diagonal_matrix_.rows()>0) // If base_level is empty, do nothing
+  if (base_level_diagonal_.size()>0) // If base_level is empty, do nothing
   {
-    assert(base_level_as_diagonal_matrix_.rows()==n_dims);
-    covar_new = covar_new + base_level_as_diagonal_matrix_;
+    assert(base_level_diagonal_.size()==n_dims);
+    for (int ii=0; ii<covar_new.rows(); ii++)
+      if (covar_new(ii,ii)<base_level_diagonal_(ii))
+        covar_new(ii,ii) = base_level_diagonal_(ii);
   }
+  
+  if (relative_lower_bound_>0.0)
+  {
+    // We now enforce a lower bound on the eigenvalues, that depends on the maximum eigenvalue. For
+    // instance, if max(eigenvalues) is 2 and relative_lower_bound is 0.2, none of the eigenvalues
+    // may be below 0.4.
+    SelfAdjointEigenSolver<MatrixXd> eigensolver(covar_new);
+    if (eigensolver.info() == Success)
+    {
+      // Get the eigenvalues
+      VectorXd eigen_values  = eigensolver.eigenvalues();
+      
+      // Enforce the lower bound
+      double abs_lower_bound = eigen_values.maxCoeff()*relative_lower_bound_;
+      bool reconstruct_covar = false;
+      for (int ii=0; ii<eigen_values.size(); ii++)
+      {
+        if (eigen_values[ii] < abs_lower_bound)
+        {
+          eigen_values[ii] = abs_lower_bound;
+          reconstruct_covar = true;
+        }
+      }
+      
+      // Reconstruct the covariance matrix with the bounded eigenvalues 
+      // (but only if the eigenvalues have changed due to the lower bound)
+      if (reconstruct_covar)
+      {
+        cout << "________________________" << endl;
+        cout << "  covar_new=\n" << covar_new << endl;
+        MatrixXd eigen_vectors  = eigensolver.eigenvectors();
+        covar_new = eigen_vectors*eigen_values.asDiagonal()*eigen_vectors.inverse();
+        cout << "  covar_new=\n" << covar_new << endl;
+      }
+    }
+  }
+  
+  
+/*
+% Compute absolute lower bound from relative bound and maximum eigenvalue
+if (lower_bound_relative~=NO_BOUND)  
+  if (lower_bound_relative<0 || lower_bound_relative>1)
+    warning('When using a relative lower bound, 0<=bound<=1 must hold, but it is %f. Not setting any lower bounds.',relative_lower_bound); %#ok<WNTAG>
+    lower_bound_absolute = NO_BOUND;
+  else
+    lower_bound_absolute = max([lower_bound_absolute lower_bound_relative*max(eigval)]);
+  end
+end
+
+% Check for lower bound
+if (lower_bound_absolute~=NO_BOUND)
+  too_small = eigval<lower_bound_absolute;
+  eigval(too_small) = lower_bound_absolute;
+end
+
+% Reconstruct covariance matrix from bounded eigenvalues
+eigval = diag(eigval);
+covar_scaled_bounded = (eigvec*eigval)/eigvec;
+  */
   
   distribution_new.set_covar(covar_new);
 
