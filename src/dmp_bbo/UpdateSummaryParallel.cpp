@@ -98,18 +98,28 @@ bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries,
   assert(n_updates>0);
   
   int n_parallel = update_summaries[0].distributions.size();
-  MatrixXd learning_curve(n_updates,2+n_parallel);
+  //int n_samples_per_update = update_summaries[0].costs.rows();
+  
+  MatrixXd learning_curve(n_updates,3+n_parallel);
   learning_curve(0,0) = 0; // First evaluation is at 0
+  
+  VectorXd costs;
   
   for (int i_update=0; i_update<n_updates; i_update++)
   {
+    // Curve 1: Individual costs
+    //int n_samples = update_summaries[i_update].costs.rows();
+    //learning_curve_all.segment(offset,n_samples) = update_summaries[i_update].costs;
+    //offset += n_samples;
+    
+    // Curve 2: Costs and exploration at each update
 
+    costs = update_summaries[i_update].costs;
+    int n_samples = costs.rows();
+    
     // Number of samples at which an evaluation was performed.
     if (i_update>0)
-    {
-      int n_samples = update_summaries[i_update].costs.rows();
       learning_curve(i_update,0) = learning_curve(i_update-1,0) + n_samples; 
-    }
     
     // The cost of the evaluation at this update
     learning_curve(i_update,1) = update_summaries[i_update].cost_eval;
@@ -121,6 +131,11 @@ bool saveToDirectory(const std::vector<UpdateSummaryParallel>& update_summaries,
       MatrixXd eigen_values = distribution->covar().eigenvalues().real();
       learning_curve(i_update,2+i_parallel) = sqrt(eigen_values.maxCoeff());
     }
+    
+    double mean_costs = update_summaries[i_update].costs.sum()/n_samples;
+    double std_costs = (update_summaries[i_update].costs.array() - mean_costs).abs2().sum();
+    std_costs = sqrt(std_costs/(n_samples-1));
+    learning_curve(i_update,2+n_parallel) = std_costs;
     
   }
 
