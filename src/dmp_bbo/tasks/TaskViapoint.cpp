@@ -48,7 +48,7 @@ namespace DmpBbo {
 
 TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius), 
-  goal_(VectorXd::Zero(viapoint.size())), goal_time_(-1),
+  goal_(VectorXd::Ones(viapoint.size())), goal_time_(-1),
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(0.0)
 {
   assert(viapoint_radius_>=0.0);
@@ -169,7 +169,7 @@ void TaskViapoint::generateDemonstration(const MatrixXd& task_parameters, const 
   assert(task_parameters.cols()==n_dims);	
 	
 	VectorXd y_from    = VectorXd::Constant(n_dims,0.0);
-	VectorXd y_to      = VectorXd::Constant(n_dims,1.0);
+	VectorXd y_to      = goal_;
 
 	VectorXd y_yd_ydd_viapoint(3*n_dims);
 	y_yd_ydd_viapoint << task_parameters.row(0), VectorXd::Constant(n_dims,1.0), VectorXd::Constant(n_dims,0.0);

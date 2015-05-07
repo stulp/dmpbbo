@@ -65,7 +65,7 @@ public:
    * \param[in] goal The goal to reach at the end of the movement
    * \param[in] goal_time The time at which the goal should have been reached
    */
-  TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal, double goal_time);
+  TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal, double goal_time=-1);
 
   virtual ~TaskViapoint(void) {}
   
