@@ -38,22 +38,9 @@ namespace DmpBbo {
 /** Interface for classes that can perform rollouts.
  * For further information see the section on \ref sec_bbo_task_and_task_solver
  */
- class TaskSolverParallel : public TaskSolver
+ class TaskSolverParallel
 {
 public:
-    
-  /** Perform rollouts, i.e. given a set of samples, determine all the variables that are relevant to evaluating the cost function. 
-   * \param[in] samples The samples
-   * \param[in] task_parameters The parameters of the task
-   * \param[out] cost_vars The variables relevant to computing the cost.
-   * \todo Compare to other functions
-   */
-  inline void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const 
-  {
-    std::vector<Eigen::MatrixXd> samples_vec(1);
-    samples_vec[0] = samples;
-    performRollouts(samples_vec, cost_vars);
-  };
   
   /** Perform rollouts, i.e. given a set of samples, determine all the variables that are relevant
    * to evaluating the cost function. 
@@ -77,6 +64,11 @@ public:
    * \todo Compare to other functions
    */
   virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples_vec, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
+  
+  /** Returns a string representation of the object.
+   * \return A string representation of the object.
+   */
+  virtual std::string toString(void) const = 0;
   
   /** Print a TaskSolver to an output stream. 
    *
@@ -104,8 +96,7 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolver);
+    // No members to serialize.
   }
   
 };

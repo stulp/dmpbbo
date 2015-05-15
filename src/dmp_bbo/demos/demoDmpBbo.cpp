@@ -28,7 +28,7 @@
 #include <eigen3/Eigen/Core>
 
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
-#include "dmp_bbo/TaskSolverParallelDmp.hpp"
+#include "dmp_bbo/TaskSolverDmp.hpp"
 
 #include "dmp/Dmp.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
@@ -96,7 +96,7 @@ int main(int n_args, char* args[])
   double dt=0.01;
   double integrate_dmp_beyond_tau_factor=1.2;
   bool use_normalized_parameter=true;  
-  TaskSolverParallelDmp* task_solver = new TaskSolverParallelDmp(dmp,parameters_to_optimize,
+  TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize,
                                        dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter);
   // task_solver->set_perturbation(1.0); // Add perturbations
   
