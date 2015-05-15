@@ -109,7 +109,7 @@ bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::st
     for (int i_update=0; i_update<n_updates; i_update++)
     {
       stringstream stream;
-      stream << directory << "/update" << setw(5) << setfill('0') << i_update+1 << "/";
+      stream << directory << "/update" << setw(5) << setfill('0') << i_update+1;
       if (!saveToDirectory(update_summaries[i_update], stream.str(),overwrite))
         return false;
     }
