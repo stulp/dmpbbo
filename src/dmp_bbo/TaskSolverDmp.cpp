@@ -76,9 +76,6 @@ void TaskSolverDmp::performRollouts(const Eigen::MatrixXd& samples, const Eigen:
   // cost_vars       = n_samples x (n_time_steps*n_cost_vars)
   
   int n_dofs = dmp_->dim_orig();
-  // Assumes 1D dmp for now
-  assert(n_dofs==1);
-  
   int n_samples = samples.rows();
 
   VectorXd ts = VectorXd::LinSpaced(n_time_steps_,0.0,integrate_time_);
@@ -86,12 +83,11 @@ void TaskSolverDmp::performRollouts(const Eigen::MatrixXd& samples, const Eigen:
   int n_cost_vars = 4*n_dofs+1;
   cost_vars.resize(n_samples,n_time_steps_*n_cost_vars); 
     
-  vector<VectorXd> model_parameters_vec(n_dofs);
+  VectorXd model_parameters;
   for (int k=0; k<n_samples; k++)
   {
-    for (int dd=0; dd<n_dofs; dd++)
-      model_parameters_vec[dd] = samples.row(k); // Only part of the row: TODO
-    dmp_->setParameterVectorSelected(model_parameters_vec, use_normalized_parameter_);
+    model_parameters = samples.row(k);
+    dmp_->setParameterVectorSelected(model_parameters, use_normalized_parameter_);
     
     int n_dims = dmp_->dim(); // Dimensionality of the system
     MatrixXd xs_ana(n_time_steps_,n_dims);

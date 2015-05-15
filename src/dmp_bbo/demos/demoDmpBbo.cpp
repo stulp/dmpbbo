@@ -66,7 +66,7 @@ int main(int n_args, char* args[])
   }
 
   // Make the task
-  int n_dims = 1;
+  int n_dims = 2;
   VectorXd viapoint = VectorXd::Constant(n_dims,2.0);
   double viapoint_time = 0.3;
   TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
@@ -101,9 +101,9 @@ int main(int n_args, char* args[])
   // task_solver->set_perturbation(1.0); // Add perturbations
   
   // Make the initial distribution
-  vector<VectorXd> mean_init_vec;
-  dmp->getParameterVectorSelected(mean_init_vec);
-  VectorXd mean_init = mean_init_vec[0];
+  VectorXd mean_init;
+  dmp->getParameterVectorSelected(mean_init);
+  
   MatrixXd covar_init = 1000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
 
   DistributionGaussian* distribution = new DistributionGaussian(mean_init,covar_init);
