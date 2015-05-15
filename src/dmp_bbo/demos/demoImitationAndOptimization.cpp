@@ -29,7 +29,7 @@
 #include <eigen3/Eigen/Core>
 
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
-#include "dmp_bbo/TaskSolverDmp.hpp"
+#include "dmp_bbo/TaskSolverParallelDmp.hpp"
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
@@ -69,7 +69,7 @@ void runImitationAndOptimization(vector<FunctionApproximator*> function_approxim
   // Make the task solver
   set<string> parameters_to_optimize;
   parameters_to_optimize.insert("slopes");
-  TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize);
+  TaskSolverParallelDmp* task_solver = new TaskSolverParallelDmp(dmp,parameters_to_optimize);
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;

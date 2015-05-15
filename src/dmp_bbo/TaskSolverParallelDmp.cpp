@@ -1,6 +1,6 @@
 /**
- * @file   TaskSolverDmp.cpp
- * @brief  TaskSolverDmp class source file.
+ * @file   TaskSolverParallelDmp.cpp
+ * @brief  TaskSolverParallelDmp class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dmp_bbo/TaskSolverDmp.hpp"
+#include "dmp_bbo/TaskSolverParallelDmp.hpp"
 
 
 
@@ -32,10 +32,10 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "dmp_bbo/TaskSolverDmp.hpp"
+#include "dmp_bbo/TaskSolverParallelDmp.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskSolverDmp);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskSolverParallelDmp);
 
 #include <boost/serialization/base_object.hpp>
 
@@ -53,7 +53,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
+TaskSolverParallelDmp::TaskSolverParallelDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)
 {
   dmp_->setSelectedParameters(optimize_parameters);
@@ -63,13 +63,13 @@ TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters
   use_normalized_parameter_ = use_normalized_parameter;
 }
 
-void TaskSolverDmp::set_perturbation(double perturbation_standard_deviation)
+void TaskSolverParallelDmp::set_perturbation(double perturbation_standard_deviation)
 {
   dmp_->set_perturbation_analytical_solution(perturbation_standard_deviation);
 }
 
   
-void TaskSolverDmp::performRollouts(const vector<MatrixXd>& samples, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
+void TaskSolverParallelDmp::performRollouts(const vector<MatrixXd>& samples, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
 {
   // n_dofs-D Dmp, n_parallel=n_dofs
   //                   vector<Matrix>            Matrix
@@ -150,9 +150,9 @@ void TaskSolverDmp::performRollouts(const vector<MatrixXd>& samples, const Matri
   }
 }
 
-string TaskSolverDmp::toString(void) const
+string TaskSolverParallelDmp::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskSolverDmp");
+  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskSolverParallelDmp");
 }
 
 }

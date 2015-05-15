@@ -1,6 +1,6 @@
 /**
- * @file   TaskSolverDmp.hpp
- * @brief  TaskSolverDmp class header file.
+ * @file   TaskSolverParallelDmp.hpp
+ * @brief  TaskSolverParallelDmp class header file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef TaskSolverDmp_H
-#define TaskSolverDmp_H
+#ifndef TaskSolverParallelDmp_H
+#define TaskSolverParallelDmp_H
 
 #include <string>
 #include <set>
@@ -39,7 +39,7 @@ class Dmp;
 
 /** Task solver for the viapoint task, that generates trajectories with a DMP. 
  */
-class TaskSolverDmp : public TaskSolverParallel
+class TaskSolverParallelDmp : public TaskSolverParallel
 {
 private:
   Dmp* dmp_;
@@ -55,7 +55,7 @@ public:
    * \param[in] integrate_dmp_beyond_tau_factor If you want to integrate the Dmp for a longer duration than the tau with which it was trained, set this value larger than 1. I.e. integrate_dmp_beyond_tau_factor=1.5 will integrate for 3 seconds, if the original tau of the Dmp was 2.
    * \param[in] use_normalized_parameter Use normalized parameters, cf. sec_fa_changing_modelparameters
    */
-  TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
+  TaskSolverParallelDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
   virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
@@ -77,7 +77,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  TaskSolverDmp(void) {};
+  TaskSolverParallelDmp(void) {};
 
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -105,9 +105,9 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskSolverDmp, "TaskSolverDmp")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskSolverParallelDmp, "TaskSolverParallelDmp")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolverDmp,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolverParallelDmp,boost::serialization::object_serializable);
 
 #endif
