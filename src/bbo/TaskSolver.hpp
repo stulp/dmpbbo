@@ -55,14 +55,6 @@ public:
    */
   virtual void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
   
-  //void performRollouts(const Eigen::MatrixXd& samples, Eigen::MatrixXd& cost_vars) const 
-  //{
-  //  Eigen::MatrixXd task_parameters(0,0);
-  //  performRollouts(samples,task_parameters,cost_vars);
-  //}
-  
-  // virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
-  
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
