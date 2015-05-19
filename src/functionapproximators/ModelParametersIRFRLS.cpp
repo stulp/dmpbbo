@@ -125,7 +125,7 @@ string ModelParametersIRFRLS::toString(void) const
 void ModelParametersIRFRLS::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
-  selected_values_labels.insert("linear_model");
+  selected_values_labels.insert("weights");
   selected_values_labels.insert("phases");
   selected_values_labels.insert("periods");
 }
@@ -139,7 +139,7 @@ void ModelParametersIRFRLS::getParameterVectorMask(const std::set<std::string> s
   int size;
   
   size = weights_.rows() * weights_.cols();
-  if (selected_values_labels.find("linear_model")!=selected_values_labels.end())
+  if (selected_values_labels.find("weights")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(1);
   offset += size;
   
