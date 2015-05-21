@@ -38,7 +38,7 @@ namespace DmpBbo {
 /** Interface for classes that can perform rollouts.
  * For further information see the section on \ref sec_bbo_task_and_task_solver
  */
- class TaskSolverParallel
+class TaskSolverParallel: public TaskSolver
 {
 public:
   
@@ -65,25 +65,6 @@ public:
    */
   virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples_vec, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
   
-  /** Returns a string representation of the object.
-   * \return A string representation of the object.
-   */
-  virtual std::string toString(void) const = 0;
-  
-  /** Print a TaskSolver to an output stream. 
-   *
-   *  \param[in] output  Output stream to which to write to
-   *  \param[in] task_solver TaskSolver to write
-   *  \return    Output stream
-   *
-   *  \remark Calls virtual function TaskSolver::toString, which must be implemented by
-   * subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
-   */ 
-  friend std::ostream& operator<<(std::ostream& output, const TaskSolverParallel& task_solver) {
-    output << task_solver.toString();
-    return output;
-  }
-  
 private:
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -96,7 +77,8 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // No members to serialize.
+    // serialize base class information
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolver);
   }
   
 };

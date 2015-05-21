@@ -29,7 +29,7 @@
 
 #include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
-#include "dmp_bbo/TaskSolverParallelDmp.hpp"
+#include "dmp_bbo/TaskSolverDmp.hpp"
 
 #include "dmp/Dmp.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
@@ -95,7 +95,7 @@ int main(int n_args, char* args[])
   set<string> parameters_to_optimize;
   parameters_to_optimize.insert("offsets");
   
-  TaskSolverParallel* task_solver = new TaskSolverParallelDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
+  TaskSolverParallel* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;

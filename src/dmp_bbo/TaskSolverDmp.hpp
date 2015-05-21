@@ -28,7 +28,7 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "bbo/TaskSolver.hpp"
+#include "TaskSolverParallel.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -39,7 +39,7 @@ class Dmp;
 
 /** Task solver for the viapoint task, that generates trajectories with a DMP. 
  */
-class TaskSolverDmp : public TaskSolver
+class TaskSolverDmp : public TaskSolverParallel
 {
 private:
   Dmp* dmp_;
@@ -57,12 +57,14 @@ public:
    */
   TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
-  void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
+  virtual void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
+  
+  virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples_vec, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-	std::string toString(void) const;
+	virtual std::string toString(void) const;
 
   /** Add a perturbation to the forcing term when computing the analytical solution.
    * \param[in] perturbation_standard_deviation Standard deviation of the normal distribution from which perturbations will be sampled.
@@ -91,7 +93,7 @@ private:
   void serialize(Archive & ar, const unsigned int version)
   {
     // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolver);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolverParallel);
     
     ar & BOOST_SERIALIZATION_NVP(dmp_);
     ar & BOOST_SERIALIZATION_NVP(n_time_steps_);    
