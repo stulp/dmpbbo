@@ -231,10 +231,18 @@ public:
   /**
    * \todo Document this
    */
-  void setVectorLengthsPerDimension(Eigen::VectorXi lengths_per_dimension)
+  void setVectorLengthsPerDimension(const Eigen::VectorXi& lengths_per_dimension)
   {
     assert(lengths_per_dimension.sum()==getParameterVectorSelectedSize());
     lengths_per_dimension_ = lengths_per_dimension;
+  }
+  
+  /**
+   * \todo Document this
+   */
+  Eigen::VectorXi getVectorLengthsPerDimension(void) const
+  {
+    return lengths_per_dimension_;
   }
   
   /**
