@@ -90,8 +90,10 @@ UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
 UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation)
 {
   int n_basis_functions = centers.rows();
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_dims = centers.cols();
-  
+#endif 
+
   assert(n_basis_functions==widths.rows());
   assert(n_dims           ==widths.cols());
   assert(n_basis_functions==slopes.rows());
@@ -575,10 +577,12 @@ bool UnifiedModel::saveGridData(const VectorXd& min, const VectorXd& max, const 
   if (save_directory.empty())
     return true;  
  
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_dims = min.size();
   assert(n_dims==max.size());
   assert(n_dims==n_samples_per_dim.size());
-  
+#endif
+
   MatrixXd inputs;
   FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
 
