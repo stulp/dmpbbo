@@ -79,17 +79,17 @@ bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::st
   
   // Save the learning curve
   int n_updates = update_summaries.size();
-  MatrixXd learning_curve(n_updates,3);
+  MatrixXd learning_curve(n_updates,4);
   learning_curve(0,0) = 0; // First evaluation is at 0
   
   for (int i_update=0; i_update<n_updates; i_update++)
   {
+    
+    int n_samples = update_summaries[i_update].costs.rows();
+      
     // Number of samples at which an evaluation was performed.
     if (i_update>0)
-    {
-      int n_samples = update_summaries[i_update].costs.rows();
       learning_curve(i_update,0) = learning_curve(i_update-1,0) + n_samples; 
-    }
     
     // The cost of the evaluation at this update
     learning_curve(i_update,1) = update_summaries[i_update].cost_eval;
@@ -97,6 +97,12 @@ bool saveToDirectory(const std::vector<UpdateSummary>& update_summaries, std::st
     // The largest eigenvalue of the covariance matrix
     MatrixXd eigen_values = update_summaries[i_update].distribution->covar().eigenvalues().real();
     learning_curve(i_update,2) = sqrt(eigen_values.maxCoeff());
+    
+    double mean_costs = update_summaries[i_update].costs.sum()/n_samples;
+    double std_costs = (update_summaries[i_update].costs.array() - mean_costs).abs2().sum();
+    std_costs = sqrt(std_costs/(n_samples-1));
+    learning_curve(i_update,3) = std_costs;
+    
     
   }
 
