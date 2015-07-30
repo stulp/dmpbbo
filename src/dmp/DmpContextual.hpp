@@ -89,15 +89,27 @@ public:
   /** Set the current task parameters.
    * \param[in] task_parameters Current task parameters
    */
-  inline void set_task_parameters(const Eigen::MatrixXd& task_parameters)
-  {
-    assert(task_parameters_.cols()==task_parameters.cols());
-    task_parameters_ = task_parameters; 
-  }
+  void set_task_parameters(const Eigen::MatrixXd& task_parameters);
+
+  /** Set a function approximator to predict the goal from the task parameters.
+   * \param[in] function_approximator The function approximator. 
+   */
+  void set_policy_parameter_function_goal(FunctionApproximator* function_approximator);
+  
+  /** Set a function approximator to predict the duration from the task parameters.
+   * \param[in] function_approximator The function approximator. 
+   */
+  void set_policy_parameter_function_duration(FunctionApproximator* function_approximator);
   
   // Overrides Dmp::computeFunctionApproximatorOutput
   virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const = 0;
+  
 
+protected:
+  // TODO: Document. Trains goal and duration first, then calls training for rest. 
+  void  trainLocal(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory, bool overwrite);
+
+public:
   /** Train a contextual Dmp with a set of trajectories (and save results to file)
    * This function is useful for debugging, i.e. if you want to save intermediate results to a
    * directory
@@ -152,6 +164,11 @@ protected:
    * \param[in] trajectories A set of trajectories 
    */  
   void checkTrainTrajectories(const std::vector<Trajectory>& trajectories);
+  
+  std::vector<FunctionApproximator*> policy_parameter_function_goal_;
+  
+  FunctionApproximator* policy_parameter_function_duration_;
+  
 
 protected:
    DmpContextual(void) {};
