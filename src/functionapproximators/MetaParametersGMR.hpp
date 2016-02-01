@@ -46,7 +46,7 @@ public:
 	
 	MetaParametersGMR* clone(void) const;
 
-	std::string toString(void) const;
+    std::string toStr(void) const;
   
 private:
   /** Number of gaussians */

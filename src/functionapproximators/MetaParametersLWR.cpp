@@ -203,7 +203,7 @@ void MetaParametersLWR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
 }
 
-string MetaParametersLWR::toString(void) const
+string MetaParametersLWR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersLWR");
 }

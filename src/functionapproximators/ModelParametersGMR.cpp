@@ -205,7 +205,7 @@ void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
 }
 
 
-string ModelParametersGMR::toString(void) const 
+string ModelParametersGMR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGMR");
 };

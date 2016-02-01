@@ -259,7 +259,7 @@ void ModelParametersLWR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(caching_);
 }
 
-string ModelParametersLWR::toString(void) const
+string ModelParametersLWR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersLWR");
 }

@@ -403,7 +403,7 @@ void UnifiedModel::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(caching_);
 }
 
-string UnifiedModel::toString(void) const
+string UnifiedModel::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("UnifiedModel");
 }

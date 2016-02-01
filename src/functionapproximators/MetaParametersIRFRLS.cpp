@@ -66,7 +66,7 @@ void MetaParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(gamma_);
 }
 
-string MetaParametersIRFRLS::toString(void) const 
+string MetaParametersIRFRLS::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersIRFRLS");
 }

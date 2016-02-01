@@ -71,7 +71,7 @@ public:
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-  virtual std::string toString(void) const = 0;
+  virtual std::string toStr(void) const = 0;
 
   /** Print to output stream. 
    *

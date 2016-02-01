@@ -53,7 +53,7 @@ public:
    */
   ModelParametersRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights);
   
-  std::string toString(void) const;
+  std::string toStr(void) const;
   
 	ModelParameters* clone(void) const;
 	

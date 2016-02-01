@@ -199,7 +199,7 @@ void MetaParametersRBFN::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(intersection_height_);
 }
 
-string MetaParametersRBFN::toString(void) const
+string MetaParametersRBFN::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersRBFN");
 }

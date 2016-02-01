@@ -116,7 +116,7 @@ void ModelParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
 }
 
-string ModelParametersIRFRLS::toString(void) const 
+string ModelParametersIRFRLS::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersIRFRLS");
 };

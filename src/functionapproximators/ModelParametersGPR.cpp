@@ -122,7 +122,7 @@ void ModelParametersGPR::serialize(Archive & ar, const unsigned int version)
                                     
 }
 
-string ModelParametersGPR::toString(void) const
+string ModelParametersGPR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGPR");
 }
