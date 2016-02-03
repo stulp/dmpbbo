@@ -7,7 +7,7 @@ project(OO_DMP_BBO)
 
 # Some settings related to building/installing libraries and header files
 # Set this to STATIC if you want to build static libraries instead.
-option(BUILD_SHARED_LIBS "Enable this option to build shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Enable this option to build shared libraries" ON)
 
 if(BUILD_SHARED_LIBS)
 set(SHARED_OR_STATIC "SHARED")
