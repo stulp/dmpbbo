@@ -339,7 +339,10 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
         // inv(C_x) * C_y_x^T
         covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
         // - C_y_x * inv(C_x) * C_y_x^T
-        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        covar_output_prealloc_.noalias() = gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // NOTE: covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_; causes memory allocation
+        // so we split it in two operations
+        covar_output_prealloc_.noalias() = - covar_output_prealloc_;
         // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
         covar_output_prealloc_ += gmm->covars_y_[i_gau];
         // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
@@ -504,7 +507,10 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
         // inv(C_x) * C_y_x^T
         covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
         // - C_y_x * inv(C_x) * C_y_x^T
-        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        covar_output_prealloc_.noalias() = gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // NOTE: covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_; causes memory allocation
+        // so we split it in two operations
+        covar_output_prealloc_.noalias() = - covar_output_prealloc_;
         // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
         covar_output_prealloc_ += gmm->covars_y_[i_gau];
         // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
