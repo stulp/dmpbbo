@@ -16,8 +16,8 @@ set(SHARED_OR_STATIC "STATIC")
 endif()
 
 
-set(LIB_INSTALL_DIR /usr/local/lib)
-set(INCLUDE_INSTALL_DIR /usr/local/include)
+set(LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
 
 
 # Never build inside the source tree
@@ -45,9 +45,6 @@ set(CMAKE_MODULE_PATH ${oo_dmp_bbo_SOURCE_DIR}/cmake/modules "${CMAKE_SOURCE_DIR
 include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
-IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  SET(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR} CACHE PATH "Comment" FORCE)
-ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 ###############################################################################
 # See if LWPR is installed. 
