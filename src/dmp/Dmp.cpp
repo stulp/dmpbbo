@@ -794,7 +794,7 @@ string Dmp::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("Dmp");
 }
 
-
+/*
 template<class Archive>
 void Dmp::serialize(Archive & ar, const unsigned int version)
 {
@@ -807,6 +807,6 @@ void Dmp::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(phase_system_);
   ar & BOOST_SERIALIZATION_NVP(gating_system_);
   ar & BOOST_SERIALIZATION_NVP(function_approximators_);
-}
+}*/
 
 }
