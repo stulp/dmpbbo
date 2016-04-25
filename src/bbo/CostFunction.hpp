@@ -37,10 +37,10 @@ class CostFunction
 public:
   /** The cost function which defines the cost_function.
    *
-   * \param[in] samples The samples 
-   * \param[out] costs The scalar cost for each sample.
+   * \param[in] samples A sample in the search space
+   * \return cost The scalar cost for the sample.
    */
-  virtual void evaluate(const Eigen::MatrixXd& samples, Eigen::VectorXd& costs) const = 0;
+  virtual double evaluate(const Eigen::VectorXd& sample) const = 0;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.

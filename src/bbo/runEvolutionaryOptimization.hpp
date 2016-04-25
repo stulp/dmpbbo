@@ -46,7 +46,6 @@ class ExperimentBBO;
  * \param[in] n_samples_per_update The number of samples per update
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
- * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
 void runEvolutionaryOptimization(
   const CostFunction* const cost_function, 
@@ -55,8 +54,7 @@ void runEvolutionaryOptimization(
   int n_updates, 
   int n_samples_per_update, 
   std::string save_directory=std::string(""),
-  bool overwrite=false,
-  bool only_learning_curve=false);
+  bool overwrite=false,bool only_learning_curve=false);
 
 /** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] task The Task to optimize
@@ -175,73 +173,7 @@ CostFunction::evaluate(samples,costs) {
 }
 \endcode
 
-The idea here is that the TaskSolver uses the samples to perform a rollout (e.g. the samples represent the parameters of a policy which is executed) and computes all the variables that are relevant to determining the cost (e.g. it records the forces at the robot's end-effector, if this is something that needs to be minimized)
-
-Some further advantages of this approach:
-\li Different robots can solve the exact same Task implementation of the same task.
-\li Robots do not need to know about the cost function to perform rollouts (and they shouldn't)
-\li The intermediate cost-relevant variables can be stored to file for visualization etc.
-\li The procedures for performing the roll-outs (on-line on a robot) and doing the evaluation/updating/sampling (off-line on a computer) can be seperated, because there is a separate TaskSolver::performRollouts function.
-
-When using the Task/TaskSolver approach, the runEvolutionaryOptimization process is as follows (only minor changes to the above):
-\code
-
-int n_dim = 2; // Optimize 2D problem
-
-// This is the cost function to be optimized
-CostFunction* cost_function = new CostFunctionQuadratic(VectorXd::Zero(n_dim));
-
-// This is the initial distribution
-DistributionGaussian* distribution = new DistributionGaussian(VectorXd::Random(n_dim),MatrixXd::Identity(n_dim)) 
-
-// This is the updater which will update the distribution
-double eliteness = 10.0;
-Updater* updater = new UpdaterMean(eliteness);
-
-// Some variables
-MatrixXd samples;
-VectorXd costs;
-
-for (int i_update=1; i_update<=n_updates; i_update++)
-{
-  
-    // 1. Sample from distribution
-    int n_samples_per_update = 10;
-    distribution->generateSamples(n_samples_per_update, samples);
-  
-    // 2A. Perform the roll-outs
-    task_solver->performRollouts(samples,cost_vars);
-  
-    // 2B. Evaluate the samples
-    task->evaluate(cost_vars,costs);
-  
-    // 3. Update parameters
-    updater->updateDistribution(*distribution, samples, costs, *distribution);
-    
-}
-\endcode
-
+For more details, see \ref sec_dmp_bbo_task_and_task_solver
 
  */
- 
-/**
-\todo Include this in the documentation somewhere
 
-\verbatim
-For standard optimization, n_parallel = 1 and n_time_steps = 1 so that
-                    vector<Matrix>            Matrix
-  samples         =                   n_samples x n_dim
-  task_parameters =                   n_samples x n_task_pars
-  cost_vars       =                   n_samples x n_cost_vars
-
-
-Generic case: n_dofs-D Dmp, n_parallel=n_dofs
-                    vector<Matrix>            Matrix
-  samples         = n_parallel     x  n_samples x sum(n_model_parameters)
-  task_parameters =                   n_samples x n_task_pars
-  cost_vars       =                   n_samples x (n_time_steps*n_cost_vars)
-  
-Standard optimization is special case of the above with, n_parallel = 1 and n_time_steps = 1
-\endverbatim
-
-*/

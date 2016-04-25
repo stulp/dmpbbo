@@ -64,23 +64,13 @@ public:
   
   /** The cost function which defines the cost_function.
    *
-   * \param[in] samples The samples 
-   * \param[out] costs The scalar cost for each sample.
+   * \param[in] sample The sample 
+   * \return The scalar cost for each sample.
    */
-  void evaluate(const MatrixXd& samples, VectorXd& costs) const {
-#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
-    int n_dims    = samples.cols();
-#endif
-    assert(n_dims==point_.size());
-    
-    int n_samples = samples.rows();
-
-    costs.resize(n_samples);
-    for (int ss=0; ss<n_samples; ss++)
-    {
-      // Cost is distance to point
-      costs[ss] = sqrt((samples.row(ss) - point_.transpose()).array().pow(2).sum());
-    }
+  double evaluate(const VectorXd& sample) const {
+    assert(sample.size()==point_.size());
+    // Cost is distance to point
+    return sqrt((sample - point_).array().pow(2).sum());
   }
   
   /** Returns a string representation of the object.

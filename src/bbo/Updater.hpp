@@ -28,7 +28,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include "bbo/UpdateSummary.hpp"
 #include "bbo/DistributionGaussian.hpp"
 
 #include <boost/serialization/access.hpp>
@@ -59,23 +58,6 @@ class Updater
 {
 public:
   
-  /** Update a distribution given the samples and costs of an epoch.
-   * \param[in] distribution Current distribution
-   * \param[in] samples The samples in the epoch (size: n_samples X n_dims)
-   * \param[in] costs Costs of the samples (size: n_samples x 1)
-   * \param[out] weights The weights computed from the costs
-   * \param[out] distribution_new Updated distribution
-   * \param[out] summary An object containing all relevant update information, for logging and debugging purposes.
-   */
-  inline void updateDistribution(const DistributionGaussian& distribution, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, Eigen::VectorXd& weights, DistributionGaussian& distribution_new, UpdateSummary& summary) const
-  {
-    summary.distribution = distribution.clone();
-    summary.samples = samples;
-    summary.costs = costs;
-    updateDistribution(distribution, samples, costs, weights, distribution_new);
-    summary.weights = weights;
-    summary.distribution_new = distribution_new.clone();
-  }
 
   /** Update a distribution given the samples and costs of an epoch.
    * \param[in] distribution Current distribution
@@ -86,19 +68,6 @@ public:
   inline void updateDistribution(const DistributionGaussian& distribution, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, DistributionGaussian& distribution_new) const {
     Eigen::VectorXd weights;
     updateDistribution(distribution, samples, costs, weights, distribution_new);     
-  }
-  
-  /** Update a distribution given the samples and costs of an epoch.
-   * \param[in] distribution Current distribution
-   * \param[in] samples The samples in the epoch (size: n_samples X n_dims)
-   * \param[in] costs Costs of the samples (size: n_samples x 1)
-   * \param[out] distribution_new Updated distribution
-   * \param[out] summary An object containing all relevant update information, for logging and debugging purposes.
-   */
-  inline void updateDistribution(const DistributionGaussian& distribution, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, DistributionGaussian& distribution_new, UpdateSummary& summary) const 
-  {
-    Eigen::VectorXd weights;
-    updateDistribution(distribution, samples, costs, weights, distribution_new, summary);     
   }
   
   /** Update a distribution given the samples and costs of an epoch.

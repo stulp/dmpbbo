@@ -74,20 +74,13 @@ public:
   /** Cost function
    * \param[in] cost_vars y in \f$ y = a*x^2 + c \f$
    * \param[in] task_parameters Ignored
-   * \param[out] costs Costs of the cost_vars
+   * \param[out] costs Cost of the cost_vars ZZZ
    */
-  void evaluate(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& costs) const
+  void evaluate(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& cost) const
   {
-    int n_samples = cost_vars.rows();
-    costs.resize(n_samples);
-    
-    VectorXd predictions, diff_square;
-    for (int k=0; k<n_samples; k++)
-    {
-      predictions = cost_vars.row(k);
-      diff_square = (predictions.array()-targets_.array()).square();
-      costs[k] = diff_square.mean();
-    }
+    VectorXd diff_square = (cost_vars.array()-targets_.array()).square();
+    cost.resize(1);
+    cost[0] = diff_square.mean();
   }
   
   /** Save a python script that is able to visualize the rollouts, given the cost-relevant variables
@@ -177,24 +170,18 @@ public:
   }
   
   /** Cost function
-   * \param[in] samples Samples containing variations of a and c  (in  \f$ y = a*x^2 + c \f$)
+   * \param[in] sample Sample containing variation of a and c  (in  \f$ y = a*x^2 + c \f$)
    * \param[in] task_parameters Ignored
    * \param[in] cost_vars Cost-relevant variables, containing the predictions
    */
-  void performRollouts(const MatrixXd& samples, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
+  void performRollouts(const MatrixXd& sample, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
   {
-    int n_samples = samples.rows();
-    cost_vars.resize(n_samples,inputs_.size());
     
-    VectorXd predictions, diff_square;
-    for (int k=0; k<n_samples; k++)
-    {
-      double a = samples(k,0);
-      double c = samples(k,1);
-      targetFunction(a,c,inputs_,predictions);
-      
-      cost_vars.row(k) = predictions;
-    }
+    VectorXd predictions;
+    double a = sample(0);
+    double c = sample(1);
+    targetFunction(a,c,inputs_,predictions);
+    cost_vars = predictions;
   }
   
   /** Returns a string representation of the object.
@@ -281,12 +268,10 @@ int main(int n_args, char* args[])
   
   int n_updates = 40;
 
-  /*
   // Here's one way to call it. Below there's another one using ExperimentBBO.
   cout << "___________________________________________________________" << endl;
   cout << "RUNNING OPTIMIZATION" << endl;  
-  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update);
-  */
+  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   ExperimentBBO experiment(
     task,
@@ -299,7 +284,7 @@ int main(int n_args, char* args[])
   
   //cout << "___________________________________________________________" << endl;
   //cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
-  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
+  //runEvolutionaryOptimization(experiment, distribution, updater, n_updates, n_samples_per_update,directory);
   
   return 0;
 }
