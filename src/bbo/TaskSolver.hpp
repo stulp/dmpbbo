@@ -36,24 +36,24 @@ namespace DmpBbo {
 class TaskSolver
 {
 public:
-  /** Perform rollouts, i.e. given a set of samples, determine all the variables that are relevant to evaluating the cost function. 
-   * \param[in] samples The samples
+  /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
+   * \param[in] sample The samples
    * \param[out] cost_vars The variables relevant to computing the cost.
    * \todo Compare to other functions
    */
-  inline void performRollouts(const Eigen::MatrixXd& samples, Eigen::MatrixXd& cost_vars) const
+  inline void performRollout(const Eigen::MatrixXd& sample, Eigen::MatrixXd& cost_vars) const
   {
     Eigen::MatrixXd task_parameters(0,0);
-    performRollouts(samples,task_parameters,cost_vars);
+    performRollout(sample,task_parameters,cost_vars);
   };
     
-  /** Perform rollouts, i.e. given a set of samples, determine all the variables that are relevant to evaluating the cost function. 
-   * \param[in] samples The samples
+  /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
+   * \param[in] sample The samples
    * \param[in] task_parameters The parameters of the task
    * \param[out] cost_vars The variables relevant to computing the cost.
    * \todo Compare to other functions
    */
-  virtual void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
+  virtual void performRollout(const Eigen::MatrixXd& sample, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.

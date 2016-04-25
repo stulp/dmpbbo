@@ -174,7 +174,7 @@ public:
    * \param[in] task_parameters Ignored
    * \param[in] cost_vars Cost-relevant variables, containing the predictions
    */
-  void performRollouts(const MatrixXd& sample, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
+  void performRollout(const MatrixXd& sample, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
   {
     
     VectorXd predictions;

@@ -39,7 +39,7 @@ class Task
 public:
   /** The cost function which defines the task.
    *
-   * \param[in] cost_vars All the variables relevant to computing the cost. These are determined by TaskSolver::performRollouts(). For further information see the section on \ref sec_bbo_task_and_task_solver
+   * \param[in] cost_vars All the variables relevant to computing the cost. These are determined by TaskSolver::performRollout(). For further information see the section on \ref sec_bbo_task_and_task_solver
    * \param[out] The cost for these cost_vars. The first element should be the total cost. The others may be different cost components.
    */
   virtual void evaluate(const Eigen::MatrixXd& cost_vars, Eigen::VectorXd& costs) const 
@@ -51,7 +51,7 @@ public:
   
   /** The cost function which defines the task.
    *
-   * \param[in] cost_vars All the variables relevant to computing the cost. These are determined by TaskSolver::performRollouts(). For further information see the section on \ref sec_bbo_task_and_task_solver
+   * \param[in] cost_vars All the variables relevant to computing the cost. These are determined by TaskSolver::performRollout(). For further information see the section on \ref sec_bbo_task_and_task_solver
    * \param[in] task_parameters Optional parameters of the task, and thus the cost function.
    * \param[out] The cost for these cost_vars. The first element should be the total cost. The others may be different cost components.
    */
