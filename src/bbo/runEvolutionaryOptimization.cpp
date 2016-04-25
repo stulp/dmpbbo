@@ -349,7 +349,7 @@ void runEvolutionaryOptimization(
       {
           saveToDirectory(save_directory,i_update,distribution,rollout_eval,rollouts,weights,distribution_new);
           if (i_update==0)
-            task->savePerformRolloutsPlotScript(save_directory);
+            task->savePlotRolloutScript(save_directory);
       }
     }
     

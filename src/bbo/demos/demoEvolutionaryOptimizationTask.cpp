@@ -76,7 +76,7 @@ public:
    * \param[in] task_parameters Ignored
    * \param[out] costs Cost of the cost_vars ZZZ
    */
-  void evaluateRollout(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& cost) const
+  void evaluateRollout(const MatrixXd& cost_vars, const VectorXd& task_parameters, VectorXd& cost) const
   {
     VectorXd diff_square = (cost_vars.array()-targets_.array()).square();
     cost.resize(1);
@@ -88,9 +88,9 @@ public:
    *  \param[in] directory Directory in which to save the python script
    *  \return true if saving the script was successful, false otherwise
    */
-  bool savePerformRolloutsPlotScript(string directory) const
+  bool savePlotRolloutScript(string directory) const
   {
-    string filename = directory + "/plotRollouts.py";
+    string filename = directory + "/plotRollout.py";
     
     std::ofstream file;
     file.open(filename.c_str());
@@ -104,7 +104,7 @@ public:
     file << "import numpy as np" << endl;
     file << "import matplotlib.pyplot as plt" << endl;
     file << "import sys, os" << endl;
-    file << "def plotRollouts(cost_vars,ax):" << endl;
+    file << "def plotRollout(cost_vars,ax):" << endl;
     file << "    inputs = [";
     file << fixed;
     for (int ii=0; ii<inputs_.size(); ii++)
@@ -118,7 +118,7 @@ public:
     {
       if (ii>0) file << ", ";
       file << targets_[ii];
-    }
+    } // ZZZ FIX THIS SCRIPT
     file << "]" << endl;
     file << "    line_handles = ax.plot(inputs,cost_vars.T,linewidth=0.5)" << endl;
     file << "    ax.plot(inputs,targets,'-o',color='k',linewidth=2)" << endl;

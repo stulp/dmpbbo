@@ -45,7 +45,7 @@ public:
   virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, Eigen::VectorXd& costs) const 
   {
     int n_task_pars = 0;
-    Eigen::MatrixXd task_parameters(cost_vars.rows(),n_task_pars);
+    Eigen::VectorXd task_parameters(n_task_pars);
     evaluateRollout(cost_vars,task_parameters,costs);
   };
   
@@ -55,14 +55,14 @@ public:
    * \param[in] task_parameters Optional parameters of the task, and thus the cost function.
    * \param[out] The cost for these cost_vars. The first element should be the total cost. The others may be different cost components.
    */
-  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const = 0;
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& costs) const = 0;
   
   /** Save a python script that is able to visualize the rollouts, given the cost-relevant variables
    *  stored in a file.
    *  \param[in] directory Directory in which to save the python script
    *  \return true if saving the script was successful, false otherwise
    */
-  virtual bool savePerformRolloutsPlotScript(std::string directory) const
+  virtual bool savePlotRolloutScript(std::string directory) const
   {
     return true;
   }
