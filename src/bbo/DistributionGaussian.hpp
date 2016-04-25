@@ -56,6 +56,8 @@ public:
    */
   void generateSamples(int n_samples, Eigen::MatrixXd& samples) const;
   
+  double maxEigenValue(void) const;
+
   /** Make a deep copy of the object.
    * \return A deep copy of the object.
    */
@@ -106,6 +108,9 @@ private:
   Eigen::MatrixXd covar_;  
   /** Cholesky decomposition of the covariance matrix of the distribution. This cached variable makes it easier to generate samples. */
   mutable Eigen::MatrixXd covar_decomposed_; 
+  
+  /** Maximum eigen value of the covariance matrix of the distribution. This cached variable avoid recomputing it every time maxEigenValue is called. */
+  mutable double max_eigen_value_ = -1.0;
   
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;

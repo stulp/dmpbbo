@@ -30,6 +30,7 @@
 #include <boost/random/normal_distribution.hpp>
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Eigenvalues>
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -62,10 +63,27 @@ DistributionGaussian* DistributionGaussian::clone(void) const
   return new DistributionGaussian(mean(),covar()); 
 }
 
-void DistributionGaussian::set_mean(const VectorXd& mean) { 
+void DistributionGaussian::set_mean(const VectorXd& mean) 
+{ 
   assert(mean.size()==mean_.size());  
   mean_ = mean;
 }
+
+double DistributionGaussian::maxEigenValue(void) const
+{
+  if (max_eigen_value_<0.0)
+  {
+    SelfAdjointEigenSolver<MatrixXd> eigensolver(covar_);
+    if (eigensolver.info() == Success)
+    {
+      // Get the eigenvalues
+      VectorXd eigen_values = eigensolver.eigenvalues();
+      max_eigen_value_ = eigen_values.maxCoeff();
+    }
+  }
+  return max_eigen_value_;
+}
+
 
 
 void DistributionGaussian::set_covar(const MatrixXd& covar) { 
@@ -73,6 +91,7 @@ void DistributionGaussian::set_covar(const MatrixXd& covar) {
   assert(covar.rows()==mean_.size());
   covar_ = covar;
   covar_decomposed_ = MatrixXd::Zero(0,0);
+  max_eigen_value_ = -1.0;
 }
 
 void DistributionGaussian::generateSamples(int n_samples, MatrixXd& samples) const
