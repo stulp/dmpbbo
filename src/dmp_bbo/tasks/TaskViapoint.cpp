@@ -62,96 +62,92 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
   assert(viapoint_.size()==goal.size());
 }
   
-void TaskViapoint::evaluate(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& costs) const
+void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const VectorXd& task_parameters, VectorXd& costs) const
 {
-  int n_samples = cost_vars.rows();
+  // cost_vars is assumed to have following structure
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0  forcing_1..forcing_D
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1  forcing_1..forcing_D
+  //  |    |     |     |      |     |     |      |          |
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T  forcing_1..forcing_D
+  
+  
   int n_dims = viapoint_.size();
-  int n_cost_vars = 4*n_dims + 1; // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t forcing_term_1..forcing_term_D
-  int n_time_steps = cost_vars.cols()/n_cost_vars;
-  // cost_vars  = n_samples x (n_time_steps*n_cost_vars)
+  int n_time_steps = cost_vars.rows();
+  int n_cost_vars = cost_vars.cols();
+  
 
-  //cout << "  n_samples=" << n_samples << endl;
   //cout << "  n_dims=" << n_dims << endl;
-  //cout << "  n_cost_vars=" << n_cost_vars << endl;
-  //cout << "  cost_vars.cols()=" << cost_vars.cols() << endl;  
   //cout << "  n_time_steps=" << n_time_steps << endl;
+  //cout << "  n_cost_vars=" << n_cost_vars << endl;
+  
+  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t forcing_term_1..forcing_term_D
+  assert(n_cost_vars==(4*n_dims + 1));
+  
+  
+  
+  // rollout is of size   n_time_steps x n_cost_vars
+  VectorXd ts = cost_vars.col(3 * n_dims);
 
-  costs.resize(n_samples);
-  
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1
-  //  |    |     |     |      |     |     |
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T
-  MatrixXd rollout; //(n_time_steps,n_cost_vars);
-  MatrixXd my_row(1,n_time_steps*n_cost_vars);
-  
-  for (int k=0; k<n_samples; k++)
+  double dist_to_viapoint = 0.0;
+  if (viapoint_weight_!=0.0)
   {
-    my_row = cost_vars.row(k);
-    rollout = (Map<MatrixXd>(my_row.data(),n_cost_vars,n_time_steps)).transpose();   
-    
-    // rollout is of size   n_time_steps x n_cost_vars
-    VectorXd ts = rollout.col(3 * n_dims);
-
-    double dist_to_viapoint = 0.0;
-    if (viapoint_weight_!=0.0)
+    if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
     {
-      if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
-      {
-        // Don't compute the distance at some time, but rather get the minimum distance
-        const MatrixXd y = rollout.block(0, 0, rollout.rows(), n_dims);
-        dist_to_viapoint = (y.rowwise() - viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
-      }
-      else
-      {
-        // Compute the minimum distance at a specific time
-        
-        // Get the time_step at which viapoint_time_step approx ts[time_step]
-        int viapoint_time_step = 0;
-        while (viapoint_time_step < ts.size() && ts[viapoint_time_step] < viapoint_time_)
-          viapoint_time_step++;
-
-        assert(viapoint_time_step < ts.size());
-
-        VectorXd y_via = rollout.row(viapoint_time_step).segment(0,n_dims);
-        dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
-      }
+      // Don't compute the distance at some time, but rather get the minimum distance
+      const MatrixXd y = cost_vars.block(0, 0, n_time_steps, n_dims);
+      dist_to_viapoint = (y.rowwise() - viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
+    }
+    else
+    {
+      // Compute the minimum distance at a specific time
       
-      if (viapoint_radius_>0.0)
-      {
-        // The viapoint_radius defines a radius within which the cost is always 0
-        dist_to_viapoint -= viapoint_radius_;
-        if (dist_to_viapoint<0.0)
-          dist_to_viapoint = 0.0;
-      }
+      // Get the time_step at which viapoint_time_step approx ts[time_step]
+      int viapoint_time_step = 0;
+      while (viapoint_time_step < ts.size() && ts[viapoint_time_step] < viapoint_time_)
+        viapoint_time_step++;
+
+      assert(viapoint_time_step < ts.size());
+
+      VectorXd y_via = cost_vars.row(viapoint_time_step).segment(0,n_dims);
+      dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
     }
     
-    double sum_ydd = 0.0;
-    if (acceleration_weight_!=0.0)
+    if (viapoint_radius_>0.0)
     {
-      MatrixXd ydd = rollout.block(0,2*n_dims,n_time_steps,n_dims);
-      // ydd = n_time_steps x n_dims
-      sum_ydd = ydd.array().pow(2).sum();
+      // The viapoint_radius defines a radius within which the cost is always 0
+      dist_to_viapoint -= viapoint_radius_;
+      if (dist_to_viapoint<0.0)
+        dist_to_viapoint = 0.0;
     }
-
-    double delay_cost = 0.0;
-    if (goal_weight_!=0.0)
-    {
-      int goal_time_step = 0;
-      while (goal_time_step < ts.size() && ts[goal_time_step] < goal_time_)
-        goal_time_step++;
-
-      const MatrixXd y_after_goal = rollout.block(goal_time_step, 0,
-        rollout.rows() - goal_time_step, n_dims);
-
-      delay_cost = (y_after_goal.rowwise() - goal_.transpose()).rowwise().squaredNorm().sum();
-    }
-
-    costs[k] =  
-      viapoint_weight_*dist_to_viapoint + 
-      acceleration_weight_*sum_ydd/n_time_steps + 
-      goal_weight_*delay_cost;
   }
+  
+  double sum_ydd = 0.0;
+  if (acceleration_weight_!=0.0)
+  {
+    MatrixXd ydd = cost_vars.block(0,2*n_dims,n_time_steps,n_dims);
+    // ydd = n_time_steps x n_dims
+    sum_ydd = ydd.array().pow(2).sum();
+  }
+
+  double delay_cost = 0.0;
+  if (goal_weight_!=0.0)
+  {
+    int goal_time_step = 0;
+    while (goal_time_step < ts.size() && ts[goal_time_step] < goal_time_)
+      goal_time_step++;
+
+    const MatrixXd y_after_goal = cost_vars.block(goal_time_step, 0,
+      n_time_steps - goal_time_step, n_dims);
+
+    delay_cost = (y_after_goal.rowwise() - goal_.transpose()).rowwise().squaredNorm().sum();
+  }
+  
+  int n_cost_components = 3;
+  costs.resize(1+n_cost_components); // costs[0] = sum(costs[1:end])
+  costs[1] = viapoint_weight_*dist_to_viapoint;
+  costs[2] = acceleration_weight_*sum_ydd/n_time_steps;
+  costs[3] = goal_weight_*delay_cost;
+  costs[0] = costs[1] +  costs[2] +  costs[3];
 }
 
 void TaskViapoint::setCostFunctionWeighting(double viapoint_weight, double acceleration_weight, double goal_weight)
@@ -201,9 +197,9 @@ string TaskViapoint::toString(void) const {
 }
 
 
-bool TaskViapoint::savePerformRolloutsPlotScript(string directory) const
+bool TaskViapoint::savePlotRolloutScript(string directory) const
 {
-  string filename = directory + "/plotRollouts.py";
+  string filename = directory + "/plotRollout.py";
   
   std::ofstream file;
   file.open(filename.c_str());
@@ -212,11 +208,11 @@ bool TaskViapoint::savePerformRolloutsPlotScript(string directory) const
     std::cerr << "Couldn't open file '" << filename << "' for writing." << std::endl;
     return false;
   }
-
+  
   file << "import numpy as np" << endl;
   file << "import matplotlib.pyplot as plt" << endl;
   file << "import sys, os" << endl;
-  file << "def plotRollouts(cost_vars,ax):" << endl;
+  file << "def plotRollout(cost_vars,ax):" << endl;
   file << "    viapoint = [";
   file << fixed;
   for (int ii=0; ii<viapoint_.size(); ii++)
@@ -228,31 +224,21 @@ bool TaskViapoint::savePerformRolloutsPlotScript(string directory) const
   file << "    viapoint_time = "<< viapoint_time_<< endl;
   file << "    # y      yd     ydd    1  forcing" << endl;
   file << "    # n_dofs n_dofs n_dofs ts n_dofs" << endl;
-  file << "    n_dims = "<<viapoint_.size()<<";" << endl;
-  file << "    n_vars = (1+n_dims*4)" << endl;
-  file << "    if (len(cost_vars.shape)==1):" << endl;
-  file << "        K=1;" << endl;
-  file << "        n_cost_vars = len(cost_vars)" << endl;
-  file << "        cost_vars = np.reshape(cost_vars,(K,n_cost_vars))" << endl;
-  file << "    else:" << endl;
-  file << "        K = len(cost_vars);" << endl;
-  file << "        n_cost_vars = len(cost_vars[0])" << endl;
-  file << "    n_time_steps = n_cost_vars/n_vars;" << endl;
-  file << "    for k in range(len(cost_vars)):" << endl;
-  file << "        x = np.reshape(cost_vars[k,:],(n_time_steps, n_vars))" << endl;
-  file << "        y = x[:,0:n_dims]" << endl;
-  file << "        t = x[:,3*n_dims]" << endl;
+  file << "    n_dofs = len(viapoint)" << endl;
+  file << "    y = cost_vars[:,0:n_dofs]" << endl;
+  file << "    t = cost_vars[:,3*n_dofs]" << endl;
   if (viapoint_.size()==1)
   {
-    file << "        line_handles = ax.plot(t,y,linewidth=0.5)" << endl;
+    file << "    line_handles = ax.plot(t,y,linewidth=0.5)" << endl;
     file << "    ax.plot(viapoint_time,viapoint,'ok')" << endl;
   }
   else
   {
-    file << "        line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)" << endl;
+    file << "    line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)" << endl;
     file << "    ax.plot(viapoint[0],viapoint[1],'ok')" << endl;
   }
   file << "    return line_handles" << endl;
+  file << "" << endl;
   file << "if __name__=='__main__':" << endl;
   file << "    # See if input directory was passed" << endl;
   file << "    if (len(sys.argv)==2):" << endl;
@@ -260,10 +246,10 @@ bool TaskViapoint::savePerformRolloutsPlotScript(string directory) const
   file << "    else:" << endl;
   file << "      print 'Usage: '+sys.argv[0]+' <directory>';" << endl;
   file << "      sys.exit()" << endl;
-  file << "    cost_vars = np.loadtxt(directory+\"cost_vars.txt\")" << endl;
+  file << "    cost_vars = np.loadtxt(directory+\"/cost_vars.txt\")" << endl;
   file << "    fig = plt.figure()" << endl;
   file << "    ax = fig.gca()" << endl;
-  file << "    plotRollouts(cost_vars,ax)" << endl;
+  file << "    plotRollout(cost_vars,ax)" << endl;
   file << "    plt.show()" << endl;
   
   file.close();

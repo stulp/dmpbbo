@@ -69,7 +69,7 @@ public:
 
   virtual ~TaskViapoint(void) {}
   
-  void evaluate(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const;
+  void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& costs) const;
   
   /** Set the relative weights of the components of the cost function.
    * \param[in] viapoint_weight Weight for the cost related to not passing through the viapoint
@@ -90,7 +90,7 @@ public:
    *  \param[in] directory Directory in which to save the python script
    *  \return true if saving the script was successful, false otherwise
    */
-  bool savePerformRolloutsPlotScript(std::string directory) const;
+  bool savePlotRolloutScript(std::string directory) const;
 
 private:
   Eigen::VectorXd viapoint_;

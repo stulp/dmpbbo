@@ -23,11 +23,13 @@
 
 #include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
 
+#include "bbo/runEvolutionaryOptimization.hpp"
+
 #include "bbo/Task.hpp"
+#include "bbo/TaskSolver.hpp"
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
-#include "dmp_bbo/TaskSolverParallel.hpp"
-#include "dmp_bbo/UpdateSummaryParallel.hpp"
+#include "bbo/Rollout.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iomanip>
@@ -44,83 +46,150 @@ namespace DmpBbo {
 
 //bool saveUpdate(string save_directory, int i_update, const vector<UpdateSummary>& update_summaries, const MatrixXd& cost_vars, const MatrixXd& cost_vars_eval, bool overwrite=false);
 
-void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory, bool overwrite, bool only_learning_curve)
+/*
+MatrixXd convertSamples(vector<MatrixXd> samples)
+{
+  // Input: n_parallel X n_samples X n_dims
+  // Output: n_samples X (n_parallel * n_dims)
+  int n_parallel = samples.size();
+  int n_samples = samples[0].size();
+  int n_cols = 0;
+  for (int ii=0; ii<n_parallel; ii++)
+    n_cols += samples[n_parallel].cols();
+  
+  MatrixXd converted_samples(n_samples,n_cols);
+  return 0;
+}
+*/
+
+void runEvolutionaryOptimizationParallel(
+  Task* task, 
+  TaskSolver* task_solver, 
+  vector<DistributionGaussian*> initial_distributions, 
+  Updater* updater, 
+  int n_updates, 
+  int n_samples_per_update, 
+  string save_directory, 
+  bool overwrite, 
+  bool only_learning_curve)
 {  
   // Some variables
-  int n_parallel = distributions.size();
-  vector<MatrixXd> sample_eval(n_parallel);
-  vector<MatrixXd> samples(n_parallel);
-  MatrixXd cost_vars, cost_vars_eval;
-  VectorXd costs, cost_eval;
+  int n_parallel = initial_distributions.size();
+  assert(n_parallel>=2);
+  
+  int n_samples = n_samples_per_update; // Shorthand
+  
+  VectorXi offsets(n_parallel+1);
+  offsets[0] = 0;
+  for (int ii=0; ii<n_parallel; ii++)
+    offsets[ii+1] = offsets[ii] + initial_distributions[ii]->mean().size();
+  int sum_n_dims = offsets[n_parallel];
+  
+  // n_parallel X n_samples X n_dims
+  // Note: n_samples must be the same for all, n_dims varies
+  //vector<MatrixXd> sample(n_parallel);
+  //for (int ii=0; ii<n_parallel; ii++)
+  //  // Pre-allocate memory just to be clear.
+  //  sample[ii] = MatrixXd(n_samples_per_update,initial_distributions[ii]->mean().size());
+
+  MatrixXd samples(n_samples,sum_n_dims);
+  MatrixXd sample_eval(1,sum_n_dims);
+  
+  
+  // Some variables
+  VectorXd cost_eval;
+  MatrixXd cost_vars_eval;
+
+  MatrixXd samples_per_parallel;
+  MatrixXd cost_vars;
+  VectorXd cur_costs;
+  VectorXd costs(n_samples);
+  VectorXd total_costs(n_samples);
+  
+  VectorXd weights;
+  
   // Bookkeeping
-  // This is where the UpdateSummary objects are stored, one for each parallel optimization
-  vector<UpdateSummary> cur_summaries(n_parallel);
-  // This is the UpdateSummaryParallel, that merges the above
-  UpdateSummaryParallel update_summary;
-  update_summary.distributions.resize(n_parallel); // Pre-allocate enough space here
-  update_summary.distributions_new.resize(n_parallel); // Pre-allocate enough space here
-  update_summary.samples.resize(n_parallel); // Pre-allocate enough space here
-  // This is where the UpdateSummaryParallel objects are accumulated, one for each update
-  vector<UpdateSummaryParallel> update_summaries;
+  MatrixXd learning_curve(n_updates,3);
+  
+  vector<DistributionGaussian> distributions;
+  vector<DistributionGaussian> distributions_new;
+  for (int ii=0; ii<n_parallel; ii++)
+  {
+    distributions.push_back(*(initial_distributions[ii]->clone()));
+    distributions_new.push_back(*(initial_distributions[ii]->clone()));
+  }
   
   // Optimization loop
   for (int i_update=0; i_update<n_updates; i_update++)
   {
     // 0. Get cost of current distribution mean
     for (int pp=0; pp<n_parallel; pp++)
-      sample_eval[pp] = distributions[pp]->mean().transpose();
-    task_solver->performRollouts(sample_eval,cost_vars_eval);
-    task->evaluate(cost_vars_eval,cost_eval);
+      sample_eval.block(0,offsets[pp],1,offsets[pp+1]) = distributions[pp].mean();
+    task_solver->performRollout(sample_eval,cost_vars_eval);
+    task->evaluateRollout(cost_vars_eval,cost_eval);
+    Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
     
     // 1. Sample from distribution
     for (int pp=0; pp<n_parallel; pp++)
-      distributions[pp]->generateSamples(n_samples_per_update, samples[pp]);
-
-    // 2. Perform rollouts for the samples
-    task_solver->performRollouts(samples, cost_vars);
+    {
+      distributions[pp].generateSamples(n_samples, samples_per_parallel);
+      samples.block(0,offsets[pp],n_samples,offsets[pp+1]) = samples_per_parallel;
+    }
       
-    // 3. Evaluate the last batch of rollouts
-    task->evaluate(cost_vars,costs);
+    vector<Rollout*> rollouts(n_samples_per_update);
+    for (int i_sample=0; i_sample<n_samples_per_update; i_sample++)
+    {
+        
+      // 2. Perform rollouts for the samples
+      task_solver->performRollout(samples.row(i_sample), cost_vars);
+      
+      // 3. Evaluate the last batch of rollouts
+      task->evaluateRollout(cost_vars,cur_costs);
+
+      costs[i_sample] = cur_costs[0];
+      
+      rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_costs);
+      
+    }
   
     // 4. Update parameters
     for (int pp=0; pp<n_parallel; pp++)
-      updater->updateDistribution(*(distributions[pp]), samples[pp], costs, *(distributions[pp]),
-                                                                      (cur_summaries[pp]));
+    {
+      samples_per_parallel = samples.block(0,offsets[pp],n_samples,offsets[pp+1]);
+      updater->updateDistribution(distributions[pp], samples_per_parallel, costs, distributions_new[pp]);
+    }
       
     // Some output and/or saving to file (if "directory" is set)
     if (save_directory.empty()) 
     {
       cout << i_update+1 << "  cost_eval=" << cost_eval << "  ";
-      if (distributions.size()==1)
-        cout << *(distributions[0]);
-      else
-        for (unsigned int ii=0; ii<distributions.size(); ii++)
-          cout  << endl << "       distributions["<<ii<<"]=" << *(distributions[ii]);
+      for (unsigned int ii=0; ii<distributions.size(); ii++)
+        cout  << endl << "       distributions["<<ii<<"]=" << distributions[ii];
       cout << endl;
     }
     else
     {
-      update_summary.cost_eval = cost_eval[0];
-      update_summary.cost_vars_eval = cost_vars_eval;
-      update_summary.cost_vars = cost_vars;
-      update_summary.costs =  costs;
+      // Update learning curve
+      // How many samples so far?
+      learning_curve(i_update,0) = i_update*n_samples_per_update;      
+      // Cost of evaluation
+      learning_curve(i_update,1) = cost_eval[0];
+      // Exploration magnitude
+      learning_curve(i_update,2) = 0.0;
       for (int pp=0; pp<n_parallel; pp++)
+        learning_curve(i_update,2) += sqrt(distributions[pp].maxEigenValue()); 
+      // Save more than just learning curve. 
+      if (!only_learning_curve)
       {
-        update_summary.distributions[pp] =  cur_summaries[pp].distribution;
-        update_summary.distributions_new[pp] =  cur_summaries[pp].distribution_new;
-        update_summary.samples[pp] =  cur_summaries[pp].samples;
+          saveToDirectory(save_directory,i_update,distributions,rollout_eval,rollouts,weights,distributions_new);
+          if (i_update==0)
+            task->savePlotRolloutScript(save_directory);
       }
-      update_summaries.push_back(update_summary);
     }
-  }
-
-  // Save update summaries to file, if necessary
-  if (!save_directory.empty())
-  {
-    saveToDirectory(update_summaries,save_directory,overwrite,only_learning_curve);
-    // If you store only the learning curve, no need to save the script to visualize rollouts    
-    if (!only_learning_curve)
-      task->savePerformRolloutsPlotScript(save_directory);
+    
+    // Distribution is new distribution
+    for (int ii=0; ii<n_parallel; ii++)
+      distributions[ii] = distributions_new[ii];
   }
   
 }

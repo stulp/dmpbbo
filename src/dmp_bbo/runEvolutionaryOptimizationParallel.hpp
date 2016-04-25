@@ -31,7 +31,7 @@ namespace DmpBbo {
   
 // Forward declarations
 class Task;
-class TaskSolverParallel;
+class TaskSolver;
 class DistributionGaussian;
 class Updater;
 
@@ -46,7 +46,7 @@ class Updater;
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
-void runEvolutionaryOptimizationParallel(Task* task, TaskSolverParallel* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
+void runEvolutionaryOptimizationParallel(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
 bool only_learning_curve=false);
 
 }
@@ -58,6 +58,217 @@ bool only_learning_curve=false);
 
 /** \page page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
 
+This page assumes you have read \ref sec_bbo_implementation . Applying BBO to robots (which may execute DMPs) requires several extensions:
+
+\li Use of a Task/TaskSolver instead of a CostFunction
+\li Running multiple optimizations in parallel, one for each DOF of the DMP
+\li Allowing the optimization to be run one update at a time, instead of one loop
+
+\section sec_dmp_bbo_task_and_task_solver Task/TaskSolver
+
+See also \ref sec_bbo_task_and_task_solver
+
+In robotics, it is suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
+
+\code
+CostFunction::evaluate(samples,costs) {
+  TaskSolver::performRollouts(samples,cost_vars)
+  Task::evaluate(cost_vars,costs)
+}
+\endcode
+
+The roles of the Task/TaskSolver are:
+
+\li TaskSolver: performing the rollouts on the robot (based on the samples in policy space), and saving all the variables related to computing the costs into a file (called cost_vars.txt)
+
+\li Task: determining the costs from the cost-relevant variables
+
+
+The idea here is that the TaskSolver uses the samples to perform a rollout (e.g. the samples represent the parameters of a policy which is executed) and computes all the variables that are relevant to determining the cost (e.g. it records the forces at the robot's end-effector, if this is something that needs to be minimized)
+
+Some further advantages of this approach, which are discussed in more detail in \ref page_dmp_bbo :
+\li Different robots can solve the exact same Task implementation of the same task.
+\li Robots do not need to know about the cost function to perform rollouts (and they shouldn't)
+\li The intermediate cost-relevant variables can be stored to file for visualization etc.
+\li The procedures for performing the roll-outs (on-line on a robot) and doing the evaluation/updating/sampling (off-line on a computer) can be seperated, because there is a separate TaskSolver::performRollouts function.
+
+When using the Task/TaskSolver approach, the runEvolutionaryOptimization process is as follows (only minor changes to the above):
+\code
+
+int n_dim = 2; // Optimize 2D problem
+
+// This is the cost function to be optimized
+CostFunction* cost_function = new CostFunctionQuadratic(VectorXd::Zero(n_dim));
+
+// This is the initial distribution
+DistributionGaussian* distribution = new DistributionGaussian(VectorXd::Random(n_dim),MatrixXd::Identity(n_dim)) 
+
+// This is the updater which will update the distribution
+double eliteness = 10.0;
+Updater* updater = new UpdaterMean(eliteness);
+
+// Some variables
+MatrixXd samples;
+VectorXd costs;
+
+for (int i_update=1; i_update<=n_updates; i_update++)
+{
+  
+    // 1. Sample from distribution
+    int n_samples_per_update = 10;
+    distribution->generateSamples(n_samples_per_update, samples);
+  
+    // 2A. Perform the roll-outs
+    task_solver->performRollouts(samples,cost_vars);
+  
+    // 2B. Evaluate the samples
+    task->evaluate(cost_vars,costs);
+  
+    // 3. Update parameters
+    updater->updateDistribution(*distribution, samples, costs, *distribution);
+    
+}
+\endcode
+
+\section sec_parallel_optimization Optimizing DMP DOFs in parallel
+
+Consider a 7-DOF robotic arm. With a DMP, each DOF would be represented by a different dimension of a 7-D DMP (let as assume that each dimension of the DMP uses 10 basis functions). There are then two distinct approaches towards optimizing the parameters of the DMP with respect to a cost function:
+
+\li Consider the search space for optimization to be 70-D, i.e. consider all open parameters of the DMP in one search space. The disadvantage is that reward-weighted averaging will require more samples to perform a robust update, especially for the covariance matrix, which is 70X70! With this approach the implementation in runEvolutionaryOptimization and UpdateSummary is appropriate.
+
+\li Run a seperate optimization for each of the 7 DOFs. Thus, here we have seven 10-D search spaces (with different distributions and samples for each DOF), but using the same costs for all optimizations. This is what is proposed for instance in PI^2. This approach is not able to exploit covariance between different DOFs, but in practice it works robustly.
+
+To enable the latter approach, the function runEvolutionaryOptimizationParallel and the class UpdateSummaryParallel have been added. The main difference is that instead of using one distribution (mean and covariance), D distributions must be used (these are stored in a std::vector).
+
+\section sec_bbo_one_update One update at a time with Task/TaskSolver
+
+When running an optimization on a real robot, it is convenient to seperate it in two alternating steps:
+
+\li compute the costs from the rollouts, update the parameter distribution from the costs, and generate samples from the new distribution. The input to this step are the rollouts, which should 
+contain all the variables relevant to computing the costs. The output is the new samples.
+
+\li perform the roll-outs, given the samples in parameter space. Save all the cost-relevant variables to file.
+
+The first part has been implemented in Python (run_one_update.py), and the second part is specific to your robot, and can be implemented however you want.
+
+In practice, it is not convenient to run above two phases in a loop, but rather perform them step by step. That means the optimization can be stopped at any time, which is useful if you are running long optimization (and want to go to lunch or something). To enable this update-by-update approach, the loop is modified as follows:
+
+\code
+
+int n_dim = 2; // Optimize 2D problem
+
+// This is the cost function to be optimized
+CostFunction* cost_function = new CostFunctionQuadratic(VectorXd::Zero(n_dim));
+
+// This is the updater which will update the distribution
+double eliteness = 10.0;
+Updater* updater = new UpdaterMean(eliteness);
+
+// Some variables
+MatrixXd samples;
+VectorXd costs;
+
+// DETERMINE WHICH UPDATE BY READING FROM FILE
+
+if (i_update==0) 
+{
+  // This is the initial distribution, only used before the first update
+  DistributionGaussian* distribution = new DistributionGaussian(VectorXd::Random(n_dim),MatrixXd::Identity(n_dim)) 
+}
+else 
+{
+    READ THE COST-RELEVANT VARIABLES FROM FILE
+  
+    // 2B. Evaluate the samples
+    task->evaluate(cost_vars,costs);
+  
+    // 3. Update parameters
+    updater->updateDistribution(*distribution, samples, costs, *distribution);
+    
+}
+
+// 1. Sample from distribution
+int n_samples_per_update = 10;
+distribution->generateSamples(n_samples_per_update, samples);
+
+// SAVE SAMPLES TO FILE. THESE SHOULD BE READ BY YOUR ROBOT
+
+// Thus 2A. Perform the roll-outs: task_solver->performRollouts(samples,cost_vars);
+// no longer occurs in the code. Your robot does this now.  
+
+\endcode
+
+\subsection sec_practical_howto Practical howto
+
+\todo Update this with DMP example
+
+The typical use case for running black-box optimization with a robot requires run_one_update.py. Here's what you need to do to make it all work.
+
+<ul>
+<li> In Python, implement a script that sets the parameters of the optimization (i.e. the initial distribution, the task, the covariance update method, etc.). 
+The task should inherit from Task (see task.py), and you'll need to implement the evaluate function, which is the cost function for your task. It takes all the cost-relevant variables, and returns a cost. For an example see demo_one_update.py
+</li>
+
+<li> Implement a script "performRollouts" for your robot (in whatever language you want). The "communication protocol" between run_one_update.py and the robot is very simple (conciously made so!). Only .txt files containing matrices are exchanged. An example script (in Python) can be found in demo_fake_robot.py
+
+<ol>
+
+<li> The script should take a directory as an input. Suppose we are writing to the master directory "./meka_bbo/", then each update has its own directory: "./meka_bbo/update00001", "./meka_bbo/update00002", "./meka_bbo/update00003", etc.</li>
+
+<li> Read the file "samples.txt" from the directory. The size of this file is n_samples X n_dim, where n_samples is the number of sample/rollouts, and n_dim is the dimensionality of the search space. For parallel optimization, a different file is provided for each dimension, i.e. "samples_00.txt" for the first dimension, etc.</li>
+
+<li>Perform the n_samples rollouts on your robot, and write the resulting trajectories/forces whatever to a file "cost_vars.txt", which should be of size n_samples X n_cost_vars. Thus again, each row should represent one rollout. (For parallel optimization, there will be only one cost_vars.txt)</li>
+
+<li>Optional: To determine the cost of the mean of the current distribution (rather than of samples from this distribution as before), read "distribution_mean", and treat it as one sample. The resulting cost-relevant variables should be written in "cost_vars_eval.txt" rather than 
+"cost_vars.txt".
+
+</ol>
+
+</li>
+
+<li>Run the actual optimization by alternatively calling the Python script for updating the parameters, and your script for running the rollouts.
+
+<ul>
+<li>python demo_one_update.py ./meka_bbo</li>
+<li>python demo_fake_robot.py ./meka_bbo/update00001</li>
+<li>python demo_one_update.py ./meka_bbo</li>
+<li>python demo_fake_robot.py ./meka_bbo/update00002</li>
+<li>python demo_one_update.py ./meka_bbo</li>
+<li>python demo_fake_robot.py ./meka_bbo/update00003</li>
+<li>python demo_one_update.py ./meka_bbo</li>
+</ul>
+</li>
+
+<li>When you are done with the optimization, you can use the  function bb_plotting.plotEvolutionaryOptimizationDir(directory) to visualize the result.
+<ol>
+<li>python plotEvolutionaryOptimizationDir ./meka_bbo</li>
+</ol>
+</li>
+</ul>
+
+
  */
+
+
+ /**
+\verbatim
+For standard optimization, n_parallel = 1 and n_time_steps = 1 so that
+                    vector<Matrix>            Matrix
+  samples         =                   n_samples x n_dim
+  task_parameters =                   n_samples x n_task_pars
+  cost_vars       =                   n_samples x n_cost_vars
+
+
+Generic case: n_dofs-D Dmp, n_parallel=n_dofs
+                    vector<Matrix>            Matrix
+  samples         = n_parallel     x  n_samples x sum(n_model_parameters)
+  task_parameters =                   n_samples x n_task_pars
+  cost_vars       =                   n_samples x (n_time_steps*n_cost_vars)
+  
+Standard optimization is special case of the above with, n_parallel = 1 and n_time_steps = 1
+\endverbatim
+ 
+ */
+ 
  
  

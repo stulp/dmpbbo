@@ -28,7 +28,7 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "TaskSolverParallel.hpp"
+#include "bbo/TaskSolver.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
@@ -39,7 +39,7 @@ class Dmp;
 
 /** Task solver for the viapoint task, that generates trajectories with a DMP. 
  */
-class TaskSolverDmp : public TaskSolverParallel
+class TaskSolverDmp : public TaskSolver
 {
 private:
   Dmp* dmp_;
@@ -57,10 +57,10 @@ public:
    */
   TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
-  virtual void performRollouts(const Eigen::MatrixXd& samples, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
+  virtual void performRollout(const Eigen::VectorXd& samples, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
-  virtual void performRollouts(const std::vector<Eigen::MatrixXd>& samples_vec, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
-  
+  //virtual void performRollout(const std::vector<Eigen::MatrixXd>& samples_parallel, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
+
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
@@ -93,7 +93,7 @@ private:
   void serialize(Archive & ar, const unsigned int version)
   {
     // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolverParallel);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolver);
     
     ar & BOOST_SERIALIZATION_NVP(dmp_);
     ar & BOOST_SERIALIZATION_NVP(n_time_steps_);    
