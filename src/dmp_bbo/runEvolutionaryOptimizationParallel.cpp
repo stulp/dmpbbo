@@ -93,10 +93,10 @@ void runEvolutionaryOptimizationParallel(
   //  sample[ii] = MatrixXd(n_samples_per_update,initial_distributions[ii]->mean().size());
 
   MatrixXd samples(n_samples,sum_n_dims);
-  MatrixXd sample_eval(1,sum_n_dims);
   
   
   // Some variables
+  VectorXd sample_eval(sum_n_dims);
   VectorXd cost_eval;
   MatrixXd cost_vars_eval;
 
@@ -122,9 +122,10 @@ void runEvolutionaryOptimizationParallel(
   // Optimization loop
   for (int i_update=0; i_update<n_updates; i_update++)
   {
+    
     // 0. Get cost of current distribution mean
     for (int pp=0; pp<n_parallel; pp++)
-      sample_eval.block(0,offsets[pp],1,offsets[pp+1]) = distributions[pp].mean();
+      sample_eval.segment(offsets[pp],offsets[pp+1]-offsets[pp]) = distributions[pp].mean().transpose();
     task_solver->performRollout(sample_eval,cost_vars_eval);
     task->evaluateRollout(cost_vars_eval,cost_eval);
     Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
@@ -133,7 +134,8 @@ void runEvolutionaryOptimizationParallel(
     for (int pp=0; pp<n_parallel; pp++)
     {
       distributions[pp].generateSamples(n_samples, samples_per_parallel);
-      samples.block(0,offsets[pp],n_samples,offsets[pp+1]) = samples_per_parallel;
+      int width = offsets[pp+1]-offsets[pp];
+      samples.block(0,offsets[pp],n_samples,width) = samples_per_parallel;
     }
       
     vector<Rollout*> rollouts(n_samples_per_update);
@@ -146,8 +148,8 @@ void runEvolutionaryOptimizationParallel(
       // 3. Evaluate the last batch of rollouts
       task->evaluateRollout(cost_vars,cur_costs);
 
+      // Bookkeeping
       costs[i_sample] = cur_costs[0];
-      
       rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_costs);
       
     }
@@ -155,17 +157,15 @@ void runEvolutionaryOptimizationParallel(
     // 4. Update parameters
     for (int pp=0; pp<n_parallel; pp++)
     {
-      samples_per_parallel = samples.block(0,offsets[pp],n_samples,offsets[pp+1]);
-      updater->updateDistribution(distributions[pp], samples_per_parallel, costs, distributions_new[pp]);
+      int width = offsets[pp+1]-offsets[pp];
+      samples_per_parallel = samples.block(0,offsets[pp],n_samples,width);
+      updater->updateDistribution(distributions[pp], samples_per_parallel, costs, weights, distributions_new[pp]);
     }
       
     // Some output and/or saving to file (if "directory" is set)
     if (save_directory.empty()) 
     {
-      cout << i_update+1 << "  cost_eval=" << cost_eval << "  ";
-      for (unsigned int ii=0; ii<distributions.size(); ii++)
-        cout  << endl << "       distributions["<<ii<<"]=" << distributions[ii];
-      cout << endl;
+      cout << i_update+1 << "  cost_eval=" << cost_eval << endl;
     }
     else
     {

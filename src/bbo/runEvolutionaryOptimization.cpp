@@ -87,13 +87,15 @@ bool saveToDirectory(string directory, int i_update, const vector<DistributionGa
   }
   else
   {
+    VectorXi n_parallel = VectorXi::Constant(1,distributions.size());
+    if (!saveMatrix(dir, "n_parallel.txt", n_parallel,  ow)) return false;
     for (unsigned int dd=0; dd<distributions.size(); dd++)
     { 
       stringstream stream;
-      stream  << "/distribution_new_" << setw(3) << setfill('0') << dd;
-      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions_new[dd].mean(), ow)) 
+      stream  << "/distribution_" << setw(3) << setfill('0') << dd;
+      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions[dd].mean(), ow)) 
         return false;
-      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions_new[dd].covar(), ow)) 
+      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions[dd].covar(), ow)) 
         return false;
       
     }
