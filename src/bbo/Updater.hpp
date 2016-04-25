@@ -43,7 +43,7 @@ for (int i_update=1; i_update<=n_updates; i_update++)
   // Sample from distribution
   samples = distribution->generateSamples(n_samples_per_update);
   // Perform rollouts for the samples and compute costs
-  costs = cost_function_solver->evaluate(samples);
+  costs = cost_function->evaluate(samples);
   // Update parameters
   distribution = updater->updateDistribution(distribution, samples, costs);
 }

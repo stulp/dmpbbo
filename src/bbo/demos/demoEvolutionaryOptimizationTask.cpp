@@ -76,7 +76,7 @@ public:
    * \param[in] task_parameters Ignored
    * \param[out] costs Cost of the cost_vars ZZZ
    */
-  void evaluate(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& cost) const
+  void evaluateRollout(const MatrixXd& cost_vars, const MatrixXd& task_parameters, VectorXd& cost) const
   {
     VectorXd diff_square = (cost_vars.array()-targets_.array()).square();
     cost.resize(1);

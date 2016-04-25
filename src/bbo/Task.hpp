@@ -42,11 +42,11 @@ public:
    * \param[in] cost_vars All the variables relevant to computing the cost. These are determined by TaskSolver::performRollout(). For further information see the section on \ref sec_bbo_task_and_task_solver
    * \param[out] The cost for these cost_vars. The first element should be the total cost. The others may be different cost components.
    */
-  virtual void evaluate(const Eigen::MatrixXd& cost_vars, Eigen::VectorXd& costs) const 
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, Eigen::VectorXd& costs) const 
   {
     int n_task_pars = 0;
     Eigen::MatrixXd task_parameters(cost_vars.rows(),n_task_pars);
-    evaluate(cost_vars,task_parameters,costs);
+    evaluateRollout(cost_vars,task_parameters,costs);
   };
   
   /** The cost function which defines the task.
@@ -55,7 +55,7 @@ public:
    * \param[in] task_parameters Optional parameters of the task, and thus the cost function.
    * \param[out] The cost for these cost_vars. The first element should be the total cost. The others may be different cost components.
    */
-  virtual void evaluate(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const = 0;
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& task_parameters, Eigen::VectorXd& costs) const = 0;
   
   /** Save a python script that is able to visualize the rollouts, given the cost-relevant variables
    *  stored in a file.

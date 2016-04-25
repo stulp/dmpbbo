@@ -181,7 +181,7 @@ When the cost function has a simple structure, e.g. cost = \f$ x^2 \f$ it is con
 \code
 CostFunction::evaluate(samples,costs) {
   TaskSolver::performRollout(samples,cost_vars)
-  Task::evaluate(cost_vars,costs)
+  Task::evaluateRollout(cost_vars,costs)
 }
 \endcode
 

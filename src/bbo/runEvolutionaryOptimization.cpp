@@ -308,7 +308,7 @@ void runEvolutionaryOptimization(
     // 0. Get cost of current distribution mean
     sample_eval = distribution.mean().transpose();
     task_solver->performRollout(sample_eval,cost_vars_eval);
-    task->evaluate(cost_vars_eval,cost_eval);
+    task->evaluateRollout(cost_vars_eval,cost_eval);
     Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
     
     // 1. Sample from distribution
@@ -321,7 +321,7 @@ void runEvolutionaryOptimization(
       task_solver->performRollout(samples.row(i_sample),cost_vars);
 
       // 2B. Evaluate the samples
-      task->evaluate(cost_vars,cur_costs);
+      task->evaluateRollout(cost_vars,cur_costs);
       total_costs[i_sample] = cur_costs[0];
 
       rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_costs);
