@@ -169,12 +169,12 @@ public:
     inputs_ = inputs;
   }
   
-  /** Cost function
+  /** Function to perform a rollout
    * \param[in] sample Sample containing variation of a and c  (in  \f$ y = a*x^2 + c \f$)
    * \param[in] task_parameters Ignored
    * \param[in] cost_vars Cost-relevant variables, containing the predictions
    */
-  void performRollout(const MatrixXd& sample, const MatrixXd& task_parameters, MatrixXd& cost_vars) const 
+  void performRollout(const VectorXd& sample, const VectorXd& task_parameters, MatrixXd& cost_vars) const 
   {
     
     VectorXd predictions;

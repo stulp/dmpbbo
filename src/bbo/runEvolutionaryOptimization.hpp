@@ -26,6 +26,7 @@
 
 #include <string>
 #include <vector>
+#include <eigen3/Eigen/Core>
 
 
 namespace DmpBbo {
@@ -37,6 +38,7 @@ class CostFunction;
 class Task;
 class TaskSolver;
 class ExperimentBBO;
+class Rollout;
 
 /** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] cost_function The cost function to optimize
@@ -89,6 +91,16 @@ void runEvolutionaryOptimization(
   std::string save_directory=std::string(""),
   bool overwrite=false,
   bool only_learning_curve=false);
+
+
+bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
+
+
+bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
+
+bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distribution_new, bool overwrite=false);
+
+bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
 
 }
 

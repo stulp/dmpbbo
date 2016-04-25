@@ -46,7 +46,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false)
+bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distributions, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const vector<DistributionGaussian>& distributions_new, bool overwrite)
 {
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
@@ -78,25 +78,71 @@ bool saveToDirectory(string directory, int i_update, const DistributionGaussian&
   bool ow = overwrite;
   string dir = dir_update;
   
-  if (!saveMatrix(dir, "distribution_mean.txt",      distribution.mean(),  ow)) return false;
-  if (!saveMatrix(dir, "distribution_covar.txt",     distribution.covar(), ow)) return false;
+  assert(distributions.size()==distributions_new.size());
+  
+  if (distributions.size()==1)
+  {
+    if (!saveMatrix(dir, "distribution_mean.txt",      distributions[0].mean(),  ow)) return false;
+    if (!saveMatrix(dir, "distribution_covar.txt",     distributions[0].covar(), ow)) return false;
+  }
+  else
+  {
+    for (unsigned int dd=0; dd<distributions.size(); dd++)
+    { 
+      stringstream stream;
+      stream  << "/distribution_new_" << setw(3) << setfill('0') << dd;
+      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions_new[dd].mean(), ow)) 
+        return false;
+      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions_new[dd].covar(), ow)) 
+        return false;
+      
+    }
+  }
+  
   if (cost_eval!=NULL)
   {
     VectorXd cost_eval_vec = VectorXd::Constant(1,*cost_eval);
     if (!saveMatrix(dir, "cost_eval.txt",            cost_eval_vec,          ow)) return false;
   }
+
   if (samples.size()>0)
     if (!saveMatrix(dir, "samples.txt",              samples,                ow)) return false;
   if (costs.size()>0)
     if (!saveMatrix(dir, "costs.txt",                costs,                  ow)) return false;
   if (weights.size()>0)
     if (!saveMatrix(dir, "weights.txt",              weights,                ow)) return false;
-  if (!saveMatrix(dir, "distribution_new_mean.txt",  distribution_new.mean(),  ow)) return false;
-  if (!saveMatrix(dir, "distribution_new_covar.txt", distribution_new.covar(), ow)) return false;
-    
+  if (distributions.size()==1)
+  {
+    if (!saveMatrix(dir, "distribution_new_mean.txt",  distributions_new[0].mean(),  ow)) return false;
+    if (!saveMatrix(dir, "distribution_new_covar.txt", distributions_new[0].covar(), ow)) return false;
+  }
+  else
+  {
+    for (unsigned int dd=0; dd<distributions.size(); dd++)
+    { 
+      stringstream stream;
+      stream  << "/distribution_new_" << setw(3) << setfill('0') << dd;
+      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions_new[dd].mean(), ow)) 
+        return false;
+      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions_new[dd].covar(), ow)) 
+        return false;
+      
+    }
+  }
   return true;    
 }
+
+bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
+{
+  vector<DistributionGaussian> distribution_vec;
+  distribution_vec.push_back(distribution);
+
+  vector<DistributionGaussian> distribution_new_vec;
+  distribution_new_vec.push_back(distribution_new);
   
+  return saveToDirectory(directory, i_update, distribution_vec, cost_eval, samples, costs, weights, distribution_new_vec, overwrite);
+}
+
 void runEvolutionaryOptimization(
   const CostFunction* const cost_function, 
   const DistributionGaussian* const initial_distribution, 
@@ -171,7 +217,7 @@ void runEvolutionaryOptimization(
 
 }
 
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false)
+bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const vector<DistributionGaussian>& distribution_new, bool overwrite)
 {
   
   double* cost_eval = NULL;
@@ -208,6 +254,18 @@ bool saveToDirectory(string directory, int i_update, const DistributionGaussian&
     
   return true;    
 }
+
+bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
+{
+  vector<DistributionGaussian> distribution_vec;
+  distribution_vec.push_back(distribution);
+
+  vector<DistributionGaussian> distribution_new_vec;
+  distribution_new_vec.push_back(distribution_new);
+  
+  return saveToDirectory(directory, i_update, distribution_vec, rollout_eval, rollouts, weights, distribution_new_vec, overwrite);
+}
+
 
 // This function could have been integrated with the above. But I preferred to duplicate a bit of
 // code so that the difference between running an optimziation with a CostFunction or

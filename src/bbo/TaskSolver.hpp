@@ -37,23 +37,25 @@ class TaskSolver
 {
 public:
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
+  * ZZZ Document this properly
    * \param[in] sample The samples
    * \param[out] cost_vars The variables relevant to computing the cost.
    * \todo Compare to other functions
    */
-  inline void performRollout(const Eigen::MatrixXd& sample, Eigen::MatrixXd& cost_vars) const
+  inline void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
   {
-    Eigen::MatrixXd task_parameters(0,0);
+    Eigen::VectorXd task_parameters;
     performRollout(sample,task_parameters,cost_vars);
   };
     
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
+  * ZZZ Document this properly
    * \param[in] sample The samples
    * \param[in] task_parameters The parameters of the task
    * \param[out] cost_vars The variables relevant to computing the cost.
    * \todo Compare to other functions
    */
-  virtual void performRollout(const Eigen::MatrixXd& sample, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
+  virtual void performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.
