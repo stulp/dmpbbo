@@ -2,7 +2,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-from bbo_plotting import plotLearningCurve, plotExplorationCurve, plotUpdateLines
+from bbo_plotting import plotCurve
 
 if __name__=='__main__':
     
@@ -15,20 +15,12 @@ if __name__=='__main__':
     learning_curve = np.loadtxt(filename)
     
     if learning_curve.shape[1]>2: # Plot exploration too?
-        
         fig = plt.figure(1,figsize=(16, 6))
-        ax_explo = fig.add_subplot(121)
-        ax_cost = fig.add_subplot(122)
-
-        plotExplorationCurve(learning_curve[:,0],learning_curve[:,2],ax_explo)
-        plotUpdateLines(learning_curve[:,0],ax_explo)
-        
-        
+        axs = [fig.add_subplot(121), fig.add_subplot(122)]
     else:
         fig = plt.figure(1,figsize=(8, 6))
-        ax_cost = fig.add_subplot(111)
+        axs = [fig.add_subplot(111)]
         
-    plotLearningCurve(learning_curve[:,0],learning_curve[:,1],ax_cost)
-    plotUpdateLines(learning_curve[:,0],ax_cost)
-    
+    plotCurve(learning_curve,axs)
+        
     plt.show()

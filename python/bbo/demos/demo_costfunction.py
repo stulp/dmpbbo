@@ -45,7 +45,7 @@ if __name__=="__main__":
   
     n_samples_per_update = 20
     n_updates = 40
-    update_summaries = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update)
+    learning_curve = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update)
 
 
     import matplotlib.pyplot as plt

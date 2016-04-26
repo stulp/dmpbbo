@@ -45,6 +45,28 @@ def plotExplorationCurve(n_samples_per_update,exploration_curve,ax):
     ax.set_title('Exploration magnitude')
     return line
 
+def plotCurve(curve,axs,costs_all=[]):
+    lines = []
+    if curve.shape[1]>2 and len(axs)>=2: # Plot exploration too?
+        ax_explo = axs[0]
+        ax_cost = axs[1]
+        
+        line = plotExplorationCurve(curve[:,0],curve[:,2],ax_explo)
+        plotUpdateLines(curve[:,0],ax_explo)
+        lines.append(line)
+        
+    else:
+        ax_cost = axs[0]
+        
+    # Plot costs of all individual samples 
+    if (len(costs_all)>0):
+        ax_cost.plot(costs_all,'.',color='gray')
+    # Plot costs at evaluations 
+    line = plotLearningCurve(curve[:,0],curve[:,1],ax_cost)
+    plotUpdateLines(curve[:,0],ax_cost)
+    
+    lines.append(line)
+    return lines
 
 
 def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
