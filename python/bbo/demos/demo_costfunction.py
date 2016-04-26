@@ -9,7 +9,6 @@ sys.path.append(lib_path)
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.updater import UpdaterCovarDecay
 from bbo.run_optimization import runOptimization
-from bbo.update_summary import UpdateSummary, extractLearningCurve
 from bbo.cost_function import CostFunction
 
 from bbo.bbo_plotting import plotEvolutionaryOptimization
@@ -22,22 +21,13 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         """ Constructor.
         \param[in] point Point to which distance must be minimized.
         """
-        self.point = point
+        self.point = np.asarray(point)
   
-    def evaluate(self,samples):
-        n_dims = len(self.point) # Dimensionality of point
-        
-        # Very un-Pythonic. Sorry, written on train without references
-        if samples.ndim==1: # Only one sample
-            assert len(samples)==n_dims
-            costs = np.linalg.norm(samples-self.point)
-        else:
-            assert samples.shape[1]==n_dims
-            costs = [ np.linalg.norm(sample-self.point) for sample in samples]
-        
-        return costs
+    def evaluate(self,sample):
+        # Compute distance from sample to point
+        return np.linalg.norm(sample-self.point) 
 
-def testRunEvolutionaryOptimization():
+if __name__=="__main__":
 
     n_dims = 2
     minimum = np.full(n_dims,0.0)
@@ -64,7 +54,4 @@ def testRunEvolutionaryOptimization():
     plotEvolutionaryOptimization(update_summaries,axs)
     plt.show()
 
-if __name__=="__main__":
-  
-  testRunEvolutionaryOptimization()
 

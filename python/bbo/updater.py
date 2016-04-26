@@ -1,4 +1,5 @@
 import numpy as np
+
 from distribution_gaussian import DistributionGaussian
 
 class Updater:
