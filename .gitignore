@@ -1,5 +1,6 @@
 *~
 *.bak
+*.back
 *.pyc
 build_dir*
 bin/

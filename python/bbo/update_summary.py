@@ -6,12 +6,23 @@ from distribution_gaussian import DistributionGaussian
 class UpdateSummary:
     
     def __init__(self,distributions,samples,cost_eval,costs,weights,distributions_new,cost_vars=None,cost_vars_eval=None):
-        self.distributions = distributions
+
+        if isinstance(distributions,DistributionGaussian):
+            # distributions should be a list of DistributionGaussian
+            self.distributions = [distributions]
+        else:
+            self.distributions = distributions
+            
+        if isinstance(distributions_new,DistributionGaussian):
+            # distributions should be a list of DistributionGaussian
+            self.distributions_new = [distributions_new]
+        else:
+            self.distributions_new = distributions_new
+        
         self.samples = samples
         self.cost_eval = cost_eval
         self.costs = costs
         self.weights = weights
-        self.distributions_new = distributions_new
         self.cost_vars = cost_vars
         self.cost_vars_eval = cost_vars_eval
         
