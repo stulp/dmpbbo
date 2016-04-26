@@ -4,7 +4,7 @@
  * \brief  Demonstrates how to run an evolution strategy to optimize the parameters of a quadratic function, implemented as a Task and TaskSolver.
  *
  * \ingroup Demos
- * \ingroup BBO
+ * \ingroup DMP_BBO
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.
@@ -24,10 +24,11 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bbo/Task.hpp"
-#include "bbo/TaskSolver.hpp"
-#include "bbo/runEvolutionaryOptimization.hpp"
-#include "bbo/ExperimentBBO.hpp"
+#include "dmp_bbo/Task.hpp"
+#include "dmp_bbo/TaskSolver.hpp"
+#include "dmp_bbo/ExperimentBBO.hpp"
+#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
+
 #include "bbo/DistributionGaussian.hpp"
 
 #include "bbo/updaters/UpdaterMean.hpp"
@@ -271,7 +272,7 @@ int main(int n_args, char* args[])
   // Here's one way to call it. Below there's another one using ExperimentBBO.
   //cout << "___________________________________________________________" << endl;
   //cout << "RUNNING OPTIMIZATION" << endl;  
-  runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
+  runEvolutionaryOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   ExperimentBBO experiment(
     task,

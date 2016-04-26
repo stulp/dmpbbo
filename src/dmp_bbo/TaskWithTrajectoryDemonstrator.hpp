@@ -24,7 +24,7 @@
 #ifndef TASKWITHTRAJECTORYDEMONSTRATOR_H
 #define TASKWITHTRAJECTORYDEMONSTRATOR_H
 
-#include "bbo/Task.hpp"
+#include "dmp_bbo/Task.hpp"
 #include "bbo/DistributionGaussian.hpp"
 #include "dmp/Trajectory.hpp"
 

@@ -28,7 +28,7 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
+#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
 

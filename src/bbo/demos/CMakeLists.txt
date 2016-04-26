@@ -2,8 +2,5 @@ add_executable(demoEvolutionaryOptimization demoEvolutionaryOptimization.cpp)
 target_link_libraries(demoEvolutionaryOptimization bbo ${Boost_LIBRARIES})
 install(TARGETS demoEvolutionaryOptimization DESTINATION bin)
 
-add_executable(demoEvolutionaryOptimizationTask demoEvolutionaryOptimizationTask.cpp)
-target_link_libraries(demoEvolutionaryOptimizationTask bbo ${Boost_LIBRARIES})
-install(TARGETS demoEvolutionaryOptimizationTask DESTINATION bin)
 
 

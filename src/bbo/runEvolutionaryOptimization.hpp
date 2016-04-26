@@ -35,10 +35,6 @@ namespace DmpBbo {
 class DistributionGaussian;
 class Updater;
 class CostFunction;
-class Task;
-class TaskSolver;
-class ExperimentBBO;
-class Rollout;
 
 /** Run an evolutionary optimization process, see \ref page_bbo
  * \param[in] cost_function The cost function to optimize
@@ -58,49 +54,12 @@ void runEvolutionaryOptimization(
   std::string save_directory=std::string(""),
   bool overwrite=false,bool only_learning_curve=false);
 
-/** Run an evolutionary optimization process, see \ref page_bbo
- * \param[in] task The Task to optimize
- * \param[in] task_solver The TaskSolver that will solve the task
- * \param[in] initial_distribution The initial parameter distribution
- * \param[in] updater The Updater used to update the parameters
- * \param[in] n_updates The number of updates to perform
- * \param[in] n_samples_per_update The number of samples per update
- * \param[in] save_directory Optional directory to save to (default: don't save)
- * \param[in] overwrite Overwrite existing files in the directory above (default: false)
- * \param[in] only_learning_curve Save only the learning curve (default: false)
- */
-void runEvolutionaryOptimization(
-  const Task* const task, 
-  const TaskSolver* const task_solver, 
-  const DistributionGaussian* const initial_distribution, 
-  const Updater* const updater, 
-  int n_updates, 
-  int n_samples_per_update, 
-  std::string save_directory=std::string(""),
-  bool overwrite=false,
-  bool only_learning_curve=false);
-
-/** Run an evolutionary optimization process, see \ref page_bbo
- * \param[in] experiment The experiment to run, cf. ExperimentBBO
- * \param[in] save_directory Optional directory to save to (default: don't save)
- * \param[in] overwrite Overwrite existing files in the directory above (default: false)
- * \param[in] only_learning_curve Save only the learning curve (default: false)
- */
-void runEvolutionaryOptimization(
-  ExperimentBBO* experiment, 
-  std::string save_directory=std::string(""),
-  bool overwrite=false,
-  bool only_learning_curve=false);
-
-
-bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
+// ZZZ Document
 
 
 bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
 
-bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distribution_new, bool overwrite=false);
-
-bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
+bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
 
 }
 
@@ -174,18 +133,6 @@ for (int i_update=1; i_update<=n_updates; i_update++)
 }
 \endcode
 
-\subsection sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
-
-When the cost function has a simple structure, e.g. cost = \f$ x^2 \f$ it is convenient to implement the function \f$ x^2 \f$ in CostFunction::evaluate(). In robotics however, it is more suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
-
-\code
-CostFunction::evaluate(samples,costs) {
-  TaskSolver::performRollout(samples,cost_vars)
-  Task::evaluateRollout(cost_vars,costs)
-}
-\endcode
-
-For more details, see \ref sec_dmp_bbo_task_and_task_solver
 
  */
 

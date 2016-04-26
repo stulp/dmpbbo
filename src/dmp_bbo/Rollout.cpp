@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bbo/Rollout.hpp"
+#include "dmp_bbo/Rollout.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 

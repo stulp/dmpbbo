@@ -42,7 +42,7 @@
 #include "bbo/Updater.hpp"
 #include "bbo/updaters/UpdaterCovarDecay.hpp"
 #include "bbo/updaters/UpdaterCovarAdaptation.hpp"
-#include "dmp_bbo/runEvolutionaryOptimizationParallel.hpp"
+#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
 
 using namespace std;
 using namespace Eigen;

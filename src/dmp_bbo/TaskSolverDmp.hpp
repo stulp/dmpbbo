@@ -28,7 +28,7 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "bbo/TaskSolver.hpp"
+#include "dmp_bbo/TaskSolver.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 

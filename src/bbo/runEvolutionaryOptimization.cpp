@@ -31,10 +31,6 @@
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
 #include "bbo/CostFunction.hpp"
-#include "bbo/Task.hpp"
-#include "bbo/TaskSolver.hpp"
-#include "bbo/Rollout.hpp"
-#include "bbo/ExperimentBBO.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 
@@ -46,6 +42,17 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
+bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
+{
+  vector<DistributionGaussian> distribution_vec;
+  distribution_vec.push_back(distribution);
+
+  vector<DistributionGaussian> distribution_new_vec;
+  distribution_new_vec.push_back(distribution_new);
+  
+  return saveToDirectory(directory, i_update, distribution_vec, cost_eval, samples, costs, weights, distribution_new_vec, overwrite);
+}
+
 bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distributions, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const vector<DistributionGaussian>& distributions_new, bool overwrite)
 {
   // Make directory if it doesn't already exist
@@ -134,16 +141,6 @@ bool saveToDirectory(string directory, int i_update, const vector<DistributionGa
   return true;    
 }
 
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
-{
-  vector<DistributionGaussian> distribution_vec;
-  distribution_vec.push_back(distribution);
-
-  vector<DistributionGaussian> distribution_new_vec;
-  distribution_new_vec.push_back(distribution_new);
-  
-  return saveToDirectory(directory, i_update, distribution_vec, cost_eval, samples, costs, weights, distribution_new_vec, overwrite);
-}
 
 void runEvolutionaryOptimization(
   const CostFunction* const cost_function, 
@@ -219,180 +216,6 @@ void runEvolutionaryOptimization(
 
 }
 
-bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const vector<DistributionGaussian>& distribution_new, bool overwrite)
-{
-  
-  double* cost_eval = NULL;
-  if (rollout_eval!=NULL)
-  {
-    double c = rollout_eval->total_cost();
-    cost_eval = &c;
-  }
-  
-  VectorXd costs(rollouts.size());
-  for (unsigned int ii=0; ii<rollouts.size(); ii++)
-    costs[ii] = rollouts[ii]->total_cost();
-
-  // Save update information
-  MatrixXd samples;
-  saveToDirectory(directory, i_update, distribution, cost_eval, samples, costs, weights, distribution_new,overwrite);
-
-  stringstream stream;
-  stream << directory << "/update" << setw(5) << setfill('0') << i_update << "/";
-  string directory_update = stream.str();
-  
-  // Save rollouts too
-  for (unsigned int i_rollout=0; i_rollout<rollouts.size(); i_rollout++)
-  {
-    stringstream stream;
-    stream << directory_update << "/rollout" << setw(3) << setfill('0') << i_rollout+1;
-    if (!rollouts[i_rollout]->saveToDirectory(stream.str(),overwrite))
-      return false;
-  }
-  
-  if (rollout_eval!=NULL)
-    if (rollout_eval->saveToDirectory(directory_update+"/rollout_eval",overwrite))
-      return false;
-    
-  return true;    
-}
-
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
-{
-  vector<DistributionGaussian> distribution_vec;
-  distribution_vec.push_back(distribution);
-
-  vector<DistributionGaussian> distribution_new_vec;
-  distribution_new_vec.push_back(distribution_new);
-  
-  return saveToDirectory(directory, i_update, distribution_vec, rollout_eval, rollouts, weights, distribution_new_vec, overwrite);
-}
-
-
-// This function could have been integrated with the above. But I preferred to duplicate a bit of
-// code so that the difference between running an optimziation with a CostFunction or
-// Task/TaskSolver is more apparent.
-void runEvolutionaryOptimization(
-  const Task* const task, 
-  const TaskSolver* const task_solver, 
-  const DistributionGaussian* const initial_distribution, 
-  const Updater* const updater, 
-  int n_updates, 
-  int n_samples_per_update, 
-  std::string save_directory, 
-  bool overwrite,
-  bool only_learning_curve)
-{
-  // Some variables
-  VectorXd sample_eval;
-  VectorXd cost_eval;
-  MatrixXd cost_vars_eval;
-
-  MatrixXd samples;
-  MatrixXd cost_vars;
-  VectorXd cur_costs;
-  VectorXd total_costs(n_samples_per_update);
-  
-  VectorXd weights;
-
-  // Bookkeeping
-  MatrixXd learning_curve(n_updates,3);
-  
-  if (save_directory.empty()) 
-    cout << "init  =  " << "  distribution=" << *initial_distribution;
-  
-  DistributionGaussian distribution = *(initial_distribution->clone());
-  DistributionGaussian distribution_new = *(initial_distribution->clone());
-  
-  // Optimization loop
-  for (int i_update=0; i_update<n_updates; i_update++)
-  {
-    // 0. Get cost of current distribution mean
-    sample_eval = distribution.mean().transpose();
-    task_solver->performRollout(sample_eval,cost_vars_eval);
-    task->evaluateRollout(cost_vars_eval,cost_eval);
-    Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
-    
-    // 1. Sample from distribution
-    distribution.generateSamples(n_samples_per_update, samples);
-
-    vector<Rollout*> rollouts(n_samples_per_update);
-    for (int i_sample=0; i_sample<n_samples_per_update; i_sample++)
-    {
-      // 2A. Perform the roll-outs
-      task_solver->performRollout(samples.row(i_sample),cost_vars);
-
-      // 2B. Evaluate the samples
-      task->evaluateRollout(cost_vars,cur_costs);
-      total_costs[i_sample] = cur_costs[0];
-
-      rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_costs);
-      
-    }
-    
-  
-    // 3. Update parameters (first column of costs contains sum of cost components)
-    updater->updateDistribution(distribution, samples, total_costs, weights, distribution_new);
-    
-    // Bookkeeping
-    // Some output and/or saving to file (if "directory" is set)
-    if (save_directory.empty()) 
-    {
-      cout << "\t cost_eval=" << cost_eval << endl << i_update+1 << "  " << distribution;
-    }
-    else
-    {
-      // Update learning curve
-      learning_curve(i_update,0) = i_update*n_samples_per_update;      // How many samples so far?
-      learning_curve(i_update,1) = cost_eval[0];                       // Cost of evaluation
-      learning_curve(i_update,2) = sqrt(distribution.maxEigenValue()); // Exploration magnitude
-      // Save more than just learning curve. 
-      if (!only_learning_curve)
-      {
-          saveToDirectory(save_directory,i_update,distribution,rollout_eval,rollouts,weights,distribution_new);
-          if (i_update==0)
-            task->savePlotRolloutScript(save_directory);
-      }
-    }
-    
-    // Distribution is new distribution
-    distribution = distribution_new;
-    
-  }
-  
-  // Save learning curve to file, if necessary
-  if (!save_directory.empty())
-    saveMatrix(save_directory, "learning_curve.txt",learning_curve,overwrite);
-  
-}
-
-void runEvolutionaryOptimization(ExperimentBBO* experiment, std::string save_directory, bool overwrite,   bool only_learning_curve)
-{
- if (experiment->cost_function!=NULL)
- {
-   runEvolutionaryOptimization(
-     experiment->cost_function,
-     experiment->initial_distribution,
-     experiment->updater, 
-     experiment->n_updates, 
-     experiment->n_samples_per_update, 
-     save_directory,
-     overwrite);
- }
- else
- {
-   runEvolutionaryOptimization(
-     experiment->task,
-     experiment->task_solver,
-     experiment->initial_distribution,
-     experiment->updater, 
-     experiment->n_updates, 
-     experiment->n_samples_per_update, 
-     save_directory,
-     overwrite,
-     only_learning_curve);
- }
-}
 
 
 }

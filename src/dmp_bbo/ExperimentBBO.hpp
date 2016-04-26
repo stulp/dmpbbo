@@ -32,7 +32,6 @@
 
 namespace DmpBbo {
 
-class CostFunction;
 class Task;
 class TaskSolver;
 class DistributionGaussian;
@@ -43,30 +42,6 @@ class ExperimentBBO
 {
 
 public:
-  /** Constructor.
-   * \param[in] cost_function_arg The cost function to optimize
-   * \param[in] initial_distribution_arg The initial parameter distribution
-   * \param[in] updater_arg The Updater used to update the parameters
-   * \param[in] n_updates_arg The number of updates to perform
-   * \param[in] n_samples_per_update_arg The number of samples per update
-   */
-  ExperimentBBO(
-    CostFunction* cost_function_arg,
-    DistributionGaussian* initial_distribution_arg,
-    Updater* updater_arg,
-    int n_updates_arg,
-    int n_samples_per_update_arg
-  )
-  :
-    cost_function(cost_function_arg),
-    task(NULL),
-    task_solver(NULL),
-    initial_distribution(initial_distribution_arg),
-    updater(updater_arg),
-    n_updates(n_updates_arg),
-    n_samples_per_update(n_samples_per_update_arg)
-  {}
-  
   /** Constructor.
    * \param[in] task_arg The Task to optimize
    * \param[in] task_solver_arg The TaskSolver that will solve the task
@@ -84,7 +59,6 @@ public:
     int n_samples_per_update_arg
   )
   :
-    cost_function(NULL),
     task(task_arg),
     task_solver(task_solver_arg),
     initial_distribution(initial_distribution_arg),
@@ -92,19 +66,12 @@ public:
     n_updates(n_updates_arg),
     n_samples_per_update(n_samples_per_update_arg)
   {}
-
-  /** Cost function to be used during evaluation.
-   * If it is NULL, ExperimentBBO::task and ExperimentBBO::task_solver must be set.
-   */
-  const CostFunction* cost_function;
   
   /** Task to be used during evaluation.
-   * If it is NULL, ExperimentBBO::cost_function must be set.
    */
   const Task* task;
 
   /** Task solver to be used for a rollout.
-   * If it is NULL, ExperimentBBO::cost_function must be set.
    */
   const TaskSolver* task_solver;
   
@@ -128,7 +95,6 @@ public:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    ar & BOOST_SERIALIZATION_NVP(cost_function);
     ar & BOOST_SERIALIZATION_NVP(task);
     ar & BOOST_SERIALIZATION_NVP(task_solver);
     ar & BOOST_SERIALIZATION_NVP(initial_distribution);
