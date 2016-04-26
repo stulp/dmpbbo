@@ -1,19 +1,20 @@
-## \file demoExponentialSystem.py
+## \file demoDmpBbo.py
 ## \author Freek Stulp
-## \brief  Visualizes results of demoExponentialSystem.cpp
+## \brief  Visualizes results of demoDmpBbo.cpp
 ## 
 ## \ingroup Demos
-## \ingroup DynamicalSystems
+## \ingroup DMP_BBO
 
 import matplotlib.pyplot as plt
 import numpy
-import os, sys, subprocess
+import subprocess
 
-# Include scripts for plotting
-lib_path = os.path.abspath('../../bbo/plotting')
+# Add relative path if PYTHONPATH is not set
+import os, sys
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from plotEvolutionaryOptimization import plotEvolutionaryOptimization
+import bbo.bbo_plotting
 
 if __name__=='__main__':
     executable = "../../../bin/demoDmpBbo"
@@ -33,7 +34,7 @@ if __name__=='__main__':
       
     fig = plt.figure(1,figsize=(12, 4))
     axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141)]
-    plotEvolutionaryOptimization(directory,axs)
+    bbo.bbo_plotting.plotEvolutionaryOptimizationDir(directory,axs)
 
     plt.show()
     

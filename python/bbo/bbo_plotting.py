@@ -1,3 +1,4 @@
+#ZZZ REMOVE UNCESSESARY IMPORTS
 import sys
 import numpy                                                                    
 import matplotlib.pyplot as plt
@@ -5,32 +6,12 @@ from pylab import *
 import numpy as np
 import os
 import matplotlib.pyplot as pl
+from matplotlib.patches import Ellipse
 import time
 #from matplotlib import animation
 
-from plotUpdateSummary import plotUpdateSummaryFromDirectory
+from update_summary import * 
 
-
-def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
-    if (len(y_limits)==0):
-        y_limits = ax.get_ylim()
-    
-    # Find good number of horizontal update lines to plot    
-    updates = numpy.arange(0, len(n_samples_per_update))
-    while len(n_samples_per_update)>20:
-      n_samples_per_update = n_samples_per_update[0:-1:5]
-      updates = updates[0:-1:5]
-    
-    ax.plot([n_samples_per_update, n_samples_per_update],y_limits,'-',color='#bbbbbb',linewidth=0.5,zorder=0)
-    for ii in range(len(n_samples_per_update)-1):
-        y = y_limits[0] + 0.9*(y_limits[1]-y_limits[0])
-        ax.text(n_samples_per_update[ii+1], y,str(updates[ii+1]),  
-                          horizontalalignment='center',verticalalignment='top',rotation='vertical')
-        
-    y = y_limits[0] + 0.95*(y_limits[1]-y_limits[0])
-    ax.text(mean(ax.get_xlim()), y,'number of updates',
-        horizontalalignment='center', verticalalignment='top')
-    ax.set_ylim(y_limits)
 
 def loadNumberOfUpdates(directory):
     n_updates = 0;
@@ -39,6 +20,11 @@ def loadNumberOfUpdates(directory):
       n_updates+=1
       cur_directory = '%s/update%05d' % (directory, n_updates)
       dir_exists = os.path.isdir(cur_directory)
+      #if (dir_exists):
+      #    # File distribution_new_mean.txt must exist also. Otherwise
+      #    # the update didn't really happen.
+      #    if not os.path.isfile(cur_directory+'/distribution_new_mean.txt'):
+      #        dir_exists = False
     n_updates-=1
     return n_updates
 
@@ -109,6 +95,30 @@ def loadExplorationCurve(directory,i_parallel=-1):
 
     return (covar_at_samples, sqrt_max_eigvals)
 
+
+
+def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
+    if (len(y_limits)==0):
+        y_limits = ax.get_ylim()
+    
+    # Find good number of horizontal update lines to plot    
+    updates = numpy.arange(0, len(n_samples_per_update))
+    while len(n_samples_per_update)>20:
+      n_samples_per_update = n_samples_per_update[0:-1:5]
+      updates = updates[0:-1:5]
+    
+    ax.plot([n_samples_per_update, n_samples_per_update],y_limits,'-',color='#bbbbbb',linewidth=0.5,zorder=0)
+    for ii in range(len(n_samples_per_update)-1):
+        y = y_limits[0] + 0.9*(y_limits[1]-y_limits[0])
+        ax.text(n_samples_per_update[ii+1], y,str(updates[ii+1]),  
+                          horizontalalignment='center',verticalalignment='top',rotation='vertical')
+        
+    y = y_limits[0] + 0.95*(y_limits[1]-y_limits[0])
+    ax.text(mean(ax.get_xlim()), y,'number of updates',
+        horizontalalignment='center', verticalalignment='top')
+    ax.set_ylim(y_limits)
+
+
 def computeMeanCostsPerUpdateDeprecated(n_samples_per_update,costs_per_sample):
     # Take the mean of the costs per update 
     # (first, compute the center of each update)
@@ -151,7 +161,19 @@ def plotLearningCurve(samples_eval,costs_eval,ax,costs_all=[]):
     y_limits = [0,1.2*max(costs_eval)];
     ax.set_ylim(y_limits)
     return line
-      
+
+def plotLearningCurveDir(directory,ax):
+    learning_curve = np.loadtxt(directory+'/learning_curve.txt')
+    plotLearningCurve(learning_curve[:,0],learning_curve[:,1],ax)
+    plotUpdateLines(learning_curve[:,0],ax)
+    
+def plotExplorationCurveDir(directory,ax):
+    learning_curve = np.loadtxt(directory+'/learning_curve.txt')
+    if learning_curve.shape[1]>2:
+        plotLearningCurve(learning_curve[:,0],learning_curve[:,2],ax)
+        plotUpdateLines(learning_curve[:,0],ax)
+    
+
 def plotExplorationCurves(all_covar_at_samples,all_exploration_curves,ax):
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.
     std_samples = all_covar_at_samples.std(0)
@@ -178,53 +200,183 @@ def plotExplorationCurve(n_samples_per_update,exploration_curve,ax):
     ax.set_ylabel('sqrt of max. eigval of covar')
     ax.set_title('Exploration magnitude')
     return line
+    
 
-def plotEvolutionaryOptimization(directory,axs,plot_all_rollouts=False):
+# From https://github.com/dfm/dfmplot/blob/master/dfmplot/ellipse.py
+def plot_error_ellipse(mu, cov, ax=None, **kwargs):
+    """
+Plot the error ellipse at a point given it's covariance matrix
+
+Parameters
+----------
+mu : array (2,)
+The center of the ellipse
+
+cov : array (2,2)
+The covariance matrix for the point
+
+ax : matplotlib.Axes, optional
+The axis to overplot on
+
+**kwargs : dict
+These keywords are passed to matplotlib.patches.Ellipse
+
+"""
+    # some sane defaults
+    facecolor = kwargs.pop('facecolor', 'none')
+    edgecolor = kwargs.pop('edgecolor', 'k')
+
+    x, y = mu
+    U,S,V = np.linalg.svd(cov)
+    theta = np.degrees(np.arctan2(U[1,0], U[0,0]))
+    ellipsePlot = Ellipse(xy=[x, y],
+            width = 2*np.sqrt(S[0]),
+            height= 2*np.sqrt(S[1]),
+            angle=theta,
+            facecolor=facecolor, edgecolor=edgecolor, **kwargs)
+
+    if ax is None:
+        ax = pl.gca()
+    lines = ax.add_patch(ellipsePlot)
+    return lines
+    
+def plotUpdateSummary(update_summary,ax,highlight=True,plot_samples=False):
+    us = update_summary
+    
+    if us.samples==None:
+        plot_samples = False
+    
+    n_parallel = len(us.distributions)
+    n_dims = len(us.distributions[0].mean)
+    if (n_dims==1):
+        print "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
+        return
+    if (n_dims>=2):
+        #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
+        distr_mean = us.distributions[0].mean[0:2]
+        distr_covar = us.distributions[0].covar[0:2,0:2]
+        distr_new_mean  = us.distributions_new[0].mean[0:2]
+        distr_new_covar = us.distributions_new[0].covar[0:2,0:2]
+        if us.samples!=None:
+            samples = us.samples[:,0:2]
+                
+    if plot_samples:
+        max_marker_size = 80;
+        for ii in range(len(weights)):
+            cur_marker_size = max_marker_size*weights[ii]
+            sample_handle = ax.plot(samples[ii,0],samples[ii,1],'o',color='green')
+            plt.setp(sample_handle,markersize=cur_marker_size,markerfacecolor=(0.5,0.8,0.5),markeredgecolor='none')
       
-    #################################
-    # Load and plot learning curve
-    (update_at_samples, costs_all, eval_at_samples, costs_eval) = loadLearningCurve(directory)
-    ax = (None if axs==None else axs[1])
-    plotLearningCurve(eval_at_samples,costs_eval,ax,costs_all)
-    #y_limits = [0,1.2*max(learning_curve)];
-    plotUpdateLines(update_at_samples,ax)
-    
-    
-    #################################
-    # Load and plot exploration curve
-    (covar_at_samples, sqrt_max_eigvals) = loadExplorationCurve(directory)
-    ax = (None if axs==None else axs[0])
-    plotExplorationCurve(covar_at_samples,sqrt_max_eigvals,ax)
-    plotUpdateLines(update_at_samples,ax)
+            ax.plot(samples[:,0],samples[:,1],'.',color='black')
+        ax.plot((distr_mean[0],distr_new_mean[0]),(distr_mean[1],distr_new_mean[1]),'-',color='blue')
+            
+    mean_handle = ax.plot(distr_mean[0],distr_mean[1],'o',label='old')
+    mean_handle_new = ax.plot(distr_new_mean[0],distr_new_mean[1],'o',label='new')
+    mean_handle_link = ax.plot([distr_mean[0], distr_new_mean[0]],[distr_mean[1], distr_new_mean[1]],'-')
+    patch = plot_error_ellipse(distr_mean[0:2],distr_covar[0:2,0:2],ax)
+    patch_new = plot_error_ellipse(distr_new_mean[0:2],distr_new_covar[0:2,0:2],ax)
+    if (highlight):
+        plt.setp(mean_handle,color='red')
+        plt.setp(mean_handle_new,color='blue')
+        plt.setp(patch,edgecolor='red')
+        plt.setp(patch_new,edgecolor='blue')
+    else:
+        plt.setp(mean_handle,color='gray')
+        plt.setp(mean_handle_new,color='gray')
+        plt.setp(patch,edgecolor='gray')
+        plt.setp(patch_new,edgecolor='gray')
+    plt.setp(mean_handle_link,color='gray')
+    ax.set_aspect('equal')
 
+    plt.rcParams['text.usetex']=True
+    ax.set_xlabel(r'$\theta_1$')
+    ax.set_ylabel(r'$\theta_2$')
+    return mean_handle,mean_handle_new,patch,patch_new
+    
+
+#if __name__=='__main__':
+#    
+#    # See if input directory was passed
+#    if (len(sys.argv)==2):
+#      directory = str(sys.argv[1])
+#    else:
+#      print '\nUsage: '+sys.argv[0]+' <directory>\n';
+#      sys.exit()
+#    
+#    update_summary = loadFromDirectory(directory)
+#    
+#    fig = plt.figure()
+#    ax = fig.gca()
+#    highlight = True
+#    plot_samples = True
+#    plotUpdateSummaryFromDirectory(update_summary,ax,highlight,plot_samples)
+#    plt.show()
+    
+    
+def plotEvolutionaryOptimizationDir(directory,axs=None,plot_all_rollouts=False):
+    if axs==None:
+        fig = plt.figure(1,figsize=(9, 4))
+        axs = [ fig.add_subplot(132), fig.add_subplot(133), fig.add_subplot(131) ]
+    
     n_updates = loadNumberOfUpdates(directory)
+    update_summaries = []
+    for i_update in range(1,n_updates):
+        cur_directory = '%s/update%05d' % (directory, i_update)
+        us = loadFromDirectory(cur_directory)
+        update_summaries.append(us)
+        
+    plotRollout = None
+    rollouts_python_script = directory+'/plotRollout.py'
+    if (os.path.isfile(rollouts_python_script)):
+        lib_path = os.path.abspath(directory)
+        sys.path.append(lib_path)
+        from plotRollout import plotRollout
+   
+    return plotEvolutionaryOptimization(update_summaries,axs,plotRollout,plot_all_rollouts)
+        
+
+def plotEvolutionaryOptimization(update_summaries,axs,plotRolloutFunc=None,plot_all_rollouts=False):
+
+    curves = extractLearningCurve(update_summaries)
+    samples_eval = curves[:,0]
+    costs_eval   = curves[:,1]
+    explo_curve  = curves[:,2]
+    costs_all = []
+    for us in update_summaries:
+        costs_all.extend(us.costs)
+    
+    ax = (None if axs==None else axs[0])
+    if ax:
+        plotExplorationCurve(samples_eval,explo_curve,ax)
+        plotUpdateLines(samples_eval,ax)
+
+    ax = (None if axs==None else axs[1])
+    if ax:
+        plotLearningCurve(samples_eval,costs_eval,ax,costs_all)
+        plotUpdateLines(samples_eval,ax)
+
+    n_updates = len(update_summaries)
     ax = (None if axs==None else axs[2])
     if (ax!=None):
         #################################
         # Visualize the update in parameter space 
-        for update in range(n_updates):
-            cur_directory = '%s/update%05d' % (directory, update+1)
-            plotUpdateSummaryFromDirectory(cur_directory,ax,False)
-            
-        cur_directory = '%s/update%05d' % (directory, n_updates)
-        plotUpdateSummaryFromDirectory(cur_directory,ax,True)
+        for update_summary in update_summaries:
+            plotUpdateSummary(update_summary,ax,False)
+        plotUpdateSummary(update_summaries[-1],ax,True)
         ax.set_title('Search space')
         
-    if ( (axs!=None) and (len(axs)>3) ):
+    if (plotRolloutFunc and (axs!=None) and (len(axs)>3)):
         ax = axs[3];
-        rollouts_python_script = directory+'/plotRollouts.py'
-        if (os.path.isfile(rollouts_python_script)):
-            lib_path = os.path.abspath(directory)
-            sys.path.append(lib_path)
-            from plotRollouts import plotRollouts
-        
-            for update in range(n_updates):
-                cur_directory = '%s/update%05d' % (directory, update+1)
-                filename = "/cost_vars_eval.txt"
-                if plot_all_rollouts:
-                    filename = "/cost_vars.txt"
-                cost_vars = np.loadtxt(cur_directory+filename)
-                rollout_lines = plotRollouts(cost_vars,ax)
+    
+        for update in range(n_updates):
+            cost_vars = [update_summaries[update].cost_vars_eval]
+            if plot_all_rollouts:
+                cost_vars = update_summaries[update].cost_vars
+                
+            for i_rollout in range(len(cost_vars)):
+                cur_cost_vars = cost_vars[i_rollout]
+
+                rollout_lines = plotRolloutFunc(cur_cost_vars,ax)
                 color_val = (1.0*update/n_updates)
                 #cur_color = [1.0-0.9*color_val,0.1+0.9*color_val,0.1]
                 cur_color = [0.0-0.0*color_val, 0.0+1.0*color_val, 0.0-0.0*color_val]
@@ -278,11 +430,11 @@ if __name__=='__main__':
     
     
     if (len(directories)==1):
-        rollouts_python_script = directories[0]+'/plotRollouts.py'
+        rollouts_python_script = directories[0]+'/plotRollout.py'
         if (os.path.isfile(rollouts_python_script)):
             lib_path = os.path.abspath(directories[0])
             sys.path.append(lib_path)
-            from plotRollouts import plotRollouts
+            from plotRollout import plotRollout
             fig = plt.figure(1,figsize=(12, 4))
             axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
         else:
@@ -295,4 +447,4 @@ if __name__=='__main__':
         plotEvolutionaryOptimizations(directories,axs)
  
     plt.show()
-
+    

@@ -1,19 +1,20 @@
-## \file demoExponentialSystem.py
+## \file demoEvolutionaryOptimizationTask.py
 ## \author Freek Stulp
-## \brief  Visualizes results of demoExponentialSystem.cpp
+## \brief  Visualizes results of demoEvolutionaryOptimizationTask.cpp
 ## 
 ## \ingroup Demos
-## \ingroup DynamicalSystems
+## \ingroup BBO
 
 import matplotlib.pyplot as plt
 import numpy
-import os, sys, subprocess
+import subprocess
 
-# Include scripts for plotting
-lib_path = os.path.abspath('../plotting')
+# Add relative path if PYTHONPATH is not set
+import os, sys
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from plotEvolutionaryOptimization import plotEvolutionaryOptimization
+import bbo.bbo_plotting
 
 if __name__=='__main__':
     executable = "../../../bin/demoEvolutionaryOptimizationTask"
@@ -38,7 +39,7 @@ if __name__=='__main__':
       fig = plt.figure(figure_number,figsize=(12, 4))
       figure_number += 1;
       axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
-      plotEvolutionaryOptimization(directory,axs)
+      bbo.bbo_plotting.plotEvolutionaryOptimizationDir(directory,axs)
       fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
 
     plt.show()
