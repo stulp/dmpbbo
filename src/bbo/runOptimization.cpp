@@ -1,5 +1,5 @@
 /**
- * @file runEvolutionaryOptimization.cpp
+ * @file runOptimization.cpp
  * @brief  Source file for function to run an evolutionary optimization process.
  * @author Freek Stulp
  *
@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "bbo/runEvolutionaryOptimization.hpp"
+#include "bbo/runOptimization.hpp"
 
 #include <iomanip>
 #include <fstream>
@@ -142,7 +142,7 @@ bool saveToDirectory(string directory, int i_update, const vector<DistributionGa
 }
 
 
-void runEvolutionaryOptimization(
+void runOptimization(
   const CostFunction* const cost_function, 
   const DistributionGaussian* const initial_distribution, 
   const Updater* const updater, 

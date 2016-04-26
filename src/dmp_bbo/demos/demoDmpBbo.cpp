@@ -30,7 +30,7 @@
 
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
-#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
+#include "dmp_bbo/runOptimizationTask.hpp"
 
 #include "dmp/Dmp.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
@@ -119,6 +119,6 @@ int main(int n_args, char* args[])
   int n_updates = 40;
   int n_samples_per_update = 15;
   bool overwrite = true;
-  runEvolutionaryOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
+  runOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

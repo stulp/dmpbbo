@@ -1,5 +1,5 @@
 /**
- * @file runEvolutionaryOptimization.hpp
+ * @file runOptimization.hpp
  * @brief  Header file for function to run an evolutionary optimization process.
  * @author Freek Stulp
  *
@@ -45,7 +45,7 @@ class CostFunction;
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  */
-void runEvolutionaryOptimization(
+void runOptimization(
   const CostFunction* const cost_function, 
   const DistributionGaussian* const initial_distribution, 
   const Updater* const updater, 
@@ -98,7 +98,7 @@ while (!halt_condition) {
 \section sec_bbo_implementation Implementation
 
 The algorithm above has been implemented as follows (see 
-runEvolutionaryOptimization() and demoEvolutionaryOptimization.cpp):
+runOptimization() and demoOptimization.cpp):
 \code
 
 int n_dim = 2; // Optimize 2D problem

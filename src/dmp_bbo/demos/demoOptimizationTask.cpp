@@ -1,5 +1,5 @@
 /**
- * \file demoEvolutionaryOptimizationTask.cpp
+ * \file demoOptimizationTask.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to run an evolution strategy to optimize the parameters of a quadratic function, implemented as a Task and TaskSolver.
  *
@@ -27,7 +27,7 @@
 #include "dmp_bbo/Task.hpp"
 #include "dmp_bbo/TaskSolver.hpp"
 #include "dmp_bbo/ExperimentBBO.hpp"
-#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
+#include "dmp_bbo/runOptimizationTask.hpp"
 
 #include "bbo/DistributionGaussian.hpp"
 
@@ -272,7 +272,7 @@ int main(int n_args, char* args[])
   // Here's one way to call it. Below there's another one using ExperimentBBO.
   //cout << "___________________________________________________________" << endl;
   //cout << "RUNNING OPTIMIZATION" << endl;  
-  runEvolutionaryOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
+  runOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   ExperimentBBO experiment(
     task,
@@ -285,7 +285,7 @@ int main(int n_args, char* args[])
   
   //cout << "___________________________________________________________" << endl;
   //cout << "RUNNING SAME OPTIMIZATION (WITH ExperimentBBO)" << endl;  
-  //runEvolutionaryOptimization(experiment, distribution, updater, n_updates, n_samples_per_update,directory);
+  //runOptimization(experiment, distribution, updater, n_updates, n_samples_per_update,directory);
   
   return 0;
 }

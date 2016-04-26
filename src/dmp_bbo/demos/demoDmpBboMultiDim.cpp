@@ -28,7 +28,7 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
+#include "dmp_bbo/runOptimizationTask.hpp"
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
@@ -124,6 +124,6 @@ int main(int n_args, char* args[])
   int n_updates = 40;
   int n_samples_per_update = 15;
   bool overwrite = true;
-  runEvolutionaryOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory,overwrite);
+  runOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

@@ -1,5 +1,5 @@
 /**
- * \file demoEvolutionaryOptimization.cpp
+ * \file demoOptimization.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to run an evolution strategy to optimize a distance function, implemented as a CostFunction.
  *
@@ -30,7 +30,7 @@
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include "bbo/CostFunction.hpp"
-#include "bbo/runEvolutionaryOptimization.hpp"
+#include "bbo/runOptimization.hpp"
 #include "bbo/DistributionGaussian.hpp"
 
 #include "bbo/updaters/UpdaterMean.hpp"
@@ -154,7 +154,7 @@ int main(int n_args, char* args[])
   int n_samples_per_update = 10;
   int n_updates = 40;
   bool overwrite = true;  
-  runEvolutionaryOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
+  runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }
 

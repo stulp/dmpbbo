@@ -1,6 +1,6 @@
-add_executable(demoEvolutionaryOptimizationTask demoEvolutionaryOptimizationTask.cpp)
-target_link_libraries(demoEvolutionaryOptimizationTask dmp_bbo bbo ${Boost_LIBRARIES})
-install(TARGETS demoEvolutionaryOptimizationTask DESTINATION bin)
+add_executable(demoOptimizationTask demoOptimizationTask.cpp)
+target_link_libraries(demoOptimizationTask dmp_bbo bbo ${Boost_LIBRARIES})
+install(TARGETS demoOptimizationTask DESTINATION bin)
 
 add_executable(demoDmpBbo demoDmpBbo.cpp)
 target_link_libraries( demoDmpBbo taskviapoint dmp functionapproximators dynamicalsystems dmp_bbo bbo  ${LWPR_LIBRARIES} ${Boost_LIBRARIES})

@@ -1,5 +1,5 @@
 /**
- * @file runEvolutionaryOptimization.hpp
+ * @file runOptimization.hpp
  * @brief  Header file for function to run an evolutionary optimization process.
  * @author Freek Stulp
  *
@@ -50,7 +50,7 @@ class Rollout;
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
-void runEvolutionaryOptimizationTask(
+void runOptimizationTask(
   const Task* const task, 
   const TaskSolver* const task_solver, 
   const DistributionGaussian* const initial_distribution, 
@@ -67,7 +67,7 @@ void runEvolutionaryOptimizationTask(
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
-void runEvolutionaryOptimizationTask(
+void runOptimizationTask(
   ExperimentBBO* experiment, 
   std::string save_directory=std::string(""),
   bool overwrite=false,
@@ -84,7 +84,7 @@ void runEvolutionaryOptimizationTask(
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  */
-void runEvolutionaryOptimizationParallel(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
+void runOptimizationParallel(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
 bool only_learning_curve=false);
 
 bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
@@ -139,7 +139,7 @@ Some further advantages of this approach, which are discussed in more detail in 
 \li The intermediate cost-relevant variables can be stored to file for visualization etc.
 \li The procedures for performing the roll-outs (on-line on a robot) and doing the evaluation/updating/sampling (off-line on a computer) can be seperated, because there is a separate TaskSolver::performRollouts function.
 
-When using the Task/TaskSolver approach, the runEvolutionaryOptimization process is as follows (only minor changes to the above):
+When using the Task/TaskSolver approach, the runOptimization process is as follows (only minor changes to the above):
 \code
 
 int n_dim = 2; // Optimize 2D problem
@@ -181,11 +181,11 @@ for (int i_update=1; i_update<=n_updates; i_update++)
 
 Consider a 7-DOF robotic arm. With a DMP, each DOF would be represented by a different dimension of a 7-D DMP (let as assume that each dimension of the DMP uses 10 basis functions). There are then two distinct approaches towards optimizing the parameters of the DMP with respect to a cost function:
 
-\li Consider the search space for optimization to be 70-D, i.e. consider all open parameters of the DMP in one search space. The disadvantage is that reward-weighted averaging will require more samples to perform a robust update, especially for the covariance matrix, which is 70X70! With this approach the implementation in runEvolutionaryOptimization and UpdateSummary is appropriate.
+\li Consider the search space for optimization to be 70-D, i.e. consider all open parameters of the DMP in one search space. The disadvantage is that reward-weighted averaging will require more samples to perform a robust update, especially for the covariance matrix, which is 70X70! With this approach the implementation in runOptimization and UpdateSummary is appropriate.
 
 \li Run a seperate optimization for each of the 7 DOFs. Thus, here we have seven 10-D search spaces (with different distributions and samples for each DOF), but using the same costs for all optimizations. This is what is proposed for instance in PI^2. This approach is not able to exploit covariance between different DOFs, but in practice it works robustly.
 
-To enable the latter approach, the function runEvolutionaryOptimizationParallel and the class UpdateSummaryParallel have been added. The main difference is that instead of using one distribution (mean and covariance), D distributions must be used (these are stored in a std::vector).
+To enable the latter approach, the function runOptimizationParallel and the class UpdateSummaryParallel have been added. The main difference is that instead of using one distribution (mean and covariance), D distributions must be used (these are stored in a std::vector).
 
 \section sec_bbo_one_update One update at a time with Task/TaskSolver
 
@@ -286,9 +286,9 @@ The task should inherit from Task (see task.py), and you'll need to implement th
 </ul>
 </li>
 
-<li>When you are done with the optimization, you can use the  function bb_plotting.plotEvolutionaryOptimizationDir(directory) to visualize the result.
+<li>When you are done with the optimization, you can use the  function bb_plotting.plotOptimizationDir(directory) to visualize the result.
 <ol>
-<li>python plotEvolutionaryOptimizationDir ./meka_bbo</li>
+<li>python plotOptimizationDir ./meka_bbo</li>
 </ol>
 </li>
 </ul>
@@ -347,7 +347,7 @@ while (!halt_condition) {
 \section sec_bbo_implementation Implementation
 
 The algorithm above has been implemented as follows (see 
-runEvolutionaryOptimization() and demoEvolutionaryOptimization.cpp):
+runOptimization() and demoOptimization.cpp):
 \code
 
 int n_dim = 2; // Optimize 2D problem

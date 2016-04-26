@@ -1,5 +1,5 @@
 /**
- * @file runEvolutionaryOptimization.cpp
+ * @file runOptimization.cpp
  * @brief  Source file for function to run an evolutionary optimization process.
  * @author Freek Stulp
  *
@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dmp_bbo/runEvolutionaryOptimizationTask.hpp"
+#include "dmp_bbo/runOptimizationTask.hpp"
 
 #include <iomanip>
 #include <fstream>
@@ -36,7 +36,7 @@
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
 
-#include "bbo/runEvolutionaryOptimization.hpp" // For saving functionality
+#include "bbo/runOptimization.hpp" // For saving functionality
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 
@@ -98,7 +98,7 @@ bool saveToDirectory(string directory, int i_update, const vector<DistributionGa
 }
 
 
-void runEvolutionaryOptimizationTask(
+void runOptimizationTask(
   const Task* const task, 
   const TaskSolver* const task_solver, 
   const DistributionGaussian* const initial_distribution, 
@@ -192,9 +192,9 @@ void runEvolutionaryOptimizationTask(
   
 }
 
-void runEvolutionaryOptimizationTask(ExperimentBBO* experiment, std::string save_directory, bool overwrite,   bool only_learning_curve)
+void runOptimizationTask(ExperimentBBO* experiment, std::string save_directory, bool overwrite,   bool only_learning_curve)
 {
- runEvolutionaryOptimizationTask(
+ runOptimizationTask(
    experiment->task,
    experiment->task_solver,
    experiment->initial_distribution,
@@ -206,7 +206,7 @@ void runEvolutionaryOptimizationTask(ExperimentBBO* experiment, std::string save
    only_learning_curve);
 }
 
-void runEvolutionaryOptimizationParallel(
+void runOptimizationParallel(
   Task* task, 
   TaskSolver* task_solver, 
   vector<DistributionGaussian*> initial_distributions, 
