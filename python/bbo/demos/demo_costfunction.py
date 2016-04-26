@@ -2,14 +2,17 @@ import os
 import sys
 import numpy as np
 
-lib_path = os.path.abspath('../')
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from distribution_gaussian import DistributionGaussian
-from updater import UpdaterCovarDecay
-from run_optimization import runOptimization
-from update_summary import UpdateSummary, extractLearningCurve
-from cost_function import CostFunction
+
+from bbo.distribution_gaussian import DistributionGaussian
+from bbo.updater import UpdaterCovarDecay
+from bbo.run_optimization import runOptimization
+from bbo.update_summary import UpdateSummary, extractLearningCurve
+from bbo.cost_function import CostFunction
+
+from bbo.bbo_plotting import plotEvolutionaryOptimization
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):
@@ -56,10 +59,9 @@ def testRunEvolutionaryOptimization():
 
 
     import matplotlib.pyplot as plt
-    import bbo_plotting
     fig = plt.figure(1,figsize=(15, 5))
     axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133)]
-    bbo_plotting.plotEvolutionaryOptimization(update_summaries,axs)
+    plotEvolutionaryOptimization(update_summaries,axs)
     plt.show()
 
 if __name__=="__main__":
