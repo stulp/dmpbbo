@@ -269,8 +269,8 @@ int main(int n_args, char* args[])
   int n_updates = 40;
 
   // Here's one way to call it. Below there's another one using ExperimentBBO.
-  cout << "___________________________________________________________" << endl;
-  cout << "RUNNING OPTIMIZATION" << endl;  
+  //cout << "___________________________________________________________" << endl;
+  //cout << "RUNNING OPTIMIZATION" << endl;  
   runEvolutionaryOptimization(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory);
   
   ExperimentBBO experiment(

@@ -4,6 +4,7 @@
  * \brief  Demonstrates how to run an evolution strategy to optimize a Dmp.
  *
  * \ingroup Demos
+ * \ingroup DMP_BBO
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.
