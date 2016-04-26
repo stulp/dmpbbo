@@ -2,13 +2,14 @@ import os
 import sys
 import numpy as np
 
+# Add relative path, in case PYTHONPATH is not set
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
+from bbo.cost_function import CostFunction
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.updater import UpdaterCovarDecay
 from bbo.run_optimization import runOptimization
-from bbo.cost_function import CostFunction
 
 class DemoCostFunctionDistanceToPoint(CostFunction):
     """ CostFunction in which the distance to a pre-defined point must be minimized."""
@@ -24,6 +25,10 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         return np.linalg.norm(sample-self.point) 
 
 if __name__=="__main__":
+
+    directory = None
+    if (len(sys.argv)>1):
+        directory = sys.argv[1]
 
     n_dims = 2
     minimum = np.full(n_dims,0.0)
@@ -45,7 +50,7 @@ if __name__=="__main__":
     import matplotlib.pyplot as plt
     fig = plt.figure(1,figsize=(15, 5))
     
-    learning_curve = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,fig)
+    learning_curve = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,fig,directory)
     
     plt.show()
 

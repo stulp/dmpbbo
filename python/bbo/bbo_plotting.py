@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 from pylab import mean
 
@@ -72,7 +73,49 @@ def plotCurve(curve,axs,costs_all=[]):
     lines.append(line)
     return lines
 
+def saveCurve(directory,learning_curve):
+    np.savetxt(directory+'/learning_curve.txt',learning_curve)
+    
+def loadCurve(directory):
+    return np.loadtxt(directory+'/learning_curve.txt')
+    
+def saveUpdate(directory,i_update,distributions,cost_eval,samples,costs,weights,distributions_new):
 
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        
+    cur_dir = '%s/update%05d' % (directory, i_update)
+    if not os.path.exists(cur_dir):
+        os.makedirs(cur_dir)
+        
+    
+    if isinstance(distributions,DistributionGaussian):
+        # Just one distribution to be stored
+        np.savetxt(cur_dir+"/distribution_mean.txt",distributions.mean)
+        np.savetxt(cur_dir+"/distribution_covar.txt",distributions.covar)
+        np.savetxt(cur_dir+"/distribution_new_mean.txt",distributions_new.mean)
+        np.savetxt(cur_dir+"/distribution_new_covar.txt",distributions_new.covar)
+    else:
+        # List of distributions to be stored
+        n_parallel = len(distributions)
+        for i_parallel in range(n_parallel):
+            cur_file = '%s/distribution_%03d' % (cur_dir, i_parallel)
+            np.savetxt(cur_file+'_mean.txt',distributions[i_parallel].mean)
+            np.savetxt(cur_file+'_covar.txt',distributions[i_parallel].covar)
+            
+            cur_file = '%s/distribution_new_%03d' % (directory, i_parallel)
+            np.savetxt(cur_file+'_mean.txt',distributions_new[i_parallel].mean)
+            np.savetxt(cur_file+'_covar.txt',distributions_new[i_parallel].covar)
+          
+    if cost_eval!=None:
+        np.savetxt(cur_dir+'/cost_eval.txt',np.atleast_1d(cost_eval))
+    if samples!=None:
+        np.savetxt(cur_dir+'/samples.txt',samples)
+    if costs!=None:
+        np.savetxt(cur_dir+'/costs.txt',costs)
+    if weights!=None:
+        np.savetxt(cur_dir+'/weights.txt',weights)
+        
 def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
     
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.

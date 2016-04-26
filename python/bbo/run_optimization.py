@@ -1,14 +1,14 @@
 import numpy as np
 import math
 import os
-from pylab import sqrt
 
-from bbo_plotting import plotUpdate, plotCurve
+from bbo_plotting import plotUpdate, plotCurve, saveUpdate, saveCurve
+from distribution_gaussian import DistributionGaussian
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
-
+        
     learning_curve = np.zeros((n_updates, 3))
 
     if fig:
@@ -41,12 +41,14 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         # Cost of evaluation
         learning_curve[i_update,1] = cost_eval
         # Exploration magnitude
-        learning_curve[i_update,2] = sqrt(distribution.maxEigenValue()); 
+        learning_curve[i_update,2] = np.sqrt(distribution.maxEigenValue()); 
 
         # Plot summary of this update
         if fig:
             highlight = (i_update==0)
             plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight)
+        if directory:
+            saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new)
         
         # Distribution is new distribution
         distribution = distribution_new;
@@ -59,7 +61,7 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
 
     # Save learning curve to file, if necessary
     if directory:
-        np.savetxt(directory+'/learning_curve.txt',learning_curve)
-        
+        saveCurve(directory,learning_curve)
+        print('Saved results to "'+directory+'".')
         
     return learning_curve

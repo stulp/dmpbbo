@@ -14,10 +14,6 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-
-lib_path = os.path.abspath('../../../python/')
-sys.path.append(lib_path)
-
 from bbo.bbo_plotting import plotCurve
 
 
