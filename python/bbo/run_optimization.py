@@ -1,13 +1,19 @@
 import numpy as np
 import math
 import os
+from pylab import sqrt
 
-def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,directory=None):
+from bbo_plotting import plotUpdate, plotCurve
 
+def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
 
     learning_curve = np.zeros((n_updates, 3))
+
+    if fig:
+        ax = fig.add_subplot(131)
+
     
     # Optimization loop
     for i_update in range(n_updates): 
@@ -24,17 +30,32 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
             costs.append(cost_function.evaluate(samples[i_sample,:]))
       
         # 3. Update parameters
-        distribution = updater.updateDistribution(distribution, samples, costs)
+        distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
         
         
-        # Bookkeeping: update learning curve
-        # How many samples so far?
+        # Bookkeeping and plotting
+        
+        # Update learning curve
+        # How many samples so far?  
         learning_curve[i_update,0] = i_update*n_samples_per_update
         # Cost of evaluation
         learning_curve[i_update,1] = cost_eval
         # Exploration magnitude
         learning_curve[i_update,2] = sqrt(distribution.maxEigenValue()); 
+
+        # Plot summary of this update
+        if fig:
+            highlight = (i_update==0)
+            plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight)
         
+        # Distribution is new distribution
+        distribution = distribution_new;
+        
+        
+    # Plot learning curve
+    if fig:
+        axs = [ fig.add_subplot(132), fig.add_subplot(133)]
+        plotCurve(learning_curve,axs)
 
     # Save learning curve to file, if necessary
     if directory:

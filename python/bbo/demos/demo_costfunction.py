@@ -5,14 +5,10 @@ import numpy as np
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.updater import UpdaterCovarDecay
 from bbo.run_optimization import runOptimization
 from bbo.cost_function import CostFunction
-
-from bbo.bbo_plotting import plotEvolutionaryOptimization
-
 
 class DemoCostFunctionDistanceToPoint(CostFunction):
     """ CostFunction in which the distance to a pre-defined point must be minimized."""
@@ -45,13 +41,12 @@ if __name__=="__main__":
   
     n_samples_per_update = 20
     n_updates = 40
-    learning_curve = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update)
-
 
     import matplotlib.pyplot as plt
     fig = plt.figure(1,figsize=(15, 5))
-    axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133)]
-    plotEvolutionaryOptimization(update_summaries,axs)
+    
+    learning_curve = runOptimization(cost_function, distribution, updater, n_updates, n_samples_per_update,fig)
+    
     plt.show()
 
 

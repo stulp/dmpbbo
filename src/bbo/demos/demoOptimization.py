@@ -6,7 +6,7 @@
 ## \ingroup BBO
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import subprocess
 
 # Add relative path if PYTHONPATH is not set
@@ -14,10 +14,15 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-import bbo.bbo_plotting
+
+lib_path = os.path.abspath('../../../python/')
+sys.path.append(lib_path)
+
+from bbo.bbo_plotting import plotCurve
+
 
 if __name__=='__main__':
-    executable = "../../../bin/demoEvolutionaryOptimization"
+    executable = "../../../bin/demoOptimization"
     
     if (not os.path.isfile(executable)):
         print ""
@@ -30,17 +35,19 @@ if __name__=='__main__':
 
     figure_number = 1;
     for covar_update in covar_updates:
-      # Call the executable with the directory to which results should be written
-      directory = "/tmp/demoEvolutionaryOptimization/"+covar_update
-      command = executable+" "+directory+" "+covar_update
-      print command
-      subprocess.call(command, shell=True)
+        # Call the executable with the directory to which results should be written
+        directory = "/tmp/demoOptimization/"+covar_update
+        command = executable+" "+directory+" "+covar_update
+        print command
+        subprocess.call(command, shell=True)
       
-      fig = plt.figure(figure_number)
-      figure_number += 1;
-      axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133)]
-      bbo.bbo_plotting.plotEvolutionaryOptimizationDir(directory,axs)
-      fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
+        fig = plt.figure(figure_number)
+        figure_number += 1;
+        axs = [ fig.add_subplot(121), fig.add_subplot(122)]
+        learning_curve = np.loadtxt(directory+'/learning_curve.txt')
+        plotCurve(learning_curve,axs)
+        fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
+      
 
     plt.show()
     

@@ -10,6 +10,9 @@ class DistributionGaussian:
     def generateSamples(self,n_samples=1):
         return np.random.multivariate_normal(self.mean, self.covar, n_samples)
 
+    def maxEigenValue(self):
+        return max(np.linalg.eigvals(self.covar))
+
     def __str__(self):
         return 'N( '+str(self.mean)+', '+str(self.covar)+' )'
 
