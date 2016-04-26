@@ -7,6 +7,14 @@ from matplotlib.patches import Ellipse
 
 from bbo.distribution_gaussian import DistributionGaussian
 
+def setColor(handle,i_update,n_updates):
+    if (i_update==0):
+        plt.setp(handle,color='r',linewidth=2)
+    else:
+        color_val = (1.0*i_update/n_updates)
+        cur_color = [0.0-0.0*color_val, 0.0+1.0*color_val, 0.0-0.0*color_val]
+        plt.setp(handle,color=cur_color)
+
 def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
     if (len(y_limits)==0):
         y_limits = ax.get_ylim()
@@ -98,6 +106,7 @@ def saveUpdate(directory,i_update,distributions,cost_eval,samples,costs,weights,
     else:
         # List of distributions to be stored
         n_parallel = len(distributions)
+        np.savetxt(directory+"/n_parallel.txt",n_parallel)
         for i_parallel in range(n_parallel):
             cur_file = '%s/distribution_%03d' % (cur_dir, i_parallel)
             np.savetxt(cur_file+'_mean.txt',distributions[i_parallel].mean)
