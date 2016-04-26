@@ -1,6 +1,6 @@
-## \file demoDmpBbo.py
+## \file demoOptimizationDmp.py
 ## \author Freek Stulp
-## \brief  Visualizes results of demoDmpBbo.cpp
+## \brief  Visualizes results of demoOptimizationDmp.cpp
 ## 
 ## \ingroup Demos
 ## \ingroup DMP_BBO
@@ -17,7 +17,7 @@ sys.path.append(lib_path)
 import bbo.bbo_plotting
 
 if __name__=='__main__':
-    executable = "../../../bin/demoDmpBbo"
+    executable = "../../../bin/demoOptimizationDmp"
     
     if (not os.path.isfile(executable)):
         print ""
@@ -27,7 +27,7 @@ if __name__=='__main__':
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoDmpBbo"
+    directory = "/tmp/demoOptimizationDmp"
     command = executable+" "+directory
     print command
     subprocess.call(command, shell=True)

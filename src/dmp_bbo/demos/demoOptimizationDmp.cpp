@@ -1,5 +1,5 @@
 /**
- * \file demoDmpBbo.cpp
+ * \file demoOptimizationDmp.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to run an evolution strategy to optimize a Dmp.
  *
