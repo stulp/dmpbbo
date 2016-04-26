@@ -105,22 +105,22 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 
 /** \page page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
 
-This page assumes you have read \ref sec_bbo_implementation . Applying BBO to robots (which may execute DMPs) requires several extensions:
+This page assumes you have read the page on \ref page_bbo. Applying BBO to robots (which may execute DMPs) requires several extensions:
 
 \li Use of a Task/TaskSolver instead of a CostFunction
 \li Running multiple optimizations in parallel, one for each DOF of the DMP
-\li Allowing the optimization to be run one update at a time, instead of one loop
+\li Allowing the optimization to be run one update at a time, instead of in a loop
 
-\section sec_dmp_bbo_task_and_task_solver Task/TaskSolver
+\section sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
 
-See also \ref sec_bbo_task_and_task_solver
+When the cost function has a simple structure, e.g. cost = \f$ x^2 \f$ it is convenient to implement the function \f$ x^2 \f$ in CostFunction::evaluate(). 
 
-In robotics, it is suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
+In robotics however, it is suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
 
 \code
 CostFunction::evaluate(samples,costs) {
-  TaskSolver::performRollouts(samples,cost_vars)
-  Task::evaluate(cost_vars,costs)
+  TaskSolver::performRollout(samples,cost_vars)
+  Task::evaluateRollout(cost_vars,costs)
 }
 \endcode
 
@@ -133,13 +133,15 @@ The roles of the Task/TaskSolver are:
 
 The idea here is that the TaskSolver uses the samples to perform a rollout (e.g. the samples represent the parameters of a policy which is executed) and computes all the variables that are relevant to determining the cost (e.g. it records the forces at the robot's end-effector, if this is something that needs to be minimized)
 
-Some further advantages of this approach, which are discussed in more detail in \ref page_dmp_bbo :
+Some further advantages of this approach:
 \li Different robots can solve the exact same Task implementation of the same task.
 \li Robots do not need to know about the cost function to perform rollouts (and they shouldn't)
 \li The intermediate cost-relevant variables can be stored to file for visualization etc.
 \li The procedures for performing the roll-outs (on-line on a robot) and doing the evaluation/updating/sampling (off-line on a computer) can be seperated, because there is a separate TaskSolver::performRollouts function.
 
-When using the Task/TaskSolver approach, the runOptimization process is as follows (only minor changes to the above):
+\subsection Implementation
+
+When using the Task/TaskSolver approach, the optimization process is as follows:
 \code
 
 int n_dim = 2; // Optimize 2D problem
@@ -165,11 +167,16 @@ for (int i_update=1; i_update<=n_updates; i_update++)
     int n_samples_per_update = 10;
     distribution->generateSamples(n_samples_per_update, samples);
   
-    // 2A. Perform the roll-outs
-    task_solver->performRollouts(samples,cost_vars);
+    for (int i_sample=0; i_sample<n_samples_per_update; i_sample++)
+    {
+      // 2A. Perform the rollout
+      task_solver->performRollout(sample.row(i_sample),cost_vars);
   
-    // 2B. Evaluate the samples
-    task->evaluate(cost_vars,costs);
+      // 2B. Evaluate the rollout
+      task->evaluateRollout(cost_vars,costs);
+      costs[i_sample] = cur_costs[0];
+      
+    }
   
     // 3. Update parameters
     updater->updateDistribution(*distribution, samples, costs, *distribution);
@@ -177,17 +184,25 @@ for (int i_update=1; i_update<=n_updates; i_update++)
 }
 \endcode
 
+\b Remark: evaluateRollout returns a vector of costs. This is convenient for tracing different cost components. For instance, consider a task where the costs consist of going through a viapoint with minimal acceleration. In this case, the cost components are: 1) distance to the viapoint and 2) sum of acceleration. Then 
+\li cost[1] = distance to the viapoint
+\li cost[2] = acceleration
+\li cost[0] = cost[1] + cost[2] (cost[0] must always be the sum of the individual cost components)
+
+\b Remark: cost_vars should contain all variables that are relevant to computing the cost. This depends entirely on the task at hand. Whatever cost_vars contains, it should be made sure that a Task and its TaskSolver are compatible, and have the same understanding of what is contained in cost_vars. Tip: for rollouts on the robot I usually let each row in cost_vars be the relevant variables at one time step. An example is given in TaskViapoint, which implements a Task in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by TaskSolverDmp, which is able to generate such trajectories.
+
 \section sec_parallel_optimization Optimizing DMP DOFs in parallel
 
 Consider a 7-DOF robotic arm. With a DMP, each DOF would be represented by a different dimension of a 7-D DMP (let as assume that each dimension of the DMP uses 10 basis functions). There are then two distinct approaches towards optimizing the parameters of the DMP with respect to a cost function:
 
-\li Consider the search space for optimization to be 70-D, i.e. consider all open parameters of the DMP in one search space. The disadvantage is that reward-weighted averaging will require more samples to perform a robust update, especially for the covariance matrix, which is 70X70! With this approach the implementation in runOptimization and UpdateSummary is appropriate.
+\li Consider the search space for optimization to be 70-D, i.e. consider all open parameters of the DMP in one search space. For this you can use runOptimizationTask(), see also the demos in demoOptimizationTask.cpp and demoOptimizationDmp.cpp. 
+The disadvantage is that reward-weighted averaging will require more samples to perform a robust update, especially for the covariance matrix, which is 70X70! 
 
-\li Run a seperate optimization for each of the 7 DOFs. Thus, here we have seven 10-D search spaces (with different distributions and samples for each DOF), but using the same costs for all optimizations. This is what is proposed for instance in PI^2. This approach is not able to exploit covariance between different DOFs, but in practice it works robustly.
-
-To enable the latter approach, the function runOptimizationParallel and the class UpdateSummaryParallel have been added. The main difference is that instead of using one distribution (mean and covariance), D distributions must be used (these are stored in a std::vector).
+\li Run a seperate optimization for each of the 7 DOFs. Thus, here we have seven 10-D search spaces (with different distributions and samples for each DOF), but using the same costs for all optimizations. This is what is proposed for instance in PI^2. This approach is not able to exploit covariance between different DOFs, but in practice it works robustly. For this you must runOptimizationParallel(), see also the demo in demoOptimizationDmpParallel.cpp. The main difference is that instead of using one distribution (mean and covariance), D distributions must be used (these are stored in a std::vector), one for each DOF.
 
 \section sec_bbo_one_update One update at a time with Task/TaskSolver
+
+\b Note: this is currently only implemented in python/bbo/
 
 When running an optimization on a real robot, it is convenient to seperate it in two alternating steps:
 
@@ -227,7 +242,7 @@ else
     READ THE COST-RELEVANT VARIABLES FROM FILE
   
     // 2B. Evaluate the samples
-    task->evaluate(cost_vars,costs);
+    task->evaluateRollout(cost_vars,costs);
   
     // 3. Update parameters
     updater->updateDistribution(*distribution, samples, costs, *distribution);
@@ -240,7 +255,7 @@ distribution->generateSamples(n_samples_per_update, samples);
 
 // SAVE SAMPLES TO FILE. THESE SHOULD BE READ BY YOUR ROBOT
 
-// Thus 2A. Perform the roll-outs: task_solver->performRollouts(samples,cost_vars);
+// Thus 2A. Perform the roll-outs: task_solver->performRollout(samples,cost_vars);
 // no longer occurs in the code. Your robot does this now.  
 
 \endcode
@@ -317,96 +332,4 @@ Standard optimization is special case of the above with, n_parallel = 1 and n_ti
  
  */
  
-/** \page page_bbo Black Box Optimization
-
-This module implements several <A HREF="http://en.wikipedia.org/wiki/Evolution_strategy">evolution strategies</A> for the <A HREF="http://en.wikipedia.org/wiki/Optimization_%28mathematics%29">optimization</A> of black-box <A HREF="http://en.wikipedia.org/wiki/Loss_function">cost functions</A>. Black-box in this context means that no assumptions about the cost function can be made, for example, we do not have access to its derivative, and we do not even know if it is continuous or not.
-
-The evolution strategies that are implemented are all based on reward-weighted averaging (aka probablity-weighted averaging), as explained in this paper/presentation: http://icml.cc/discuss/2012/171.html
-
-The basic algorithm is as follows:
-\code
-x_mu = ??; x_Sigma = ?? // Initialize multi-variate Gaussian distribution
-while (!halt_condition) {
-
-    // Explore
-    for k=1:K {
-        x[k]     ~ N(x_mu,x_Sigma)    // Sample from Gaussian
-        costs[k] = costfunction(x[k]) // Evaluate sample
-    }
-        
-    // Update distribution
-    weights = costs2weights(costs) // Should assign higher weights to lower costs
-    x_mu_new = weights^T * x; // Compute weighted mean of samples
-    x_covar_new = (weights .* x)^T * weights // Compute weighted covariance matrix of samples
-    
-    x_mu = x_mu_new
-    x_covar = x_covar_new
-}
-\endcode
-
-\section sec_bbo_implementation Implementation
-
-The algorithm above has been implemented as follows (see 
-runOptimization() and demoOptimization.cpp):
-\code
-
-int n_dim = 2; // Optimize 2D problem
-
-// This is the cost function to be optimized
-CostFunction* cost_function = new CostFunctionQuadratic(VectorXd::Zero(n_dim));
-
-// This is the initial distribution
-DistributionGaussian* distribution = new DistributionGaussian(VectorXd::Random(n_dim),MatrixXd::Identity(n_dim)) 
-
-// This is the updater which will update the distribution
-double eliteness = 10.0;
-Updater* updater = new UpdaterMean(eliteness);
-
-// Some variables
-MatrixXd samples;
-VectorXd costs;
-
-for (int i_update=1; i_update<=n_updates; i_update++)
-{
-  
-    // 1. Sample from distribution
-    int n_samples_per_update = 10;
-    distribution->generateSamples(n_samples_per_update, samples);
-  
-    // 2. Evaluate the samples
-    cost_function->evaluate(samples,costs);
-  
-    // 3. Update parameters
-    updater->updateDistribution(*distribution, samples, costs, *distribution);
-    
-}
-\endcode
-
-\subsection sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
-
-When the cost function has a simple structure, e.g. cost = \f$ x^2 \f$ it is convenient to implement the function \f$ x^2 \f$ in CostFunction::evaluate(). In robotics however, it is more suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
-
-\code
-CostFunction::evaluate(samples,costs) {
-  TaskSolver::performRollout(samples,cost_vars)
-  Task::evaluateRollout(cost_vars,costs)
-}
-\endcode
-
-For more details, see \ref sec_dmp_bbo_task_and_task_solver
-
-\subsection sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
-
-When the cost function has a simple structure, e.g. cost = \f$ x^2 \f$ it is convenient to implement the function \f$ x^2 \f$ in CostFunction::evaluate(). In robotics however, it is more suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
-
-\code
-CostFunction::evaluate(samples,costs) {
-  TaskSolver::performRollout(samples,cost_vars)
-  Task::evaluateRollout(cost_vars,costs)
-}
-\endcode
-
-For more details, see \ref sec_dmp_bbo_task_and_task_solver
-
- */
 

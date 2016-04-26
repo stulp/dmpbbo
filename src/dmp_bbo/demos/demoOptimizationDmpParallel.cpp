@@ -1,5 +1,5 @@
 /**
- * \file demoOptimizationDmpMultiDim.cpp
+ * \file demoOptimizationDmpParallel.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to run multiple evolution strategies in parallel to optimize a Dmp.
  *

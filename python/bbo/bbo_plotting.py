@@ -251,41 +251,43 @@ def plotUpdateSummary(update_summary,ax,highlight=True,plot_samples=False):
     if (n_dims==1):
         print "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
         return
-    if (n_dims>=2):
-        #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
-        distr_mean = us.distributions[0].mean[0:2]
-        distr_covar = us.distributions[0].covar[0:2,0:2]
-        distr_new_mean  = us.distributions_new[0].mean[0:2]
-        distr_new_covar = us.distributions_new[0].covar[0:2,0:2]
-        if us.samples!=None:
-            samples = us.samples[:,0:2]
-                
-    if plot_samples:
-        max_marker_size = 80;
-        for ii in range(len(weights)):
-            cur_marker_size = max_marker_size*weights[ii]
-            sample_handle = ax.plot(samples[ii,0],samples[ii,1],'o',color='green')
-            plt.setp(sample_handle,markersize=cur_marker_size,markerfacecolor=(0.5,0.8,0.5),markeredgecolor='none')
-      
-            ax.plot(samples[:,0],samples[:,1],'.',color='black')
-        ax.plot((distr_mean[0],distr_new_mean[0]),(distr_mean[1],distr_new_mean[1]),'-',color='blue')
+    for i_parallel in range(n_parallel):
+        # ZZZ Perhaps plot in different subplots
+        if (n_dims>=2):
+            #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
+            distr_mean = us.distributions[i_parallel].mean[0:2]
+            distr_covar = us.distributions[i_parallel].covar[0:2,0:2]
+            distr_new_mean  = us.distributions_new[i_parallel].mean[0:2]
+            distr_new_covar = us.distributions_new[i_parallel].covar[0:2,0:2]
+            if us.samples!=None:
+                samples = us.samples[i_parallel,0:2]
+                    
+        if plot_samples:
+            max_marker_size = 80;
+            for ii in range(len(weights)):
+                cur_marker_size = max_marker_size*weights[ii]
+                sample_handle = ax.plot(samples[ii,0],samples[ii,1],'o',color='green')
+                plt.setp(sample_handle,markersize=cur_marker_size,markerfacecolor=(0.5,0.8,0.5),markeredgecolor='none')
+          
+                ax.plot(samples[:,0],samples[:,1],'.',color='black')
+            ax.plot((distr_mean[0],distr_new_mean[0]),(distr_mean[1],distr_new_mean[1]),'-',color='blue')
             
-    mean_handle = ax.plot(distr_mean[0],distr_mean[1],'o',label='old')
-    mean_handle_new = ax.plot(distr_new_mean[0],distr_new_mean[1],'o',label='new')
-    mean_handle_link = ax.plot([distr_mean[0], distr_new_mean[0]],[distr_mean[1], distr_new_mean[1]],'-')
-    patch = plot_error_ellipse(distr_mean[0:2],distr_covar[0:2,0:2],ax)
-    patch_new = plot_error_ellipse(distr_new_mean[0:2],distr_new_covar[0:2,0:2],ax)
-    if (highlight):
-        plt.setp(mean_handle,color='red')
-        plt.setp(mean_handle_new,color='blue')
-        plt.setp(patch,edgecolor='red')
-        plt.setp(patch_new,edgecolor='blue')
-    else:
-        plt.setp(mean_handle,color='gray')
-        plt.setp(mean_handle_new,color='gray')
-        plt.setp(patch,edgecolor='gray')
-        plt.setp(patch_new,edgecolor='gray')
-    plt.setp(mean_handle_link,color='gray')
+        mean_handle = ax.plot(distr_mean[0],distr_mean[1],'o',label='old')
+        mean_handle_new = ax.plot(distr_new_mean[0],distr_new_mean[1],'o',label='new')
+        mean_handle_link = ax.plot([distr_mean[0], distr_new_mean[0]],[distr_mean[1], distr_new_mean[1]],'-')
+        patch = plot_error_ellipse(distr_mean[0:2],distr_covar[0:2,0:2],ax)
+        patch_new = plot_error_ellipse(distr_new_mean[0:2],distr_new_covar[0:2,0:2],ax)
+        if (highlight):
+            plt.setp(mean_handle,color='red')
+            plt.setp(mean_handle_new,color='blue')
+            plt.setp(patch,edgecolor='red')
+            plt.setp(patch_new,edgecolor='blue')
+        else:
+            plt.setp(mean_handle,color='gray')
+            plt.setp(mean_handle_new,color='gray')
+            plt.setp(patch,edgecolor='gray')
+            plt.setp(patch_new,edgecolor='gray')
+        plt.setp(mean_handle_link,color='gray')
     ax.set_aspect('equal')
 
     plt.rcParams['text.usetex']=True

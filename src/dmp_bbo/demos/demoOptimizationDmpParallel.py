@@ -1,6 +1,6 @@
-## \file demoOptimizationDmpMultiDim.py
+## \file demoOptimizationDmpParallel.py
 ## \author Freek Stulp
-## \brief  Visualizes results of demoOptimizationDmpMultiDim.cpp
+## \brief  Visualizes results of demoOptimizationDmpParallel.cpp
 ## 
 ## \ingroup Demos
 ## \ingroup DMP_BBO
@@ -17,7 +17,7 @@ sys.path.append(lib_path)
 import bbo.bbo_plotting
 
 if __name__=='__main__':
-    executable = "../../../bin/demoOptimizationDmpMultiDim"
+    executable = "../../../bin/demoOptimizationDmpParallel"
     
     if (not os.path.isfile(executable)):
         print ""
@@ -27,7 +27,7 @@ if __name__=='__main__':
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoOptimizationDmpMultiDim"
+    directory = "/tmp/demoOptimizationDmpParallel"
     command = executable+" "+directory
     print command
     subprocess.call(command, shell=True)

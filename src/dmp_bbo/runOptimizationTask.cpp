@@ -145,10 +145,10 @@ void runOptimizationTask(
     vector<Rollout*> rollouts(n_samples_per_update);
     for (int i_sample=0; i_sample<n_samples_per_update; i_sample++)
     {
-      // 2A. Perform the roll-outs
+      // 2A. Perform the rollout
       task_solver->performRollout(samples.row(i_sample),cost_vars);
 
-      // 2B. Evaluate the samples
+      // 2B. Evaluate the rollout
       task->evaluateRollout(cost_vars,cur_costs);
       total_costs[i_sample] = cur_costs[0];
 

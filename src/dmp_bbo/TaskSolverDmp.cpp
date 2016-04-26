@@ -193,7 +193,7 @@ void TaskSolverDmp::performRolloutDeprecated(const vector<MatrixXd>& samples, co
 */
 
 /*
-bool TaskSolver::performRollouts(const string& samples_filename, const string& cost_vars_filename) const
+bool TaskSolver::performRollout(const string& samples_filename, const string& cost_vars_filename) const
 {
   
   // Read samples from file
@@ -203,7 +203,7 @@ bool TaskSolver::performRollouts(const string& samples_filename, const string& c
 
   // Perform rollouts
   MatrixXd cost_vars;
-  performRollouts(samples,cost_vars);
+  performRollout(samples,cost_vars);
     
   bool ow = true;
   if (!saveMatrix(cost_vars_filename,  cost_vars,  ow)) 
