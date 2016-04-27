@@ -14,7 +14,17 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-import bbo.bbo_plotting
+from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
+
+def plotRollout(cost_vars,ax):
+    """Simple script to plot y of DMP trajectory"""
+    n_dofs = (cost_vars.shape[1]-1)//4
+    y = cost_vars[:,0:n_dofs]
+    if n_dofs==1:
+        line_handles = ax.plot(y,linewidth=0.5)
+    else:
+        line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
+    return line_handles
 
 if __name__=='__main__':
     executable = "../../../bin/demoOptimizationDmp"
@@ -33,8 +43,7 @@ if __name__=='__main__':
     subprocess.call(command, shell=True)
       
     fig = plt.figure(1,figsize=(12, 4))
-    axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141)]
-    bbo.bbo_plotting.plotEvolutionaryOptimizationDir(directory,axs)
+    plotOptimizationRollouts(directory,fig,plotRollout)
 
     plt.show()
     

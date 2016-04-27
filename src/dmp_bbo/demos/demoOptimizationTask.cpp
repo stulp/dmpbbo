@@ -134,7 +134,7 @@ public:
     file << "    cost_vars = np.loadtxt(directory+\"cost_vars.txt\")" << endl;
     file << "    fig = plt.figure()" << endl;
     file << "    ax = fig.gca()" << endl;
-    file << "    plotRollouts(cost_vars,ax)" << endl;
+    file << "    plotRollout(cost_vars,ax)" << endl;
     file << "    plt.show()" << endl;
     
     file.close();

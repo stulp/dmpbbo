@@ -14,7 +14,11 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-import bbo.bbo_plotting
+from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
+
+def plotRollout(cost_vars,ax):
+    line_handles = ax.plot(cost_vars.T,linewidth=0.5)
+    return line_handles
 
 if __name__=='__main__':
     executable = "../../../bin/demoEvolutionaryOptimizationTask"
@@ -38,8 +42,7 @@ if __name__=='__main__':
       
       fig = plt.figure(figure_number,figsize=(12, 4))
       figure_number += 1;
-      axs = [ fig.add_subplot(143), fig.add_subplot(144), fig.add_subplot(142) , fig.add_subplot(141) ]
-      bbo.bbo_plotting.plotEvolutionaryOptimizationDir(directory,axs)
+      plotOptimizationRollouts(directory,fig,plotRollout)
       fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
 
     plt.show()

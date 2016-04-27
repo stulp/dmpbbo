@@ -49,6 +49,11 @@ a*x^2 + c \f$ best matches a set of target values y_target for a set of input va
         diff_square = np.square(cost_vars-self.targets)
         costs = [np.mean(diff_square)]
         return costs
+        
+    def plotRollout(self,cost_vars,ax):
+        line_handles = ax.plot(self.inputs,cost_vars.T,linewidth=0.5)
+        ax.plot(self.inputs,self.targets,'-o',color='k',linewidth=2)
+        return line_handles
 
 class DemoTaskSolverApproximateQuadraticFunction(TaskSolver):
     """The task solver tunes the parameters a and c such that the function \f$ y = a*x^2 + c \f$ best matches a set of target values y_target for a set of input values x"""

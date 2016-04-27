@@ -10,6 +10,12 @@ from rollout import Rollout, loadRolloutFromDirectory
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.bbo_plotting import plotUpdate, plotCurve, setColor, saveUpdate
 
+def containsNewDistribution(directory):
+    if os.path.exists(directory+"/distribution_new_mean.txt"):
+        return True
+    if os.path.exists(directory+"/distribution_new_000_mean.txt"):
+        return True
+    return False
 
 def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False):
     
@@ -19,7 +25,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
     # Determine number of updates
     n_updates = 1
     update_dir = '%s/update%05d' % (directory, n_updates)
-    while os.path.exists(update_dir+"/distribution_new_mean.txt"):
+    while containsNewDistribution(update_dir):
         n_updates += 1
         update_dir = '%s/update%05d' % (directory, n_updates)
     n_updates -= 1
