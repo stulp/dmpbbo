@@ -65,8 +65,6 @@ def loadRolloutsFromDirectory(directory):
 
     i_rollout = 0
     cur_dir = '%s/rollout%03d' % (directory, i_rollout+1)
-    print('===========')
-    print(cur_dir)
     while os.path.exists(cur_dir):
         rollouts.append(loadRolloutFromDirectory(cur_dir))
         i_rollout += 1

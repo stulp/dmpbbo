@@ -78,7 +78,6 @@ if __name__=="__main__":
     i_update = runOptimizationTaskOneUpdate(directory, task, initial_distribution, updater, n_samples_per_update)
 
     i_update -= 1
-    print(i_update)
     if plot_results and i_update>1:
         # Plot the optimization results (from the files saved to disk)
         fig = plt.figure(1,figsize=(15, 5))

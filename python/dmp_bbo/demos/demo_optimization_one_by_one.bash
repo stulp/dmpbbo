@@ -17,13 +17,13 @@ python demo_perform_rollouts.py $DIREC/update00003 # Replace this with your robo
 python demo_one_update.py $DIREC/
 python demo_perform_rollouts.py $DIREC/update00004 # Replace this with your robot
 
-python demo_one_update.py $DIREC/ 
+python demo_one_update.py $DIREC/ plotresults
 python demo_perform_rollouts.py $DIREC/update00005 # Replace this with your robot
 
 python demo_one_update.py $DIREC/ 
 python demo_perform_rollouts.py $DIREC/update00006 # Replace this with your robot
 
-python demo_one_update.py $DIREC/ 
+python demo_one_update.py $DIREC/ plotresults
 python demo_perform_rollouts.py $DIREC/update00007 # Replace this with your robot
 
 python demo_one_update.py $DIREC/ 

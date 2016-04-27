@@ -25,7 +25,6 @@ class DistributionGaussian:
         np.savetxt(directory+'/'+basename+'_covar.txt',self.covar)
 
 def loadDistributionGaussianFromDirectory(directory,basename):
-    print(directory+'/'+basename+'_mean.txt')
     mean = np.loadtxt(directory+'/'+basename+'_mean.txt')
     covar = np.loadtxt(directory+'/'+basename+'_covar.txt')
     return DistributionGaussian(mean,covar)

@@ -91,8 +91,8 @@ def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, 
             costs[i_rollout] = np.atleast_1d(cur_costs)
       
         # 3. Update parameters
-        print('UPDATING')
-        print('  * Loading distribution, samples and cost_vars from  "'+update_dir+'/"')
+        print('UPDATING DISTRIBUTION')
+        print('  * Loading previous distribution and samples from  "'+update_dir+'/"')
         name = 'distribution'
         distribution = loadDistributionGaussianFromDirectory(update_dir,name)
         
@@ -123,7 +123,7 @@ def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, 
     np.savetxt(update_dir+"/distribution_covar.txt",distribution_new.covar)
         
     # 1. Sample from distribution (for next epoch of rollouts)
-    print('SAMPLING')
+    print('SAMPLING FROM UPDATED DISTRIBUTION')
     samples = distribution_new.generateSamples(n_samples_per_update)
     print('  * Save samples to "'+update_dir+'/samples.txt"')
     np.savetxt(update_dir+"/samples.txt",samples)
