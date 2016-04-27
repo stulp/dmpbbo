@@ -15,12 +15,22 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
     
     if not fig:    
         fig = plt.figure(1,figsize=(9, 4))
-        
-    i_update = 1
-    update_dir = '%s/update%05d' % (directory, i_update)
-    
+
+    # Determine number of updates
+    n_updates = 1
+    update_dir = '%s/update%05d' % (directory, n_updates)
     while os.path.exists(update_dir+"/distribution_new_mean.txt"):
-        
+        n_updates += 1
+        update_dir = '%s/update%05d' % (directory, n_updates)
+    n_updates -= 1
+    
+    learning_curve = np.zeros((n_updates, 3))
+    
+    
+    for i_update in range(1,n_updates):
+    
+        update_dir = '%s/update%05d' % (directory, i_update)
+    
         # Read data
         try:
             n_parallel = np.loadtxt(update_dir+"/n_parallel.txt")
@@ -79,6 +89,17 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
             
         rollout_eval = loadRolloutFromDirectory(update_dir+'/rollout_eval/')
     
+        # Update learning curve 
+        # How many samples so far?  
+        learning_curve[i_update,0] = learning_curve[i_update-1,0] + n_rollouts
+        # Cost of evaluation
+        if cost_eval!=None:
+            learning_curve[i_update,1] = cost_eval[0]
+        # Exploration magnitude
+        learning_curve[i_update,2] = 0.0
+        for distr in distributions:
+            learning_curve[i_update,2] += np.sqrt(distr.maxEigenValue()); 
+        
         n_subplots = 3
         i_subplot = 1
         if task_solver:
@@ -94,17 +115,15 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
         highlight = (i_update==0)
         plotUpdate(distributions,cost_eval,samples,costs,weights,distributions_new,ax_space,highlight)
             
-        i_update += 1
-        update_dir = '%s/update%05d' % (directory, i_update)
         
     
     try:
         learning_curve = np.loadtxt(directory+'/learning_curve.txt')
-        axs = [fig.add_subplot(1,n_subplots,i_subplot), fig.add_subplot(1,n_subplots,i_subplot+1)]
-            
-        plotCurve(learning_curve,axs)
     except IOError:
-        print("Could not find 'directory"+"/learning_curve.txt'")
+        pass
+
+    axs = [fig.add_subplot(1,n_subplots,i_subplot), fig.add_subplot(1,n_subplots,i_subplot+1)]
+    plotCurve(learning_curve,axs)
 
 #def plotOptimizations(directories,axs):
 #    n_updates = 10000000
