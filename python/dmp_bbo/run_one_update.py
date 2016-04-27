@@ -2,6 +2,8 @@ import numpy as np
 import math
 import os
 import sys
+import pickle
+import inspect
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
@@ -10,14 +12,41 @@ from rollout import loadRolloutFromDirectory, loadRolloutsFromDirectory
 from dmp_bbo_plotting import saveUpdateRollouts
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.distribution_gaussian import loadDistributionGaussianFromDirectory
+from dmp_bbo.task import Task
 
-def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_per_update, directory):
-
-    # If directory doesnt exist
-    if not os.path.isdir(directory):
+def prepareOptimization(directory,task,initial_distribution,updater,    n_samples_per_update):
+    
+    if not os.path.exists(directory):
         os.makedirs(directory)
-        i_update = 0
-    else:
+        
+    print('  * Saving task to "'+directory+'/"')
+    # Save the source code of the task for future reference
+    src_task = inspect.getsourcelines(task.__class__)
+    src_task = ' '.join(src_task[0])
+    src_task = src_task.replace("(Task)", "")    
+    filename = directory+'/the_task.py'
+    task_file = open(filename, "w")
+    task_file.write(src_task)
+    task_file.close()
+    
+    # Save the task instance itself
+    filename = directory+'/task.p'
+    pickle.dump(task, open(filename, "wb" ))
+
+    print('  * Saving updater to "'+directory+'/"')
+    filename = directory+'/updater.p'
+    pickle.dump(updater, open(filename, "wb" ))
+
+    filename = directory+'/n_samples_per_update.txt'
+    np.savetxt(filename,[n_samples_per_update])
+    
+    print('  * Saving initial distribution to "'+directory+'/"')
+    initial_distribution.saveToDirectory(directory,'distribution_initial')
+    
+    
+def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, n_samples_per_update,i_update=None):
+
+    if not i_update:
         i_update = 0;
         dir_exists = True;
         while (dir_exists):
@@ -30,28 +59,31 @@ def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_
     if not os.path.isdir(update_dir):
         os.makedirs(update_dir)
         
-        
     print('======================================================')
     print('i_update = '+str(i_update))
     if i_update==0:
-        print('INITIALIZING')
-        print('  * Save distribution to "'+update_dir+'/"')
-        # First update: current distribution is initial distribution
+        print('NO UPDATES YET: PREPARE OPTIMIZATION')
+        
+        prepareOptimization(directory,task,initial_distribution,updater,    n_samples_per_update)
+            
+        # First update: distribution is initial distribution
         distribution_new = initial_distribution
         
     else:
         
+        print('EVALUATING ROLLOUTS')
         
-        print('EVALUATING')
-        
+        print('  * Loading rollouts')
         rollout_eval = loadRolloutFromDirectory(update_dir+'/rollout_eval')
         rollouts = loadRolloutsFromDirectory(update_dir)
-        assert(len(rollouts)==n_samples_per_update)
-        assert(rollouts[0])
-        
+        n_samples = len(rollouts)
+    
         print('  * Evaluating costs')
-        costs = np.full(n_samples_per_update,0.0)
-        for i_rollout in range(len(rollouts)):
+        cost_eval = task.evaluateRollout(rollout_eval.cost_vars)
+        rollout_eval.cost = np.atleast_1d(cost_eval)
+        
+        costs = np.full(n_samples,0.0)
+        for i_rollout in range(n_samples):
           
             # 2B. Evaluate the samples
             cur_costs = task.evaluateRollout(rollouts[i_rollout].cost_vars)
@@ -65,7 +97,10 @@ def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_
         distribution = loadDistributionGaussianFromDirectory(update_dir,name)
         
         samples = np.loadtxt(update_dir+"/samples.txt")
-        
+
+        print('  * Loading updater')
+        updater = pickle.load(open(directory+'/updater.p', "rb" ))
+
         print('  * Updating parameters')
         distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
         
@@ -73,7 +108,7 @@ def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_
         print('  * Saving update to  "'+update_dir+'/"')
         saveUpdateRollouts(directory, i_update, distribution, rollout_eval, rollouts, weights, distribution_new)
         
-    print('  * Saving updated distribution to "'+update_dir+'/"')
+    print('  * Saving distribution to "'+update_dir+'/"')
     np.savetxt(update_dir+"/distribution_new_mean.txt",distribution_new.mean)
     np.savetxt(update_dir+"/distribution_new_covar.txt",distribution_new.covar)
     
@@ -83,7 +118,7 @@ def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_
     # If directory doesnt exist
     if not os.path.isdir(update_dir):
         os.makedirs(update_dir)
-    print('  * Saving updated distribution to "'+update_dir+'/"')
+    print('  * Saving distribution to "'+update_dir+'/"')
     np.savetxt(update_dir+"/distribution_mean.txt",distribution_new.mean)
     np.savetxt(update_dir+"/distribution_covar.txt",distribution_new.covar)
         
@@ -93,12 +128,8 @@ def runOptimizationTaskOneUpdate(task, initial_distribution, updater, n_samples_
     print('  * Save samples to "'+update_dir+'/samples.txt"')
     np.savetxt(update_dir+"/samples.txt",samples)
     
-    print('ROLLOUTS')
-    print('  * Info: '+str(n_samples_per_update)+' samples have been save in "'+update_dir+'"/samples.txt".')
-    print('    Please run '+str(n_samples_per_update)+' rollouts on the robot and write cost-relevant variables in "'+directory+'/cost_vars.txt"')
+    print('ROLLOUTS NOW REQUIRED')
+    print('  * Info: '+str(n_samples_per_update)+' samples have been save in "'+update_dir+'/samples.txt".')
+    print('    Please run '+str(n_samples_per_update)+' rollouts on the robot and write cost-relevant variables in "'+update_dir+'/cost_vars.txt"')
 
     return i_update
-
-
-
-

@@ -67,12 +67,6 @@ class DemoTaskSolverApproximateQuadraticFunction(TaskSolver):
         c = sample[1]
         cost_vars = targetFunction(a,c,self.inputs)
         return cost_vars
-
-    def plotRollout(self,cost_vars,ax):
-        line_handles = ax.plot(self.inputs,cost_vars.T,linewidth=0.5)
-        #ax.plot(self.inputs,self.targets,'-o',color='k',linewidth=2)
-        return line_handles
-    
     
 if __name__=="__main__":
   

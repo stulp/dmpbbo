@@ -11,7 +11,7 @@ from bbo.distribution_gaussian import DistributionGaussian
 from bbo.bbo_plotting import plotUpdate, plotCurve, setColor, saveUpdate
 
 
-def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=False):
+def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False):
     
     if not fig:    
         fig = plt.figure(1,figsize=(9, 4))
@@ -23,6 +23,9 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
         n_updates += 1
         update_dir = '%s/update%05d' % (directory, n_updates)
     n_updates -= 1
+    
+    if n_updates<2:
+        return None
     
     learning_curve = np.zeros((n_updates, 3))
     
@@ -94,7 +97,7 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
         learning_curve[i_update,0] = learning_curve[i_update-1,0] + n_rollouts
         # Cost of evaluation
         if cost_eval!=None:
-            learning_curve[i_update,1] = cost_eval[0]
+            learning_curve[i_update,1] = np.atleast_1d(cost_eval)[0]
         # Exploration magnitude
         learning_curve[i_update,2] = 0.0
         for distr in distributions:
@@ -102,13 +105,13 @@ def plotOptimizationRollouts(directory,fig,task_solver=None,plot_all_rollouts=Fa
         
         n_subplots = 3
         i_subplot = 1
-        if task_solver:
+        if plotRollout:
             n_subplots = 4
             ax_rollout = fig.add_subplot(1,n_subplots,i_subplot)
             i_subplot += 1
-            h = task_solver.plotRollout(rollout_eval.cost_vars,ax_rollout)
-            setColor(h,i_update,100) # ZZZ
-         
+            h = plotRollout(rollout_eval.cost_vars,ax_rollout)
+            setColor(h,i_update,n_updates)
+            
          
         ax_space = fig.add_subplot(1,n_subplots,i_subplot)
         i_subplot += 1
@@ -175,7 +178,7 @@ def saveUpdateRollouts(directory, i_update, distributions, rollout_eval, rollout
     cost_eval = None
     if rollout_eval:
         cost_eval = rollout_eval.total_cost()
-    
+        
     if rollouts[0].total_cost():
         costs = [rollout.total_cost() for rollout in rollouts]
     else:

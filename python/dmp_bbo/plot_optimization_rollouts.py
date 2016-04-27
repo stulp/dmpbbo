@@ -15,7 +15,7 @@ if __name__=='__main__':
       sys.exit()
     
     fig = plt.figure()
-    task_solver = None # ZZZ
-    plotOptimizationRollouts(directory,fig,task_solver)
+    plot_rollout = None
+    plotOptimizationRollouts(directory,fig,plot_rollout)
     plt.show()
 

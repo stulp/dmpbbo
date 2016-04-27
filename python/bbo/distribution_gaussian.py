@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import os
 
 class DistributionGaussian:
 
@@ -16,6 +17,12 @@ class DistributionGaussian:
     def __str__(self):
         return 'N( '+str(self.mean)+', '+str(self.covar)+' )'
 
+    def saveToDirectory(self,directory,basename):
+        if not os.path.exists(directory):
+              os.makedirs(directory)
+        d = directory
+        np.savetxt(directory+'/'+basename+'_mean.txt',self.mean)
+        np.savetxt(directory+'/'+basename+'_covar.txt',self.covar)
 
 def loadDistributionGaussianFromDirectory(directory,basename):
     print(directory+'/'+basename+'_mean.txt')
