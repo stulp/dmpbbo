@@ -16,6 +16,23 @@ class DistributionGaussian:
     def __str__(self):
         return 'N( '+str(self.mean)+', '+str(self.covar)+' )'
 
+
+def loadDistributionGaussianFromDirectory(directory,basename):
+    print(directory+'/'+basename+'_mean.txt')
+    mean = np.loadtxt(directory+'/'+basename+'_mean.txt')
+    covar = np.loadtxt(directory+'/'+basename+'_covar.txt')
+    return DistributionGaussian(mean,covar)
+    
+#def loadDistributionGaussianFromDirectory(directory):
+#    rollouts = []
+#    if i_rollout:
+#        cur_dir = '%s/rollout%03d' % (directory, i_rollout+1)
+#        if not os.path.exists(cur_dir):
+#            return rollouts
+#        else:
+#            rollouts.append(loadRolloutFromDirectory(cur_dir))
+
+
 def testDistributionGaussian():
     mu  = np.array([2,4])
     cov = np.array([[0.1,0.3],[0.3,0.5]])

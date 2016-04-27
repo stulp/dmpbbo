@@ -38,7 +38,7 @@ def costsToWeights(costs, weighting_method, eliteness):
         h = eliteness # In PI^2, eliteness parameter is known as "h"
         costs_range = max(costs)-min(costs)
         if costs_range==0:
-            weights = np.full(size(costs),1.0)
+            weights = np.full(costs.shape,1.0)
         else:
             costs_norm = [-h*(x-min(costs))/costs_range for x in costs]
             weights = np.exp(costs_norm)
