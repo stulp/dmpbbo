@@ -54,11 +54,12 @@ void runOptimization(
   std::string save_directory=std::string(""),
   bool overwrite=false,bool only_learning_curve=false);
 
-// ZZZ Document
-
-
+/** Save all the information relevant to an update to a directory as text files.
+ */
 bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
 
+/** Save all the information relevant to an update to a directory as text files.
+ */
 bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, double* cost_eval, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
 
 }

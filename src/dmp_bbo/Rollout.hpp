@@ -37,42 +37,59 @@ class Rollout {
   
 public:
   
+  /** Constructor.
+   * \param[in] policy_parameters The parameters of the policy for this rollout
+   */
   Rollout(const Eigen::MatrixXd& policy_parameters);
   
+  /** Constructor.
+   * \param[in] policy_parameters The parameters of the policy for this rollout
+   * \param[in] cost_vars The cost-relevant variables that arose from executing the policy (e.g. DMP) with the policy parameters.
+   */
   Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd& cost_vars);
   
-  // ZZZ
+  /** Constructor.
+   * \param[in] policy_parameters The parameters of the policy for this rollout
+   * \param[in] cost_vars The cost-relevant variables that arose from executing the policy (e.g. DMP) with the policy parameters.
+   * \param[in] cost The cost of this rollout. The first element cost[0] should be the total cost. The others may be the individual cost components that consitute the total cost, e.g. cost[0] = cost[1] + cost[2] ...
+   */
   Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& cost);
   
+  /** Accessor function.
+   * \param[in] cost_vars The cost-relevant variables that arose from executing the policy (e.g. DMP) with the policy parameters.
+   */
   inline void set_cost_vars(const Eigen::MatrixXd& cost_vars)
   {
     cost_vars_ = cost_vars;
   }
   
+  /** Accessor function.
+   * \param[in] cost The cost of this rollout. The first element cost[0] should be the total cost. The others may be the individual cost components that consitute the total cost, e.g. cost[0] = cost[1] + cost[2] ...
+   */
   inline void set_cost(const Eigen::VectorXd& cost)
   { 
     assert(cost.size()>=1);
     cost_ = cost;
   }
   
+  /** Accessor function.
+   * \param[out] cost The cost of this rollout. The first element cost[0] should be the total cost. The others may be the individual cost components that consitute the total cost, e.g. cost[0] = cost[1] + cost[2] ...
+   */
   inline void cost(Eigen::VectorXd& cost) const
   { 
     cost = Eigen::VectorXd(cost_);
   }
   
-  inline double total_cost(void) const
-  { 
-    if (cost_.size()==0)
-      return 0.0; // ZZZ Issue warning
-    return cost_[0];
-  }
+  /** Get the (total) cost of the rollout.
+   * \return The cost of this rollout.
+   */
+  double total_cost(void) const;
   
-  inline int n_cost_components(void) const
-  {
-    if (cost_.size()>1)
-      return cost_.size();
-    return 1;
-  }
+  
+  /** Get the number of individual cost components that constitute the final total cost.
+   * \return The number of cost components.
+   */
+  int n_cost_components(void) const;
   
   /**
    * Save a rollout to a directory

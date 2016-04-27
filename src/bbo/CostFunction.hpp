@@ -37,7 +37,7 @@ class CostFunction
 public:
   /** The cost function which defines the cost_function.
    *
-   * \param[in] samples A sample in the search space
+   * \param[in] sample A sample in the search space
    * \return cost The scalar cost for the sample.
    */
   virtual double evaluate(const Eigen::VectorXd& sample) const = 0;

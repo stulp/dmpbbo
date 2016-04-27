@@ -45,7 +45,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-FunctionApproximator* getFunctionApproximatorByName(string name, int n_input_dims)
+FunctionApproximator* getFunctionApproximatorByName(std::string name, int n_input_dims)
 {
   int n_args = 1;
   

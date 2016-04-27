@@ -95,7 +95,6 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 
 #endif
 
-// ZZ Merge docu below
 /** \defgroup BBO Black Box Optimization Module
  */
 
@@ -105,10 +104,12 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 
 /** \page page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
 
-This page assumes you have read the page on \ref page_bbo. Applying BBO to robots (which may execute DMPs) requires several extensions:
+This page assumes you have read the page on \ref page_bbo. When applying BBO to policy improvement (e.g. optimizing a DMP on a robot), the concept of a "rollout" becomes important. A rollout is the result of executing a policy (e.g. a DMP) with a certain set of policy parameters (e.g. the parameter of the DMP). Although the search space for optimization is in the space of the policy parameters, the costs are rather determined from the rollout.
+
+From an implementation point of view, applying BBO to policy improvement (which may execute DMPs) requires several extensions:
 
 \li Running multiple optimizations in parallel, one for each DOF of the DMP
-\li Use of a Task/TaskSolver instead of a CostFunction
+\li Using rollouts with a Task/TaskSolver instead of a CostFunction
 \li Allowing the optimization to be run one update at a time, instead of in a loop
 
 \section sec_parallel_optimization Optimizing DMP DOFs in parallel

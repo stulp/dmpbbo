@@ -165,8 +165,12 @@ protected:
    */  
   void checkTrainTrajectories(const std::vector<Trajectory>& trajectories);
   
+  /** FunctionApproximators that relate task parameters the goal of the DMP.
+   */  
   std::vector<FunctionApproximator*> policy_parameter_function_goal_;
   
+  /** FunctionApproximator that relates task parameters the duration of the DMP.
+   */  
   FunctionApproximator* policy_parameter_function_duration_;
   
 

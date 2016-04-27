@@ -206,7 +206,7 @@ double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& co
 }
 
 
-void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
+void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   outputs.resize(inputs.rows(),getExpectedOutputDim());
@@ -214,7 +214,7 @@ void FunctionApproximatorGMR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
-void FunctionApproximatorGMR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
+void FunctionApproximatorGMR::predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   variances.resize(inputs.rows(),getExpectedOutputDim());
@@ -359,7 +359,7 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
-void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot)
+void FunctionApproximatorGMR::predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   outputs.resize(inputs.rows(),getExpectedOutputDim());
@@ -367,7 +367,7 @@ void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outpu
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
-void FunctionApproximatorGMR::predictDot(const MatrixXd& inputs, MatrixXd& outputs, MatrixXd& outputs_dot, Eigen::MatrixXd& variances)
+void FunctionApproximatorGMR::predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances)
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
  

@@ -45,6 +45,7 @@ public:
    * \param[in] base_level Small covariance matrix that is added after each update to avoid premature convergence
    * \param[in] diag_only Update only the diagonal of the covariance matrix (true) or the full matrix (false)
    * \param[in] learning_rate Low pass filter on the covariance updates. In range [0.0-1.0] with 0.0 = no updating, 1.0  = complete update by ignoring previous covar matrix. 
+   * \param[in] relative_lower_bound Enforces a lower bound on the eigen values of the covariance matrix, relative to the largest eigenvalue. E.g. if relative_lower_bound=0.1, than no eigenvalue may be smaller than 10% of the largest eigenvalue. 
    */
   UpdaterCovarAdaptation(double eliteness, std::string weighting_method="PI-BB", const Eigen::VectorXd& base_level=Eigen::VectorXd::Zero(0), bool diag_only=true, double learning_rate=1.0, double relative_lower_bound=0.0);
   

@@ -33,6 +33,11 @@ namespace DmpBbo {
 
 class FunctionApproximator;
 
+/** Initialize a function approximator from its name.
+ \param[in] name Name of the function approximator, e.g. "LWR"
+ \param[in] n_input_dims Dimensionality of the input data
+ \return A pointer to an initialized function approximator.
+ */
 FunctionApproximator* getFunctionApproximatorByName(std::string name, int n_input_dims=1);
 
 /**

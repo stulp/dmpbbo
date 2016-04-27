@@ -37,26 +37,50 @@ using namespace Eigen;
 namespace DmpBbo {
 
   
-Rollout::Rollout(const MatrixXd& policy_parameters):
+Rollout::Rollout(const Eigen::MatrixXd& policy_parameters):
   policy_parameters_(policy_parameters),
   cost_vars_(MatrixXd(0,0)),
   cost_(VectorXd(0,0))
 {
 }
   
-Rollout::Rollout(const MatrixXd& policy_parameters, const MatrixXd& cost_vars):
+Rollout::Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd& cost_vars):
   policy_parameters_(policy_parameters),
   cost_vars_(cost_vars),
   cost_(VectorXd(0,0))
 {
 }
 
-Rollout::Rollout(const MatrixXd& policy_parameters, const MatrixXd& cost_vars, const Eigen::MatrixXd& cost):
+Rollout::Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd& cost_vars, const Eigen::MatrixXd& cost):
   policy_parameters_(policy_parameters),
   cost_vars_(cost_vars),
   cost_(cost)
 {
 }
+
+int Rollout::n_cost_components(void) const
+{
+  if (cost_.size()==0)
+  {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "This rollout has not cost yet!" << std::endl;
+    return 0;
+  }
+
+  return cost_.size();
+}
+
+double Rollout::total_cost(void) const
+{ 
+  if (cost_.size()==0)
+  {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "This rollout has not cost yet!" << std::endl;
+    return 0.0;
+  }
+  return cost_[0];
+}
+
 
 bool Rollout::saveToDirectory(std::string directory, bool overwrite) const
 {

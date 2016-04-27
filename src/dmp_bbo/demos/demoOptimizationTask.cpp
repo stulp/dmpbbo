@@ -75,7 +75,7 @@ public:
   /** Cost function
    * \param[in] cost_vars y in \f$ y = a*x^2 + c \f$
    * \param[in] task_parameters Ignored
-   * \param[out] costs Cost of the cost_vars ZZZ
+   * \param[out] cost Cost of the rollout. 
    */
   void evaluateRollout(const MatrixXd& cost_vars, const VectorXd& task_parameters, VectorXd& cost) const
   {
@@ -84,63 +84,6 @@ public:
     cost[0] = diff_square.mean();
   }
   
-  /** Save a python script that is able to visualize the rollouts, given the cost-relevant variables
-   *  stored in a file.
-   *  \param[in] directory Directory in which to save the python script
-   *  \return true if saving the script was successful, false otherwise
-   */
-  bool savePlotRolloutScript(string directory) const
-  {
-    string filename = directory + "/plotRollout.py";
-    
-    std::ofstream file;
-    file.open(filename.c_str());
-    if (!file.is_open())
-    {
-      std::cerr << "Couldn't open file '" << filename << "' for writing." << std::endl;
-      return false;
-    }
-    
-    
-    file << "import numpy as np" << endl;
-    file << "import matplotlib.pyplot as plt" << endl;
-    file << "import sys, os" << endl;
-    file << "def plotRollout(cost_vars,ax):" << endl;
-    file << "    inputs = [";
-    file << fixed;
-    for (int ii=0; ii<inputs_.size(); ii++)
-    {
-      if (ii>0) file << ", ";
-      file << inputs_[ii];
-    }
-    file << "]" << endl;
-    file << "    targets = [";
-    for (int ii=0; ii<targets_.size(); ii++)
-    {
-      if (ii>0) file << ", ";
-      file << targets_[ii];
-    } // ZZZ FIX THIS SCRIPT
-    file << "]" << endl;
-    file << "    line_handles = ax.plot(inputs,cost_vars.T,linewidth=0.5)" << endl;
-    file << "    ax.plot(inputs,targets,'-o',color='k',linewidth=2)" << endl;
-    file << "    return line_handles" << endl;
-    file << "if __name__=='__main__':" << endl;
-    file << "    # See if input directory was passed" << endl;
-    file << "    if (len(sys.argv)==2):" << endl;
-    file << "      directory = str(sys.argv[1])" << endl;
-    file << "    else:" << endl;
-    file << "      print 'Usage: '+sys.argv[0]+' <directory>';" << endl;
-    file << "      sys.exit()" << endl;
-    file << "    cost_vars = np.loadtxt(directory+\"cost_vars.txt\")" << endl;
-    file << "    fig = plt.figure()" << endl;
-    file << "    ax = fig.gca()" << endl;
-    file << "    plotRollout(cost_vars,ax)" << endl;
-    file << "    plt.show()" << endl;
-    
-    file.close();
-    
-    return true;
-  }
 
   /** Returns a string representation of the object.
    * \return A string representation of the object.

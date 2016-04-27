@@ -41,6 +41,8 @@ class ModelParametersGMR : public ModelParameters
   
 public:
   
+  /** Constructor for the model parameters of the GMR function approximator.
+   */
   ModelParametersGMR(std::vector<double> priors,
     std::vector<Eigen::VectorXd> means, 
     std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);

@@ -41,8 +41,17 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-  
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
+
+bool saveToDirectory(
+  string directory, 
+  int i_update, 
+  const DistributionGaussian& distribution, 
+  double* cost_eval, 
+  const Eigen::MatrixXd& samples, 
+  const Eigen::VectorXd& costs, 
+  const Eigen::VectorXd& weights, 
+  const DistributionGaussian& distribution_new, 
+  bool overwrite)
 {
   vector<DistributionGaussian> distribution_vec;
   distribution_vec.push_back(distribution);
@@ -53,7 +62,15 @@ bool saveToDirectory(string directory, int i_update, const DistributionGaussian&
   return saveToDirectory(directory, i_update, distribution_vec, cost_eval, samples, costs, weights, distribution_new_vec, overwrite);
 }
 
-bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distributions, double* cost_eval, const MatrixXd& samples, const VectorXd& costs, const VectorXd& weights, const vector<DistributionGaussian>& distributions_new, bool overwrite)
+bool saveToDirectory(
+  std::string directory, 
+  int i_update, 
+  const std::vector<DistributionGaussian>& distributions, 
+  double* cost_eval, 
+  const Eigen::MatrixXd& samples, 
+  const Eigen::VectorXd& costs, 
+  const Eigen::VectorXd& weights, 
+  const std::vector<DistributionGaussian>& distributions_new, bool overwrite)
 {
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))

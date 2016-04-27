@@ -37,10 +37,9 @@ class TaskSolver
 {
 public:
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
-  * ZZZ Document this properly
+   * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
    * \param[in] sample The samples
    * \param[out] cost_vars The variables relevant to computing the cost.
-   * \todo Compare to other functions
    */
   inline void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
   {
@@ -49,11 +48,10 @@ public:
   };
     
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
-  * ZZZ Document this properly
+   * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
    * \param[in] sample The samples
    * \param[in] task_parameters The parameters of the task
    * \param[out] cost_vars The variables relevant to computing the cost.
-   * \todo Compare to other functions
    */
   virtual void performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const = 0;
   

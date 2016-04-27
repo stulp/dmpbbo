@@ -56,6 +56,9 @@ public:
    */
   void generateSamples(int n_samples, Eigen::MatrixXd& samples) const;
   
+  /** Get the largest eigenvalue of the covariance matrix of this distribution.
+   *  \return largest eigenvalue of the covariance matrix of this distribution.
+   */
   double maxEigenValue(void) const;
 
   /** Make a deep copy of the object.

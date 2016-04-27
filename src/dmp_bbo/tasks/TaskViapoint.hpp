@@ -69,7 +69,7 @@ public:
 
   virtual ~TaskViapoint(void) {}
   
-  void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& costs) const;
+  void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   /** Set the relative weights of the components of the cost function.
    * \param[in] viapoint_weight Weight for the cost related to not passing through the viapoint
