@@ -103,27 +103,47 @@ bool saveToDirectory(
   string dir = dir_update;
   
   assert(distributions.size()==distributions_new.size());
+  int n_parallel = distributions.size();
   
-  if (distributions.size()==1)
-  {
-    if (!saveMatrix(dir, "distribution_mean.txt",      distributions[0].mean(),  ow)) return false;
-    if (!saveMatrix(dir, "distribution_covar.txt",     distributions[0].covar(), ow)) return false;
+  if (n_parallel>1)
+  { 
+    VectorXi covar_block_sizes(n_parallel);
+    for (int pp=0; pp<n_parallel; pp++)
+      covar_block_sizes[pp] = distributions[pp].mean().size();
+    if (!saveMatrix(dir, "covar_block_sizes.txt",covar_block_sizes,ow)) return false;
   }
-  else
+  
+  VectorXi offsets(n_parallel+1);
+  offsets[0] = 0;
+  for (int ii=0; ii<n_parallel; ii++)
+    offsets[ii+1] = offsets[ii] + distributions[ii].mean().size();
+  int sum_n_dims = offsets[n_parallel];
+  
+  VectorXd mean_merged = VectorXd::Zero(sum_n_dims);
+  MatrixXd covar_merged = MatrixXd::Zero(sum_n_dims,sum_n_dims);
+  for (int pp=0; pp<n_parallel; pp++)
   {
-    VectorXi n_parallel = VectorXi::Constant(1,distributions.size());
-    if (!saveMatrix(dir, "n_parallel.txt", n_parallel,  ow)) return false;
-    for (unsigned int dd=0; dd<distributions.size(); dd++)
-    { 
-      stringstream stream;
-      stream  << "/distribution_" << setw(3) << setfill('0') << dd;
-      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions[dd].mean(), ow)) 
-        return false;
-      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions[dd].covar(), ow)) 
-        return false;
-      
-    }
+    int offset = offsets[pp];
+    int width = offsets[pp+1]-offsets[pp];
+    mean_merged.segment(offset,width) = distributions[pp].mean().transpose();
+    covar_merged.block(offset,offset,width,width) = distributions[pp].covar();
   }
+  
+  
+  if (!saveMatrix(dir, "distribution_mean.txt", mean_merged,  ow)) return false;
+  if (!saveMatrix(dir, "distribution_covar.txt",covar_merged, ow)) return false;
+
+  for (int pp=0; pp<n_parallel; pp++)
+  {
+    int offset = offsets[pp];
+    int width = offsets[pp+1]-offsets[pp];
+    mean_merged.segment(offset,width) = distributions_new[pp].mean().transpose();
+    covar_merged.block(offset,offset,width,width) = distributions_new[pp].covar();
+  }
+  
+  
+  if (!saveMatrix(dir, "distribution_new_mean.txt", mean_merged,  ow)) return false;
+  if (!saveMatrix(dir, "distribution_new_covar.txt",covar_merged, ow)) return false;
   
   if (cost_eval!=NULL)
   {
@@ -137,24 +157,6 @@ bool saveToDirectory(
     if (!saveMatrix(dir, "costs.txt",                costs,                  ow)) return false;
   if (weights.size()>0)
     if (!saveMatrix(dir, "weights.txt",              weights,                ow)) return false;
-  if (distributions.size()==1)
-  {
-    if (!saveMatrix(dir, "distribution_new_mean.txt",  distributions_new[0].mean(),  ow)) return false;
-    if (!saveMatrix(dir, "distribution_new_covar.txt", distributions_new[0].covar(), ow)) return false;
-  }
-  else
-  {
-    for (unsigned int dd=0; dd<distributions.size(); dd++)
-    { 
-      stringstream stream;
-      stream  << "/distribution_new_" << setw(3) << setfill('0') << dd;
-      if (!saveMatrix(dir, stream.str()+"_mean.txt", distributions_new[dd].mean(), ow)) 
-        return false;
-      if (!saveMatrix(dir, stream.str()+"_covar.txt", distributions_new[dd].covar(), ow)) 
-        return false;
-      
-    }
-  }
   return true;    
 }
 

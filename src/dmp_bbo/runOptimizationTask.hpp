@@ -83,6 +83,7 @@ void runOptimizationTask(
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
  * \param[in] only_learning_curve Save only the learning curve (default: false)
+ * \todo Remove this function. It can be implemented much simpler. Only UpdateCovarAdapation is affected by this, and one can enforce block-diagonal-covars there (e.g. with a function setSubCovars(VectorXi). Update the docu accordingly when this is done. )
  */
 void runOptimizationParallel(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
 bool only_learning_curve=false);

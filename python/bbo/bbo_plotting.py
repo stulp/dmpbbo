@@ -87,7 +87,7 @@ def saveCurve(directory,learning_curve):
 def loadCurve(directory):
     return np.loadtxt(directory+'/learning_curve.txt')
     
-def saveUpdate(directory,i_update,distributions,cost_eval,samples,costs,weights,distributions_new):
+def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new):
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -95,26 +95,11 @@ def saveUpdate(directory,i_update,distributions,cost_eval,samples,costs,weights,
     cur_dir = '%s/update%05d' % (directory, i_update)
     if not os.path.exists(cur_dir):
         os.makedirs(cur_dir)
-        
     
-    if isinstance(distributions,DistributionGaussian):
-        # Just one distribution to be stored
-        np.savetxt(cur_dir+"/distribution_mean.txt",distributions.mean)
-        np.savetxt(cur_dir+"/distribution_covar.txt",distributions.covar)
-        np.savetxt(cur_dir+"/distribution_new_mean.txt",distributions_new.mean)
-        np.savetxt(cur_dir+"/distribution_new_covar.txt",distributions_new.covar)
-    else:
-        # List of distributions to be stored
-        n_parallel = len(distributions)
-        np.savetxt(directory+"/n_parallel.txt",n_parallel)
-        for i_parallel in range(n_parallel):
-            cur_file = '%s/distribution_%03d' % (cur_dir, i_parallel)
-            np.savetxt(cur_file+'_mean.txt',distributions[i_parallel].mean)
-            np.savetxt(cur_file+'_covar.txt',distributions[i_parallel].covar)
-            
-            cur_file = '%s/distribution_new_%03d' % (directory, i_parallel)
-            np.savetxt(cur_file+'_mean.txt',distributions_new[i_parallel].mean)
-            np.savetxt(cur_file+'_covar.txt',distributions_new[i_parallel].covar)
+    np.savetxt(cur_dir+"/distribution_mean.txt",distribution.mean)
+    np.savetxt(cur_dir+"/distribution_covar.txt",distribution.covar)
+    np.savetxt(cur_dir+"/distribution_new_mean.txt",distribution_new.mean)
+    np.savetxt(cur_dir+"/distribution_new_covar.txt",distribution_new.covar)
           
     if cost_eval!=None:
         np.savetxt(cur_dir+'/cost_eval.txt',np.atleast_1d(cost_eval))
@@ -207,34 +192,27 @@ These keywords are passed to matplotlib.patches.Ellipse
     lines = ax.add_patch(ellipsePlot)
     return lines
     
-def plotUpdate(distributions,cost_eval,samples,costs,weights,distributions_new,ax,highlight=False,plot_samples=False):
-    
-    if isinstance(distributions,DistributionGaussian):
-        # distributions should be a list of DistributionGaussian
-        distributions = [distributions]
-        
-    if isinstance(distributions_new,DistributionGaussian):
-        # distributions should be a list of DistributionGaussian
-        distributions_new = [distributions_new]
+def plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight=False,plot_samples=False):
     
     if samples==None:
         plot_samples = False
     
-    n_parallel = len(distributions)
-    n_dims = len(distributions[0].mean)
+    n_dims = len(distribution.mean)
     if (n_dims==1):
         print "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
         return
-    for i_parallel in range(n_parallel):
-        # ZZZ Perhaps plot in different subplots
-        if (n_dims>=2):
-            #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
-            distr_mean = distributions[i_parallel].mean[0:2]
-            distr_covar = distributions[i_parallel].covar[0:2,0:2]
-            distr_new_mean  = distributions_new[i_parallel].mean[0:2]
-            distr_new_covar = distributions_new[i_parallel].covar[0:2,0:2]
-            if samples!=None:
-                samples = samples[i_parallel,0:2]
+        
+    # ZZZ Take into consideration block_covar_sizes to plot sub blocks in 
+    # different subplots
+    
+    if (n_dims>=2):
+        #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
+        distr_mean = distribution.mean[0:2]
+        distr_covar = distribution.covar[0:2,0:2]
+        distr_new_mean  = distribution_new.mean[0:2]
+        distr_new_covar = distribution_new.covar[0:2,0:2]
+        if samples!=None:
+            samples = samples[:,0:2]
                     
         if plot_samples:
             max_marker_size = 80;
@@ -249,8 +227,8 @@ def plotUpdate(distributions,cost_eval,samples,costs,weights,distributions_new,a
         mean_handle = ax.plot(distr_mean[0],distr_mean[1],'o',label='old')
         mean_handle_new = ax.plot(distr_new_mean[0],distr_new_mean[1],'o',label='new')
         mean_handle_link = ax.plot([distr_mean[0], distr_new_mean[0]],[distr_mean[1], distr_new_mean[1]],'-')
-        patch = plot_error_ellipse(distr_mean[0:2],distr_covar[0:2,0:2],ax)
-        patch_new = plot_error_ellipse(distr_new_mean[0:2],distr_new_covar[0:2,0:2],ax)
+        patch = plot_error_ellipse(distr_mean,distr_covar,ax)
+        patch_new = plot_error_ellipse(distr_new_mean,distr_new_covar,ax)
         if (highlight):
             plt.setp(mean_handle,color='red')
             plt.setp(mean_handle_new,color='blue')

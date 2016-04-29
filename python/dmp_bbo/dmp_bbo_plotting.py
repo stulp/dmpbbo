@@ -41,41 +41,21 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
         update_dir = '%s/update%05d' % (directory, i_update)
     
         # Read data
-        try:
-            n_parallel = np.loadtxt(update_dir+"/n_parallel.txt")
-        except IOError:
-            n_parallel = 1
+        mean = np.loadtxt(update_dir+"/distribution_mean.txt")
+        covar = np.loadtxt(update_dir+"/distribution_covar.txt")
+        distribution = DistributionGaussian(mean,covar)
         
-        if n_parallel==1:
-            mean = np.loadtxt(update_dir+"/distribution_mean.txt")
-            covar = np.loadtxt(update_dir+"/distribution_covar.txt")
-            distributions = [DistributionGaussian(mean,covar)]
-            
-            try:
-                mean = np.loadtxt(update_dir+"/distribution_new_mean.txt")
-                covar = np.loadtxt(update_dir+"/distribution_new_covar.txt")
-                distributions_new = [DistributionGaussian(mean,covar)]
-            except IOError:
-                distributions_new =[]
+        try:
+            mean = np.loadtxt(update_dir+"/distribution_new_mean.txt")
+            covar = np.loadtxt(update_dir+"/distribution_new_covar.txt")
+            distribution_new = DistributionGaussian(mean,covar)
+        except IOError:
+            distribution_new = None
     
-        else:
-            distributions = []
-            distributions_new = []
-            for i_parallel in range(n_parallel):
-                cur_file = '%s/distribution_%03d' % (update_dir, i_parallel)
-                mean = np.loadtxt(cur_file+'_mean.txt')
-                covar = np.loadtxt(cur_file+'_covar.txt')
-                distributions.append(DistributionGaussian(mean,covar))
-                
-            try:
-                for i_parallel in range(n_parallel):
-                    cur_file = '%s/distribution_new_%03d' % (update_dir, i_parallel)
-                    mean = np.loadtxt(cur_file+'_mean.txt')
-                    covar = np.loadtxt(cur_file+'_covar.txt')
-                    distributions_new.append(DistributionGaussian(mean,covar))
-            except IOError:
-                distributions_new =[]
-    
+        try:
+            covar_block_sizes = np.loadtxt(update_dir+"/covar_block_sizes.txt")
+        except IOError:
+            covar_block_sizes = len(distribution.mean)
         
         try:
             samples = np.loadtxt(update_dir+"/samples.txt")
@@ -105,9 +85,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
         if cost_eval!=None:
             learning_curve[i_update,1] = np.atleast_1d(cost_eval)[0]
         # Exploration magnitude
-        learning_curve[i_update,2] = 0.0
-        for distr in distributions:
-            learning_curve[i_update,2] += np.sqrt(distr.maxEigenValue()); 
+        learning_curve[i_update,2] = np.sqrt(distribution.maxEigenValue()); 
         
         n_subplots = 3
         i_subplot = 1
@@ -122,7 +100,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
         ax_space = fig.add_subplot(1,n_subplots,i_subplot)
         i_subplot += 1
         highlight = (i_update==0)
-        plotUpdate(distributions,cost_eval,samples,costs,weights,distributions_new,ax_space,highlight)
+        plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax_space,highlight)
             
         
     
@@ -165,7 +143,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
 #    
 #return (lines_ec, lines_lc)
 
-def saveUpdateRollouts(directory, i_update, distributions, rollout_eval, rollouts, weights, distributions_new):
+def saveUpdateRollouts(directory, i_update, distribution, rollout_eval, rollouts, weights, distribution_new):
     
     update_dir = '%s/update%05d' % (directory, i_update)
     if not os.path.exists(update_dir):
@@ -195,6 +173,6 @@ def saveUpdateRollouts(directory, i_update, distributions, rollout_eval, rollout
     for i_rollout in range(n_rollouts):
         samples[i_rollout,:] = rollouts[i_rollout].policy_parameters
     
-    saveUpdate(directory, i_update, distributions, cost_eval, samples, costs, weights, distributions_new)
+    saveUpdate(directory, i_update, distribution, cost_eval, samples, costs, weights, distribution_new)
 
 
