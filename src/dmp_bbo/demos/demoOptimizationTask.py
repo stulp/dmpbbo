@@ -21,7 +21,7 @@ def plotRollout(cost_vars,ax):
     return line_handles
 
 if __name__=='__main__':
-    executable = "../../../bin/demoEvolutionaryOptimizationTask"
+    executable = "../../../bin/demoOptimizationTask"
     
     if (not os.path.isfile(executable)):
         print ""

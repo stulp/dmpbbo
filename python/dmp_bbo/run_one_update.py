@@ -47,21 +47,22 @@ def prepareOptimization(directory,task,initial_distribution,updater,    n_sample
 def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, n_samples_per_update,i_update=None):
 
     if not i_update:
-        i_update = 0;
+        i_update = -1;
         dir_exists = True;
         while (dir_exists):
           i_update +=1
-          cur_directory = '%s/update%05d' % (directory, i_update)
+          cur_directory = '%s/update%05d/rollout001' % (directory, i_update)
           dir_exists = os.path.isdir(cur_directory)
         i_update-=1
         
-    update_dir = '%s/update%05d' % (directory, i_update)
-    if not os.path.isdir(update_dir):
-        os.makedirs(update_dir)
+    if i_update>=0:
+        update_dir = '%s/update%05d' % (directory, i_update)
+        if not os.path.isdir(update_dir):
+            os.makedirs(update_dir)
         
     print('======================================================')
     print('i_update = '+str(i_update))
-    if i_update==0:
+    if i_update==-1:
         print('NO UPDATES YET: PREPARE OPTIMIZATION')
         
         prepareOptimization(directory,task,initial_distribution,updater,    n_samples_per_update)
@@ -108,9 +109,9 @@ def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, 
         print('  * Saving update to  "'+update_dir+'/"')
         saveUpdateRollouts(directory, i_update, distribution, rollout_eval, rollouts, weights, distribution_new)
         
-    print('  * Saving distribution to "'+update_dir+'/"')
-    np.savetxt(update_dir+"/distribution_new_mean.txt",distribution_new.mean)
-    np.savetxt(update_dir+"/distribution_new_covar.txt",distribution_new.covar)
+        print('  * Saving distribution to "'+update_dir+'/"')
+        np.savetxt(update_dir+"/distribution_new_mean.txt",distribution_new.mean)
+        np.savetxt(update_dir+"/distribution_new_covar.txt",distribution_new.covar)
     
     # Update done! Increment counter, and save distribution to new dir.
     i_update += 1

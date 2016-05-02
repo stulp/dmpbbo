@@ -40,7 +40,7 @@ if __name__=='__main__':
     directory = "/tmp/demoOptimizationDmpParallel"
     command = executable+" "+directory
     print command
-    #subprocess.call(command, shell=True)
+    subprocess.call(command, shell=True)
       
     fig = plt.figure(1,figsize=(12, 4))
     plotOptimizationRollouts(directory,fig,plotRollout)

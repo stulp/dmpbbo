@@ -8,12 +8,11 @@ from distribution_gaussian import DistributionGaussian
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
-        
+    
     learning_curve = np.zeros((n_updates, 3))
-
+    
     if fig:
         ax = fig.add_subplot(131)
-
     
     # Optimization loop
     for i_update in range(n_updates): 
@@ -25,13 +24,12 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         samples = distribution.generateSamples(n_samples_per_update)
     
         # 2. Evaluate the samples
-        costs = []
+        costs = np.full(n_samples_per_update,0.0)
         for i_sample in range(n_samples_per_update):
-            costs.append(cost_function.evaluate(samples[i_sample,:]))
+            costs[i_sample] = cost_function.evaluate(samples[i_sample,:])
       
         # 3. Update parameters
         distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
-        
         
         # Bookkeeping and plotting
         
@@ -42,7 +40,7 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         learning_curve[i_update,1] = cost_eval
         # Exploration magnitude
         learning_curve[i_update,2] = np.sqrt(distribution.maxEigenValue()); 
-
+        
         # Plot summary of this update
         if fig:
             highlight = (i_update==0)
@@ -51,8 +49,7 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
             saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new)
         
         # Distribution is new distribution
-        distribution = distribution_new;
-        
+        distribution = distribution_new
         
     # Plot learning curve
     if fig:
@@ -63,5 +60,5 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
     if directory:
         saveCurve(directory,learning_curve)
         print('Saved results to "'+directory+'".')
-        
+    
     return learning_curve

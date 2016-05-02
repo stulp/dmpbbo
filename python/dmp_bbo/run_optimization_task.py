@@ -16,15 +16,14 @@ from dmp_bbo.dmp_bbo_plotting import saveUpdateRollouts, setColor
 def runOptimizationTask(task, task_solver, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
-  
+    
     learning_curve = np.zeros((n_updates, 3))
     
     if fig:
         ax_space   = fig.add_subplot(141)
         ax_rollout = fig.add_subplot(142)
-
+    
     # Optimization loop
-    update_summaries = []
     for i_update in range(n_updates): 
         
         # 0. Get cost of current distribution mean
@@ -35,8 +34,9 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         # 1. Sample from distribution
         samples = distribution.generateSamples(n_samples_per_update)
     
-        rollouts = []
+        # 2. Evaluate the samples
         costs = np.full(n_samples_per_update,0.0)
+        rollouts = []
         for i_sample in range(n_samples_per_update):
             
             # 2A. Perform the rollouts
@@ -47,14 +47,14 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
             costs[i_sample] = cur_costs[0]
 
             rollouts.append(Rollout(samples[i_sample,:],cost_vars,cur_costs))
-
+        
       
         # 3. Update parameters
         distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
-          
+        
         # Bookkeeping and plotting
         
-        # Update learning curve 
+        # Update learning curve
         # How many samples so far?  
         learning_curve[i_update,0] = i_update*n_samples_per_update
         # Cost of evaluation
@@ -66,12 +66,19 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         if fig:
             highlight = (i_update==0)
             plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax_space,highlight)
+            # Try plotting rollout with task solver
             h = task_solver.plotRollout(rollout_eval.cost_vars,ax_rollout)
-            setColor(h,i_update,n_updates)
+            if not h:
+                # Task solver didn't know how to plot the rollout, try plotting 
+                # it with task instead
+                h = task.plotRollout(rollout_eval.cost_vars,ax_rollout)
+            if h:
+                # If there is a handle, change its color depending on i_update
+                setColor(h,i_update,n_updates)
             
         if directory:
             saveUpdateRollouts(directory, i_update, distribution, rollout_eval, rollouts, weights, distribution_new)
-                
+        
         # Distribution is new distribution
         distribution = distribution_new
         
@@ -83,9 +90,6 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
     # Save learning curve to file, if necessary
     if directory:
         saveCurve(directory,learning_curve)
-    
+        print('Saved results to "'+directory+'".')
     
     return learning_curve
-
-
-

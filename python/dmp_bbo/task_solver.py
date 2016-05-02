@@ -16,5 +16,6 @@ class TaskSolver:
         raise NotImplementedError('subclasses must override performRollout()!')
         
     def plotRollout(self,cost_vars,ax):
-        print("plotRollout not implemented.")
+        #print("plotRollout not implemented.")
+        pass
 

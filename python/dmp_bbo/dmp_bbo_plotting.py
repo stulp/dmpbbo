@@ -36,7 +36,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
     learning_curve = np.zeros((n_updates, 3))
     
     
-    for i_update in range(1,n_updates):
+    for i_update in range(n_updates):
     
         update_dir = '%s/update%05d' % (directory, i_update)
     
