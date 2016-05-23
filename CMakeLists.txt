@@ -16,8 +16,8 @@ set(SHARED_OR_STATIC "STATIC")
 endif()
 
 
-set(LIB_INSTALL_DIR /usr/local/lib)
-set(INCLUDE_INSTALL_DIR /usr/local/include)
+set(LIB_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/lib)
+set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
 
 
 # Never build inside the source tree
