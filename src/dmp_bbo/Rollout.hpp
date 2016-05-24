@@ -106,7 +106,10 @@ private:
   Eigen::MatrixXd cost_vars_;
   /** The cost of this rollout. */
   Eigen::VectorXd cost_;  
-    
+  
+  /** Give boost serialization access to private members. */  
+  friend class boost::serialization::access;
+   
 };
 
 
