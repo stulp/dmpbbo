@@ -38,7 +38,7 @@ install(TARGETS testBasisFunctionsLWR  DESTINATION bin_test)
 ################################################################################
 # GMR
 add_executable(testSaveGMMMatrix testSaveGMMMatrix.cpp)
-target_link_libraries(testSaveGMMMatrix functionapproximators ${Boost_LIBRARIES})
+target_link_libraries(testSaveGMMMatrix functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS testSaveGMMMatrix  DESTINATION bin_test)
 
 add_executable(testMultiDimOutput testMultiDimOutput.cpp getFunctionApproximatorsVector.cpp)
