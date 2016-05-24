@@ -110,34 +110,25 @@ private:
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
    
+  /** Serialize class data members to boost archive. 
+   * \param[in] ar Boost archive
+   * \param[in] version Version of the class
+   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
+   */
+  template<class Archive>
+  void serialize(Archive & ar, DmpBbo::Rollout& rollout, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_NVP(policy_parameters_);
+    ar & BOOST_SERIALIZATION_NVP(cost_vars_);
+    ar & BOOST_SERIALIZATION_NVP(cost_);
+  }
+  
 };
 
 
 
 
 }
-
-
-/** Serialization function for boost::serialization. */
-namespace boost {
-namespace serialization {
-
-/** Serialize class data members to boost archive. 
- * \param[in] ar Boost archive
- * \param[in] rollout Rollout object to serialize.
- * \param[in] version Version of the class
- * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
- */
-template<class Archive>
-void serialize(Archive & ar, DmpBbo::Rollout& rollout, const unsigned int version)
-{
-  ar & BOOST_SERIALIZATION_NVP(rollout.policy_parameters_);
-  ar & BOOST_SERIALIZATION_NVP(rollout.cost_vars_);
-  ar & BOOST_SERIALIZATION_NVP(rollout.cost_);
-}
-
-} // namespace serialization
-} // namespace boost
 
 
 /** Don't add version information to archives. */
