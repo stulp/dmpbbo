@@ -1,6 +1,11 @@
 import numpy as np
+import sys
+import os
 
-from distribution_gaussian import DistributionGaussian
+lib_path = os.path.abspath('../../python/')
+sys.path.append(lib_path)
+
+from bbo.distribution_gaussian import DistributionGaussian
 
 class Updater:
     def updateDistribution(distribution, samples, costs):
@@ -33,6 +38,11 @@ class UpdaterCovarDecay(Updater):
 
 def costsToWeights(costs, weighting_method, eliteness):
     
+    # Costs can be a 2D array or a list of lists. In this case, the first
+    # column is the sum of the other columns (which contain the different cost
+    # components). In this  case, we should use only the first column.
+    costs = [np.atleast_1d(x)[0] for x in costs]
+
     if weighting_method == 'PI-BB':
         # PI^2 style weighting: continuous, cost exponention
         h = eliteness # In PI^2, eliteness parameter is known as "h"

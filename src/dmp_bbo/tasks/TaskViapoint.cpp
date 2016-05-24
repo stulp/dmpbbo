@@ -62,7 +62,7 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
   assert(viapoint_.size()==goal.size());
 }
   
-void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const VectorXd& task_parameters, VectorXd& costs) const
+void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
 {
   // cost_vars is assumed to have following structure
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0  forcing_1..forcing_D
@@ -149,6 +149,11 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const VectorXd& ta
   costs[3] = goal_weight_*delay_cost;
   costs[0] = costs[1] +  costs[2] +  costs[3];
 }
+
+unsigned int TaskViapoint::getNumberOfCostComponents(void) const
+{ 
+  return 3;
+};
 
 void TaskViapoint::setCostFunctionWeighting(double viapoint_weight, double acceleration_weight, double goal_weight)
 {

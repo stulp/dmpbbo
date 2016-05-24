@@ -36,7 +36,7 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
               active = activations>(max(activations)*0.001)
               line_handles = ax.plot(inputs[active],lines[active], '--',color='#aaaaaa',linewidth=0.5)
             else:
-              for ii in xrange(n_basis_functions):
+              for ii in range(n_basis_functions):
                   active = activations[:,ii]>(max(activations[:,ii])*0.0001)
                   line_handles = ax.plot(inputs[active],lines[active,ii], '--',color='#aaaaaa',linewidth=1)
     
@@ -79,7 +79,7 @@ def plotLocallyWeightedLines(inputs,lines,ax,n_samples_per_dim,activations=None,
         #line_handles = ax.plot_wireframe(inputs_0_on_grid,inputs_1_on_grid,line_on_grid,linewidth=1,rstride=1, cstride=1, color="#333333")
           
     else:
-        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
         line_handles = []
         
     return line_handles
@@ -146,7 +146,7 @@ if __name__=='__main__':
     if (len(sys.argv)==2):
         directory = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n';
+        print('\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n')
         sys.exit()
     
   

@@ -14,15 +14,23 @@ from bbo.run_optimization import runOptimization
 class DemoCostFunctionDistanceToPoint(CostFunction):
     """ CostFunction in which the distance to a pre-defined point must be minimized."""
 
-    def __init__(self,point):
+    def __init__(self,point,regularization_weight=1.0):
         """ Constructor.
         \param[in] point Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
+        self.regularization_weight = regularization_weight
+        
   
     def evaluate(self,sample):
         # Compute distance from sample to point
-        return [np.linalg.norm(sample-self.point)]
+        dist = np.linalg.norm(sample-self.point)
+        # Regularization term
+        if self.regularization_weight>0:
+            regularization = self.regularization_weight*np.linalg.norm(sample)
+            return [dist+regularization, dist, regularization]
+        else:
+            return [dist]
 
 if __name__=="__main__":
 
@@ -31,8 +39,9 @@ if __name__=="__main__":
         directory = sys.argv[1]
 
     n_dims = 2
-    minimum = np.full(n_dims,0.0)
-    cost_function = DemoCostFunctionDistanceToPoint(minimum)
+    minimum = np.full(n_dims,2.0)
+    regul_weight = 1.0
+    cost_function = DemoCostFunctionDistanceToPoint(minimum,regul_weight)
 
     
     mean_init  =  np.full(n_dims,5.0)

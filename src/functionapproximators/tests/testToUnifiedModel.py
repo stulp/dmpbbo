@@ -20,10 +20,10 @@ if __name__=='__main__':
     executable = "../../../bin_test/testToUnifiedModel"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     function_approximator_names = ["LWR","RBFN","GPR","GMR","LWPR","IRFRLS"]
@@ -57,7 +57,7 @@ if __name__=='__main__':
                 plotDataFromDirectory(directory_fa,ax)
                 ax.set_ylim(-1.0,1.5)
             except IOError:
-                print "WARNING: Could not find data for function approximator "+name
+                print("WARNING: Could not find data for function approximator "+name)
             ax.set_title(name+" "+uni_name)
         
         #ax.legend(['f(x)','+std','-std','residuals'])

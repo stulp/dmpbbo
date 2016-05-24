@@ -62,17 +62,18 @@ bool saveToDirectory(string directory, int i_update, const DistributionGaussian&
 bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const vector<DistributionGaussian>& distribution_new, bool overwrite)
 {
   
-  double* cost_eval = NULL;
+  VectorXd cost_eval;
   if (rollout_eval!=NULL)
+    rollout_eval->cost(cost_eval);
+  
+  MatrixXd costs(rollouts.size(),rollouts[0]->getNumberOfCostComponents());
+  for (unsigned int ii=0; ii<rollouts.size(); ii++)
   {
-    double c = rollout_eval->total_cost();
-    cost_eval = &c;
+    VectorXd cur_cost;
+    rollouts[ii]->cost(cur_cost);
+    costs.row(ii) = cur_cost;
   }
   
-  VectorXd costs(rollouts.size());
-  for (unsigned int ii=0; ii<rollouts.size(); ii++)
-    costs[ii] = rollouts[ii]->total_cost();
-
   // Save update information
   MatrixXd samples;
   saveToDirectory(directory, i_update, distribution, cost_eval, samples, costs, weights, distribution_new,overwrite);
@@ -109,20 +110,26 @@ void runOptimizationTask(
   bool overwrite,
   bool only_learning_curve)
 {
+  
+  int n_cost_components = task->getNumberOfCostComponents();
+
   // Some variables
   VectorXd sample_eval;
-  VectorXd cost_eval;
   MatrixXd cost_vars_eval;
-
+  VectorXd cost_eval(1+n_cost_components);
+  
   MatrixXd samples;
   MatrixXd cost_vars;
-  VectorXd cur_costs;
-  VectorXd total_costs(n_samples_per_update);
-  
   VectorXd weights;
-
+  MatrixXd costs(n_samples_per_update,1+n_cost_components);
+  
+  // tmp variables
+  VectorXd total_costs(n_samples_per_update);
+  VectorXd cur_cost(1+n_cost_components);
+  
   // Bookkeeping
-  MatrixXd learning_curve(n_updates,3);
+  MatrixXd learning_curve(n_updates,2+n_cost_components);
+  MatrixXd exploration_curve(n_updates,2);
   
   if (save_directory.empty()) 
     cout << "init  =  " << "  distribution=" << *initial_distribution;
@@ -136,7 +143,7 @@ void runOptimizationTask(
     // 0. Get cost of current distribution mean
     sample_eval = distribution.mean().transpose();
     task_solver->performRollout(sample_eval,cost_vars_eval);
-    task->evaluateRollout(cost_vars_eval,cost_eval);
+    task->evaluateRollout(cost_vars_eval,sample_eval,cost_eval);
     Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
     
     // 1. Sample from distribution
@@ -149,16 +156,17 @@ void runOptimizationTask(
       task_solver->performRollout(samples.row(i_sample),cost_vars);
 
       // 2B. Evaluate the rollout
-      task->evaluateRollout(cost_vars,cur_costs);
-      total_costs[i_sample] = cur_costs[0];
+      task->evaluateRollout(cost_vars,samples.row(i_sample),cur_cost);
+      costs.row(i_sample) = cur_cost;
 
-      rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_costs);
+      rollouts[i_sample] = new Rollout(samples.row(i_sample),cost_vars,cur_cost);
       
     }
-    
   
     // 3. Update parameters (first column of costs contains sum of cost components)
+    total_costs = costs.col(0);
     updater->updateDistribution(distribution, samples, total_costs, weights, distribution_new);
+    
     
     // Bookkeeping
     // Some output and/or saving to file (if "directory" is set)
@@ -169,10 +177,17 @@ void runOptimizationTask(
     else
     {
       // Update learning curve
-      learning_curve(i_update,0) = i_update*n_samples_per_update;      // How many samples so far?
-      learning_curve(i_update,1) = cost_eval[0];                       // Cost of evaluation
-      learning_curve(i_update,2) = sqrt(distribution.maxEigenValue()); // Exploration magnitude
-      // Save more than just learning curve. 
+      // How many samples?
+      int i_samples = i_update*n_samples_per_update;
+      learning_curve(i_update,0) = i_samples;
+      // Cost of evaluation
+      learning_curve.block(i_update,1,1,1+n_cost_components) = cost_eval.transpose();
+      
+      // Exploration magnitude
+      exploration_curve(i_update,0) = i_samples;
+      exploration_curve(i_update,1) = sqrt(distribution.maxEigenValue()); 
+      
+      // Save more than just learning curve.
       if (!only_learning_curve)
       {
           saveToDirectory(save_directory,i_update,distribution,rollout_eval,rollouts,weights,distribution_new);
@@ -188,8 +203,11 @@ void runOptimizationTask(
   
   // Save learning curve to file, if necessary
   if (!save_directory.empty())
+  {
+    // Todo: save cost labels also
+    saveMatrix(save_directory, "exploration_curve.txt",exploration_curve,overwrite);
     saveMatrix(save_directory, "learning_curve.txt",learning_curve,overwrite);
-  
+  }
 }
 
 void runOptimizationTask(ExperimentBBO* experiment, std::string save_directory, bool overwrite,   bool only_learning_curve)
@@ -206,7 +224,7 @@ void runOptimizationTask(ExperimentBBO* experiment, std::string save_directory, 
    only_learning_curve);
 }
 
-void runOptimizationParallel(
+void runOptimizationParallelDeprecated(
   Task* task, 
   TaskSolver* task_solver, 
   vector<DistributionGaussian*> initial_distributions, 
@@ -271,7 +289,7 @@ void runOptimizationParallel(
     for (int pp=0; pp<n_parallel; pp++)
       sample_eval.segment(offsets[pp],offsets[pp+1]-offsets[pp]) = distributions[pp].mean().transpose();
     task_solver->performRollout(sample_eval,cost_vars_eval);
-    task->evaluateRollout(cost_vars_eval,cost_eval);
+    task->evaluateRollout(cost_vars_eval,sample_eval,cost_eval);
     Rollout* rollout_eval = new Rollout(sample_eval,cost_vars_eval,cost_eval);
     
     // 1. Sample from distribution
@@ -290,7 +308,7 @@ void runOptimizationParallel(
       task_solver->performRollout(samples.row(i_sample), cost_vars);
       
       // 3. Evaluate the last batch of rollouts
-      task->evaluateRollout(cost_vars,cur_costs);
+      task->evaluateRollout(cost_vars,samples.row(i_sample),cur_costs);
 
       // Bookkeeping
       costs[i_sample] = cur_costs[0];

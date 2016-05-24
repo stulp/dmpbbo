@@ -89,7 +89,7 @@ public:
   /** Get the number of individual cost components that constitute the final total cost.
    * \return The number of cost components.
    */
-  int n_cost_components(void) const;
+  unsigned int getNumberOfCostComponents(void) const;
   
   /**
    * Save a rollout to a directory

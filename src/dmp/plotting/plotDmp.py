@@ -15,10 +15,10 @@ def plotDmp(data,fig,forcing_terms_data=0,fa_output_data=0):
     # Number of columns in the data
     n_cols = data.shape[1]             
     # Dimensionality of dynamical system. -1 because of time, /2 because both x and xd are stored.
-    n_state_length = (n_cols-1)/2      
+    n_state_length = (n_cols-1)//2      
     # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
-    n_dims_dmp = (n_state_length-2)/3
-    D = n_dims_dmp;  # Abbreviation for convencience
+    n_dims_dmp = (n_state_length-2)//3
+    D = n_dims_dmp  # Abbreviation for convencience
     
     # We will loop over each of the subsystems of the DMP: prepare some variables here
     # Names of each of the subsystems
@@ -43,7 +43,7 @@ def plotDmp(data,fig,forcing_terms_data=0,fa_output_data=0):
           axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]+2))
           
         
-        indices = system_indices[i_system];
+        indices = list(system_indices[i_system])
         indices_xd =[i+n_state_length for i in indices] # +n_state_length because xd is in second half
         indices.extend(indices_xd) # For derivative
         indices.append(-1) # For time
@@ -98,7 +98,7 @@ if __name__=='__main__':
       directory = str(sys.argv[1])
       filename = str(sys.argv[2])
     else:
-      print '\nUsage: '+sys.argv[0]+' <directory> <filename>\n';
+      print('\nUsage: '+sys.argv[0]+' <directory> <filename>\n')
       sys.exit()
     
     # Read data

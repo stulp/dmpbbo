@@ -95,7 +95,7 @@ if __name__=="__main__":
     if (len(sys.argv)==2):
         directory = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <directory>\n';
+        print('\nUsage: '+sys.argv[0]+' <directory>\n')
         sys.exit()
   
     performRolloutsFakeRobot(directory)

@@ -46,9 +46,9 @@ bool saveToDirectory(
   string directory, 
   int i_update, 
   const DistributionGaussian& distribution, 
-  double* cost_eval, 
+  const Eigen::VectorXd& cost_eval, 
   const Eigen::MatrixXd& samples, 
-  const Eigen::VectorXd& costs, 
+  const Eigen::MatrixXd& costs, 
   const Eigen::VectorXd& weights, 
   const DistributionGaussian& distribution_new, 
   bool overwrite)
@@ -66,9 +66,9 @@ bool saveToDirectory(
   std::string directory, 
   int i_update, 
   const std::vector<DistributionGaussian>& distributions, 
-  double* cost_eval, 
+  const Eigen::VectorXd& cost_eval, 
   const Eigen::MatrixXd& samples, 
-  const Eigen::VectorXd& costs, 
+  const Eigen::MatrixXd& costs, 
   const Eigen::VectorXd& weights, 
   const std::vector<DistributionGaussian>& distributions_new, bool overwrite)
 {
@@ -145,10 +145,9 @@ bool saveToDirectory(
   if (!saveMatrix(dir, "distribution_new_mean.txt", mean_merged,  ow)) return false;
   if (!saveMatrix(dir, "distribution_new_covar.txt",covar_merged, ow)) return false;
   
-  if (cost_eval!=NULL)
+  if (cost_eval.size()>0)
   {
-    VectorXd cost_eval_vec = VectorXd::Constant(1,*cost_eval);
-    if (!saveMatrix(dir, "cost_eval.txt",            cost_eval_vec,          ow)) return false;
+    if (!saveMatrix(dir, "cost_eval.txt",            cost_eval,          ow)) return false;
   }
 
   if (samples.size()>0)
@@ -171,16 +170,24 @@ void runOptimization(
   bool overwrite,
   bool only_learning_curve)
 {
+  
+  int n_cost_components = cost_function->getNumberOfCostComponents();
 
   // Some variables
-  double cost_eval;
+  VectorXd sample_eval;
+  VectorXd cost_eval(1+n_cost_components);
+  
   MatrixXd samples;
-  VectorXd sample;
   VectorXd weights;
-  VectorXd costs(n_samples_per_update);
+  MatrixXd costs(n_samples_per_update,1+n_cost_components);
+  
+  // tmp variables
+  VectorXd total_costs(n_samples_per_update);
+  VectorXd cur_cost(1+n_cost_components);
   
   // Bookkeeping
-  MatrixXd learning_curve(n_updates,3);
+  MatrixXd learning_curve(n_updates,2+n_cost_components);
+  MatrixXd exploration_curve(n_updates,2);
   
   if (save_directory.empty()) 
     cout << "init  =  " << "  distribution=" << *initial_distribution;
@@ -192,17 +199,22 @@ void runOptimization(
   for (int i_update=0; i_update<n_updates; i_update++)
   {
     // 0. Get cost of current distribution mean
-    cost_eval = cost_function->evaluate(distribution.mean().transpose());
+    sample_eval = distribution.mean().transpose();
+    cost_function->evaluate(sample_eval,cost_eval);
     
     // 1. Sample from distribution
     distribution.generateSamples(n_samples_per_update, samples);
       
     // 2. Evaluate the samples
     for (int i_sample=0; i_sample<n_samples_per_update; i_sample++)
-      costs[i_sample] = cost_function->evaluate(samples.row(i_sample));
+    {
+      cost_function->evaluate(samples.row(i_sample),cur_cost);
+      costs.row(i_sample) = cur_cost;
+    }
   
-    // 3. Update parameters
-    updater->updateDistribution(distribution, samples, costs, weights, distribution_new);
+    // 3. Update parameters (first column of costs contains sum of cost components)
+    total_costs = costs.col(0);
+    updater->updateDistribution(distribution, samples, total_costs, weights, distribution_new);
     
     
     // Bookkeeping
@@ -214,13 +226,20 @@ void runOptimization(
     else
     {
       // Update learning curve
-      learning_curve(i_update,0) = i_update*n_samples_per_update; // How many samples so far?
-      learning_curve(i_update,1) = cost_eval;                     // Cost of evaluation
-      learning_curve(i_update,2) = sqrt(distribution.maxEigenValue()); // Exploration magnitude
+      // How many samples?
+      int i_samples = i_update*n_samples_per_update;
+      learning_curve(i_update,0) = i_samples;
+      // Cost of evaluation
+      learning_curve.block(i_update,1,1,1+n_cost_components) = cost_eval.transpose();
+      
+      // Exploration magnitude
+      exploration_curve(i_update,0) = i_samples;
+      exploration_curve(i_update,1) = sqrt(distribution.maxEigenValue()); 
+      
       // Save more than just learning curve.
       if (!only_learning_curve)
       {
-        saveToDirectory(save_directory, i_update, distribution, &cost_eval, samples, costs, weights, distribution_new);
+        saveToDirectory(save_directory, i_update, distribution, cost_eval, samples, costs, weights, distribution_new);
       }
     }
     
@@ -231,8 +250,11 @@ void runOptimization(
   
   // Save learning curve to file, if necessary
   if (!save_directory.empty())
+  {
+    // Todo: save cost labels also
+    saveMatrix(save_directory, "exploration_curve.txt",exploration_curve,overwrite);
     saveMatrix(save_directory, "learning_curve.txt",learning_curve,overwrite);
-
+  }
 }
 
 

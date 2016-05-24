@@ -6,3 +6,5 @@ build_dir*
 bin/
 bin_test/
 thirdparty/
+include/
+lib/

@@ -124,6 +124,6 @@ int main(int n_args, char* args[])
   int n_updates = 40;
   int n_samples_per_update = 15;
   bool overwrite = true;
-  runOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory,overwrite);
+  runOptimizationParallelDeprecated(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

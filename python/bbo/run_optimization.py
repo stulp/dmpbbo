@@ -1,15 +1,22 @@
 import numpy as np
 import math
 import os
+import sys
 
-from bbo_plotting import plotUpdate, plotCurve, saveUpdate, saveCurve
-from distribution_gaussian import DistributionGaussian
+lib_path = os.path.abspath('../../python/')
+sys.path.append(lib_path)
+
+from bbo.bbo_plotting import plotUpdate, plotLearningCurve, plotExplorationCurve
+from bbo.bbo_plotting import saveUpdate, saveLearningCurve, saveExplorationCurve
+from bbo.distribution_gaussian import DistributionGaussian
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
     
-    learning_curve = np.zeros((n_updates, 3))
+    all_costs = []
+    learning_curve = []
+    exploration_curve = []
     
     if fig:
         ax = fig.add_subplot(131)
@@ -24,22 +31,24 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         samples = distribution.generateSamples(n_samples_per_update)
     
         # 2. Evaluate the samples
-        costs = np.full(n_samples_per_update,0.0)
+        costs = []
         for i_sample in range(n_samples_per_update):
-            costs[i_sample] = cost_function.evaluate(samples[i_sample,:])
+            costs.append(cost_function.evaluate(samples[i_sample,:]))
       
         # 3. Update parameters
         distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
         
         # Bookkeeping and plotting
-        
+        # All the costs so far
+        all_costs.extend(costs)
+        # Update exploration curve
+        cur_samples = i_update*n_samples_per_update
+        cur_exploration = np.sqrt(distribution.maxEigenValue())
+        exploration_curve.append([cur_samples,cur_exploration])
         # Update learning curve
-        # How many samples so far?  
-        learning_curve[i_update,0] = i_update*n_samples_per_update
-        # Cost of evaluation
-        learning_curve[i_update,1] = cost_eval
-        # Exploration magnitude
-        learning_curve[i_update,2] = np.sqrt(distribution.maxEigenValue()); 
+        learning_curve.append([cur_samples])
+        learning_curve[-1].extend(cost_eval)
+        
         
         # Plot summary of this update
         if fig:
@@ -51,14 +60,16 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         # Distribution is new distribution
         distribution = distribution_new
         
+        
     # Plot learning curve
     if fig:
-        axs = [ fig.add_subplot(132), fig.add_subplot(133)]
-        plotCurve(learning_curve,axs)
+        plotExplorationCurve(exploration_curve,fig.add_subplot(132))
+        plotLearningCurve(learning_curve,fig.add_subplot(133),all_costs)
 
     # Save learning curve to file, if necessary
     if directory:
-        saveCurve(directory,learning_curve)
+        saveLearningCurve(directory,learning_curve)
+        saveExplorationCurve(directory,exploration_curve)
         print('Saved results to "'+directory+'".')
     
     return learning_curve

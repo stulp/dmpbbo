@@ -19,10 +19,10 @@ from plotDmp import plotDmp
 executable = "../../../bin/demoDmpContextual"
 
 if (not os.path.isfile(executable)):
-    print ""
-    print "ERROR: Executable '"+executable+"' does not exist."
-    print "Please call 'make install' in the build directory first."
-    print ""
+    print("")
+    print("ERROR: Executable '"+executable+"' does not exist.")
+    print("Please call 'make install' in the build directory first.")
+    print("")
     sys.exit(-1);
 
 # Call the executable with the directory to which results should be written
@@ -30,16 +30,16 @@ main_directory = "/tmp/demoDmpContextual"
 
 # Test both 1-step and 2-step Dmps
 for n_dmp_contextual_step in [1, 2]:
-    print "_______________________________________________________________"
-    print "Demo for "+str(n_dmp_contextual_step)+"-step contextual Dmp"
+    print("_______________________________________________________________")
+    print("Demo for "+str(n_dmp_contextual_step)+"-step contextual Dmp")
     
     directory = main_directory + "/Step"+str(n_dmp_contextual_step)
 
     command = executable+" "+directory+" "+str(n_dmp_contextual_step)
-    print command
+    print(command)
     subprocess.call(command, shell=True)
     
-    print "Plotting"
+    print("Plotting")
     
     task_parameters_demos   = numpy.loadtxt(directory+"/task_parameters_demos.txt")
     task_parameters_repros   = numpy.loadtxt(directory+"/task_parameters_repros.txt")

@@ -20,7 +20,7 @@ sys.path.append(lib_path)
 a*x^2 + c \f$ best matches a set of target values y_target for a set of input values x
     """
 
-    def __init__(self, a, c, inputs):
+    def __init__(self, a, c, inputs, regularization_weight=0.1):
         """ Constructor
         \param[in] a a in \f$ y = a*x^2 + c \f$
         \param[in] c c in \f$ y = a*x^2 + c \f$
@@ -29,16 +29,23 @@ a*x^2 + c \f$ best matches a set of target values y_target for a set of input va
         self.inputs = inputs;
         # Compute a*x^2 + c
         self.targets = [a*x*x + c for x in inputs]
+        self.regularization_weight = regularization_weight
   
-    def evaluateRollout(self, cost_vars):
+    def costLabels(self):
+        return ['MSE','regularization']
+  
+    def evaluateRollout(self, cost_vars, sample):
         """ Cost function
         \param[in] cost_vars y in \f$ y = a*x^2 + c \f$
         \return costs Costs of the cost_vars
         """
         diff_square = np.square(cost_vars-self.targets)
-        costs = [np.mean(diff_square)]
+        regularization = self.regularization_weight*np.linalg.norm(sample)
+        costs = [0, np.mean(diff_square), regularization]
+        costs[0] = sum(costs[1:])
         return costs
-
+        
+        
     def plotRollout(self,cost_vars,ax):
         line_handles = ax.plot(self.inputs,cost_vars.T,linewidth=0.5)
         ax.plot(self.inputs,self.targets,'-o',color='k',linewidth=2)
@@ -50,7 +57,7 @@ if __name__=="__main__":
     if (len(sys.argv)>=2):
         directory = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <directory> [plot_results]\n';
+        print('\nUsage: '+sys.argv[0]+' <directory> [plot_results]\n')
         sys.exit()
 
     plot_results = False
@@ -62,7 +69,8 @@ if __name__=="__main__":
     c = -1.0
     n_params = 2
 
-    task = DemoTaskApproximateQuadraticFunction(a,c,inputs)
+    regularization = 0.01
+    task = DemoTaskApproximateQuadraticFunction(a,c,inputs,regularization)
   
     mean_init  =  np.full(n_params,0.5)
     covar_init =  0.25*np.eye(n_params)

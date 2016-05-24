@@ -8,8 +8,8 @@ import inspect
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from rollout import loadRolloutFromDirectory, loadRolloutsFromDirectory 
-from dmp_bbo_plotting import saveUpdateRollouts
+from dmp_bbo.rollout import loadRolloutFromDirectory, loadRolloutsFromDirectory 
+from dmp_bbo.dmp_bbo_plotting import saveUpdateRollouts
 from bbo.distribution_gaussian import DistributionGaussian
 from bbo.distribution_gaussian import loadDistributionGaussianFromDirectory
 from dmp_bbo.task import Task
@@ -80,16 +80,19 @@ def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, 
         n_samples = len(rollouts)
     
         print('  * Evaluating costs')
-        cost_eval = task.evaluateRollout(rollout_eval.cost_vars)
-        rollout_eval.cost = np.atleast_1d(cost_eval)
+        sample = rollout_eval.policy_parameters
+        cost_eval = task.evaluateRollout(rollout_eval.cost_vars,sample)
+        rollout_eval.cost = cost_eval
         
-        costs = np.full(n_samples,0.0)
+        costs = []
         for i_rollout in range(n_samples):
           
             # 2B. Evaluate the samples
-            cur_costs = task.evaluateRollout(rollouts[i_rollout].cost_vars)
+            cost_vars = rollouts[i_rollout].cost_vars
+            sample = rollouts[i_rollout].policy_parameters
+            cur_costs = task.evaluateRollout(cost_vars,sample)
             rollouts[i_rollout].cost = cur_costs
-            costs[i_rollout] = np.atleast_1d(cur_costs)
+            costs.append(cur_costs)
       
         # 3. Update parameters
         print('UPDATING DISTRIBUTION')

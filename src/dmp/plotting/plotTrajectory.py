@@ -35,7 +35,7 @@ if __name__=='__main__':
     if (len(sys.argv)==2):
         filename = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <filename>    (trajectory is read from file)\n';
+        print('\nUsage: '+sys.argv[0]+' <filename>    (trajectory is read from file)\n')
         sys.exit()
         
     fig = plt.figure()                                                            

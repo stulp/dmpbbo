@@ -21,24 +21,24 @@ if __name__=='__main__':
     executable = "../../../bin/demoDynamicalSystems"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     # See if input directory was passed
     if (len(sys.argv)<2 or len(sys.argv)>3):
-        print '\nUsage: '+sys.argv[0]+' <test1> [test2]\n';
-        print 'Available test labels are:'
-        print '   rungekutta - Use 4th-order Runge-Kutta numerical integration.'
-        print '   euler      - Use simple Euler numerical integration.'
-        print '   analytical - Compute analytical solution (rather than numerical integration)'
-        print '   tau        - Change the time constant "tau"'
-        print '   attractor  - Change the attractor state during the integration'
-        print '   perturb    - Perturb the system during the integration' 
-        print ''
-        print 'If you call with two tests, the results of the two are compared in one plot.\n'
+        print('\nUsage: '+sys.argv[0]+' <test1> [test2]\n')
+        print('Available test labels are:')
+        print('   rungekutta - Use 4th-order Runge-Kutta numerical integration.')
+        print('   euler      - Use simple Euler numerical integration.')
+        print('   analytical - Compute analytical solution (rather than numerical integration)')
+        print('   tau        - Change the time constant "tau"')
+        print('   attractor  - Change the attractor state during the integration')
+        print('   perturb    - Perturb the system during the integration')
+        print('')
+        print('If you call with two tests, the results of the two are compared in one plot.\n')
         sys.exit()
         
     demo_labels = [];
@@ -52,8 +52,8 @@ if __name__=='__main__':
     for demo_label in demo_labels:
       command += " "+demo_label
      
-    print "____________________________________________________________________"
-    print command
+    print("____________________________________________________________________")
+    print(command)
     subprocess.call(command, shell=True)
     
     figure_number = 1;

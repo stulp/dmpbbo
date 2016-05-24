@@ -29,10 +29,10 @@ if __name__=='__main__':
     executable = "../../../bin_test/testFunctionApproximatorTraining"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     fig_number = 1;     
@@ -43,7 +43,7 @@ if __name__=='__main__':
       
         # Call the executable with the directory to which results should be written
         command = executable+" "+directory+" "+fa_name
-        #print command
+        print(command)
         subprocess.call(command, shell=True)
     
     for fa_name in fa_names:

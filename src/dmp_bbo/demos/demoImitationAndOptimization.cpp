@@ -92,7 +92,7 @@ void runImitationAndOptimization(vector<FunctionApproximator*> function_approxim
   int n_updates = 50;
   int n_samples_per_update = 15;
   
-  runOptimizationParallel(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory);
+  runOptimizationParallelDeprecated(task, task_solver, distributions, updater, n_updates, n_samples_per_update,directory);
   
   // Save the initial data (doing this after runOptimization so that it can take care of
   // checking/making the directory)

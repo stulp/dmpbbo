@@ -1,9 +1,12 @@
 import numpy as np
-import os
+import os, sys
 import matplotlib.pyplot as plt
 from pylab import mean
 
 from matplotlib.patches import Ellipse
+
+lib_path = os.path.abspath('../../python/')
+sys.path.append(lib_path)
 
 from bbo.distribution_gaussian import DistributionGaussian
 
@@ -37,28 +40,48 @@ def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
     ax.set_ylim(y_limits)
 
 
-def plotLearningCurve(samples_eval,costs_eval,ax,costs_all=[]):
-    # Plot costs of all individual samples 
+def plotLearningCurve(learning_curve,ax,costs_all=[],cost_labels=[]):
+
+    # Plot (sum of) costs of all individual samples 
     if (len(costs_all)>0):
+        # costs_all may also contain individual cost components. Only take
+        # first one, because it represents the sum of the individual comps.
+        costs_all = np.atleast_2d(costs_all)[:,0]
         ax.plot(costs_all,'.',color='gray')
+        
     # Plot costs at evaluations 
-    line = ax.plot(samples_eval,costs_eval,'-',color='blue',linewidth=2)
+    learning_curve = np.array(learning_curve)
+    # Sum of cost components
+    samples_eval = learning_curve[:,0]
+    costs_eval = learning_curve[:,1:]
+    lines = ax.plot(samples_eval,costs_eval[:,0],'-',color='black',linewidth=2)
+    # Individual cost components
+    if costs_eval.shape[1]>1:
+        lines.extend(ax.plot(samples_eval,costs_eval[:,1:],'-',linewidth=1))
+    
+    # Annotation
     ax.set_xlabel('number of evaluations')
     ax.set_ylabel('cost')
     ax.set_title('Learning curve')
-    y_limits = [0,1.2*max(costs_eval)];
-    ax.set_ylim(y_limits)
-    return line
-
     
-def plotExplorationCurve(n_samples_per_update,exploration_curve,ax):
-    line = ax.plot(n_samples_per_update,exploration_curve,'-',color='green',linewidth=2)
+    if len(cost_labels)>0:
+        cost_labels.insert(0,'total cost')
+        plt.legend(lines, cost_labels)
+
+    y_limits = [0,1.2*np.max(costs_eval)]
+    ax.set_ylim(y_limits)
+    return lines
+    
+    
+def plotExplorationCurve(exploration_curve,ax):    
+    exploration_curve = np.array(exploration_curve)
+    line = ax.plot(exploration_curve[:,0],exploration_curve[:,1],'-',color='green',linewidth=2)
     ax.set_xlabel('number of evaluations')
     ax.set_ylabel('sqrt of max. eigval of covar')
     ax.set_title('Exploration magnitude')
     return line
 
-def plotCurve(curve,axs,costs_all=[]):
+def plotCurveDeprecated(curve,axs,costs_all=[]):
     lines = []
     if curve.shape[1]>2 and len(axs)>=2: # Plot exploration too?
         ax_explo = axs[0]
@@ -81,11 +104,18 @@ def plotCurve(curve,axs,costs_all=[]):
     lines.append(line)
     return lines
 
-def saveCurve(directory,learning_curve):
+def saveLearningCurve(directory,learning_curve):
     np.savetxt(directory+'/learning_curve.txt',learning_curve)
     
-def loadCurve(directory):
+def loadLearningCurve(directory):
     return np.loadtxt(directory+'/learning_curve.txt')
+
+def saveExplorationCurve(directory,exploration_curve):
+    np.savetxt(directory+'/exploration_curve.txt',exploration_curve)
+    
+def loadExplorationCurve(directory):
+    return np.loadtxt(directory+'/exploration_curve.txt')
+    
     
 def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new):
 
@@ -115,7 +145,7 @@ def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.
     std_samples = all_eval_at_samples.std(0)
     if (sum(std_samples)>0.0001):
-        print "WARNING: updates must be the same"
+        print("WARNING: updates must be the same")
     eval_at_samples = all_eval_at_samples[0];
             
     # Compute average and standard deviation for learning and exploration curves
@@ -135,7 +165,7 @@ def plotExplorationCurves(all_covar_at_samples,all_exploration_curves,ax):
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.
     std_samples = all_covar_at_samples.std(0)
     if (sum(std_samples)>0.0001):
-        print "WARNING: updates must be the same"
+        print("WARNING: updates must be the same")
     covar_at_samples = all_covar_at_samples[0];
 
     # Compute average and standard deviation for learning and exploration curves
@@ -199,14 +229,14 @@ def plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,
     
     n_dims = len(distribution.mean)
     if (n_dims==1):
-        print "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
+        print("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
         return
         
     # ZZZ Take into consideration block_covar_sizes to plot sub blocks in 
     # different subplots
     
     if (n_dims>=2):
-        #print "Sorry, only know how to plot for n_dims==2, throwing away excess dimensions"
+        #print("Sorry, only know how to plot for n_dims==2, throwing away excess dimensions")
         distr_mean = distribution.mean[0:2]
         distr_covar = distribution.covar[0:2,0:2]
         distr_new_mean  = distribution_new.mean[0:2]

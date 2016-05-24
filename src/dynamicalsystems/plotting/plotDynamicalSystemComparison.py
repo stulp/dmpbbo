@@ -25,7 +25,7 @@ def plotDynamicalSystemComparison(data1,data2,name1,name2,axs,axs_diff):
 if __name__=='__main__':
   # Process arguments
   if ( (len(sys.argv)<3)):
-    print '\nUsage: '+sys.argv[0]+' <filename1> <filename2> [system order]\n';
+    print('\nUsage: '+sys.argv[0]+' <filename1> <filename2> [system order]\n')
     sys.exit()
   
   filename1 = str(sys.argv[1])
@@ -38,13 +38,13 @@ if __name__=='__main__':
   try:
       data1 = numpy.loadtxt(filename1);
   except IOError:
-      print "File '"+filename1+ "' does not exist. ABORT."
+      print("File '"+filename1+ "' does not exist. ABORT.")
       sys.exit(-1)
   
   try:
       data2 = numpy.loadtxt(filename2);
   except IOError:
-      print "File '"+filename2+ "' does not exist. ABORT."
+      print("File '"+filename2+ "' does not exist. ABORT.")
       sys.exit(-1)
      
   fig = plt.figure(1,figsize=(12, 4))

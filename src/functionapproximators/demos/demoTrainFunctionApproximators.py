@@ -20,10 +20,10 @@ if __name__=='__main__':
     executable = "../../../bin/demoTrainFunctionApproximators"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
@@ -53,7 +53,7 @@ if __name__=='__main__':
             plotDataFromDirectory(directory_fa,ax)
             ax.set_ylim(-1.0,1.5)
         except IOError:
-            print "WARNING: Could not find data for function approximator "+name
+            print("WARNING: Could not find data for function approximator "+name)
         ax.set_title(name)
     
     ax.legend(['f(x)','+std','-std','residuals'])

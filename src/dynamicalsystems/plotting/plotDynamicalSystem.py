@@ -69,7 +69,7 @@ def plotDynamicalSystem(data,axs):
 if __name__=='__main__':
   # Process arguments
   if ( (len(sys.argv)<2)):
-    print '\nUsage: '+sys.argv[0]+' <filename> [system order]\n';
+    print('\nUsage: '+sys.argv[0]+' <filename> [system order]\n')
     sys.exit()
   
   filename = str(sys.argv[1])
@@ -81,7 +81,7 @@ if __name__=='__main__':
   try:
       data = numpy.loadtxt(filename);
   except IOError:
-      print "File '"+filename+ "' does not exist. ABORT."
+      print("File '"+filename+ "' does not exist. ABORT.")
       sys.exit(-1)
      
   fig = plt.figure(1,figsize=(12, 4))

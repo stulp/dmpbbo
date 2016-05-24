@@ -58,7 +58,7 @@ Rollout::Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd
 {
 }
 
-int Rollout::n_cost_components(void) const
+unsigned int Rollout::getNumberOfCostComponents(void) const
 {
   if (cost_.size()==0)
   {

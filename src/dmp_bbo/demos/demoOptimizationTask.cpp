@@ -66,25 +66,33 @@ public:
    *  \param[in] c c in \f$ y = a*x^2 + c \f$
    *  \param[in] inputs x in \f$ y = a*x^2 + c \f$
    */
-  DemoTaskApproximateQuadraticFunction(double a, double c, const VectorXd& inputs) 
+  DemoTaskApproximateQuadraticFunction(double a, double c, const VectorXd& inputs,double regularization_weight) 
   {
     inputs_ = inputs;
     targetFunction(a,c,inputs_,targets_);
+    regularization_weight_ = regularization_weight;
   }
   
   /** Cost function
    * \param[in] cost_vars y in \f$ y = a*x^2 + c \f$
+   * \param[in] sample The sample from which cost_vars was generated. Required for regularization.
    * \param[in] task_parameters Ignored
    * \param[out] cost Cost of the rollout. 
    */
-  void evaluateRollout(const MatrixXd& cost_vars, const VectorXd& task_parameters, VectorXd& cost) const
+  void evaluateRollout(const MatrixXd& cost_vars, const VectorXd& sample, const VectorXd& task_parameters, VectorXd& cost) const
   {
     VectorXd diff_square = (cost_vars.array()-targets_.array()).square();
-    cost.resize(1);
-    cost[0] = diff_square.mean();
+    cost.resize(3);
+    cost[1] = diff_square.mean();
+    cost[2] = regularization_weight_*sqrt(sample.array().pow(2).sum());
+    cost[0] = cost[1] + cost[2];
   }
   
-
+  unsigned int getNumberOfCostComponents(void) const
+  { 
+    return 2;
+  };
+  
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
@@ -97,6 +105,7 @@ public:
 private:
   VectorXd inputs_;
   VectorXd targets_;
+  double regularization_weight_;
 };
 
 
@@ -178,7 +187,9 @@ int main(int n_args, char* args[])
   double c = -1.0;
   int n_params = 2;
   
-  Task* task = new DemoTaskApproximateQuadraticFunction(a,c,inputs);
+  double regularization = 0.01;
+  
+  Task* task = new DemoTaskApproximateQuadraticFunction(a,c,inputs,regularization);
   TaskSolver* task_solver = new DemoTaskSolverApproximateQuadraticFunction(inputs); 
   
   VectorXd mean_init  =  0.5*VectorXd::Ones(n_params);

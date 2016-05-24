@@ -43,7 +43,7 @@ def plotBasisFunctions(inputs,activations,ax,n_samples_per_dim,cosine_basis_func
           lines.append(cur_lines) 
           
     else:
-        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
         lines = []
         
     return lines
@@ -120,7 +120,7 @@ if __name__=='__main__':
     if (len(sys.argv)==2):
         directory = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n';
+        print('\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n')
         sys.exit()
     
     fig = plt.figure(1) 

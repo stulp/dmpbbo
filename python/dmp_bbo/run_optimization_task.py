@@ -7,17 +7,21 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from rollout import Rollout
 
-from bbo.bbo_plotting import plotUpdate, plotCurve, saveUpdate, saveCurve
+from bbo.bbo_plotting import plotUpdate, plotExplorationCurve, plotLearningCurve 
+from bbo.bbo_plotting import saveUpdate, saveExplorationCurve, saveLearningCurve
+
 from dmp_bbo.dmp_bbo_plotting import saveUpdateRollouts, setColor
+from dmp_bbo.rollout import Rollout
   
   
 def runOptimizationTask(task, task_solver, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     
     distribution = initial_distribution
     
-    learning_curve = np.zeros((n_updates, 3))
+    all_costs = []
+    learning_curve = []
+    exploration_curve = []
     
     if fig:
         ax_space   = fig.add_subplot(141)
@@ -28,7 +32,7 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         
         # 0. Get cost of current distribution mean
         cost_vars_eval = task_solver.performRollout(distribution.mean)
-        cost_eval = task.evaluateRollout(cost_vars_eval)
+        cost_eval = task.evaluateRollout(cost_vars_eval,distribution.mean)
         rollout_eval = Rollout(distribution.mean,cost_vars_eval,cost_eval)
         
         # 1. Sample from distribution
@@ -43,24 +47,25 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
             cost_vars = task_solver.performRollout(samples[i_sample,:])
       
             # 2B. Evaluate the rollouts
-            cur_costs = task.evaluateRollout(cost_vars)
+            cur_costs = task.evaluateRollout(cost_vars,samples[i_sample,:])
             costs[i_sample] = cur_costs[0]
 
             rollouts.append(Rollout(samples[i_sample,:],cost_vars,cur_costs))
-        
       
         # 3. Update parameters
         distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
         
         # Bookkeeping and plotting
-        
+        # All the costs so far
+        all_costs.extend(costs)
+        # Update exploration curve
+        cur_samples = i_update*n_samples_per_update
+        cur_exploration = np.sqrt(distribution.maxEigenValue())
+        exploration_curve.append([cur_samples,cur_exploration])
         # Update learning curve
-        # How many samples so far?  
-        learning_curve[i_update,0] = i_update*n_samples_per_update
-        # Cost of evaluation
-        learning_curve[i_update,1] = cost_eval[0]
-        # Exploration magnitude
-        learning_curve[i_update,2] = np.sqrt(distribution.maxEigenValue()); 
+        learning_curve.append([cur_samples])
+        learning_curve[-1].extend(cost_eval)
+        
         
         # Plot summary of this update
         if fig:
@@ -82,14 +87,17 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         # Distribution is new distribution
         distribution = distribution_new
         
+        
     # Plot learning curve
+    cost_labels = task.costLabels()
     if fig:
-        axs = [ fig.add_subplot(143), fig.add_subplot(144)]
-        plotCurve(learning_curve,axs)
+        plotExplorationCurve(exploration_curve,fig.add_subplot(143))
+        plotLearningCurve(learning_curve,fig.add_subplot(144),all_costs,cost_labels)
 
     # Save learning curve to file, if necessary
     if directory:
-        saveCurve(directory,learning_curve)
+        saveLearningCurve(directory,learning_curve)
+        saveExplorationCurve(directory,exploration_curve)
         print('Saved results to "'+directory+'".')
     
     return learning_curve

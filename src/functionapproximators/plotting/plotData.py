@@ -13,7 +13,7 @@ def plotData(inputs,outputs,ax):
     elif (n_dims==2):
         return ax.plot(inputs[:,0],inputs[:,1],outputs,'.')
     else:
-        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
         return []
 
 
@@ -44,7 +44,7 @@ def plotDataResiduals(inputs,targets,predictions,ax):
             l = ax.plot([inputs[ii,0], inputs[ii,0]],[inputs[ii,1], inputs[ii,1]],[targets[ii], predictions[ii] ])
             list_of_lines.append(l)
     else:
-        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
 
     plt.setp(list_of_lines, label='predictions', color='red', linewidth=2)
     return list_of_lines
@@ -61,7 +61,7 @@ def plotGrid(inputs,outputs,ax,n_samples_per_dim):
         outputs_on_grid = numpy.reshape(outputs,n_samples_per_dim)
         list_of_lines = ax.plot_wireframe(inputs_0_on_grid,inputs_1_on_grid,outputs_on_grid,rstride=1, cstride=1)
     else:
-        print 'Cannot plot input data with a dimensionality of '+str(n_dims)+'.'
+        print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
         
     return list_of_lines
     
@@ -151,7 +151,7 @@ if __name__=='__main__':
     if (len(sys.argv)==2):
         directory = str(sys.argv[1])
     else:
-        print '\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n';
+        print('\nUsage: '+sys.argv[0]+' <directory>    (data is read from directory)\n')
         sys.exit()
     
     fig = plt.figure()                                                            

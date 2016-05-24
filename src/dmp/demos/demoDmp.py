@@ -19,17 +19,17 @@ from plotDmp import plotDmp
 executable = "../../../bin/demoDmp"
 
 if (not os.path.isfile(executable)):
-    print ""
-    print "ERROR: Executable '"+executable+"' does not exist."
-    print "Please call 'make install' in the build directory first."
-    print ""
+    print("")
+    print("ERROR: Executable '"+executable+"' does not exist.")
+    print("Please call 'make install' in the build directory first.")
+    print("")
     sys.exit(-1);
 
 # Call the executable with the directory to which results should be written
 directory = "/tmp/demoDmp"
 subprocess.call([executable, directory])
 
-print "Plotting"
+print("Plotting")
 
 fig = plt.figure(1)
 axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 

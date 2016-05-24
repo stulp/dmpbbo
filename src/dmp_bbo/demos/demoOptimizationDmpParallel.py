@@ -30,16 +30,16 @@ if __name__=='__main__':
     executable = "../../../bin/demoOptimizationDmpParallel"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/demoOptimizationDmpParallel"
     command = executable+" "+directory
-    print command
+    print(command)
     subprocess.call(command, shell=True)
       
     fig = plt.figure(1,figsize=(12, 4))

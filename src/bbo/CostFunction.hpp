@@ -38,15 +38,21 @@ public:
   /** The cost function which defines the cost_function.
    *
    * \param[in] sample A sample in the search space
-   * \return cost The scalar cost for the sample.
+   * \param[out] cost The cost for the sample. The first entry cost[0] is the total cost. cost[1..n_cost_components] can contain individual cost components.
    */
-  virtual double evaluate(const Eigen::VectorXd& sample) const = 0;
+  virtual void evaluate(const Eigen::VectorXd& sample, Eigen::VectorXd& cost) const = 0;
+
+  /** Get the number of individual cost components that constitute the final total cost.
+   * \return The number of cost components.
+   */
+  virtual unsigned int getNumberOfCostComponents(void) const = 0;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
   virtual std::string toString(void) const = 0;
 
+  
   /** Write to output stream. 
    *  \param[in] output Output stream to which to write to 
    *  \param[in] cost_function CostFunction object to write

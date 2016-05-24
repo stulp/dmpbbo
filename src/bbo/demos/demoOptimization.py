@@ -14,17 +14,17 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from bbo.bbo_plotting import plotCurve
+from bbo.bbo_plotting import plotLearningCurve, plotExplorationCurve
 
 
 if __name__=='__main__':
     executable = "../../../bin/demoOptimization"
     
     if (not os.path.isfile(executable)):
-        print ""
-        print "ERROR: Executable '"+executable+"' does not exist."
-        print "Please call 'make install' in the build directory first."
-        print ""
+        print("")
+        print("ERROR: Executable '"+executable+"' does not exist.")
+        print("Please call 'make install' in the build directory first.")
+        print("")
         sys.exit(-1);
     
     covar_updates = ["none","decay","adaptation"]
@@ -34,14 +34,15 @@ if __name__=='__main__':
         # Call the executable with the directory to which results should be written
         directory = "/tmp/demoOptimization/"+covar_update
         command = executable+" "+directory+" "+covar_update
-        print command
+        print(command)
         subprocess.call(command, shell=True)
       
         fig = plt.figure(figure_number)
         figure_number += 1;
-        axs = [ fig.add_subplot(121), fig.add_subplot(122)]
+        exploration_curve = np.loadtxt(directory+'/exploration_curve.txt')
+        plotExplorationCurve(exploration_curve,fig.add_subplot(121))
         learning_curve = np.loadtxt(directory+'/learning_curve.txt')
-        plotCurve(learning_curve,axs)
+        plotLearningCurve(learning_curve,fig.add_subplot(122))
         fig.canvas.set_window_title("Optimization with covar_update="+covar_update) 
       
 
