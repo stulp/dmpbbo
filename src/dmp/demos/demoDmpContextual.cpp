@@ -108,7 +108,7 @@ int main(int n_args, char** args)
     n_input_dim += n_task_parameters;
     
   VectorXi n_bfs_per_dim = VectorXi::Constant(n_input_dim,3);
-  n_bfs_per_dim[0] = 50; // Need some more along time dimension;
+  n_bfs_per_dim[0] = 10; // Need some more along time dimension;
   
   MetaParametersLWR* meta_parameters = new MetaParametersLWR(n_input_dim,n_bfs_per_dim);
   cout << "MetaParameters of the function approximator:" << endl;

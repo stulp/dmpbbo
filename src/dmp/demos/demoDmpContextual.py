@@ -60,12 +60,24 @@ for n_dmp_contextual_step in [1, 2]:
       lines = plotTrajectoryFromFile(directory+"/"+filename+".txt",axs)
       plt.setp(lines, linestyle='-', linewidth=1, color=(0.5,0.0,0.0), label=filename)
     
-    #ax = fig.add_subplot(144)
-    #inputs   = numpy.loadtxt(directory+'/inputs.txt')
-    #targets  = numpy.loadtxt(directory+'/targets.txt')
-    #lines = ax.plot(inputs[:,0],targets,linestyle='-',color='red')
-    #ax.set_xlabel('input')
-    #ax.set_ylabel('targets')
+    if n_dmp_contextual_step==2:
+        fig = plt.figure(n_dmp_contextual_step+1)
+        n_polpar = 5
+        for i_polpar in range(n_polpar):
+            ax = fig.add_subplot(1,n_polpar,i_polpar+1)
+            dir_polpar = directory+'/dim0_polpar'+str(i_polpar)
+            print(dir_polpar)
+
+            inputs   = numpy.loadtxt(dir_polpar+'/inputs.txt')
+            targets  = numpy.loadtxt(dir_polpar+'/targets.txt')
+            inputs_grid = numpy.loadtxt(dir_polpar+'/inputs_grid.txt')
+            pred_grid = numpy.loadtxt(dir_polpar+'/predictions_grid.txt')
+    
+            ax.plot(inputs,targets,'o',color='green',label='targets')
+            ax.plot(inputs_grid,pred_grid,linestyle='-',color='red',label='predictions')
+            ax.set_xlabel('task parameter')
+            ax.set_ylabel('policy parameter')
+            plt.legend()
     
     #ax = fig.add_subplot(155)
     #for i_repro in range(n_repros):
@@ -77,6 +89,4 @@ for n_dmp_contextual_step in [1, 2]:
     #ax.set_ylabel('forcing term')
       
     
-    
-    #plt.legend()
 plt.show()
