@@ -132,6 +132,11 @@ void Trajectory::append(const Trajectory& trajectory)
   }
 }
 
+VectorXd Trajectory::getRangePerDim(void) const
+{
+  return ys_.colwise().maxCoeff().array()-ys_.colwise().minCoeff().array();
+}
+
 Trajectory Trajectory::generateMinJerkTrajectory(const VectorXd& ts, const VectorXd& y_from, const VectorXd& y_to)
 {
   int n_time_steps = ts.size();

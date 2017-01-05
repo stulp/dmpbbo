@@ -57,7 +57,8 @@ public:
   /** Different types of DMPs that can be initialized. */
   enum DmpType { IJSPEERT_2002_MOVEMENT, KULVICIUS_2012_JOINING, COUNTDOWN_2013  };
 
-
+  /** Different ways to scale the forcing term. */
+  enum ForcingTermScaling { NO_SCALING, G_MINUS_Y0_SCALING, AMPLITUDE_SCALING };
   
   /**
    *  Initialization constructor.
@@ -70,9 +71,11 @@ public:
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
    */
-   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, std::vector<FunctionApproximator*> function_approximators,
-   double alpha_spring_damper, DynamicalSystem* goal_system,
-   DynamicalSystem* phase_system, DynamicalSystem* gating_system);
+   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
+     std::vector<FunctionApproximator*> function_approximators,
+     double alpha_spring_damper, DynamicalSystem* goal_system,
+     DynamicalSystem* phase_system, DynamicalSystem* gating_system, 
+     ForcingTermScaling scaling=NO_SCALING);
   
   /**
    *  Initialization constructor for Dmps of known dimensionality, but with unknown initial and
@@ -85,8 +88,9 @@ public:
    *  \param function_approximators Function approximators for the forcing term
    */
    Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
-   double alpha_spring_damper, DynamicalSystem* goal_system,
-   DynamicalSystem* phase_system, DynamicalSystem* gating_system);
+     double alpha_spring_damper, DynamicalSystem* goal_system,
+     DynamicalSystem* phase_system, DynamicalSystem* gating_system,
+     ForcingTermScaling scaling=NO_SCALING);
     
   /**
    *  Constructor that initializes the DMP with default dynamical systems.
@@ -96,7 +100,11 @@ public:
    *  \param function_approximators Function approximators for the forcing term
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
    */
-  Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, std::vector<FunctionApproximator*> function_approximators, DmpType dmp_type=KULVICIUS_2012_JOINING);
+  Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
+    std::vector<FunctionApproximator*> function_approximators, 
+    DmpType dmp_type=KULVICIUS_2012_JOINING,   
+    ForcingTermScaling scaling=NO_SCALING);
+
   
   /**
    *  Initialization constructor for Dmps of known dimensionality, but with unknown initial and
@@ -106,7 +114,7 @@ public:
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
    */
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
-    DmpType dmp_type=KULVICIUS_2012_JOINING);      
+    DmpType dmp_type=KULVICIUS_2012_JOINING, ForcingTermScaling scaling=NO_SCALING);      
    
   /**
    *  Initialization constructor for Dmps without a forcing term.
@@ -353,13 +361,20 @@ private:
   
   /** The function approximators, one for each dimension, in the forcing term. */
   std::vector<FunctionApproximator*> function_approximators_;
+  
+  /** How is the forcing term scaled? */
+  ForcingTermScaling forcing_term_scaling_;
+  
+  /** Ranges of the trajectory (per dimension) for (optional) scaling of forcing term.  */
+  Eigen::VectorXd trajectory_amplitudes_;
+
   /** @} */ // end of group_nonlinear
   
   /**
    *  Helper function for constructor.
    *  \param spring_system   Spring-damper system                 cf. Dmp::spring_system_
    *  \param goal_system     System to compute delayed goal,      cf. Dmp::damping_coefficient_
-   *  \param phase_system    System tod compute the phase,        cf. Dmp::phase_system_
+   *  \param phase_system    System to compute the phase,         cf. Dmp::phase_system_
    *  \param gating_system   System to compute the gating term,   cf. Dmp::gating_system_
    *  \param function_approximators Function approximators for the forcing term, cf. Dmp::function_approximators_
    */

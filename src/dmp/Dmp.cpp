@@ -87,10 +87,12 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          double alpha_spring_damper, 
          DynamicalSystem* goal_system,
          DynamicalSystem* phase_system, 
-         DynamicalSystem* gating_system)
+         DynamicalSystem* gating_system,     
+         ForcingTermScaling scaling)
   : DynamicalSystem(1, tau, y_init, y_attr, "name"),
   goal_system_(goal_system),
-  phase_system_(phase_system), gating_system_(gating_system) 
+  phase_system_(phase_system), gating_system_(gating_system), 
+  forcing_term_scaling_(scaling)
 {
   initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
   initFunctionApproximators(function_approximators);
@@ -99,10 +101,12 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
   
 Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
    double alpha_spring_damper, DynamicalSystem* goal_system,
-   DynamicalSystem* phase_system, DynamicalSystem* gating_system)
+   DynamicalSystem* phase_system, DynamicalSystem* gating_system,     
+   ForcingTermScaling scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
   goal_system_(goal_system),
-  phase_system_(phase_system), gating_system_(gating_system), function_approximators_(function_approximators)
+  phase_system_(phase_system), gating_system_(gating_system), function_approximators_(function_approximators),
+  forcing_term_scaling_(scaling)
 {
   initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
   initFunctionApproximators(function_approximators);
@@ -110,8 +114,10 @@ Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximato
     
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
          std::vector<FunctionApproximator*> function_approximators, 
-         DmpType dmp_type)
-  : DynamicalSystem(1, tau, y_init, y_attr, "name")
+         DmpType dmp_type,     
+         ForcingTermScaling scaling)
+  : DynamicalSystem(1, tau, y_init, y_attr, "name"),
+    forcing_term_scaling_(scaling)
 {  
   initSubSystems(dmp_type);
   initFunctionApproximators(function_approximators);
@@ -119,15 +125,16 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
   
 Dmp::Dmp(int n_dims_dmp, 
          std::vector<FunctionApproximator*> function_approximators, 
-         DmpType dmp_type)
-  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name")
+         DmpType dmp_type, ForcingTermScaling scaling)
+  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
+    forcing_term_scaling_(scaling)
 {
   initSubSystems(dmp_type);
   initFunctionApproximators(function_approximators);
 }
 
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
-  : DynamicalSystem(1, tau, y_init, y_attr, "name")
+  : DynamicalSystem(1, tau, y_init, y_attr, "name"), forcing_term_scaling_(NO_SCALING)
 {
   
   VectorXd one_1 = VectorXd::Ones(1);
@@ -194,7 +201,7 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
 
   gating_system_ = gating_system;
   gating_system_->set_name(name()+"_gating");
-
+  
 }
 
 void Dmp::set_damping_coefficient(double damping_coefficient)
@@ -349,11 +356,22 @@ void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
   phase_state = x.PHASE;
   MatrixXd fa_output(1,dim_orig());
   computeFunctionApproximatorOutput(phase_state, fa_output); 
-  
+
+  // Gate the output of the function approximators
   int t0 = 0;
   double gating = (x.GATING)[0];
-  VectorXd g_minus_y0 = (attractor_state()-initial_state()).transpose();
-  VectorXd forcing_term = gating*fa_output.row(t0); // todo .array()*g_minus_y0.array();
+  VectorXd forcing_term = gating*fa_output.row(t0);
+  
+  // Scale the forcing term, if necessary
+  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  {
+    VectorXd g_minus_y0 = (attractor_state()-initial_state()).transpose();
+    forcing_term = forcing_term.array()*g_minus_y0.array();
+  }
+  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  {
+    forcing_term = forcing_term.array()*trajectory_amplitudes_.array();
+  }
 
   // Add forcing term to the ZD component of the spring state
   xd.SPRING_Z = xd.SPRING_Z + forcing_term/tau();
@@ -428,9 +446,22 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eig
   //if (isTrained())
   computeFunctionApproximatorOutput(xs_phase, fa_outputs);
 
+  // Gate the output to get the forcing term
   MatrixXd xs_gating_rep = xs_gating.replicate(1,fa_outputs.cols());
-  MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1);
-  forcing_terms = fa_outputs.array()*xs_gating_rep.array(); // todo *g_minus_y0_rep.array();
+  forcing_terms = fa_outputs.array()*xs_gating_rep.array();
+  
+  // Scale the forcing term, if necessary
+  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  {
+    MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1);
+    forcing_terms = forcing_terms.array()*g_minus_y0_rep.array();
+  }
+  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  {
+    MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1);
+    forcing_terms = forcing_terms.array()*trajectory_amplitudes_rep.array();
+  }
+  
   
   MatrixXd xs_goal, xds_goal;
   // Get current delayed goal
@@ -558,6 +589,18 @@ void Dmp::computeFunctionApproximatorInputsAndTargets(const Trajectory& trajecto
   //Factor out gating term
   for (unsigned int dd=0; dd<function_approximators_.size(); dd++)
     f_target.col(dd) = f_target.col(dd).array()/xs_gating.array();
+  
+  // Factor out scaling
+  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  {
+    MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1);
+    f_target = f_target.array()/g_minus_y0_rep.array();
+  }
+  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  {
+    MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1);
+    f_target = f_target.array()/trajectory_amplitudes_rep.array();
+  }
  
 }
 
@@ -573,6 +616,10 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
   set_tau(trajectory.duration());
   set_initial_state(trajectory.initial_y());
   set_attractor_state(trajectory.final_y());
+
+  // This needs to be computed for (optional) scaling of the forcing term.
+  // Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
+  trajectory_amplitudes_ = trajectory.getRangePerDim();
   
   VectorXd fa_input_phase;
   MatrixXd f_target;

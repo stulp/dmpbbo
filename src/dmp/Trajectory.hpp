@@ -131,6 +131,12 @@ public:
    */
   void append(const Trajectory& trajectory);
   
+  /** Get the range of ys per dimension.
+   *
+   * \return The range of ys, one value for each dimension.
+   */
+  Eigen::VectorXd getRangePerDim(void) const;
+  
   /** Write object to an output stream.
    *
    *  \param[in] output  Output stream to which to write to
