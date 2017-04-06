@@ -109,12 +109,22 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   }
   
   assert(inputs.rows() == targets.rows()); // Must have same number of examples
-  assert(inputs.cols()==getExpectedInputDim());
+  assert(inputs.cols() == getExpectedInputDim());
 
   const MetaParametersGMR* meta_parameters_GMR = 
     static_cast<const MetaParametersGMR*>(getMetaParameters());
 
-  int n_gaussians = meta_parameters_GMR->number_of_gaussians_;
+  const ModelParametersGMR* model_parameters_GMR =
+    static_cast<const ModelParametersGMR*>(getModelParameters());
+
+  int n_gaussians;
+  if(meta_parameters_GMR!=NULL)
+      n_gaussians = meta_parameters_GMR->number_of_gaussians_;
+  else if(model_parameters_GMR!=NULL)
+      n_gaussians = model_parameters_GMR->priors_.size();
+  else
+      cerr << "FunctionApproximatorGMR::train Something wrong happened, both ModelParameters and MetaParameters are not initialized." << endl;
+
   int n_dims_in = inputs.cols();
   int n_dims_out = targets.cols();
   int n_dims_gmm = n_dims_in + n_dims_out;
@@ -123,6 +133,8 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   std::vector<VectorXd> means(n_gaussians);
   std::vector<MatrixXd> covars(n_gaussians);
   std::vector<double> priors(n_gaussians);
+  int n_observations = 0;
+
   for (int i = 0; i < n_gaussians; i++)
   {
     means[i] = VectorXd(n_dims_gmm);
@@ -133,6 +145,7 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   // Put the input/output data in one big matrix
   MatrixXd data = MatrixXd(inputs.rows(), n_dims_gmm);
   data << inputs, targets;
+  n_observations = data.rows();
 
   // Initialization
   if (inputs.cols() == 1)
@@ -159,7 +172,7 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
     covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
 
-  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x));
+  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x, n_observations));
 
   // After training, we know the sizes of the matrices that should be cached
   preallocateMatrices(n_gaussians,n_dims_in,n_dims_out);
@@ -193,6 +206,105 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
   //delete covars[i];
 }
 
+void FunctionApproximatorGMR::trainIncremental(const MatrixXd& inputs, const MatrixXd& targets)
+{
+  if (!isTrained())
+  {
+    //cout << " Training for the first time... " << endl;
+    train(inputs,targets);
+    return;
+  }
+
+  const ModelParametersGMR* model_parameters_GMR = static_cast<const ModelParametersGMR*>(getModelParameters());
+
+
+  int n_gaussians = model_parameters_GMR->priors_.size();
+  int n_dims_in = inputs.cols();
+  int n_dims_out = targets.cols();
+  int n_dims_gmm = n_dims_in + n_dims_out;
+
+  // Initialize the means, priors and covars
+  std::vector<VectorXd> means(n_gaussians);
+  std::vector<MatrixXd> covars(n_gaussians);
+  std::vector<double> priors(n_gaussians);
+  int n_observations = 0;
+  for (int i = 0; i < n_gaussians; i++)
+  {
+    means[i] = VectorXd(n_dims_gmm);
+    priors[i] = 0.0;
+    covars[i] = MatrixXd(n_dims_gmm, n_dims_gmm);
+  }
+
+  // Extract the model parameters
+  for (int i = 0; i < n_gaussians; i++)
+  {
+    means[i].segment(0, n_dims_in)    = model_parameters_GMR->means_x_[i];
+    means[i].segment(n_dims_in, n_dims_out)    = model_parameters_GMR->means_y_[i];
+
+    covars[i].block(0, 0, n_dims_in, n_dims_in)   = model_parameters_GMR->covars_x_[i];
+    covars[i].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out)   = model_parameters_GMR->covars_y_[i];
+    covars[i].block(n_dims_in, 0, n_dims_out, n_dims_in) = model_parameters_GMR->covars_y_x_[i];
+
+    priors[i] = model_parameters_GMR->priors_[i];
+  }
+  n_observations = model_parameters_GMR->n_observations_;
+
+  // Put the input/output data in one big matrix
+  MatrixXd data = MatrixXd(inputs.rows(), n_dims_gmm);
+  data << inputs, targets;
+
+  // Expectation-Maximization Incremental
+  expectationMaximizationIncremental(data, means, priors, covars, n_observations);
+
+  // Extract the different input/output components from the means/covars which contain both
+  std::vector<Eigen::VectorXd> means_x(n_gaussians);
+  std::vector<Eigen::VectorXd> means_y(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_x(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_y(n_gaussians);
+  std::vector<Eigen::MatrixXd> covars_y_x(n_gaussians);
+  for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  {
+    means_x[i_gau]    = means[i_gau].segment(0, n_dims_in);
+    means_y[i_gau]    = means[i_gau].segment(n_dims_in, n_dims_out);
+
+    covars_x[i_gau]   = covars[i_gau].block(0, 0, n_dims_in, n_dims_in);
+    covars_y[i_gau]   = covars[i_gau].block(n_dims_in, n_dims_in, n_dims_out, n_dims_out);
+    covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
+  }
+
+  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x, n_observations));
+
+  // After training, we know the sizes of the matrices that should be cached
+  preallocateMatrices(n_gaussians,n_dims_in,n_dims_out);
+
+  // std::vector<VectorXd> centers;
+  // std::vector<MatrixXd> slopes;
+  // std::vector<VectorXd> biases;
+  // std::vector<MatrixXd> inverseCovarsL;
+
+  // // int n_dims_in = inputs.cols();
+  // // int n_dims_out = targets.cols();
+
+  // for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
+  // {
+  //   centers.push_back(VectorXd(means[i_gau].segment(0, n_dims_in)));
+
+  //   slopes.push_back(MatrixXd(covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in) * covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse()));
+
+  //   biases.push_back(VectorXd(means[i_gau].segment(n_dims_in, n_dims_out) -
+  //     slopes[i_gau]*means[i_gau].segment(0, n_dims_in)));
+
+  //   MatrixXd L = covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse().llt().matrixL();
+  //   inverseCovarsL.push_back(MatrixXd(L));
+  // }
+
+  // setModelParameters(new ModelParametersGMR(centers, priors, slopes, biases, inverseCovarsL));
+
+  //for (size_t i = 0; i < means.size(); i++)
+  //  delete means[i];
+  //for (size_t i = 0; i < covars.size(); i++)
+  //delete covars[i];
+}
 
 double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
 {
@@ -203,6 +315,31 @@ double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& co
   //  ( (2*pi)^N*|\Sigma| )^(-1/2)
   output *= pow(pow(2*M_PI,mu.size())/covar_inverse.determinant(),-0.5);   
   return output;
+}
+
+double FunctionApproximatorGMR::normalPDFDamped(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
+{
+  if(covar.determinant() > 0) // It is invertible
+  {
+    MatrixXd covar_inverse = covar.inverse();
+
+      double output = exp(-0.5*(input-mu).transpose()*covar_inverse*(input-mu));
+
+      // Check that:
+      // if output == 0.0
+      // return 0.0;
+
+      // For invertible matrices (which covar apparently was), det(A^-1) = 1/det(A)
+      // Hence the 1.0/covar_inverse.determinant() below
+      //  ( (2\pi)^N*|\Sigma| )^(-1/2)
+      output *= pow(pow(2*M_PI,mu.size())/(covar_inverse.determinant()),-0.5);
+      return output;
+  }
+  else
+  {
+      //cerr << "WARNING: FunctionApproximatorGMR::normalPDFDamped output close to singularity..." << endl;
+      return std::numeric_limits<double>::min();
+  }
 }
 
 
@@ -339,7 +476,10 @@ void FunctionApproximatorGMR::predict(const Eigen::MatrixXd& inputs, Eigen::Matr
         // inv(C_x) * C_y_x^T
         covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
         // - C_y_x * inv(C_x) * C_y_x^T
-        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        covar_output_prealloc_.noalias() = gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // NOTE: covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_; causes memory allocation
+        // so we split it in two operations
+        covar_output_prealloc_.noalias() = - covar_output_prealloc_;
         // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
         covar_output_prealloc_ += gmm->covars_y_[i_gau];
         // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
@@ -504,7 +644,10 @@ void FunctionApproximatorGMR::predictDot(const Eigen::MatrixXd& inputs, Eigen::M
         // inv(C_x) * C_y_x^T
         covar_input_times_output_.noalias() = gmm->covars_x_inv_[i_gau]*gmm->covars_y_x_[i_gau].transpose();
         // - C_y_x * inv(C_x) * C_y_x^T
-        covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        covar_output_prealloc_.noalias() = gmm->covars_y_x_[i_gau] * covar_input_times_output_;
+        // NOTE: covar_output_prealloc_.noalias() = - gmm->covars_y_x_[i_gau] * covar_input_times_output_; causes memory allocation
+        // so we split it in two operations
+        covar_output_prealloc_.noalias() = - covar_output_prealloc_;
         // (C_y - C_y_x * inv(C_x) * C_y_x^T) 
         covar_output_prealloc_ += gmm->covars_y_[i_gau];
         // h^2 * (C_y - C_y_x * inv(C_x) * C_y_x^T) 
@@ -661,6 +804,8 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
   MatrixXd assign(centers.size(), data.rows());
   assign.setZero();
 
+  std::vector<double> E(centers.size());
+
   double oldLoglik = -1e10f;
   double loglik = 0;
 
@@ -677,8 +822,12 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
 
     oldLoglik = loglik;
     loglik = 0;
+    double sum_tmp = 0.0;
     for (int iData = 0; iData < data.rows(); iData++)
-      loglik += log(assign.col(iData).sum());
+    {
+        sum_tmp = assign.col(iData).sum();
+        loglik += log(sum_tmp);
+    }
     loglik /= data.rows();
 
     if (fabs(loglik / oldLoglik - 1) < 1e-8f)
@@ -687,12 +836,16 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
     for (int iData = 0; iData < data.rows(); iData++)
       assign.col(iData) /= assign.col(iData).sum();
 
+    if (fabs(loglik / oldLoglik - 1) < 1e-8f)
+      break;
+
     // M step
     for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
     {
       centers[i_gau].setZero();
       covars[i_gau].setZero();
       priors[i_gau] = 0;
+      E[i_gau] = assign.row(i_gau).sum();
     }
 
     for (int iData = 0; iData < data.rows(); iData++)
@@ -750,11 +903,133 @@ void FunctionApproximatorGMR::expectationMaximization(const MatrixXd& data, std:
   
 }
 
+void FunctionApproximatorGMR::expectationMaximizationIncremental(const MatrixXd& data, std::vector<VectorXd>& centers, std::vector<double>& priors,
+    std::vector<MatrixXd>& covars, int& n_observations, int n_max_iter)
+{
+
+  std::vector<VectorXd> centers_prev = centers;
+  std::vector<double> priors_prev = priors;
+  std::vector<MatrixXd> covars_prev = covars;
+  int n_observations_prev = n_observations;
+  std::vector<double> E_prev;
+  std::vector<double> E(centers.size());
+  n_observations = data.rows();
+
+  double oldLoglik = -1e10f;
+  double loglik = 0;
+
+  MatrixXd assign(centers.size(), data.rows());
+  assign.setZero();
+
+  // Compute the old E
+  E_prev.resize(centers.size());
+  for (size_t i_gau = 0; i_gau<centers.size(); i_gau++)
+      E_prev[i_gau] = priors_prev[i_gau] * n_observations_prev;
+
+  for (int iIter = 0; iIter < n_max_iter; iIter++)
+  {
+    //cout << "  iIter=" << iIter << endl;
+    // For debugging only
+    //ModelParametersGMR::saveGMM("/tmp/demoTrainFunctionApproximators/GMR",centers,covars,iIter);
+
+    // E step
+    for (int iData = 0; iData < data.rows(); iData++)
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+        assign(i_gau, iData) = priors[i_gau] * FunctionApproximatorGMR::normalPDFDamped(centers[i_gau], covars[i_gau],data.row(iData).transpose());
+
+    oldLoglik = loglik;
+    loglik = 0;
+    double sum_tmp = 0.0;
+    for (int iData = 0; iData < data.rows(); iData++)
+    {
+        sum_tmp = assign.col(iData).sum();
+        loglik += log(sum_tmp);
+    }
+    loglik /= data.rows();
+
+    for (int iData = 0; iData < data.rows(); iData++)
+      assign.col(iData) /= assign.col(iData).sum();
+
+    if (fabs(loglik / oldLoglik - 1) < 1e-8f)
+      break;
+
+    // M step
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    {
+      centers[i_gau].setZero();
+      covars[i_gau].setZero();
+      priors[i_gau] = 0;
+      E[i_gau] = assign.row(i_gau).sum();
+      //E_prev[i_gau] = assign_prev.row(i_gau).sum();
+    }
+
+    for (int iData = 0; iData < data.rows(); iData++)
+    {
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      {
+          centers[i_gau] += assign(i_gau, iData) * data.row(iData).transpose();
+      }
+    }
+
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+    {
+      centers[i_gau] = (E_prev[i_gau] * centers_prev[i_gau] + centers[i_gau])/(E[i_gau] + E_prev[i_gau]);
+      priors[i_gau] = (E[i_gau] + E_prev[i_gau])/(n_observations + n_observations_prev);
+    }
+
+    for (int iData = 0; iData < data.rows(); iData++)
+      for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+        covars[i_gau] += assign(i_gau, iData) * (data.row(iData).transpose() - centers[i_gau]) * (data.row(iData).transpose() - centers[i_gau]).transpose();
+
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      covars[i_gau] = covars[i_gau] +  E_prev[i_gau] * (covars_prev[i_gau] + (centers_prev[i_gau] - centers[i_gau]) * (centers_prev[i_gau] - centers[i_gau]).transpose());
+
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+        covars[i_gau] /= (E[i_gau] + E_prev[i_gau]);
+
+    // Be sure that covar is invertible
+    for (size_t i_gau = 0; i_gau < centers.size(); i_gau++)
+      covars[i_gau] += MatrixXd::Identity(covars[i_gau].rows(), covars[i_gau].cols()) * 1e-5f;
+  }
+
+  // Increase the total number of obs counting the old plus the new
+  n_observations += n_observations_prev;
+
+  /*
+  Here's a hacky Matlab script for plotting the EM procedure above (if you cann saveGMM)
+  directory = '/tmp/demoTrainFunctionApproximators/GMR/';
+  inputs = load([directory '/inputs.txt']);
+  targets = load([directory '/targets.txt']);
+  outputs = load([directory '/outputs.txt']);
+
+
+  plot(inputs,targets,'.k')
+  hold on
+  plot(inputs,outputs,'.r')
+
+  max_iter = 5;
+  for iter=0:max_iter
+    color = 0.2+(0.8-iter/max_iter)*[1 1 1];
+    for bfs=0:2
+      center = load(sprintf('%s/gmm_iter%02d_mu%03d.txt',directory,iter,bfs));
+      %plot(center(1),center(2))
+      covar = load(sprintf('%s/gmm_iter%02d_covar%03d.txt',directory,iter,bfs));
+      h = error_ellipse(covar,center,'conf',0.95);
+      set(h,'Color',color,'LineWidth',1+iter/max_iter)
+    end
+  end
+  hold off
+  */
+
+}
+
 template<class Archive>
 void FunctionApproximatorGMR::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
 }
+
+
 
 }
