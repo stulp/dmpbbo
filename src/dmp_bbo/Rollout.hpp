@@ -129,10 +129,11 @@ private:
 
 
 }
-
+  
 
 /** Don't add version information to archives. */
 BOOST_CLASS_IMPLEMENTATION(DmpBbo::Rollout,boost::serialization::object_serializable);
 
 #endif
+
 
