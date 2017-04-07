@@ -53,6 +53,19 @@ public:
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
     std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
 
+  /** Constructor for the model parameters of the GMR function approximator (Used by the incremental training).
+   */
+  ModelParametersGMR(int n_observations,
+    std::vector<double> priors,
+    std::vector<Eigen::VectorXd> means,
+    std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);
+
+  /** Constructor for the model parameters of the GMR function approximator (Used by the incremental training).
+   */
+  ModelParametersGMR(int n_observations, std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
+    std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
+    std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
+
   inline unsigned int getNumberOfGaussians(void) const 
   {
     return priors_.size();
@@ -109,21 +122,22 @@ public:
    * 
 \verbatim
  0. meta_data  (n_gaussians and n_output_dims)
+ 1. meta_data  (n_observations)
+__________________________
+ 2. prior1 and E1
+ 3. mean1      (size: 3)
+ 4. covar1     (row1 of covar matrix)
+ 5. covar1     (row2 of covar matrix)
+ 6. covar1     (row3 of covar matrix)
  __________________________
- 1. prior1     (only column 0 contains the prior, the rest is zero)
- 2. mean1      (size: 3)
- 3. covar1     (row1 of covar matrix)
- 4. covar1     (row2 of covar matrix)
- 5. covar1     (row3 of covar matrix)
- __________________________
- 6. prior2     (only column 0 contains the prior, the rest is zero) 
- 7. mean2      (size: 3)
- 8. covar2     (row1 of covar matrix)
- 9. covar2     (row2 of covar matrix)
-10. covar2     (row3 of covar matrix)
+ 7. prior2 and E2
+ 8. mean2      (size: 3)
+ 9. covar2     (row1 of covar matrix)
+ 10. covar2     (row2 of covar matrix)
+ 11. covar2     (row3 of covar matrix)
 \endverbatim
    *
-   * Thus, the number of rows in the Matrix is 1 (for meta-data) + n_gaussians * (1+1+n_dims)
+   * Thus, the number of rows in the Matrix is 2 (for meta-data) + n_gaussians * (1+1+n_dims)
    *
    * In combination with ModelParametersGMR::saveGMMToMatrix and ModelParametersGMR::loadGMMToMatrix, this hacky function allowed for easier exchange with some Matlab code we wrote.
    */
@@ -149,6 +163,8 @@ private:
   std::vector<Eigen::MatrixXd> covars_y_;
   std::vector<Eigen::MatrixXd> covars_y_x_;
 
+  /** Number of observations used to create the model. (Used by the incremental learning) */
+  int n_observations_;
 
   void updateCachedMembers(void);
   

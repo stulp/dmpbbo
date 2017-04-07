@@ -45,3 +45,7 @@ add_executable(testMultiDimOutput testMultiDimOutput.cpp getFunctionApproximator
 target_link_libraries(testMultiDimOutput functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
 install(TARGETS testMultiDimOutput  DESTINATION bin_test)
 
+add_executable(testIncrementalTrainingGMR testIncrementalTrainingGMR.cpp)
+target_link_libraries(testIncrementalTrainingGMR functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+install(TARGETS testIncrementalTrainingGMR  DESTINATION bin_test)
+
