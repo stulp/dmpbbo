@@ -2,7 +2,8 @@ language: cpp
 
 compiler:
   - gcc
-  - clang
+#  - clang # Switched off clang, because of build problem on Travis. Problem not caused by dmpbbo 
+           # code, see discussion here: https://github.com/stulp/dmpbbo/pull/14
 
 branches:
   only:
