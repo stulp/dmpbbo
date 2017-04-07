@@ -43,28 +43,28 @@ public:
   
   /** Constructor for the model parameters of the GMR function approximator.
    */
-  /*ModelParametersGMR(std::vector<double> priors,
-    std::vector<Eigen::VectorXd> means, 
-    std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);*/
-
-  /** Constructor for the model parameters of the GMR function approximator.
-   */
-  /*ModelParametersGMR(std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
-    std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
-    std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);*/
-
-  /** Constructors with incremental parameters. */
-
   ModelParametersGMR(std::vector<double> priors,
-    std::vector<Eigen::VectorXd> means,
-    std::vector<Eigen::MatrixXd> covars, int n_observations=0, int n_output_dims=1);
+    std::vector<Eigen::VectorXd> means, 
+    std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);
 
   /** Constructor for the model parameters of the GMR function approximator.
    */
   ModelParametersGMR(std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
-    std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys,
-    int n_observations=0);
+    std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
+
+  /** Constructor for the model parameters of the GMR function approximator (Used by the incremental training).
+   */
+  ModelParametersGMR(int n_observations,
+    std::vector<double> priors,
+    std::vector<Eigen::VectorXd> means,
+    std::vector<Eigen::MatrixXd> covars, int n_output_dims=1);
+
+  /** Constructor for the model parameters of the GMR function approximator (Used by the incremental training).
+   */
+  ModelParametersGMR(int n_observations, std::vector<double> priors, std::vector<Eigen::VectorXd> mu_xs,
+    std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
+    std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
 
   inline unsigned int getNumberOfGaussians(void) const 
   {

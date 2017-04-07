@@ -172,7 +172,7 @@ void FunctionApproximatorGMR::train(const MatrixXd& inputs, const MatrixXd& targ
     covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
 
-  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x, n_observations));
+  setModelParameters(new ModelParametersGMR(n_observations, priors, means_x, means_y, covars_x, covars_y, covars_y_x));
 
   // After training, we know the sizes of the matrices that should be cached
   preallocateMatrices(n_gaussians,n_dims_in,n_dims_out);
@@ -272,38 +272,10 @@ void FunctionApproximatorGMR::trainIncremental(const MatrixXd& inputs, const Mat
     covars_y_x[i_gau] = covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in);
   }
 
-  setModelParameters(new ModelParametersGMR(priors, means_x, means_y, covars_x, covars_y, covars_y_x, n_observations));
+  setModelParameters(new ModelParametersGMR(n_observations, priors, means_x, means_y, covars_x, covars_y, covars_y_x));
 
   // After training, we know the sizes of the matrices that should be cached
   preallocateMatrices(n_gaussians,n_dims_in,n_dims_out);
-
-  // std::vector<VectorXd> centers;
-  // std::vector<MatrixXd> slopes;
-  // std::vector<VectorXd> biases;
-  // std::vector<MatrixXd> inverseCovarsL;
-
-  // // int n_dims_in = inputs.cols();
-  // // int n_dims_out = targets.cols();
-
-  // for (int i_gau = 0; i_gau < n_gaussians; i_gau++)
-  // {
-  //   centers.push_back(VectorXd(means[i_gau].segment(0, n_dims_in)));
-
-  //   slopes.push_back(MatrixXd(covars[i_gau].block(n_dims_in, 0, n_dims_out, n_dims_in) * covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse()));
-
-  //   biases.push_back(VectorXd(means[i_gau].segment(n_dims_in, n_dims_out) -
-  //     slopes[i_gau]*means[i_gau].segment(0, n_dims_in)));
-
-  //   MatrixXd L = covars[i_gau].block(0, 0, n_dims_in, n_dims_in).inverse().llt().matrixL();
-  //   inverseCovarsL.push_back(MatrixXd(L));
-  // }
-
-  // setModelParameters(new ModelParametersGMR(centers, priors, slopes, biases, inverseCovarsL));
-
-  //for (size_t i = 0; i < means.size(); i++)
-  //  delete means[i];
-  //for (size_t i = 0; i < covars.size(); i++)
-  //delete covars[i];
 }
 
 double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
@@ -994,33 +966,6 @@ void FunctionApproximatorGMR::expectationMaximizationIncremental(const MatrixXd&
 
   // Increase the total number of obs counting the old plus the new
   n_observations += n_observations_prev;
-
-  /*
-  Here's a hacky Matlab script for plotting the EM procedure above (if you cann saveGMM)
-  directory = '/tmp/demoTrainFunctionApproximators/GMR/';
-  inputs = load([directory '/inputs.txt']);
-  targets = load([directory '/targets.txt']);
-  outputs = load([directory '/outputs.txt']);
-
-
-  plot(inputs,targets,'.k')
-  hold on
-  plot(inputs,outputs,'.r')
-
-  max_iter = 5;
-  for iter=0:max_iter
-    color = 0.2+(0.8-iter/max_iter)*[1 1 1];
-    for bfs=0:2
-      center = load(sprintf('%s/gmm_iter%02d_mu%03d.txt',directory,iter,bfs));
-      %plot(center(1),center(2))
-      covar = load(sprintf('%s/gmm_iter%02d_covar%03d.txt',directory,iter,bfs));
-      h = error_ellipse(covar,center,'conf',0.95);
-      set(h,'Color',color,'LineWidth',1+iter/max_iter)
-    end
-  end
-  hold off
-  */
-
 }
 
 template<class Archive>
