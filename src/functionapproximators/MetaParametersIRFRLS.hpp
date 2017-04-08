@@ -50,7 +50,7 @@ public:
 	
 	MetaParametersIRFRLS* clone(void) const;
 	
-  std::string toString(void) const;
+  std::string toStr(void) const;
 
 private:
 

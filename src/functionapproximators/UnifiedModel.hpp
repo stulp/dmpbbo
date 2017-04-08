@@ -97,7 +97,7 @@ public:
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-  std::string toString(void) const;
+  std::string toStr(void) const;
   
   /** Return a pointer to a deep copy of the object.
    *  \return Pointer to a deep copy

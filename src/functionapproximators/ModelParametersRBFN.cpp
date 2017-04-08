@@ -121,7 +121,7 @@ void ModelParametersRBFN::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(caching_);
 }
 
-string ModelParametersRBFN::toString(void) const
+string ModelParametersRBFN::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRBFN");
 }

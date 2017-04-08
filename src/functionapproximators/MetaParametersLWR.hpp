@@ -95,7 +95,7 @@ public:
 
 	MetaParametersLWR* clone(void) const;
 
-	std::string toString(void) const;
+    std::string toStr(void) const;
 
 private:
   Eigen::VectorXi n_bfs_per_dim_; // should be const

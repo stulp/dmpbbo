@@ -48,7 +48,7 @@ public:
 	
 	int getExpectedInputDim(void) const;
 	
-	std::string toString(void) const;
+    std::string toStr(void) const;
 
   ModelParameters* clone(void) const;
 

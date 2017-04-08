@@ -57,7 +57,7 @@ public:
 		 
 	MetaParametersGPR* clone(void) const;
 
-	std::string toString(void) const;
+    std::string toStr(void) const;
 	
 	/** Return the maximum covariance of the covariance function. 
 	 * \return Maximum covariance

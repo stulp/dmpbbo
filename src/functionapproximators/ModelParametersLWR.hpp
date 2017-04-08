@@ -52,7 +52,7 @@ public:
    */
   ModelParametersLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels=false, bool lines_pivot_at_max_activation=false);
   
-  std::string toString(void) const;
+  std::string toStr(void) const;
   
 	ModelParameters* clone(void) const;
 	

@@ -60,7 +60,7 @@ public:
    */
    ModelParametersGPR(const Eigen::MatrixXd& train_inputs, const Eigen::VectorXd& train_targets, const Eigen::MatrixXd& gram, double maximum_covariance, const Eigen::VectorXd& sigmas);
    
-  std::string toString(void) const;
+  std::string toStr(void) const;
   
 	ModelParameters* clone(void) const;
 	

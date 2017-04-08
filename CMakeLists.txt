@@ -24,12 +24,10 @@ set(INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_PREFIX}/include)
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
-
-
 # Some flags for CXX
-set(CMAKE_CXX_FLAGS "-Wall -std=c++0x -fPIC")
-set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++0x -fPIC ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -ggdb ${CMAKE_CXX_FLAGS_DEBUG}")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG ${CMAKE_CXX_FLAGS_RELEASE}")
 
 # Define macros to check for real time requirements
 # To activate the EIGEN_MALLOC asserts use: cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug
@@ -45,9 +43,9 @@ set(CMAKE_MODULE_PATH ${oo_dmp_bbo_SOURCE_DIR}/cmake/modules "${CMAKE_SOURCE_DIR
 include_directories(${CMAKE_SOURCE_DIR}/src)
 link_directories(${CMAKE_SOURCE_DIR}/lib)
 
-IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  SET(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR} CACHE PATH "Comment" FORCE)
-ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+#  SET(CMAKE_INSTALL_PREFIX ${CMAKE_SOURCE_DIR} CACHE PATH "Comment" FORCE)
+#ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
 ###############################################################################
 # See if LWPR is installed. 
@@ -58,7 +56,7 @@ endif()
 
 ###############################################################################
 # Find boost packages
-find_package( Boost 1.34 COMPONENTS filesystem system serialization REQUIRED)
+find_package( Boost COMPONENTS filesystem system serialization REQUIRED)
 link_directories ( ${Boost_LIBRARY_DIRS} )
 include_directories ( ${Boost_INCLUDE_DIRS} )
 

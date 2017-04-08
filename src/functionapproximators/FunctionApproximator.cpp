@@ -229,7 +229,7 @@ void FunctionApproximator::setParameterVectorAll(const Eigen::VectorXd& values) 
     model_parameters_->setParameterVectorAll(values);
 };
 
-string FunctionApproximator::toString(void) const
+string FunctionApproximator::toStr(void) const
 {
   string name = "FunctionApproximator"+getName();
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML(name.c_str());

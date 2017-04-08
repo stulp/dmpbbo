@@ -84,7 +84,7 @@ public:
 	};
 
 	
-	std::string toString(void) const;
+    std::string toStr(void) const;
 
   ModelParameters* clone(void) const;
 

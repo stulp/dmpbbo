@@ -219,14 +219,14 @@ public:
    * subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */ 
   friend std::ostream& operator<<(std::ostream& output, const FunctionApproximator& function_approximator) {
-    output << function_approximator.toString();
+    output << function_approximator.toStr();
     return output;
   }
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-  std::string toString(void) const;
+  std::string toStr(void) const;
   
   
   /** Accessor for FunctionApproximator::meta_parameters_

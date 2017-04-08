@@ -84,7 +84,7 @@ void MetaParametersGPR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(sigmas_);
 }
 
-string MetaParametersGPR::toString(void) const
+string MetaParametersGPR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersGPR");
 }

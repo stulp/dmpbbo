@@ -48,7 +48,7 @@ public:
    */
   virtual ModelParameters* clone(void) const = 0;
   
-  virtual ~ModelParameters(void) {};
+  virtual ~ModelParameters(void) {}
 
   /** Print to output stream. 
    *
@@ -60,14 +60,14 @@ public:
    * subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */ 
    friend std::ostream& operator<<(std::ostream& output, const ModelParameters& model_parameters) {
-    output << model_parameters.toString();
+    output << model_parameters.toStr();
     return output;
   }
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-  virtual std::string toString(void) const = 0;
+  virtual std::string toStr(void) const = 0;
   
   /** The expected dimensionality of the input data.
    * \return Expected dimensionality of the input data
@@ -113,11 +113,11 @@ public:
 
 /** Tell boost serialization that this class has pure virtual functions. */
 #include <boost/serialization/assume_abstract.hpp>
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::ModelParameters);
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::ModelParameters)
  
 /** Don't add version information to archives. */
 #include <boost/serialization/export.hpp>
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParameters,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParameters,boost::serialization::object_serializable)
 
 #endif //  #ifndef MODELPARAMETERS_H
 

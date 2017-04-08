@@ -61,7 +61,7 @@ void MetaParametersGMR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(number_of_gaussians_);
 }
 
-string MetaParametersGMR::toString(void) const 
+string MetaParametersGMR::toStr(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersGMR");
 }
