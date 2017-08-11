@@ -8,7 +8,7 @@ of dynamical movement primitives.
 
 A PDF tutorial on these topics (generated with Doxygen) is available at https://github.com/stulp/dmpbbo/blob/master/docs/tutorial.pdf
 
-The complete HTML doxygen documentation is at: http://perso.ensta-paristech.fr/~stulp/dmpbbo/
+A snapshot of the complete HTML doxygen documentation is here: http://freekstulp.net/dmpbbo/html/
 
 # For whom?
 
