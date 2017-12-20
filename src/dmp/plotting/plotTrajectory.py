@@ -6,7 +6,7 @@ import sys
 # 
 def plotTrajectory(trajectory,axs):
     """Plot a trajectory"""
-    n_dims = (len(trajectory[0])-1)/3 # -1 for time, /3 because contains y,yd,ydd
+    n_dims = (len(trajectory[0])-1)//3 # -1 for time, /3 because contains y,yd,ydd
     time_index = 0;
     lines = axs[0].plot(trajectory[:,time_index],trajectory[:,1:n_dims+1], '-')
     axs[0].set_xlabel('time (s)');
