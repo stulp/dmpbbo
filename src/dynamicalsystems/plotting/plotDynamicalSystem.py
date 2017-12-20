@@ -34,7 +34,7 @@ def plotDynamicalSystem(data,axs):
         # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D  t ]
         
         # For second order systems, dim_orig = dim/2 (because x = [y z] and xd = [yd zd]
-        dim_orig =dim/2;
+        dim_orig =dim//2;
         
         # data has following format: [ x_1..x_D  xd_1..xd_D  t ]
         ts  = data[:,-1] # Last column is time
