@@ -32,9 +32,9 @@ class Rollout:
           os.makedirs(directory)
       d = directory
       np.savetxt(d+'/policy_parameters.txt',     self.policy_parameters)
-      if self.cost_vars!=None:
+      if self.cost_vars is not None:
           np.savetxt(d+'/cost_vars.txt',     self.cost_vars)
-      if self.cost!=None:
+      if self.cost is not None:
           np.savetxt(d+'/cost.txt',     self.cost)
 
 def saveRolloutsToDirectory(directory,rollouts):

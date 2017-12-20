@@ -95,12 +95,12 @@ def plotBasisFunctionsFromDirectory(directory,ax):
         activations_weighted_grid = None;
 
     if (n_dims==1):
-        if lines_bfs_weighted!=None and lines_bfs!=None:
+        if lines_bfs_weighted is not None and lines_bfs is not None:
             # Both are plotted, give different colors
             plt.setp(lines_bfs_weighted,color='green')
             plt.setp(lines_bfs,color='#aaffaa')
         else:
-            if lines_bfs_weighted!=None:
+            if lines_bfs_weighted is not None:
                 plt.setp(lines_bfs,color='green')
             if lines_bfs != None:
                 plt.setp(lines_bfs,color='green')

@@ -131,13 +131,13 @@ def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,d
     np.savetxt(cur_dir+"/distribution_new_mean.txt",distribution_new.mean)
     np.savetxt(cur_dir+"/distribution_new_covar.txt",distribution_new.covar)
           
-    if cost_eval!=None:
+    if cost_eval is not None:
         np.savetxt(cur_dir+'/cost_eval.txt',np.atleast_1d(cost_eval))
-    if samples!=None:
+    if samples is not None:
         np.savetxt(cur_dir+'/samples.txt',samples)
-    if costs!=None:
+    if costs is not None:
         np.savetxt(cur_dir+'/costs.txt',costs)
-    if weights!=None:
+    if weights is not None:
         np.savetxt(cur_dir+'/weights.txt',weights)
         
 def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
@@ -223,8 +223,8 @@ These keywords are passed to matplotlib.patches.Ellipse
     return lines
     
 def plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight=False,plot_samples=False):
-    
-    if samples==None:
+
+    if samples is None:
         plot_samples = False
     
     n_dims = len(distribution.mean)
@@ -241,7 +241,7 @@ def plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,
         distr_covar = distribution.covar[0:2,0:2]
         distr_new_mean  = distribution_new.mean[0:2]
         distr_new_covar = distribution_new.covar[0:2,0:2]
-        if samples!=None:
+        if samples is not None:
             samples = samples[:,0:2]
                     
         if plot_samples:

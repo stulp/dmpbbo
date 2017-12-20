@@ -16,7 +16,7 @@ if __name__=='__main__':
     exploration_curve = loadExplorationCurve(directory)
     learning_curve = loadLearningCurve(directory)
     
-    if exploration_curve!=None: # Plot exploration too?
+    if exploration_curve is not None: # Plot exploration too?
         fig = plt.figure(1,figsize=(16, 6))
         plotExplorationCurve(exploration_curve,fig.add_subplot(121))
         plotLearningCurve(learning_curve,fig.add_subplot(122))
