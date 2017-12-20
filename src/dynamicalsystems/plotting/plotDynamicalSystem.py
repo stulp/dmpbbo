@@ -13,7 +13,7 @@ def plotDynamicalSystem(data,axs):
 
     # Get dimensionality of the dynamical system
     #     (-1 to subtract time)/divide by 2 because we have x and xd
-    dim = (data.shape[1]-1)/2;
+    dim = (data.shape[1]-1)//2
 
     system_order = len(axs)-1
 
