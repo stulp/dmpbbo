@@ -104,7 +104,8 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax):
         sys.exit('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
     
     try:
-        n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt')                             
+        filename = directory+'/n_samples_per_dim.txt'
+        n_samples_per_dim = numpy.loadtxt(filename,dtype=int)
     except IOError:
         # Assume data is 1D
         n_samples_per_dim = len(inputs)

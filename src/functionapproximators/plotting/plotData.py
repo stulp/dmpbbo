@@ -107,7 +107,7 @@ def plotDataFromDirectory(directory,ax):
       predictions = [];
         
     try:
-        n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt')                             
+        n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt',dtype=int)                             
     except IOError:
         n_samples_per_dim = None
       

@@ -67,7 +67,8 @@ def plotBasisFunctionsFromDirectory(directory,ax):
     cosine_basis_functions = False
 
     try:
-        n_samples_per_dim = numpy.loadtxt(directory+'/n_samples_per_dim.txt')                             
+        filename = directory+'/n_samples_per_dim.txt'
+        n_samples_per_dim = numpy.loadtxt(filename,dtype=int)                             
     except IOError:
         # Assume data is 1D
         n_samples_per_dim = len(inputs)
