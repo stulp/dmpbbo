@@ -100,6 +100,10 @@ public:
   {
     return all_values_vector_size_;
   }
+  inline unsigned int getNumberOfBasisFunctions() const
+  {
+    return centers_.rows();
+  }
   
   UnifiedModel* toUnifiedModel(void) const;
   
