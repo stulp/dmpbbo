@@ -258,7 +258,7 @@ public:
   /** Mutator function for the attractor state of the dynamical system.
    *  \param[in] attractor_state Attractor state of the dynamical system.
    */
-  inline virtual void set_attractor_state(const Eigen::VectorXd& attractor_state) {
+  inline virtual void set_attractor_state(const Eigen::Ref<const Eigen::VectorXd>& attractor_state) {
     assert(attractor_state.size()==dim_orig_);
     attractor_state_ = attractor_state;
   }
