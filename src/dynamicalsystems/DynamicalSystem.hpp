@@ -204,8 +204,8 @@ public:
    *
    * 2nd order systems are represented as 1st order systems with an expanded state. The
    * SpringDamperSystem for instance is represented as x = [y z], xd = [yd zd].
-   * DynamicalSystem::getDim returns dim(x) = dim([y z]) = 2*dim(y)
-   * DynamicalSystem::dim_orig returns dim(y) = dim()/2
+   * DynamicalSystem::dim() returns dim(x) = dim([y z]) = 2*dim(y)
+   * DynamicalSystem::dim_orig() returns dim(y) = dim()/2
    *
    * For Dynamical Movement Primitives, dim_orig() may be for instance 3, if the output of the DMP
    * represents x,y,z coordinates. However, dim() will have a much larger dimensionality, because it 
