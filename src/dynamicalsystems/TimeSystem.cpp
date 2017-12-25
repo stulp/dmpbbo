@@ -68,9 +68,13 @@ void TimeSystem::differentialEquation(
    const Eigen::Ref<const Eigen::VectorXd>& x, 
    Eigen::Ref<Eigen::VectorXd> xd) const
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
   // if state<1: xd = 1/obj.tau   (or for count_down=true, if state>0: xd = -1/obj.tau
   // else        xd = 0
-  xd = VectorXd::Zero(1);
+  xd.resize(1);
+  xd[0] = 0;
+  
   if (count_down_)
   {
     if (x[0]>0)
@@ -81,6 +85,8 @@ void TimeSystem::differentialEquation(
     if (x[0]<1)
       xd[0] = 1.0/tau();
   }
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
