@@ -100,7 +100,10 @@ public:
    * \remarks x and xd should be of size dim() X 1. This forces you to pre-allocate memory, which
    * speeds things up (and also makes Eigen's Ref functionality easier to deal with).
    */
-   virtual void differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const = 0;
+   virtual void differentialEquation(
+     const Eigen::Ref<const Eigen::VectorXd>& x, 
+     Eigen::Ref<Eigen::VectorXd> xd
+   ) const = 0;
 
 
   /**

@@ -63,7 +63,9 @@ DynamicalSystem* ExponentialSystem::clone(void) const
 }
 
 
-void ExponentialSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void ExponentialSystem::differentialEquation(
+  const Eigen::Ref<const Eigen::VectorXd>& x, 
+  Eigen::Ref<Eigen::VectorXd> xd) const
 {
   xd = alpha_*(attractor_state()-x)/tau();
 }

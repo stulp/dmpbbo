@@ -121,7 +121,9 @@ VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r, double inflect
   return Ks;
 }
 
-void SigmoidSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void SigmoidSystem::differentialEquation(
+   const Eigen::Ref<const Eigen::VectorXd>& x, 
+   Eigen::Ref<Eigen::VectorXd> xd) const
 {
   xd = max_rate_*x.array()*(1-(x.array()/Ks_.array()));
 }

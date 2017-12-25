@@ -64,7 +64,9 @@ DynamicalSystem* TimeSystem::clone(void) const
   return new TimeSystem(tau(),count_down(),name());
 }
 
-void TimeSystem::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void TimeSystem::differentialEquation(
+   const Eigen::Ref<const Eigen::VectorXd>& x, 
+   Eigen::Ref<Eigen::VectorXd> xd) const
 {
   // if state<1: xd = 1/obj.tau   (or for count_down=true, if state>0: xd = -1/obj.tau
   // else        xd = 0

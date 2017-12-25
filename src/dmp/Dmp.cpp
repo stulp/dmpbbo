@@ -322,7 +322,9 @@ void Dmp::computeFunctionApproximatorOutput(const MatrixXd& phase_state, MatrixX
   }
 }
 
-void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void Dmp::differentialEquation(
+  const Eigen::Ref<const Eigen::VectorXd>& x, 
+  Eigen::Ref<Eigen::VectorXd> xd) const
 {
   
   if (goal_system_==NULL)

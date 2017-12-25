@@ -62,7 +62,9 @@ DynamicalSystem* SpringDamperSystem::clone(void) const
                         damping_coefficient_,spring_constant_,mass_,name());
 }
 
-void SpringDamperSystem::differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const
+void SpringDamperSystem::differentialEquation(
+   const Eigen::Ref<const Eigen::VectorXd>& x, 
+   Eigen::Ref<Eigen::VectorXd> xd) const
 {
   // Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
   // After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z; 

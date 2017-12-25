@@ -58,7 +58,10 @@ public:
   
   DynamicalSystem* clone(void) const;
   
-  void differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const;  
+   void differentialEquation(
+     const Eigen::Ref<const Eigen::VectorXd>& x, 
+     Eigen::Ref<Eigen::VectorXd> xd
+   ) const;
   
   void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds) const;
   
