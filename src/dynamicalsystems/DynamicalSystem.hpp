@@ -24,6 +24,8 @@
 #ifndef _DYNAMICALSYSTEM_H_
 #define _DYNAMICALSYSTEM_H_
 
+#include "eigen_realtime/eigen_realtime_check.hpp" // Include this before Eigen header files
+
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>

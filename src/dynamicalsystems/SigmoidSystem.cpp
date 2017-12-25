@@ -125,7 +125,11 @@ void SigmoidSystem::differentialEquation(
    const Eigen::Ref<const Eigen::VectorXd>& x, 
    Eigen::Ref<Eigen::VectorXd> xd) const
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
   xd = max_rate_*x.array()*(1-(x.array()/Ks_.array()));
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
