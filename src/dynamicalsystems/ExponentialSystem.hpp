@@ -87,6 +87,9 @@ private:
    */
   ExponentialSystem(void) {};
 
+  /** Preallocated memory to make ExponentialSystem::differentialEquation() realtime. */
+  mutable Eigen::VectorXd attractor_state_prealloc_;
+  
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   

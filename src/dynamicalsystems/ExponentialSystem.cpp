@@ -51,6 +51,7 @@ ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::
   : DynamicalSystem(1, tau, y_init, y_attr, name),
   alpha_(alpha)
 {
+  attractor_state_prealloc_ = VectorXd::Zero(dim_orig());
 }
 
 ExponentialSystem::~ExponentialSystem(void)
@@ -67,7 +68,13 @@ void ExponentialSystem::differentialEquation(
   const Eigen::Ref<const Eigen::VectorXd>& x, 
   Eigen::Ref<Eigen::VectorXd> xd) const
 {
-  xd = alpha_*(attractor_state()-x)/tau();
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  // xd = alpha_*(attractor_state()-x)/tau(); // Non-realtime version now commented out  
+  
+  attractor_state(attractor_state_prealloc_);
+  xd.noalias() = alpha_*(attractor_state_prealloc_-x)/tau();
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const
