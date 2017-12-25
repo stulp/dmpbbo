@@ -255,6 +255,15 @@ public:
    */
   inline Eigen::VectorXd attractor_state(void) const { return attractor_state_; }
 
+  /**
+   * Accessor function for the attractor state of the dynamical system.
+   * \param[out] attractor_state Attractor state of the dynamical system.
+   */
+  inline void attractor_state(Eigen::VectorXd& attractor_state) const 
+  { 
+    attractor_state=attractor_state_;
+  }
+
   /** Mutator function for the attractor state of the dynamical system.
    *  \param[in] attractor_state Attractor state of the dynamical system.
    */
