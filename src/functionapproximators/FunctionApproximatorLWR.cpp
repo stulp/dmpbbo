@@ -96,7 +96,7 @@ FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
 //  return true;
 //}
 
-void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -208,7 +208,7 @@ void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targ
   
 }
 
-void FunctionApproximatorLWR::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& output)
 {
   if (!isTrained())  
   {

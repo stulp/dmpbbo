@@ -264,7 +264,7 @@ void UnifiedModel::set_slopes_as_angles(bool slopes_as_angles)
 
 
 
-void UnifiedModel::getLines(const MatrixXd& inputs, MatrixXd& lines) const
+void UnifiedModel::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
 {
   int n_time_steps = inputs.rows();
 
@@ -293,7 +293,7 @@ void UnifiedModel::getLines(const MatrixXd& inputs, MatrixXd& lines) const
   //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 }
   
-void UnifiedModel::evaluate(const MatrixXd& inputs, MatrixXd& output) const
+void UnifiedModel::evaluate(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& output) const
 {
   
   MatrixXd lines;
@@ -307,7 +307,7 @@ void UnifiedModel::evaluate(const MatrixXd& inputs, MatrixXd& output) const
 }
 
 /*
-void UnifiedModel::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
+void UnifiedModel::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& kernel_activations)
 {
   cout << __FILE__ << ":" << __LINE__ << ":Here" << endl;
   // Check and set sizes
@@ -345,7 +345,7 @@ void UnifiedModel::kernelActivationsSymmetric(const MatrixXd& centers, const Mat
 }
 */
 
-void UnifiedModel::kernelActivations(const MatrixXd& inputs, MatrixXd& kernel_activations) const
+void UnifiedModel::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& kernel_activations) const
 {
   if (caching_)
   {

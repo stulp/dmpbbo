@@ -75,7 +75,7 @@ ModelParameters* ModelParametersRBFN::clone(void) const {
   return new ModelParametersRBFN(centers_,widths_,weights_); 
 }
 
-void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersRBFN::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   if (caching_)
   {

@@ -94,7 +94,7 @@ ModelParameters* ModelParametersGPR::clone(void) const {
   return new ModelParametersGPR(train_inputs_,train_targets_,gram_,maximum_covariance_,sigmas_); 
 }
 
-void ModelParametersGPR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersGPR::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   
   MatrixXd centers = train_inputs_;

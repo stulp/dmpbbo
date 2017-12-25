@@ -64,19 +64,19 @@ public:
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    */
-  void unnormalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void unnormalizedKernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
 
   /** Get the normalized kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The normalized kernel activations, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
    */
-  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
   
   /** Get the output of each linear model (unweighted) for the given inputs.
    * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
    * \param[out] lines The output of the linear models (size: n_samples X n_basis_functions) 
    */
-  void getLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& lines) const;
+  void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   

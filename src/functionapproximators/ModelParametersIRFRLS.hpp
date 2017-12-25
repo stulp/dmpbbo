@@ -68,7 +68,7 @@ public:
    */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
 
-  void cosineActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& cosine_activations) const;
+  void cosineActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& cosine_activations) const;
   
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

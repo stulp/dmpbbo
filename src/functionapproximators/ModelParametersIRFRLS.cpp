@@ -69,7 +69,7 @@ ModelParameters* ModelParametersIRFRLS::clone(void) const
   return new ModelParametersIRFRLS(weights_, cosines_periodes_, cosines_phase_); 
 }
 
-void ModelParametersIRFRLS::cosineActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& cosine_activations) const
+void ModelParametersIRFRLS::cosineActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& cosine_activations) const
 {
   if (caching_)
   {

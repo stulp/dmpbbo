@@ -68,7 +68,7 @@ FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
     );
 };
 
-void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorGPR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -104,7 +104,7 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
   
 }
 
-void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
+void FunctionApproximatorGPR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -128,7 +128,7 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   
 }
 
-void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
+void FunctionApproximatorGPR::predictVariance(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& variances)
 {
   if (!isTrained())  
   {

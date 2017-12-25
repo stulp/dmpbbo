@@ -47,7 +47,7 @@ namespace Gaussian {
     const std::vector<Eigen::VectorXd>& mus, 
     const std::vector<Eigen::MatrixXd>& covars, 
     std::vector<double> priors, 
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& kernel_activations, 
     bool normalized_basis_functions=false);
 
@@ -62,7 +62,7 @@ namespace Gaussian {
   void activations(
     const Eigen::MatrixXd& mus, 
     const Eigen::MatrixXd& sigmas, 
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& kernel_activations,
     bool normalized_basis_functions,
     bool asymmetric_kernels);
@@ -80,7 +80,7 @@ namespace Cosine {
   void activations(
     const std::vector<Eigen::MatrixXd>& angular_frequencies,
     const std::vector<Eigen::VectorXd>& phases,
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& activations);
 
     /** Get the kernel activations for given angular frequencies and phases
@@ -92,7 +92,7 @@ namespace Cosine {
   void activations(
     const Eigen::MatrixXd& angular_frequencies,
     const Eigen::VectorXd& phases,
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& activations);
 
 }

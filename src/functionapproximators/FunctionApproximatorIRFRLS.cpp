@@ -75,7 +75,7 @@ FunctionApproximator* FunctionApproximatorIRFRLS::clone(void) const {
 };
 
 
-void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorIRFRLS::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -122,7 +122,7 @@ void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& t
   setModelParameters(new ModelParametersIRFRLS(linear_model, cosines_periodes, cosines_phase));
 }
 
-void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output)
+void FunctionApproximatorIRFRLS::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -133,9 +133,9 @@ void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output
   const ModelParametersIRFRLS* model = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
 
   MatrixXd proj_inputs;
-  model->cosineActivations(input,proj_inputs);
+  model->cosineActivations(inputs,proj_inputs);
   
-  output = proj_inputs * model->weights_;
+  outputs = proj_inputs * model->weights_;
 }
 
 bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const

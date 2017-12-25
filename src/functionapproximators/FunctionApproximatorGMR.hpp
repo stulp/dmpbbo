@@ -61,13 +61,13 @@ public:
 
 	virtual FunctionApproximator* clone(void) const;
 	
-	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
+	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
   
-	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
 
-	void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances);
+	void predictVariance(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& variances);
 
-	void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances);
 	
 	std::string getName(void) const {
     return std::string("GMR");  
@@ -139,21 +139,21 @@ public:
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
+  void predictDot(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
   
   /** Query the function approximator to make a prediction and to compute the derivate of that prediction, and also to predict its variance
    *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
    *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
    *  \param[out] outputs_dot  Predicted derivate values
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  void predictDot(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances);
+  void predictDot(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances);
 
-  void trainIncremental(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets);
+  void trainIncremental(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 
 
 private:

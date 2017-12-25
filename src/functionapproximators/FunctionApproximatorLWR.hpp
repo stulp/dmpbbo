@@ -61,9 +61,9 @@ public:
 
 	FunctionApproximator* clone(void) const;
   
-	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
+	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 
-	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
   
 	inline std::string getName(void) const {
     return std::string("LWR");  

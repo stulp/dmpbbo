@@ -68,7 +68,7 @@ FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
     );
 };
 
-void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorRBFN::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -104,7 +104,7 @@ void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& tar
   
 }
 
-void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& output)
 {
   if (!isTrained())  
   {

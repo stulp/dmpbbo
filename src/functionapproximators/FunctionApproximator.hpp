@@ -76,7 +76,9 @@ public:
    *  \param[in] inputs  Input values of the training examples
    *  \param[in] targets Target values of the training examples
    */
-  virtual void train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets) = 0;
+  virtual void train(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets) = 0;
   
   /** Train the function approximator with corresponding input and target examples (and write results to file).
    *  \param[in] inputs  Input values of the training examples
@@ -84,7 +86,11 @@ public:
    *  \param[in] save_directory Directory to which to write results.
    * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
    */
-  void train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite=false);
+  void train(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
+    std::string save_directory, 
+    bool overwrite=false);
 
   /** Re-train the function approximator with corresponding input and target examples.
    *  \param[in] inputs  Input values of the training examples
@@ -93,7 +99,9 @@ public:
    *  wanted to keep a clear disctinction between training (which must be done at least once before 
    *  FunctionApproximator::predict) can be called and re-training.
    */
-  void reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets);
+  void reTrain(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets);
   
   /** Re-train the function approximator with corresponding input and target examples (and write results to file).
    *  \param[in] inputs  Input values of the training examples
@@ -104,7 +112,11 @@ public:
    *  wanted to keep a clear disctinction between training (which must be done at least once before 
    *  FunctionApproximator::predict) can be called and re-training.
    */
-  void reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite=false);
+  void reTrain(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
+    std::string save_directory, 
+    bool overwrite=false);
   
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
@@ -114,18 +126,23 @@ public:
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) = 0;
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs) = 0;
 
   /** Query the function approximator to make a prediction, and also to predict its variance
    *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
    *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs,
+    Eigen::MatrixXd& variances)
   {
     predict(inputs, outputs);
     variances.fill(0);
@@ -140,7 +157,10 @@ public:
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances)
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs, 
+    std::vector<Eigen::MatrixXd>& variances)
   {
     predict(inputs, outputs);
     for (unsigned int i=0; i<variances.size(); i++)
@@ -152,13 +172,15 @@ public:
    * This function is not implemented by all function approximators. Therefore, the default
    * implementation fills outputs with 0s.
    *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
    * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances)
+  virtual void predictVariance(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs,
+    Eigen::MatrixXd& variances)
   {
     variances.fill(0);
   }

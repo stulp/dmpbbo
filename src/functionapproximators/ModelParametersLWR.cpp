@@ -85,14 +85,14 @@ ModelParameters* ModelParametersLWR::clone(void) const {
   return new ModelParametersLWR(centers_,widths_,slopes_,offsets_,asymmetric_kernels_,lines_pivot_at_max_activation_); 
 }
 
-void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   bool normalized_basis_functions=false;  
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels_);  
 }
 
-void ModelParametersLWR::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersLWR::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   if (caching_)
   {
@@ -176,7 +176,7 @@ void ModelParametersLWR::set_slopes_as_angles(bool slopes_as_angles)
 }
 
 
-void ModelParametersLWR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
+void ModelParametersLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
 {
   int n_time_steps = inputs.rows();
 
@@ -204,7 +204,7 @@ void ModelParametersLWR::getLines(const MatrixXd& inputs, MatrixXd& lines) const
 }
   
 /*
-void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const MatrixXd& inputs, MatrixXd& kernel_activations)
+void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& kernel_activations)
 {
   cout << __FILE__ << ":" << __LINE__ << ":Here" << endl;
   // Check and set sizes

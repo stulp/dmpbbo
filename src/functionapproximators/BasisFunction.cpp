@@ -40,7 +40,7 @@ void Gaussian::activations(
     const std::vector<Eigen::VectorXd>& mus, 
     const std::vector<Eigen::MatrixXd>& covars, 
     std::vector<double> priors, 
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& kernel_activations, 
     bool normalized_basis_functions)
 {
@@ -107,7 +107,7 @@ void Gaussian::activations(
   
 }
 
-void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions, bool asymmetric_kernels)
+void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions, bool asymmetric_kernels)
 {
   
   // Check and set sizes
@@ -182,7 +182,7 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
 void Cosine::activations(
     const std::vector<Eigen::MatrixXd>& angular_frequencies,
     const std::vector<Eigen::VectorXd>& phases,
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& activations)
 {
   unsigned int n_basis_functions = angular_frequencies.size();
@@ -210,7 +210,7 @@ void Cosine::activations(
 void Cosine::activations(
   const Eigen::MatrixXd& angular_frequencies,
   const Eigen::VectorXd& phases,
-  const Eigen::MatrixXd& inputs, 
+  const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   Eigen::MatrixXd& activations)
 {
   // Activations for each basis function are computed with:
