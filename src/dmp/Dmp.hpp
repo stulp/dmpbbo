@@ -379,6 +379,24 @@ private:
   /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
   mutable Eigen::VectorXd attractor_state_prealloc_;
   
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd initial_state_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_outputs_one_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_outputs_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_output_prealloc_; 
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd forcing_term_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd g_minus_y0_prealloc_;
+  
   /**
    *  Helper function for constructor.
    *  \param spring_system   Spring-damper system                 cf. Dmp::spring_system_
