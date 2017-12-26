@@ -85,6 +85,8 @@ Separate between understanding DMPs, and understanding the code? Or interleave?
 
 \section For next release
 
+\li Regularization in functionapproximator
+
 \li Fix warnings in "make Docs"
 
 \li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
