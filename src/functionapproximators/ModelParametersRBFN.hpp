@@ -61,6 +61,10 @@ public:
     return centers_.cols();
   };
   
+  inline unsigned int getNumberOfBasisFunctions() const
+  {
+    return centers_.rows();
+  }
   
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
