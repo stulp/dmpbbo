@@ -97,6 +97,7 @@ int main(int n_args, char** args)
   //dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
   Dmp* dmp = new Dmp(n_dims, function_approximators, dmp_type);
 
+  cout << "** Train DMP." << endl;
   // And train it. Passing the save_directory will make sure the results are saved to file.
   bool overwrite = true;
   dmp->train(trajectory,save_directory,overwrite);
@@ -104,6 +105,7 @@ int main(int n_args, char** args)
   
   // INTEGRATE DMP TO GET REPRODUCED TRAJECTORY
   
+  cout << "** Integrate DMP analytically." << endl;
   Trajectory traj_reproduced;
   tau = 0.9;
   n_time_steps = 91;
@@ -127,20 +129,37 @@ int main(int n_args, char** args)
 
 
   // INTEGRATE STEP BY STEP
-  double dt = ts[1];
+  cout << "** Integrate DMP step-by-step." << endl;
   VectorXd x(dmp->dim(),1);
   VectorXd xd(dmp->dim(),1);
   VectorXd x_updated(dmp->dim(),1);
 
-  dmp->integrateStart(x,xd);
+  MatrixXd xs_step(n_time_steps,x.size());
+  MatrixXd xds_step(n_time_steps,xd.size());
+  
   cout << std::setprecision(3) << std::fixed << std::showpos;
+  double dt = ts[1];
+  dmp->integrateStart(x,xd);
+  xs_step.row(0) = x;
+  xds_step.row(0) = xd;
   for (int t=1; t<n_time_steps; t++)
   {
     dmp->integrateStep(dt,x,x_updated,xd); 
     x = x_updated;
-    //cout << x.transpose() << endl << xs_ana.row(t) << endl << endl;
-    //cout << x.transpose() << " | " << xd.transpose() << endl;
+    xs_step.row(t) = x;
+    xds_step.row(t) = xd;
+    if (save_directory.empty())
+    {
+      // Not writing to file, output on cout instead.
+      //cout << x.transpose() << " | " << xd.transpose() << endl;
+    }
   } 
+
+  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols());
+  output_step << xs_step, xds_step, ts;
+  saveMatrix(save_directory,"reproduced_step_xs_xds.txt",output_step,overwrite);
+
+  
 
   delete meta_parameters;
   delete fa_lwr;

@@ -41,6 +41,7 @@ lines = plotTrajectoryFromFile(directory+"/reproduced_traj.txt",axs)
 plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
 
 plt.legend()
+fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
 
 # Read data
 xs_xds        = numpy.loadtxt(directory+'/reproduced_xs_xds.txt')
@@ -49,6 +50,12 @@ fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
 
 fig = plt.figure(2)
 plotDmp(xs_xds,fig,forcing_terms,fa_output)
+fig.canvas.set_window_title('Analytical integration') 
+
+xs_xds        = numpy.loadtxt(directory+'/reproduced_step_xs_xds.txt')
+fig = plt.figure(3)
+plotDmp(xs_xds,fig)
+fig.canvas.set_window_title('Step-by-step integration') 
 
 
 plt.show()
