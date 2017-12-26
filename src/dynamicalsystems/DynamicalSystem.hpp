@@ -243,6 +243,15 @@ public:
    */
   inline Eigen::VectorXd initial_state(void) const { return initial_state_; }
 
+  /**
+   * Accessor function for the initial state of the dynamical system.
+   * \param[out] initial_state Initial state of the dynamical system.
+   */
+  inline void initial_state(Eigen::VectorXd& initial_state) const 
+  { 
+    initial_state=initial_state_;
+  }
+  
   /** Mutator function for the initial state of the dynamical system.
    *  \param[in] initial_state Initial state of the dynamical system.
    */
