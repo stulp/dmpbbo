@@ -10,7 +10,7 @@ from plotDynamicalSystemComparison import plotDynamicalSystemComparison
 
 from plotDynamicalSystem import plotDynamicalSystem
 
-def plotDmp(data,fig,forcing_terms_data=0,fa_output_data=0):
+def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
 
     # Number of columns in the data
     n_cols = data.shape[1]             
