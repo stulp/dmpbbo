@@ -202,6 +202,9 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
   gating_system_ = gating_system;
   gating_system_->set_name(name()+"_gating");
   
+  // Pre-allocate memory for real-time execution
+  attractor_state_prealloc_ = VectorXd(dim_orig());
+  
 }
 
 void Dmp::set_damping_coefficient(double damping_coefficient)
@@ -302,7 +305,7 @@ bool Dmp::isTrained(void) const
 }
 */
 
-void Dmp::computeFunctionApproximatorOutput(const MatrixXd& phase_state, MatrixXd& fa_output) const
+void Dmp::computeFunctionApproximatorOutput(const Ref<const MatrixXd>& phase_state, MatrixXd& fa_output) const
 {
   int T = phase_state.rows();
   fa_output.resize(T,dim_orig());
@@ -326,25 +329,30 @@ void Dmp::differentialEquation(
   const Eigen::Ref<const Eigen::VectorXd>& x, 
   Eigen::Ref<Eigen::VectorXd> xd) const
 {
+  MatrixXd fa_output(1,dim_orig()); // yyy Should be preallocated
   
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
+  attractor_state(attractor_state_prealloc_);  
   if (goal_system_==NULL)
   {
     // If there is no dynamical system for the delayed goal, the goal is
     // simply the attractor state
-    spring_system_->set_attractor_state(attractor_state());
+    spring_system_->set_attractor_state(attractor_state_prealloc_);
     // with zero change
     xd.GOAL.fill(0);
   } 
   else
   {
     // Integrate goal system and get current goal state
-    goal_system_->set_attractor_state(attractor_state());
+    goal_system_->set_attractor_state(attractor_state_prealloc_);
     goal_system_->differentialEquation(x.GOAL, xd.GOAL);
     // The goal state is the attractor state of the spring-damper system
     spring_system_->set_attractor_state(x.GOAL);
-        
+    
   }
 
+  
   // Integrate spring damper system
   // Forcing term is added to spring_state later
   spring_system_->differentialEquation(x.SPRING, xd.SPRING);
@@ -354,10 +362,11 @@ void Dmp::differentialEquation(
   phase_system_->differentialEquation(x.PHASE, xd.PHASE);
   gating_system_->differentialEquation(x.GATING, xd.GATING);
 
-  MatrixXd phase_state(1,1);
-  phase_state = x.PHASE;
-  MatrixXd fa_output(1,dim_orig());
-  computeFunctionApproximatorOutput(phase_state, fa_output); 
+  EXITING_REAL_TIME_CRITICAL_CODE
+
+  //MatrixXd phase_state(1,1);
+  //phase_state = x.PHASE;
+  computeFunctionApproximatorOutput(x.PHASE, fa_output); 
 
   // Gate the output of the function approximators
   int t0 = 0;

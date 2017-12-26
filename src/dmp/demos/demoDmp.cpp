@@ -93,7 +93,9 @@ int main(int n_args, char** args)
   // CONSTRUCT AND TRAIN THE DMP
   
   // Initialize the DMP
-  Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
+  Dmp::DmpType dmp_type = Dmp::KULVICIUS_2012_JOINING;
+  //dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
+  Dmp* dmp = new Dmp(n_dims, function_approximators, dmp_type);
 
   // And train it. Passing the save_directory will make sure the results are saved to file.
   bool overwrite = true;
@@ -122,6 +124,23 @@ int main(int n_args, char** args)
   saveMatrix(save_directory,"reproduced_xs_xds.txt",output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
+
+
+  // INTEGRATE STEP BY STEP
+  double dt = ts[1];
+  VectorXd x(dmp->dim(),1);
+  VectorXd xd(dmp->dim(),1);
+  VectorXd x_updated(dmp->dim(),1);
+
+  dmp->integrateStart(x,xd);
+  cout << std::setprecision(3) << std::fixed << std::showpos;
+  for (int t=1; t<n_time_steps; t++)
+  {
+    dmp->integrateStep(dt,x,x_updated,xd); 
+    x = x_updated;
+    //cout << x.transpose() << endl << xs_ana.row(t) << endl << endl;
+    //cout << x.transpose() << " | " << xd.transpose() << endl;
+  } 
 
   delete meta_parameters;
   delete fa_lwr;

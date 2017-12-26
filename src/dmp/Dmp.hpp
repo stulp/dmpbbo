@@ -24,6 +24,9 @@
 #ifndef _DMP_H_
 #define _DMP_H_
 
+// This must be included before any Eigen header files are included
+#include "eigen_realtime/eigen_realtime_check.hpp"
+
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "functionapproximators/Parameterizable.hpp"
 
@@ -309,7 +312,8 @@ public:
    * \param[in] phase_state The phase states for which the outputs are computed.
    * \param[out] fa_output The outputs of the function approximators.
    */
-  virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
+  virtual void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const;
   
   /** Add a perturbation to the forcing term when computing the analytical solution.
    * This is only relevant for off-line experiments, i.e. not on a robot, for testing how
@@ -371,6 +375,9 @@ private:
   Eigen::VectorXd trajectory_amplitudes_;
 
   /** @} */ // end of group_nonlinear
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd attractor_state_prealloc_;
   
   /**
    *  Helper function for constructor.
