@@ -114,10 +114,14 @@ void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   VectorXd min = inputs.colwise().minCoeff();
   VectorXd max = inputs.colwise().maxCoeff();
   
-  MatrixXd centers, widths, activations;
+  MatrixXd centers, widths;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
   bool normalize_activations = true; 
   bool asym_kernels = meta_parameters_lwr->asymmetric_kernels(); 
+  
+  int n_samples = inputs.rows();
+  int n_kernels = centers.rows(); 
+  MatrixXd activations(n_samples,n_kernels);
   BasisFunction::Gaussian::activations(centers,widths,inputs,activations,normalize_activations,asym_kernels);
   
   // Make the design matrix
@@ -125,9 +129,9 @@ void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   X.leftCols(inputs.cols()) = inputs;
   
   
-  int n_kernels = activations.cols();
+  //int n_kernels = activations.cols();
+  //int n_samples = X.rows(); 
   int n_betas = X.cols(); 
-  int n_samples = X.rows(); 
   MatrixXd W;
   MatrixXd beta(n_kernels,n_betas);
   
@@ -249,13 +253,17 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
   //                                            (mostly for me to remember why it is like this) 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
 
-  MatrixXd lines;
+  int n_time_steps = inputs.rows();
+  int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
+  
+  MatrixXd lines(n_time_steps,n_basis_functions);
+  MatrixXd activations(n_time_steps,n_basis_functions);
+  
   model_parameters_lwr->getLines(inputs, lines);
 
-  // Weight the values for each line with the normalized basis function activations  
-  MatrixXd activations;
   model_parameters_lwr->kernelActivations(inputs,activations);
   
+  // Weight the values for each line with the normalized basis function activations  
   output = (lines.array()*activations.array()).rowwise().sum();
   
 }
@@ -270,13 +278,16 @@ bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& 
 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
   
-  MatrixXd lines;
+  int n_samples = inputs.rows();
+  int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
+  
+  MatrixXd lines(n_samples,n_basis_functions);
   model_parameters_lwr->getLines(inputs, lines);
   
-  MatrixXd unnormalized_activations;
+  MatrixXd unnormalized_activations(n_samples,n_basis_functions);
   model_parameters_lwr->unnormalizedKernelActivations(inputs, unnormalized_activations);
 
-  MatrixXd activations;
+  MatrixXd activations(n_samples,n_basis_functions);
   model_parameters_lwr->kernelActivations(inputs, activations);
 
   MatrixXd predictions = (lines.array()*activations.array()).rowwise().sum();

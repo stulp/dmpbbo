@@ -119,8 +119,9 @@ void FunctionApproximatorGPR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
   
   outputs.resize(n_samples,1);
   
-  MatrixXd ks;
+  MatrixXd ks(n_samples,n_samples);
   model_parameters_gpr->kernelActivations(inputs, ks);
+  
   
   VectorXd weights = model_parameters_gpr->weights();
   for (unsigned int ii=0; ii<n_samples; ii++)

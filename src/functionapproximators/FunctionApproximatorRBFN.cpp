@@ -86,11 +86,14 @@ void FunctionApproximatorRBFN::train(const Eigen::Ref<const Eigen::MatrixXd>& in
   VectorXd min = inputs.colwise().minCoeff();
   VectorXd max = inputs.colwise().maxCoeff();
   
-  MatrixXd centers, widths, activations;
+  MatrixXd centers, widths;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
 
   bool normalized_basis_functions=false;  
   bool asymmetric_kernels=false;  
+  int n_samples = inputs.rows();
+  int n_kernels = centers.rows(); 
+  MatrixXd activations(n_samples,n_kernels);
   BasisFunction::Gaussian::activations(centers,widths,inputs,activations,
     normalized_basis_functions,asymmetric_kernels);
   
@@ -119,7 +122,9 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
   assert(inputs.rows()==output.rows());
   
   // Get the basis function activations  
-  MatrixXd activations; // todo avoid allocation
+  int n_time_steps = inputs.rows();
+  int n_basis_functions = model_parameters_rbfn->getNumberOfBasisFunctions();
+  MatrixXd activations(n_time_steps,n_basis_functions);
   model_parameters_rbfn->kernelActivations(inputs,activations);
     
   // Weight the basis function activations  
