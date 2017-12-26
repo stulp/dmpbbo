@@ -75,6 +75,9 @@ public:
   /** Get the output of each linear model (unweighted) for the given inputs.
    * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
    * \param[out] lines The output of the linear models (size: n_samples X n_basis_functions) 
+   *
+   * If "lines" is passed as a Matrix of correct size (n_samples X n_basis_functions), this function
+   * will not allocate any memory, and is real-time.
    */
   void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
   

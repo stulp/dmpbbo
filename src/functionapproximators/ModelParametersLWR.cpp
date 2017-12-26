@@ -60,7 +60,7 @@ ModelParametersLWR::ModelParametersLWR(const Eigen::MatrixXd& centers, const Eig
   asymmetric_kernels_(asymmetric_kernels),
   lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
   slopes_as_angles_(false),
-  caching_(true)
+  caching_(false)
 {
 #ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_basis_functions = centers.rows();
@@ -87,9 +87,11 @@ ModelParameters* ModelParametersLWR::clone(void) const {
 
 void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
   bool normalized_basis_functions=false;  
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels_);  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void ModelParametersLWR::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
@@ -110,10 +112,14 @@ void ModelParametersLWR::kernelActivations(const Eigen::Ref<const Eigen::MatrixX
     }
   }
 
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
   // Cache could not be used, actually do the work
   bool normalize_activations = true;
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,normalize_activations,asymmetric_kernels_);
 
+  EXITING_REAL_TIME_CRITICAL_CODE
+  
   if (caching_)
   {
     // Cache the current results now.  
@@ -175,6 +181,9 @@ void ModelParametersLWR::set_slopes_as_angles(bool slopes_as_angles)
   slopes_as_angles_ = false;
 }
 
+/*
+The code below was previously implemted as follows. Below is the real-time version.
+
 
 void ModelParametersLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
 {
@@ -202,7 +211,44 @@ void ModelParametersLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& input
   }
   //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 }
+*/
+
+void ModelParametersLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
   
+  //cout  << endl << "========================" << endl;
+  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
+  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
+  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
+  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
+  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
+  
+  int n_time_steps = inputs.rows();
+  int n_lines = centers_.rows();
+  lines.resize(n_time_steps,n_lines);
+  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
+
+
+  // Compute values along lines for each time step  
+  // Line representation is "y = ax + b"
+  for (int i_line=0; i_line<n_lines; i_line++)
+  {
+    lines.col(i_line).noalias() = inputs*slopes_.row(i_line).transpose();
+    lines.col(i_line).array() += offsets_(i_line);
+  
+    if (lines_pivot_at_max_activation_)
+    {
+      // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
+      // Therefore, we still have to subtract "ac"
+      double ac = slopes_.row(i_line).dot(centers_.row(i_line));
+      lines.col(i_line).array() -= ac;
+    }
+  }
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
 /*
 void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& kernel_activations)
 {
