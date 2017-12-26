@@ -51,12 +51,24 @@ FunctionApproximatorLWR::FunctionApproximatorLWR(const MetaParametersLWR *const 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  if (model_parameters!=NULL)
+    preallocateMemory(model_parameters->getNumberOfBasisFunctions());
 }
 
 FunctionApproximatorLWR::FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
+  preallocateMemory(model_parameters->getNumberOfBasisFunctions());
+}
+
+void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
+{
+  lines_one_prealloc_ = MatrixXd(1,n_basis_functions);
+  activations_one_prealloc_ = MatrixXd(1,n_basis_functions);
+  
+  lines_prealloc_ = MatrixXd(1,n_basis_functions);
+  activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
 
@@ -210,16 +222,18 @@ void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   
   setModelParameters(new ModelParametersLWR(centers,widths,slopes,offsets,asym_kernels));
   
+  preallocateMemory(n_kernels);
 }
 
-void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& output)
+void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
+
   if (!isTrained())  
   {
     cerr << "WARNING: You may not call FunctionApproximatorLWPR::predict if you have not trained yet. Doing nothing." << endl;
     return;
   }
-
+  
   // The following line of code took a long time to decide on.
   // The member FunctionApproximator::model_parameters_ (which we access through
   // getModelParameters()) is of class ModelParameters, not ModelParametersLWR.
@@ -252,19 +266,42 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
   // There, ~30 lines of comment for one line of code ;-) 
   //                                            (mostly for me to remember why it is like this) 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
+  
+  bool only_one_sample = (inputs.rows()==1);
+  if (only_one_sample)
+  {
+    ENTERING_REAL_TIME_CRITICAL_CODE
 
-  int n_time_steps = inputs.rows();
-  int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
-  
-  MatrixXd lines(n_time_steps,n_basis_functions);
-  MatrixXd activations(n_time_steps,n_basis_functions);
-  
-  model_parameters_lwr->getLines(inputs, lines);
+    // Only 1 sample, so real-time execution is possible. No need to allocate memory.
+    model_parameters_lwr->getLines(inputs, lines_one_prealloc_);
 
-  model_parameters_lwr->kernelActivations(inputs,activations);
+    // Weight the values for each line with the normalized basis function activations  
+    model_parameters_lwr->kernelActivations(inputs,activations_one_prealloc_);
   
-  // Weight the values for each line with the normalized basis function activations  
-  output = (lines.array()*activations.array()).rowwise().sum();
+    outputs = (lines_one_prealloc_.array()*activations_one_prealloc_.array()).rowwise().sum();  
+    
+    EXITING_REAL_TIME_CRITICAL_CODE
+    
+  }
+  else
+  {
+    
+    int n_time_steps = inputs.rows();
+    int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
+    
+    // The next two lines are not be real-time, as they allocate memory
+    lines_prealloc_.resize(n_time_steps,n_basis_functions);
+    activations_prealloc_.resize(n_time_steps,n_basis_functions);
+    outputs.resize(n_time_steps,getExpectedOutputDim());
+    
+    model_parameters_lwr->getLines(inputs, lines_prealloc_);
+
+    // Weight the values for each line with the normalized basis function activations  
+    model_parameters_lwr->kernelActivations(inputs,activations_prealloc_);
+  
+    outputs = (lines_prealloc_.array()*activations_prealloc_.array()).rowwise().sum();  
+    
+  }
   
 }
 
