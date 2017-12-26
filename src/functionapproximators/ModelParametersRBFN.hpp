@@ -86,6 +86,11 @@ public:
    * \return weights of the basis functions.
    */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
+  
+  /** Return the weights of the basis functions.
+   * \return weights of the basis functions.
+   */
+  inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
