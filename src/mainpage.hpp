@@ -67,15 +67,14 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-\section To decide
 
-Separate between understanding DMPs, and understanding the code? Or interleave?
+\section Paper
 
-\section Things to document
 \li Python/C++ what to use for what?
 \li functionapproximator: Parameterizable
 \li functionapproximator: Unified Model
 \li functionapproximator: Model/Meta/Algorithm
+\li functionapproximator: Regularized Least Squares FunctionApproximatorRLS
 \li dynamicalsystems: differentialEquation vs analyticalSolution
 \li dmp: is a dynamical system (no analyticalSolution)
 \li dmp: is Parameterizable.
@@ -83,55 +82,51 @@ Separate between understanding DMPs, and understanding the code? Or interleave?
 \li bbo: Has nothing to do with DMPs. "Minimal CMA-ES"
 \li dmp_bbo: task and task solver
 
-\section For next release
+\section Fixes 
 
-\li Regularization in functionapproximator
+\li test DmpContextualOneStep
+\li The I in IRFRLS is not correct
 
-\li Fix warnings in "make Docs"
+\section Documentation
 
-\li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
-
-\li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
+\li Add licence to .py files
 
 \li document Python classes/functions
 
-\li test DmpContextual
+\li Fix warnings in "make Docs"
+
+\section Features
+
+\li Add FunctionapproximatorRLS
+
+\li Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
+
+\li Regularization in functionapproximator
+
+\li Regularization of optimization in Python, but in C++ too?
+
+\li implement generic regularization in Task
+
+\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
+
+\li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
+
+\li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
+
+\li DmpExtendedDimensions (started it, has separate branch)
+
+\section Restructuring
+
+\li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
 
 \li "virtual int getExpectedOutputDim(void) const" should be pure virtual
-
-
-\section Perhaps for next release?
 
 \li Optimizations: Remove all occurences of inverse()
 http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I.27m_accidentally_triggering_dynamic_memory_allocation_in_a_time_critical_block_of_code.3F  
 
-\li Should FunctionApproximators be friends with their ModelParameters?
-
-\li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
-
-
-\li implement covar adaptation in python als (with blocks too)
-  
-\li implement generic regularization in Task
-
-\li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
-
-\li More coherent structure  
-\code{.cpp}
-  void predict(const MatrixXd& inputs, MatrixXd& predictions)
-  {
-    MatrixXd variances(0,0);
-    predict(inputs,predictions,variances)
-  }
-  virtual void predict(const MatrixXd& inputs, MatrixXd& predictions, Matrix& variances) = 0;
-\endcode  
-
-\section Long-term
+\li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
 \li setColor on ellipses?
-
-
-
 
  */ 
 
