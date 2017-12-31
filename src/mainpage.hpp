@@ -67,26 +67,13 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-
-\section Paper
-
-\li Python/C++ what to use for what?
-\li functionapproximator: Parameterizable
-\li functionapproximator: Unified Model
-\li functionapproximator: Model/Meta/Algorithm
-\li functionapproximator: Regularized Least Squares FunctionApproximatorRLS
-\li dynamicalsystems: differentialEquation vs analyticalSolution
-\li dmp: is a dynamical system (no analyticalSolution)
-\li dmp: is Parameterizable.
-\li dmp: DmpContextual
-\li bbo: Has nothing to do with DMPs. "Minimal CMA-ES"
-\li dmp_bbo: task and task solver
-
 \section Fixes 
 
 \li test DmpContextualOneStep
 
 \section Documentation
+
+\li Fix license files so that Github recognizes it: https://github.com/stulp/dmpbbo/issues/18
 
 \li Add licence to .py files
 
@@ -96,7 +83,11 @@ See \ref page_serialization
 
 \section Features
 
-\li Regularization in all functionapproximators (copy from RRRFF)
+\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
+
+\li DmpExtendedDimensions (started it, has separate branch)
+
+\li L2 Regularization in all functionapproximators (copy from RRRFF)
 <ul>
 <li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
 <li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
@@ -106,10 +97,6 @@ See \ref page_serialization
 <ul>
 <li> implement generic regularization in Task
 </ul>
-
-\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
-
-\li DmpExtendedDimensions (started it, has separate branch)
 
 \section after Features (after paper)
 
@@ -130,6 +117,8 @@ http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I
 \li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
 \li setColor on ellipses?
+
+
 
  */ 
 
