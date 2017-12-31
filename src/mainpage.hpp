@@ -85,6 +85,7 @@ See \ref page_serialization
 \section Fixes 
 
 \li test DmpContextualOneStep
+
 \li The I in IRFRLS is not correct
 
 \section Documentation
@@ -97,25 +98,29 @@ See \ref page_serialization
 
 \section Features
 
-\li Add FunctionapproximatorRLS
-
-\li Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
-
-\li Regularization in functionapproximator
+\li Regularization in all functionapproximators (copy from IRFRLS)
+<ul>
+<li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
+<li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
+</ul>
 
 \li Regularization of optimization in Python, but in C++ too?
-
-\li implement generic regularization in Task
+<ul>
+<li> implement generic regularization in Task
+</ul>
 
 \li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
+
+\li DmpExtendedDimensions (started it, has separate branch)
+
+\section after Features (after paper)
 
 \li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
 
 \li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
 
-\li DmpExtendedDimensions (started it, has separate branch)
 
-\section Restructuring
+\section sec_restructuring Restructuring (after paper)
 
 \li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
 
