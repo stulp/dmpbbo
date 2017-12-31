@@ -69,6 +69,8 @@ See \ref page_serialization
 
 \section Fixes 
 
+\li Why does it compile in Debug mode, but not in optimized mode?
+
 \li test DmpContextualOneStep
 
 \section Documentation
@@ -79,11 +81,16 @@ See \ref page_serialization
 
 \li document Python classes/functions
 
-\li Fix warnings in "make Docs"
+\li Fix warnings in "make Docs" (currently 54)
 
 \section Features
 
 \li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
+
+\li Regularization of optimization in Python, but in C++ too?
+<ul>
+<li> implement generic regularization in Task
+</ul>
 
 \li DmpExtendedDimensions (started it, has separate branch)
 
@@ -91,11 +98,6 @@ See \ref page_serialization
 <ul>
 <li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
 <li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
-</ul>
-
-\li Regularization of optimization in Python, but in C++ too?
-<ul>
-<li> implement generic regularization in Task
 </ul>
 
 \section after Features (after paper)
