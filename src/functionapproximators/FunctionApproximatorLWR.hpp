@@ -68,7 +68,7 @@ public:
    *  \param[out] outputs  Predicted output values
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict).
    * Therefore, this function cannot be const.
    *
    * This function is realtime if inputs.rows()==1 (i.e. only one input sample is provided), and the

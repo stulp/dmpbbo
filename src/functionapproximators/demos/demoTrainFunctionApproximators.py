@@ -31,7 +31,7 @@ if __name__=='__main__':
     subprocess.call([executable, directory])
     
     # Plot the results in each directory
-    function_approximator_names = ["WLS","LWR","LWPR","IRFRLS","GMR","RBFN","GPR"]
+    function_approximator_names = ["WLS","LWR","LWPR","RRRFF","GMR","RBFN","GPR"]
         
     fig_number = 1;
     for name in function_approximator_names:
@@ -48,7 +48,7 @@ if __name__=='__main__':
         try:
             if (name=="WLS" or name=="LWR" or name=="LWPR" or name=="GMR"):
                 plotLocallyWeightedLinesFromDirectory(directory_fa,ax)
-            elif (name=="RBFN" or name=="GPR" or name=="IRFRLS"):
+            elif (name=="RBFN" or name=="GPR" or name=="RRRFF"):
                 plotBasisFunctionsFromDirectory(directory_fa,ax)
             plotDataFromDirectory(directory_fa,ax)
             ax.set_ylim(-1.0,1.5)

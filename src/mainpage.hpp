@@ -86,8 +86,6 @@ See \ref page_serialization
 
 \li test DmpContextualOneStep
 
-\li The I in IRFRLS is not correct
-
 \section Documentation
 
 \li Add licence to .py files
@@ -98,7 +96,7 @@ See \ref page_serialization
 
 \section Features
 
-\li Regularization in all functionapproximators (copy from IRFRLS)
+\li Regularization in all functionapproximators (copy from RRRFF)
 <ul>
 <li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
 <li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const

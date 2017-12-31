@@ -68,7 +68,7 @@ public:
    */
   UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
-  /** Constructor for the unified model parameters. This version is used by for example IRFRLS 
+  /** Constructor for the unified model parameters. This version is used by for example RRRFF 
    *  \param[in] angular_frequencies Angular frequency for each dimension and each cosine basis function  (n_bfs X n_input_dims)
    *  \param[in] phases  Phase of each cosine basis function (n_bfs X 1)
    *  \param[in] weights Weights of each basis function (n_bfs X 1)

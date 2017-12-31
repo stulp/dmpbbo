@@ -1,6 +1,6 @@
 /**
- * @file   ModelParametersIRFRLS.hpp
- * @brief  ModelParametersIRFRLS class header file.
+ * @file   ModelParametersRRRFF.hpp
+ * @brief  ModelParametersRRRFF class header file.
  * @author Freek Stulp, Thibaut Munzer
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#ifndef MODELPARAMETERSIRFRLS_H
-#define MODELPARAMETERSIRFRLS_H
+#ifndef MODELPARAMETERSRRRFF_H
+#define MODELPARAMETERSRRRFF_H
 
 #include <iosfwd>
 
@@ -30,21 +30,21 @@
 
 namespace DmpBbo {
 
-/** \brief Model parameters for the iRFRLS function approximator
+/** \brief Model parameters for the RRRFF function approximator
  * \ingroup FunctionApproximators
- * \ingroup IRFRLS
+ * \ingroup RRRFF
  */
-class ModelParametersIRFRLS : public ModelParameters
+class ModelParametersRRRFF : public ModelParameters
 {
-  friend class FunctionApproximatorIRFRLS;
+  friend class FunctionApproximatorRRRFF;
   
 public:
-  /** Constructor for the model parameters of the IRFRLS function approximator.
+  /** Constructor for the model parameters of the RRRFF function approximator.
    *  \param[in] linear_models Coefficient of the linear models (nb_cos x nb_out_dim).
    *  \param[in] cosines_periodes Matrix of periode for each cosine for each input dimension (nb_cos x nb_in_dim). 
    *  \param[in] cosines_phase Vector of periode (nb_cos).
    */
-  ModelParametersIRFRLS(Eigen::VectorXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase);
+  ModelParametersRRRFF(Eigen::VectorXd linear_models, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase);
 	
 	int getExpectedInputDim(void) const;
 	
@@ -114,7 +114,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  ModelParametersIRFRLS(void) {};
+  ModelParametersRRRFF(void) {};
 
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -133,10 +133,10 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersIRFRLS, "ModelParametersIRFRLS")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersRRRFF, "ModelParametersRRRFF")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersIRFRLS,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersRRRFF,boost::serialization::object_serializable);
 
-#endif        //  #ifndef MODELPARAMETERSIRFRLS_H
+#endif        //  #ifndef MODELPARAMETERSRRRFF_H
 

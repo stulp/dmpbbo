@@ -45,7 +45,7 @@ LWR : n_basis_functions (int), intersection (double)
 RBFN : n_basis_functions (int), intersection (double)
 LWPR: w_gen, w_prune, update_D, init_alpha, penalty, init_d    
 GMR: n_basis_functions (int)
-IRFRLS n_basis_functions (int), lambda (double), gamma (double)
+RRRFF n_basis_functions (int), lambda (double), gamma (double)
 GPR: maximum_covariance (double), length (double)
  */
 FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], int n_input_dims=1);
