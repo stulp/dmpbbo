@@ -53,6 +53,36 @@ using namespace std;
 using namespace Eigen;
 using namespace Dmp;
 
+Here's how to do it
+
+Implement: extra states with an attractor. 
+
+Option 1: Part of DMP. 
+  Advantage: better integration
+  Downside: code becomes larges, no separation of basic/advanced code.
+  
+Option 2: Subclass of DMP
+  Advantage: Advanced feature separated
+  Downside: ??
+  
+DMPExtendedState
+
+DMPExtended(.....,fas)
+  DMP(....)
+  {
+    local_fas = fas
+  }
+
+train(xs,targets,xs_extra)
+
+differentialEquation(xs,xds,xs_extra)
+  Dmp::differentialEquation(xs,xds)
+  for fa in fas
+    xs_extra.row() = fa.predict(xs[0])
+  
+
+    
+    
 namespace DmpBbo {
 
 DmpExtendedDimensions::DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
