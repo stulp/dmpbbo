@@ -117,8 +117,10 @@ void FunctionApproximatorRLS::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
     X = inputs;
   }
     
-  
-  
+  Do we want to do weighted least squares here? If so, how are the weights passed?
+    
+  Idea: standard predict is without weights, static predict(inputs,weights,targets) is weighted version   
+     
   //int n_kernels = activations.cols();
   //int n_samples = X.rows(); 
   int n_betas = X.cols(); 
