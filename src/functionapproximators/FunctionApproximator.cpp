@@ -127,14 +127,14 @@ int FunctionApproximator::getExpectedOutputDim(void) const
     return meta_parameters_->getExpectedOutputDim();
 }
 
-void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets)
+void FunctionApproximator::reTrain(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   delete model_parameters_;
   model_parameters_ = NULL;
   train(inputs,targets);
 }
 
-void FunctionApproximator::reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite)
+void FunctionApproximator::reTrain(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets, std::string save_directory, bool overwrite)
 {
   delete model_parameters_;
   model_parameters_ = NULL;
@@ -285,7 +285,7 @@ bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max
   
 }
 
-void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite)
+void FunctionApproximator::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets, std::string save_directory, bool overwrite)
 {
   train(inputs,targets);
   
@@ -332,10 +332,14 @@ void FunctionApproximator::train(const Eigen::MatrixXd& inputs, const Eigen::Mat
   predict(inputs,outputs);
 
     
-
-  saveMatrix(save_directory,"inputs.txt",inputs,overwrite);
-  saveMatrix(save_directory,"targets.txt",targets,overwrite);
-  saveMatrix(save_directory,"outputs.txt",outputs,overwrite);
+  // saveMatrix does not accept Ref, but only Matrix
+  MatrixXd save_matrix;
+  save_matrix = inputs;
+  saveMatrix(save_directory,"inputs.txt",save_matrix,overwrite);
+  save_matrix = targets;
+  saveMatrix(save_directory,"targets.txt",save_matrix,overwrite);
+  save_matrix = outputs;
+  saveMatrix(save_directory,"outputs.txt",save_matrix,overwrite);
   
   
   

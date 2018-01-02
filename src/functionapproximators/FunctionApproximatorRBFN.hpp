@@ -61,9 +61,11 @@ public:
 
 	FunctionApproximator* clone(void) const;
   
-	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
+	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 
-	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
+  
+  void preallocateMemory(int n_basis_functions);
   
 	inline std::string getName(void) const {
     return std::string("RBFN");  
@@ -80,6 +82,15 @@ private:
    */
   FunctionApproximatorRBFN(void) {};
    
+  /** Preallocated memory to make things realtime and more efficient. */
+  mutable Eigen::VectorXd weights_prealloc_;
+  
+  /** Preallocated memory for one time step, required to make the predict() function real-time. */
+  mutable Eigen::MatrixXd activations_one_prealloc_;
+  
+  /** Preallocated memory to make things more efficient. */
+  mutable Eigen::MatrixXd activations_prealloc_;
+  
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   

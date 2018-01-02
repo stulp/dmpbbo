@@ -26,7 +26,7 @@
 
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/ModelParametersIRFRLS.hpp"
+#include "functionapproximators/ModelParametersRRRFF.hpp"
 #include "getFunctionApproximatorsVector.hpp"
 
 using namespace std;
@@ -48,14 +48,14 @@ int main(int n_args, char** args)
   
   model_parameters.push_back(new ModelParametersLWR(centers, widths, slopes, offsets));
 
-  // IRFRLS  
+  // RRRFF  
   MatrixXd linear_models = (100.0*MatrixXd::Random(n_basis_functions,n_dims)).cast<int>().cast<double>().array().abs();
   MatrixXd cosines_periodes = 
   (100.0*MatrixXd::Random(n_basis_functions,n_dims)).cast<int>().cast<double>().array().abs();
   VectorXd cosines_phase = 
   (100.0*VectorXd::Random(n_basis_functions)).cast<int>().cast<double>().array().abs();
 
-  model_parameters.push_back(new ModelParametersIRFRLS(linear_models, cosines_periodes, cosines_phase));
+  model_parameters.push_back(new ModelParametersRRRFF(linear_models, cosines_periodes, cosines_phase));
 
   // GMR
   /*
@@ -99,7 +99,7 @@ int main(int n_args, char** args)
     selected_labels.insert("centers");
     
     
-    // IRFRLS
+    // RRRFF
     //selected_labels.insert("linear_model");
     selected_labels.insert("phases");
     //selected_labels.insert("periods");

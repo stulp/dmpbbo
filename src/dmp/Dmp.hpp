@@ -24,6 +24,9 @@
 #ifndef _DMP_H_
 #define _DMP_H_
 
+// This must be included before any Eigen header files are included
+#include "eigen_realtime/eigen_realtime_check.hpp"
+
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "functionapproximators/Parameterizable.hpp"
 
@@ -70,6 +73,7 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
    Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
      std::vector<FunctionApproximator*> function_approximators,
@@ -86,6 +90,7 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
    Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
      double alpha_spring_damper, DynamicalSystem* goal_system,
@@ -99,6 +104,7 @@ public:
    *  \param y_attr    Attractor state
    *  \param function_approximators Function approximators for the forcing term
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
     std::vector<FunctionApproximator*> function_approximators, 
@@ -112,6 +118,7 @@ public:
    *  \param n_dims_dmp      Dimensionality of the DMP
    *  \param function_approximators Function approximators for the forcing term
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
     DmpType dmp_type=KULVICIUS_2012_JOINING, ForcingTermScaling scaling=NO_SCALING);      
@@ -137,7 +144,9 @@ public:
   
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const;
   
-  void differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const;
+  void differentialEquation(
+   const Eigen::Ref<const Eigen::VectorXd>& x, 
+   Eigen::Ref<Eigen::VectorXd> xd) const;
   
   /**
    * Return analytical solution of the system at certain times (and return forcing terms)
@@ -307,7 +316,8 @@ public:
    * \param[in] phase_state The phase states for which the outputs are computed.
    * \param[out] fa_output The outputs of the function approximators.
    */
-  virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
+  virtual void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const;
   
   /** Add a perturbation to the forcing term when computing the analytical solution.
    * This is only relevant for off-line experiments, i.e. not on a robot, for testing how
@@ -369,6 +379,27 @@ private:
   Eigen::VectorXd trajectory_amplitudes_;
 
   /** @} */ // end of group_nonlinear
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd attractor_state_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd initial_state_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_outputs_one_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_outputs_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_output_prealloc_; 
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd forcing_term_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::VectorXd g_minus_y0_prealloc_;
   
   /**
    *  Helper function for constructor.
@@ -509,7 +540,7 @@ So far, the graphs have shown 1-dimensional systems. To generate D-dimensional t
 
 <em>
 
-\subsection Implementation
+\subsection sec_implementation_dmp Implementation
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).
 

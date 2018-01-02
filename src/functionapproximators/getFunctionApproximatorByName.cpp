@@ -33,8 +33,8 @@
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/MetaParametersIRFRLS.hpp"
-#include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
+#include "functionapproximators/MetaParametersRRRFF.hpp"
+#include "functionapproximators/FunctionApproximatorRRRFF.hpp"
 #include "functionapproximators/MetaParametersGPR.hpp"
 #include "functionapproximators/FunctionApproximatorGPR.hpp"
 
@@ -136,9 +136,9 @@ FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], 
     return new FunctionApproximatorGMR(pars);
   }
   
-  if (fa_name.compare("IRFRLS")==0)
+  if (fa_name.compare("RRRFF")==0)
   {
-    // IRFRLS
+    // RRRFF
     int n_basis_functions = 20;
     double lambda=0.2;
     double gamma=5;
@@ -148,8 +148,8 @@ FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], 
       if (string(args[aa]).compare("lambda")==0)  lambda = stod(args[++aa]);
       if (string(args[aa]).compare("gamma")==0)  gamma = stod(args[++aa]);
     }
-    MetaParametersIRFRLS* pars = new MetaParametersIRFRLS(n_input_dims,n_basis_functions,lambda,gamma);
-    return new FunctionApproximatorIRFRLS(pars);
+    MetaParametersRRRFF* pars = new MetaParametersRRRFF(n_input_dims,n_basis_functions,lambda,gamma);
+    return new FunctionApproximatorRRRFF(pars);
   }
 
   if (fa_name.compare("GPR")==0)

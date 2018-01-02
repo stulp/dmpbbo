@@ -1,6 +1,6 @@
 /**
- * @file   MetaParametersIRFRLS.hpp
- * @brief  MetaParametersIRFRLS class header file.
+ * @file   MetaParametersRRRFF.hpp
+ * @brief  MetaParametersRRRFF class header file.
  * @author Freek Stulp, Thibaut Munzer
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,8 +21,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-#ifndef METAPARAMETERSIRFRLS_H
-#define METAPARAMETERSIRFRLS_H
+#ifndef METAPARAMETERSRRRFF_H
+#define METAPARAMETERSRRRFF_H
 
 #include "functionapproximators/MetaParameters.hpp"
 
@@ -30,25 +30,25 @@
 
 namespace DmpBbo {
 
-/** \brief Meta-parameters for the iRFRLS function approximator
+/** \brief Meta-parameters for the RRRFF function approximator
  * \ingroup FunctionApproximators
- * \ingroup IRFRLS
+ * \ingroup RRRFF
  */
-class MetaParametersIRFRLS : public MetaParameters
+class MetaParametersRRRFF : public MetaParameters
 {
-  friend class FunctionApproximatorIRFRLS;
+  friend class FunctionApproximatorRRRFF;
   
 public:
 
-  /** Constructor for the algorithmic meta-parameters of the IRFRLS function approximator
+  /** Constructor for the algorithmic meta-parameters of the RRRFF function approximator
    *  \param[in] expected_input_dim Expected dimensionality of the input data
    *  \param[in] number_of_basis_functions Number of basis functions
    *  \param[in] lambda Ridge regression coefficient, tradeoff between data fit and model complexity
    *  \param[in] gamma Cosines periodes distribution standard derivation
    */
-	MetaParametersIRFRLS(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma);
+	MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma);
 	
-	MetaParametersIRFRLS* clone(void) const;
+	MetaParametersRRRFF* clone(void) const;
 	
   std::string toString(void) const;
 
@@ -69,7 +69,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-   MetaParametersIRFRLS(void) {};
+   MetaParametersRRRFF(void) {};
    
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -88,10 +88,10 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::MetaParametersIRFRLS, "MetaParametersIRFRLS")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::MetaParametersRRRFF, "MetaParametersRRRFF")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::MetaParametersIRFRLS,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::MetaParametersRRRFF,boost::serialization::object_serializable);
 
-#endif        //  #ifndef METAPARAMETERSIRFRLS_H
+#endif        //  #ifndef METAPARAMETERSRRRFF_H
 

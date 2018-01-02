@@ -118,6 +118,9 @@ public:
   bool saveGMM(std::string directory, bool overwrite=false) const;
 
   /** This function represents the Gaussian Mixture Model as one big matrix.
+   *
+   * \param[out] gmm_as_matrix The Gaussian Mixture Model as one big matrix
+   *
    * This matrix contains the following rows (example for two Gaussians, with dimensionality 3)
    * 
 \verbatim
@@ -140,11 +143,13 @@ __________________________
    * Thus, the number of rows in the Matrix is 2 (for meta-data) + n_gaussians * (1+1+n_dims)
    *
    * In combination with ModelParametersGMR::saveGMMToMatrix and ModelParametersGMR::loadGMMToMatrix, this hacky function allowed for easier exchange with some Matlab code we wrote.
+   *
    */
   void toMatrix(Eigen::MatrixXd& gmm_as_matrix) const;
   static ModelParametersGMR* fromMatrix(const Eigen::MatrixXd& gmm_matrix);
   
-  bool saveGMMToMatrix(std::string filename, bool overwrite=false) const;  
+  bool saveGMMToMatrix(std::string filename, bool overwrite=false) const; 
+  
   static ModelParametersGMR* loadGMMFromMatrix(std::string filename);
 
   

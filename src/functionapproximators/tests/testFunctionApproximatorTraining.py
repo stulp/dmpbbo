@@ -38,7 +38,7 @@ if __name__=='__main__':
     fig_number = 1;     
     directory = "/tmp/testFunctionApproximatorTraining/"
     
-    fa_names = ["RBFN","GPR","IRFRLS","LWR", "LWPR", "GMR"] 
+    fa_names = ["RBFN","GPR","RRRFF","LWR", "LWPR", "GMR"] 
     for fa_name in fa_names:
       
         # Call the executable with the directory to which results should be written

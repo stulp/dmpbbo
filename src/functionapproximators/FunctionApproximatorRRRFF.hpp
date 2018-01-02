@@ -1,6 +1,6 @@
 /**
- * @file FunctionApproximatorIRFRLS.hpp
- * @brief FunctionApproximatorIRFRLS class header file.
+ * @file FunctionApproximatorRRRFF.hpp
+ * @brief FunctionApproximatorRRRFF class header file.
  * @author Thibaut Munzer, Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -21,27 +21,28 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _FUNCTION_APPROXIMATOR_IRFRLS_H_
-#define _FUNCTION_APPROXIMATOR_IRFRLS_H_
+#ifndef _FUNCTION_APPROXIMATOR_RRRFF_H_
+#define _FUNCTION_APPROXIMATOR_RRRFF_H_
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
 
-/** @defgroup IRFRLS Incremental Random Features Regularized Least Squares (iRFRLS)
+/** @defgroup RRRFF Incremental Random Features Regularized Least Squares (RRRFF)
  *  @ingroup FunctionApproximators
  */
 
 namespace DmpBbo {
 
 // Forward declarations
-class MetaParametersIRFRLS;
-class ModelParametersIRFRLS;
+class MetaParametersRRRFF;
+class ModelParametersRRRFF;
 
-/** \brief iRFRLS (Incremental Random Features Regularized Least Squares) function approximator
+/** \brief RRRFF (Ridge Regression with Random Fourier Features) function approximator
  * \ingroup FunctionApproximators
- * \ingroup IRFRLS
+ * \ingroup RRRFF
+ * https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3935121/
  */
-class FunctionApproximatorIRFRLS : public FunctionApproximator
+class FunctionApproximatorRRRFF : public FunctionApproximator
 {
 public:
   
@@ -53,20 +54,20 @@ public:
    *                              being able to call FunctionApproximator::predict().
    * Either meta_parameters XOR model-parameters can passed as NULL, but not both.
    */
-  FunctionApproximatorIRFRLS(const MetaParametersIRFRLS *const meta_parameters, const ModelParametersIRFRLS *const model_parameters=NULL);  
+  FunctionApproximatorRRRFF(const MetaParametersRRRFF *const meta_parameters, const ModelParametersRRRFF *const model_parameters=NULL);  
 
   /** Initialize a function approximator with model parameters
    *  \param[in] model_parameters The parameters of the (previously) trained model.
    */
-  FunctionApproximatorIRFRLS(const ModelParametersIRFRLS *const model_parameters);
+  FunctionApproximatorRRRFF(const ModelParametersRRRFF *const model_parameters);
 
 	virtual FunctionApproximator* clone(void) const;
 	
-	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
-	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs);
 
 	std::string getName(void) const {
-    return std::string("IRFRLS");  
+    return std::string("RRRFF");  
   };
 
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
@@ -79,7 +80,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  FunctionApproximatorIRFRLS(void) {};
+  FunctionApproximatorRRRFF(void) {};
 
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -98,9 +99,9 @@ private:
 
 #include <boost/serialization/export.hpp>
 /** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::FunctionApproximatorIRFRLS, "FunctionApproximatorIRFRLS")
+BOOST_CLASS_EXPORT_KEY2(DmpBbo::FunctionApproximatorRRRFF, "FunctionApproximatorRRRFF")
 
 /** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximatorIRFRLS,boost::serialization::object_serializable);
+BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximatorRRRFF,boost::serialization::object_serializable);
 
-#endif // !_FUNCTION_APPROXIMATOR_IRFRLS_H_
+#endif // !_FUNCTION_APPROXIMATOR_RRRFF_H_

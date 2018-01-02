@@ -53,7 +53,7 @@ ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const E
   centers_(centers),
   widths_(widths),
   weights_(weights),
-  caching_(true)
+  caching_(false)
 {
 #ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_basis_functions = centers.rows();
@@ -75,7 +75,7 @@ ModelParameters* ModelParametersRBFN::clone(void) const {
   return new ModelParametersRBFN(centers_,widths_,weights_); 
 }
 
-void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const
+void ModelParametersRBFN::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
   if (caching_)
   {
@@ -92,12 +92,16 @@ void ModelParametersRBFN::kernelActivations(const Eigen::MatrixXd& inputs, Eigen
       }
     }
   }
+  
+  ENTERING_REAL_TIME_CRITICAL_CODE
 
   // Cache could not be used, actually do the work
   bool normalized_basis_functions=false;  
   bool asymmetric_kernels=false;
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels);
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 
   if (caching_)
   {

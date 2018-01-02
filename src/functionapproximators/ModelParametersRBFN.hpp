@@ -61,12 +61,19 @@ public:
     return centers_.cols();
   };
   
+  /** Get the number of basis functions in this model.
+   * \return The number of basis functions.
+   */
+  inline unsigned int getNumberOfBasisFunctions() const
+  {
+    return centers_.rows();
+  }
   
   /** Get the kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    */
-  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   
@@ -82,6 +89,11 @@ public:
    * \return weights of the basis functions.
    */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
+  
+  /** Return the weights of the basis functions.
+   * \param[out] weights of the basis functions.
+   */
+  inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
 
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);

@@ -76,7 +76,9 @@ public:
    *  \param[in] inputs  Input values of the training examples
    *  \param[in] targets Target values of the training examples
    */
-  virtual void train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets) = 0;
+  virtual void train(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets) = 0;
   
   /** Train the function approximator with corresponding input and target examples (and write results to file).
    *  \param[in] inputs  Input values of the training examples
@@ -84,7 +86,11 @@ public:
    *  \param[in] save_directory Directory to which to write results.
    * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
    */
-  void train(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite=false);
+  void train(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
+    std::string save_directory, 
+    bool overwrite=false);
 
   /** Re-train the function approximator with corresponding input and target examples.
    *  \param[in] inputs  Input values of the training examples
@@ -93,7 +99,9 @@ public:
    *  wanted to keep a clear disctinction between training (which must be done at least once before 
    *  FunctionApproximator::predict) can be called and re-training.
    */
-  void reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets);
+  void reTrain(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets);
   
   /** Re-train the function approximator with corresponding input and target examples (and write results to file).
    *  \param[in] inputs  Input values of the training examples
@@ -104,28 +112,37 @@ public:
    *  wanted to keep a clear disctinction between training (which must be done at least once before 
    *  FunctionApproximator::predict) can be called and re-training.
    */
-  void reTrain(const Eigen::MatrixXd& inputs, const Eigen::MatrixXd& targets, std::string save_directory, bool overwrite=false);
+  void reTrain(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
+    std::string save_directory, 
+    bool overwrite=false);
   
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs) = 0;
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs) = 0;
 
   /** Query the function approximator to make a prediction, and also to predict its variance
    *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
    *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& variances)
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs,
+    Eigen::MatrixXd& variances)
   {
     predict(inputs, outputs);
     variances.fill(0);
@@ -137,10 +154,13 @@ public:
    *  \param[out] variances Predicted covariance matrices for the output values. It is is of size  (n_samples X n_dims_out X n_dims_out), which has been implemented as a std::vector of Eigen::MatrixXd.
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
    * Therefore, this function cannot be const.
    */
-  virtual void predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances)
+  virtual void predict(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+    Eigen::MatrixXd& outputs, 
+    std::vector<Eigen::MatrixXd>& variances)
   {
     predict(inputs, outputs);
     for (unsigned int i=0; i<variances.size(); i++)
@@ -152,13 +172,15 @@ public:
    * This function is not implemented by all function approximators. Therefore, the default
    * implementation fills outputs with 0s.
    *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
+   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict).
    * Therefore, this function cannot be const.
    */
-  virtual void predictVariance(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& variances)
+  virtual void predictVariance(
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs,
+    Eigen::MatrixXd& variances)
   {
     variances.fill(0);
   }
@@ -341,7 +363,7 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximator,boost::serialization::ob
 
 \section sec_fa Function Approximation
 
-This module implements a set of function approximators, i.e. supervised learning algorithms that are trained with demonstration pairs input/target, after which they make predictions for new inputs. For simplicity, this module implements only batch learning (not incremental), and does not allow trained function approximators to be retrained.
+This module implements a set of function approximators, i.e. supervised learning algorithms that are trained with demonstration pairs input/target, after which they make predictions for new inputs. For simplicity, this module implements only batch learning (not incremental).
 
 The two main functions are FunctionApproximator::train, which takes a set of inputs and corresponding targets, and FunctionApproximator::predict, which makes predictions for novel inputs. 
 
@@ -386,11 +408,13 @@ model_parameters.getParameterVectorSelected(values);
 
 The rationale behind this implementation is that optimizers (such as evolution strategies) should not have to care about whether a particular set of model parameters contains centers, widths or slopes. Therefore, these different types of parameters are provided in one vector without semantics, and the generic interface is provided by the Parameterizable class.
 
-Classes that inherit from Parameterizable (such as all ModelParameters and FunctionApproximator subclasses, must implement the pure virtual methods Parameterizable::getParameterVectorAll Parameterizable::setParameterVectorAll and Parameterizable::getParameterVectorMask. Which gets/sets all the possible parameters in one vector, and a mask specifying the semantics of each value in the vector. The work of setting/getting the selected parameters (and normalizing them) is done in the Parameterizable class itself. This approach is a slightly longer run-time than doing the work in the subclasses, but it leads to more legible and robust code (less code duplication).
+Classes that inherit from Parameterizable (such as all ModelParameters and FunctionApproximator subclasses, must implement the pure virtual methods Parameterizable::getParameterVectorAll()  Parameterizable::setParameterVectorAll and Parameterizable::getParameterVectorMask. Which gets/sets all the possible parameters in one vector, and a mask specifying the semantics of each value in the vector. The work of setting/getting the selected parameters (and normalizing them) is done in the Parameterizable class itself. This approach is a slightly longer run-time than doing the work in the subclasses, but it leads to more legible and robust code (less code duplication).
 
 \subsection sec_caching_basisfunctions Caching of basis functions
 
-If the parameters of the basis functions (centers and widths of the kernels) do not change often, you can cache the basis function activations by calling ModelParameters::set_caching(true). This can lead to speed improvements because the activations are not computed over and over again. This function only makes senses if the inputs remain the same, i.e. this is not the case when running on a real robot. 
+If the parameters of the basis functions (centers and widths of the kernels) do not change often, you can cache the basis function activations by calling set_caching(true) on several subclasses of  ModelParameters, e.g. see 
+ModelParametersLWR::set_caching() and
+ModelParametersRBFN::set_caching(). This can lead to speed improvements because the activations are not computed over and over again. This function only makes senses if the inputs remain the same, i.e. this is not the case when running on a real robot. 
 
 The reason why caching is implemented in ModelParameters, and not in FunctionApproximator is because ModelParameters knows which parts of the ModelParameters change the basis function activations, and which do not (for instance in RBFN, the widths and centers change the basis function activations, but the weights do not).
 

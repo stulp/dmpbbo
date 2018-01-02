@@ -1,5 +1,5 @@
 /**
- * \file testFunctionApproximatorTraining.cpp
+ * \file testFunctionApproximatorRealtime.cpp
  * \author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -97,30 +97,23 @@ int main(int n_args, char** args)
       cout << ": " << mean_abs_error_per_output_dim.transpose();      
       cout << "   \t(range of target data is " << targets.colwise().maxCoeff().array()-targets.colwise().minCoeff().array() << ")";
       
-#ifdef NDEBUG
       // Here, we time the predict function on single inputs, i.e. typical usage in a
       // real-time loop on a robot.
+      // We check if memory is allocated with ENTERING_REAL_TIME_CRITICAL_CODE
       
-      // It's better to test this code with -03 instead of -ggdb. That's why its only run 
-      // when NDEBUG is set.
-
       MatrixXd input = inputs.row(0);
-      MatrixXd output(input.rows(),input.cols());
-      int n_calls = 1000000;
-      clock_t begin = clock();
-      for (int call=0; call<n_calls; call++)
+      MatrixXd output(1,outputs.cols());
+      double diff = 0.0;
+      for (int ii=0; ii<inputs.rows(); ii++)
       {
+        input = inputs.row(ii);
+        ENTERING_REAL_TIME_CRITICAL_CODE
         cur_fa->predict(input,output);
-        input(0,0) += 0.1/n_calls;
+        EXITING_REAL_TIME_CRITICAL_CODE
+        //cout << inputs.row(ii) << "  " << input << endl;
+        diff += inputs(ii,0) - input(0);
       }
-      clock_t end = clock();
-      double time_sec = (double)(end - begin) / static_cast<double>( CLOCKS_PER_SEC );
-      cout << "  time for " << n_calls << " calls of predict: "<< time_sec;
-      double time_per_call = time_sec/n_calls; 
-      cout << " => " << (int)(1.0/(time_per_call*1000)) << "kHz";
-#endif
-
-      cout << endl;
+      cout << "  diff=" << diff/inputs.rows() << endl;
       
       delete cur_fa;
 

@@ -69,7 +69,7 @@ FunctionApproximator* FunctionApproximatorLWPR::clone(void) const {
   return fa_lwpr;
 };
 
-void FunctionApproximatorLWPR::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorLWPR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -141,7 +141,7 @@ void FunctionApproximatorLWPR::train(const MatrixXd& inputs, const MatrixXd& tar
 }
 
 
-void FunctionApproximatorLWPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
+void FunctionApproximatorLWPR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {

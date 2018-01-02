@@ -51,12 +51,22 @@ FunctionApproximatorRBFN::FunctionApproximatorRBFN(const MetaParametersRBFN *con
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  if (model_parameters!=NULL)
+    preallocateMemory(model_parameters->getNumberOfBasisFunctions());
 }
 
 FunctionApproximatorRBFN::FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
+  preallocateMemory(model_parameters->getNumberOfBasisFunctions());
+}
+
+void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
+{
+  weights_prealloc_ = VectorXd(n_basis_functions);
+  activations_one_prealloc_ = MatrixXd(1,n_basis_functions);
+  activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
 
@@ -68,7 +78,7 @@ FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
     );
 };
 
-void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorRBFN::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -86,11 +96,14 @@ void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& tar
   VectorXd min = inputs.colwise().minCoeff();
   VectorXd max = inputs.colwise().maxCoeff();
   
-  MatrixXd centers, widths, activations;
+  MatrixXd centers, widths;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
 
   bool normalized_basis_functions=false;  
   bool asymmetric_kernels=false;  
+  int n_samples = inputs.rows();
+  int n_kernels = centers.rows(); 
+  MatrixXd activations(n_samples,n_kernels);
   BasisFunction::Gaussian::activations(centers,widths,inputs,activations,
     normalized_basis_functions,asymmetric_kernels);
   
@@ -102,9 +115,11 @@ void FunctionApproximatorRBFN::train(const MatrixXd& inputs, const MatrixXd& tar
 
   setModelParameters(new ModelParametersRBFN(centers,widths,weights));
   
+  preallocateMemory(n_kernels);
+
 }
 
-void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -114,21 +129,46 @@ void FunctionApproximatorRBFN::predict(const MatrixXd& inputs, MatrixXd& output)
 
   const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
   
-  output.resize(inputs.rows(),1); // Fix this
-  // Assert that memory has been pre-allocated.
-  assert(inputs.rows()==output.rows());
+  model_parameters_rbfn->weights(weights_prealloc_);
   
-  // Get the basis function activations  
-  MatrixXd activations; // todo avoid allocation
-  model_parameters_rbfn->kernelActivations(inputs,activations);
+  int n_basis_functions = model_parameters_rbfn->getNumberOfBasisFunctions();
+  
+  bool only_one_sample = (inputs.rows()==1);
+  if (only_one_sample)
+  {
+    ENTERING_REAL_TIME_CRITICAL_CODE
     
-  // Weight the basis function activations  
-  VectorXd weights = model_parameters_rbfn->weights();
-  for (int b=0; b<activations.cols(); b++)
-    activations.col(b).array() *= weights(b);
+    // Get the basis function activations  
+    model_parameters_rbfn->kernelActivations(inputs,activations_one_prealloc_);
+      
+    // Weight the basis function activations  
+    for (int b=0; b<n_basis_functions; b++)
+      activations_one_prealloc_.col(b).array() *= weights_prealloc_(b);
+  
+    // Sum over weighed basis functions
+    outputs = activations_one_prealloc_.rowwise().sum();
+    
+    EXITING_REAL_TIME_CRITICAL_CODE
+  }
+  else 
+  {
+    int n_time_steps = inputs.rows();
 
-  // Sum over weighed basis functions
-  output = activations.rowwise().sum();
+    // The next two lines may not be real-time, as they may allocate memory.
+    // (if the size are already correct, it will be realtime)
+    activations_prealloc_.resize(n_time_steps,n_basis_functions);
+    outputs.resize(n_time_steps,getExpectedOutputDim());
+    
+    // Get the basis function activations  
+    model_parameters_rbfn->kernelActivations(inputs,activations_prealloc_);
+      
+    // Weight the basis function activations  
+    for (int b=0; b<n_basis_functions; b++)
+      activations_prealloc_.col(b).array() *= weights_prealloc_(b);
+  
+    // Sum over weighed basis functions
+    outputs = activations_prealloc_.rowwise().sum();
+  }
     
 }
 

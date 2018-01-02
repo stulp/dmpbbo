@@ -22,6 +22,8 @@ To compile, do:
 To compile a version that has debugging symbols included, and compiles some tests also:
   mkdir -p build_dir_debug; cd build_dir_debug; cmake .. -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1
 
+When running the code on a real robot, you want to do an optimized build without asserts, i.e. -DCMAKE_BUILD_TYPE=Release
+
 To install libs in /usr/local/lib, headers in /usr/local/include and binaries in dmpbbo/bin:
   sudo make install
 
@@ -47,12 +49,12 @@ Note that the crash happens towards the very end of the program, just before ret
 ________________________________________________________________________________    
 REAL-TIME DEBUGGING BUILD
 
-Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. To enable this checking, do:
+Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. 
 
-  cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug
+To compile a version that has real-time checks built in:
+  mkdir -p build_dir_realtime; cd build_dir_realtime; cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1
 
 Note that it doesn't make sense to set -DREALTIME_CHECKS=1 without -DCMAKE_BUILD_TYPE=Debug, as asserts are only done in debug mode. 
-When running the code on a real robot, clearly you want to do an optimized build without asserts, i.e. -DCMAKE_BUILD_TYPE=Release
   
 ________________________________________________________________________________    
 MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES

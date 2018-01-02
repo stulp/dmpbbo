@@ -61,7 +61,10 @@ public:
 
   DynamicalSystem* clone(void) const;
 
-  void differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const;
+   void differentialEquation(
+     const Eigen::Ref<const Eigen::VectorXd>& x, 
+     Eigen::Ref<Eigen::VectorXd> xd
+   ) const;
 
   void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds) const;
   
@@ -129,6 +132,9 @@ private:
   
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time execution of the differentialEquation() function. */
+  mutable Eigen::VectorXd y_,z_,yd_,zd_,y_attr_;
   
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive

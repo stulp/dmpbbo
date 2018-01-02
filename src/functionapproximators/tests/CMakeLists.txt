@@ -6,6 +6,10 @@ add_executable(testFunctionApproximatorTraining testFunctionApproximatorTraining
 target_link_libraries(testFunctionApproximatorTraining functionapproximators ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
 install(TARGETS testFunctionApproximatorTraining DESTINATION bin_test)
 
+add_executable(testFunctionApproximatorRealtime testFunctionApproximatorRealtime.cpp getFunctionApproximatorsVector.cpp)
+target_link_libraries(testFunctionApproximatorRealtime functionapproximators ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
+install(TARGETS testFunctionApproximatorRealtime DESTINATION bin_test)
+
 add_executable(testFunctionApproximatorSerialization testFunctionApproximatorSerialization.cpp getFunctionApproximatorsVector.cpp)
 target_link_libraries(testFunctionApproximatorSerialization functionapproximators ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
 install(TARGETS testFunctionApproximatorSerialization DESTINATION bin_test)

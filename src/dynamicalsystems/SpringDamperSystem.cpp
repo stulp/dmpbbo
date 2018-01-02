@@ -50,6 +50,13 @@ SpringDamperSystem::SpringDamperSystem(double tau, Eigen::VectorXd y_init, Eigen
 {
   if (spring_constant_==CRITICALLY_DAMPED)
     spring_constant_ = damping_coefficient_*damping_coefficient_/4; // Critically damped
+  
+  y_ = VectorXd(dim_orig());
+  z_ = VectorXd(dim_orig());
+  yd_ = VectorXd(dim_orig());
+  zd_ = VectorXd(dim_orig());
+  y_attr_ = VectorXd(dim_orig());
+  
 }
 
 SpringDamperSystem::~SpringDamperSystem(void)
@@ -62,28 +69,35 @@ DynamicalSystem* SpringDamperSystem::clone(void) const
                         damping_coefficient_,spring_constant_,mass_,name());
 }
 
-void SpringDamperSystem::differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const
+void SpringDamperSystem::differentialEquation(
+   const Eigen::Ref<const Eigen::VectorXd>& x, 
+   Eigen::Ref<Eigen::VectorXd> xd) const
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
   // Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
   // After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z; 
       
   // Get 'y' and 'z' parts of the state in 'x'
-  int dim2 = dim()/2;
-  VectorXd y = x.segment(0,dim2);
-  VectorXd z = x.segment(dim2,dim2);
-  VectorXd y_attr = attractor_state().segment(0,dim2);
+  // (These memory for these vectors has been initialized in the constructor to enable realtime.)
+  y_ = x.segment(0,dim_orig());
+  z_ = x.segment(dim_orig(),dim_orig());
+  attractor_state(y_attr_);
+  //y_attr_ = attractor_state*(.segment(0,dim_orig());
+  
   
   // Compute yd and zd
   // See  http://en.wikipedia.org/wiki/Damped_spring-mass_system#Example:mass_.E2.80.93spring.E2.80.93damper
   // and equation 2.1 of http://www-clmc.usc.edu/publications/I/ijspeert-NC2013.pdf
 
-  VectorXd yd = z/tau();
+  yd_ = z_/tau();
   
-  VectorXd zd = (-spring_constant_*(y-y_attr) - damping_coefficient_*z)/(mass_*tau());
+  zd_ = (-spring_constant_*(y_-y_attr_) - damping_coefficient_*z_)/(mass_*tau());
   
-  xd.segment(0,dim()/2) = yd;
-  xd.segment(dim()/2,dim()/2) = zd;
+  xd.segment(0,dim()/2) = yd_;
+  xd.segment(dim()/2,dim()/2) = zd_;
       
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& xds) const

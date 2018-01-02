@@ -24,6 +24,8 @@
 #ifndef _DYNAMICALSYSTEM_H_
 #define _DYNAMICALSYSTEM_H_
 
+#include "eigen_realtime/eigen_realtime_check.hpp" // Include this before Eigen header files
+
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
@@ -100,7 +102,10 @@ public:
    * \remarks x and xd should be of size dim() X 1. This forces you to pre-allocate memory, which
    * speeds things up (and also makes Eigen's Ref functionality easier to deal with).
    */
-   virtual void differentialEquation(const Eigen::VectorXd& x, Eigen::Ref<Eigen::VectorXd> xd) const = 0;
+   virtual void differentialEquation(
+     const Eigen::Ref<const Eigen::VectorXd>& x, 
+     Eigen::Ref<Eigen::VectorXd> xd
+   ) const = 0;
 
 
   /**
@@ -204,8 +209,8 @@ public:
    *
    * 2nd order systems are represented as 1st order systems with an expanded state. The
    * SpringDamperSystem for instance is represented as x = [y z], xd = [yd zd].
-   * DynamicalSystem::getDim returns dim(x) = dim([y z]) = 2*dim(y)
-   * DynamicalSystem::dim_orig returns dim(y) = dim()/2
+   * DynamicalSystem::dim() returns dim(x) = dim([y z]) = 2*dim(y)
+   * DynamicalSystem::dim_orig() returns dim(y) = dim()/2
    *
    * For Dynamical Movement Primitives, dim_orig() may be for instance 3, if the output of the DMP
    * represents x,y,z coordinates. However, dim() will have a much larger dimensionality, because it 
@@ -238,6 +243,15 @@ public:
    */
   inline Eigen::VectorXd initial_state(void) const { return initial_state_; }
 
+  /**
+   * Accessor function for the initial state of the dynamical system.
+   * \param[out] initial_state Initial state of the dynamical system.
+   */
+  inline void initial_state(Eigen::VectorXd& initial_state) const 
+  { 
+    initial_state=initial_state_;
+  }
+  
   /** Mutator function for the initial state of the dynamical system.
    *  \param[in] initial_state Initial state of the dynamical system.
    */
@@ -252,10 +266,19 @@ public:
    */
   inline Eigen::VectorXd attractor_state(void) const { return attractor_state_; }
 
+  /**
+   * Accessor function for the attractor state of the dynamical system.
+   * \param[out] attractor_state Attractor state of the dynamical system.
+   */
+  inline void attractor_state(Eigen::VectorXd& attractor_state) const 
+  { 
+    attractor_state=attractor_state_;
+  }
+
   /** Mutator function for the attractor state of the dynamical system.
    *  \param[in] attractor_state Attractor state of the dynamical system.
    */
-  inline virtual void set_attractor_state(const Eigen::VectorXd& attractor_state) {
+  inline virtual void set_attractor_state(const Eigen::Ref<const Eigen::VectorXd>& attractor_state) {
     assert(attractor_state.size()==dim_orig_);
     attractor_state_ = attractor_state;
   }
@@ -540,7 +563,7 @@ The state \f$x\f$ need not be a scalar, but may be a vector. This then represent
 Dynamical system that do not depend on time are called \em autonomous. For instance, the formula \f$ \dot{x}  = -\alpha x\f$ does not depend on time, which means the exponential system is autonomous.
 
 
-\subsection Implementation
+\subsection sec_implementation_dyn_sys_1 Implementation
 <em>
 The attractor state and time constant of a dynamical system are usually passed to the constructor. They can be changed afterwards with with DynamicalSystem::set_attractor_state and DynamicalSystem::set_tau. Before integration starts, the initial state can be set with  DynamicalSystem::set_initial_state. This influences the output of DynamicalSystem::integrateStart, but not DynamicalSystem::integrateStep.
 
@@ -586,7 +609,7 @@ For implementation purposes, it is more convenient to work only with 1st order s
 
 With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state:
 
-\subsection Implementation
+\subsection sec_implementation_dyn_sys_2 Implementation
 <em>
 The constructor DynamicalSystem::DynamicalSystem immediately converts second order systems into first order systems with an expanded state.
 
