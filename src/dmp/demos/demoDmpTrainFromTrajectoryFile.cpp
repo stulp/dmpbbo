@@ -83,11 +83,13 @@ int main(int n_args, char** args)
   cout << "Training Dmp..." << endl;
   dmp->train(trajectory);
 
+  /*
   cout << "Writing trained Dmp to XML file: " << output_xml_file << endl;
   std::ofstream ofs(output_xml_file);
   boost::archive::xml_oarchive oa(ofs);
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();
+  */
     
   delete meta_parameters;
   delete fa_lwr;

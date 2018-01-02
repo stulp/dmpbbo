@@ -63,10 +63,7 @@ public:
    */
   DmpExtendedDimensions* clone(void) const;
   
-  void differentialEquation(
-   const Eigen::Ref<const Eigen::VectorXd>& x, 
-   Eigen::Ref<Eigen::VectorXd> xd,
-   Eigen::Ref<Eigen::VectorXd> extended_dimensions) const;
+  void integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> extended_dimensions) const;
   
   /**
    * Return analytical solution of the system at certain times (and return forcing terms)
@@ -135,6 +132,10 @@ public:
    */
   void train(const Trajectory& trajectory, std::string save_directory, bool overwrite=false);
   
+  int dim_extended(void) const
+  {
+    return function_approximators_ext_dims_.size();
+  }
   
   void getSelectableParameters(std::set<std::string>& selectable_values_labels) const;
   void setSelectedParameters(const std::set<std::string>& selected_values_labels);
@@ -173,6 +174,14 @@ private:
   
   void initFunctionApproximatorsExtDims(std::vector<FunctionApproximator*> function_approximators);
   
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_ext_dim_outputs_one_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_ext_dim_outputs_prealloc_;
+  
+  /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
+  mutable Eigen::MatrixXd fa_ext_dim_output_prealloc_; 
   
 protected:
    DmpExtendedDimensions(void) {};

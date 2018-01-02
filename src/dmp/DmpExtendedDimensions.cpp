@@ -83,6 +83,11 @@ DmpExtendedDimensions::DmpExtendedDimensions(
 ) : Dmp(*dmp) 
 {
   initFunctionApproximatorsExtDims(function_approximators_ext_dims);
+  
+  // Pre-allocate memory for real-time execution
+  fa_ext_dim_outputs_one_prealloc_ = MatrixXd(1,dim_orig());
+  fa_ext_dim_outputs_prealloc_ = MatrixXd(1,dim_orig());
+  fa_ext_dim_output_prealloc_ = MatrixXd(1,dim_orig()); 
 }
   
     
@@ -178,7 +183,7 @@ void DmpExtendedDimensions::computeFunctionApproximatorOutputExtendedDimensions(
   fa_output.fill(0.0);
   
   if (T>1) {
-    fa_outputs_prealloc_.resize(T,dim_orig());
+    fa_ext_dim_outputs_prealloc_.resize(T,dim_orig());
   }
   
   for (int i_dim=0; i_dim<dim_orig(); i_dim++)
@@ -189,28 +194,25 @@ void DmpExtendedDimensions::computeFunctionApproximatorOutputExtendedDimensions(
       {
         if (T==1)
         {
-          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_outputs_one_prealloc_);
-          fa_output.col(i_dim) = fa_outputs_one_prealloc_;
+          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_ext_dim_outputs_one_prealloc_);
+          fa_output.col(i_dim) = fa_ext_dim_outputs_one_prealloc_;
         }
         else
         {
-          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_outputs_prealloc_);
-          fa_output.col(i_dim) = fa_outputs_prealloc_;
+          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_ext_dim_outputs_prealloc_);
+          fa_output.col(i_dim) = fa_ext_dim_outputs_prealloc_;
         }
       }
     }
   }
 }
 
-void DmpExtendedDimensions::differentialEquation(
-  const Eigen::Ref<const Eigen::VectorXd>& x, 
-  Eigen::Ref<Eigen::VectorXd> xd,
-  Eigen::Ref<Eigen::VectorXd> extended_dimensions) const
+void DmpExtendedDimensions::integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> extended_dimensions) const
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
-  Dmp::differentialEquation(x,xd);
+  Dmp::integrateStep(dt,x,x_updated,xd_updated);
   
-  MatrixXd phase = x.PHASE;
+  MatrixXd phase = x_updated.PHASE;
   MatrixXd extended_dimensions_prealloc(phase.rows(),function_approximators_ext_dims_.size());
   computeFunctionApproximatorOutputExtendedDimensions(phase, extended_dimensions_prealloc); 
   extended_dimensions = extended_dimensions_prealloc;
@@ -224,10 +226,7 @@ void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Eigen:
 {
   Eigen::MatrixXd forcing_terms, fa_output;
   analyticalSolution(ts, xs, xds, forcing_terms, fa_output);
-  
-  computeFunctionApproximatorOutputExtendedDimensions(xs.PHASE, fa_extended_output); 
-  // get phase from xs
-  // compute output of fa_extended_output
+  computeFunctionApproximatorOutputExtendedDimensions(xs.PHASEM(xs.rows()), fa_extended_output); 
 }
 
 void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Trajectory& trajectory) const
@@ -237,7 +236,9 @@ void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Trajec
   statesAsTrajectory(ts, xs, xds, trajectory);
 
   // add output fa_extended_output as misc variables
-  computeFunctionApproximatorOutputExtendedDimensions(xs.PHASE, fa_extended_output); 
+  MatrixXd fa_extended_output;
+  computeFunctionApproximatorOutputExtendedDimensions(xs.PHASEM(xs.rows()), fa_extended_output); 
+  trajectory.set_misc(fa_extended_output);
 }
 
 void DmpExtendedDimensions::train(const Trajectory& trajectory)
@@ -299,9 +300,11 @@ void DmpExtendedDimensions::train(const Trajectory& trajectory, std::string save
   }
 }
 
-/*
 void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_values_labels) const {
-  assert(function_approximators_ext_dims_.size()>0);
+  
+  Dmp::getSelectableParameters(selectable_values_labels);
+  
+  std::set<std::string>::iterator it;
   for (int dd=0; dd<dim_orig(); dd++)
   {
     if (function_approximators_ext_dims_[dd]!=NULL)
@@ -310,12 +313,17 @@ void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_valu
       {
         set<string> cur_labels;
         function_approximators_ext_dims_[dd]->getSelectableParameters(cur_labels);
-        selectable_values_labels.insert(cur_labels.begin(), cur_labels.end());
+
+        for (it = cur_labels.begin(); it != cur_labels.end(); it++)
+        { 
+          string str = *it;
+          str += "_ext_dims";
+          selectable_values_labels.insert(str);
+        }
+        
       }
     }
   }
-  selectable_values_labels.insert("goal");
-  
   //cout << "selected_values_labels=["; 
   //for (string label : selected_values_labels) 
   //  cout << label << " ";
@@ -325,32 +333,32 @@ void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_valu
 
 void DmpExtendedDimensions::setSelectedParameters(const set<string>& selected_values_labels)
 {
-  assert(function_approximators_ext_dims_.size()>0);
-  for (int dd=0; dd<dim_orig(); dd++)
-    if (function_approximators_ext_dims_[dd]!=NULL)
-      if (function_approximators_ext_dims_[dd]->isTrained())
-        function_approximators_ext_dims_[dd]->setSelectedParameters(selected_values_labels);
-
-  // Call superclass for initializations
-  Parameterizable::setSelectedParameters(selected_values_labels);
-
-  VectorXi lengths_per_dimension = VectorXi::Zero(dim_orig());
-  for (int dd=0; dd<dim_orig(); dd++)
+  Dmp::setSelectedParameters(selected_values_labels);
+  Eigen::VectorXi lengths_per_dimension_dmp = Dmp::getVectorLengthsPerDimension();
+  
+  Eigen::VectorXi lengths_per_dimension_ext_dim(dim_extended());
+  for (int dd=0; dd<dim_extended(); dd++)
   {
     if (function_approximators_ext_dims_[dd]!=NULL)
+    {
       if (function_approximators_ext_dims_[dd]->isTrained())
-        lengths_per_dimension[dd] = function_approximators_ext_dims_[dd]->getParameterVectorSelectedSize();
-    
-    if (selected_values_labels.find("goal")!=selected_values_labels.end())
-      lengths_per_dimension[dd]++;
+      {
+        function_approximators_ext_dims_[dd]->setSelectedParameters(selected_values_labels);
+        lengths_per_dimension_ext_dim[dd] = function_approximators_ext_dims_[dd]->getParameterVectorSelectedSize();
+      }
+    }
   }
   
+  VectorXi lengths_per_dimension(dim_orig()+dim_extended());
+  lengths_per_dimension << lengths_per_dimension_dmp, lengths_per_dimension_ext_dim;
   setVectorLengthsPerDimension(lengths_per_dimension);
       
 }
 
 void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
 {
+  Dmp::getParameterVectorMask(selected_values_labels,selected_mask);
+  /*
   assert(function_approximators_ext_dims_.size()>0);
   for (int dd=0; dd<dim_orig(); dd++)
   {
@@ -359,9 +367,7 @@ void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> s
   }
 
   selected_mask.resize(getParameterVectorAllSize());
-  selected_mask.fill(0);
   
-  const int TMP_GOAL_NUMBER = -1;
   int offset = 0;
   VectorXi cur_mask;
   for (int dd=0; dd<dim_orig(); dd++)
@@ -377,9 +383,6 @@ void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> s
     selected_mask.segment(offset,cur_mask.size()) = cur_mask;
     offset += cur_mask.size();
     
-    // Goal
-    if (selected_values_labels.find("goal")!=selected_values_labels.end())
-      selected_mask(offset) = TMP_GOAL_NUMBER;
     offset++;
     
   }
@@ -390,59 +393,54 @@ void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> s
   for (int ii=0; ii<selected_mask.size(); ii++)
     if (selected_mask[ii]==TMP_GOAL_NUMBER)
       selected_mask[ii] = goal_number;
-    
+    */
 }
 
 int DmpExtendedDimensions::getParameterVectorAllSize(void) const
 {
-  int total_size = 0;
+  int total_size = Dmp::getParameterVectorAllSize();
   for (unsigned int dd=0; dd<function_approximators_ext_dims_.size(); dd++)
     total_size += function_approximators_ext_dims_[dd]->getParameterVectorAllSize();
   
-  // For the goal
-  total_size += dim_orig();
   return total_size;
 }
 
 
 void DmpExtendedDimensions::getParameterVectorAll(VectorXd& values) const
 {
+  Dmp::getParameterVectorAll(values);
+
+  int offset = values.size();
+
   values.resize(getParameterVectorAllSize());
-  int offset = 0;
+  
   VectorXd cur_values;
-  VectorXd attractor = attractor_state();
-  for (int dd=0; dd<dim_orig(); dd++)
+  for (int dd=0; dd<dim_extended(); dd++)
   {
     function_approximators_ext_dims_[dd]->getParameterVectorAll(cur_values);
     values.segment(offset,cur_values.size()) = cur_values;
     offset += cur_values.size();
-
-    values(offset) = attractor(dd);
-    offset++;
   }
 }
 
 void DmpExtendedDimensions::setParameterVectorAll(const VectorXd& values)
 {
   assert(values.size()==getParameterVectorAllSize());
-  int offset = 0;
+  
+  int last_index = values.size(); // Offset at the end
   VectorXd cur_values;
-  VectorXd attractor(dim_orig());
-  for (int dd=0; dd<dim_orig(); dd++)
+  for (int dd=dim_extended()-1; dd>=0; dd--)
   {
     int n_parameters_required = function_approximators_ext_dims_[dd]->getParameterVectorAllSize();
-    cur_values = values.segment(offset,n_parameters_required);
+    cur_values = values.segment(last_index-n_parameters_required,n_parameters_required);
     function_approximators_ext_dims_[dd]->setParameterVectorAll(cur_values);
-    offset += n_parameters_required;
-    
-    attractor(dd) = values(offset);
-    offset += 1;
+    last_index -= n_parameters_required;
   }
   
-  // Set the goal
-  set_attractor_state(attractor); 
+  VectorXd values_for_dmp = values.segment(0,last_index);
+  Dmp::setParameterVectorAll(values);
+  
 }
-*/
 
 
 template<class Archive>
