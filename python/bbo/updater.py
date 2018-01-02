@@ -139,6 +139,7 @@ def costsToWeights(costs, weighting_method, eliteness):
     # components). In this  case, we should use only the first column.
     costs = np.asarray([np.atleast_1d(x)[0] for x in costs])
 
+    #np.set_printoptions(precision=4, suppress=True)
     if weighting_method == 'PI-BB':
         # PI^2 style weighting: continuous, cost exponention
         h = eliteness # In PI^2, eliteness parameter is known as "h"
@@ -149,6 +150,19 @@ def costsToWeights(costs, weighting_method, eliteness):
             costs_norm = np.asarray([-h*(x-min(costs))/costs_range for x in costs])
             weights = np.exp(costs_norm)
 
+    elif weighting_method=='CEM' or weighting_method=='CMA-ES':
+        # CEM/CMA-ES style weights: rank-based, uses defaults
+        mu = eliteness # In CMA-ES, eliteness parameter is known as "mu"
+        indices = np.argsort(costs)
+        weights = np.full(costs.size,0.0)
+        if weighting_method=='CEM':
+            # CEM
+            weights[indices[0:mu]] = 1.0/mu
+        else:
+            # CMA-ES
+            for ii in range(mu):
+                weights[indices[ii]] = np.log(mu+0.5)-np.log(ii+1)
+            
     else:
         print("WARNING: Unknown weighting method '", weighting_method, "'. Calling with PI-BB weighting."); 
         return costsToWeights(costs, 'PI-BB', eliteness);

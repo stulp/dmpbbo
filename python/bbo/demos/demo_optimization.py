@@ -61,7 +61,7 @@ if __name__=="__main__":
         distribution = DistributionGaussian(mean_init, covar_init)
         
         eliteness = 10
-        weighting_method = 'PI-BB'
+        weighting_method = 'PI-BB' # or 'CEM' or 'CMA-ES'
         if (covar_update=='none'):
             updater = UpdaterMean(eliteness,weighting_method)
         elif (covar_update=='decay'):
