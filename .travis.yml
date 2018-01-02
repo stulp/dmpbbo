@@ -8,7 +8,6 @@ compiler:
 branches:
   only:
     - master
-    - realtime
 
 env:
   - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=ON
