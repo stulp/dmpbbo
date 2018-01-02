@@ -38,9 +38,10 @@ namespace BasisFunction {
 
 namespace Gaussian {
 
-  /** Get the kernel activations for given centers, widths and inputs
+  /** Get the kernel activations for given centers, widths and inputs. This one is mainly used for Gaussian Mixture Models, hence the slightly different names for the function arguments.
    * \param[in] mus The center of the basis function (size: n_basis_functions X n_dims)
    * \param[in] covars The covariance matrices of the basis functions (size: n_basis_functions X n_dims X n_dims)
+   * \param[in] priors The priors for each basis functions (size: n_basis_functions)
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    * \param[in] normalized_basis_functions Whether to normalize the basis functions

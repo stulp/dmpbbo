@@ -73,7 +73,11 @@ See \ref page_serialization
 
 \li document Python classes/functions
 
-\li Fix warnings in "make Docs" (currently 54)
+\li Fix warnings in "make Docs" (currently 2)
+
+\li Gennaro: document FunctionApproximatorGMR::trainIncremental
+
+\li Gennaro: document FunctionApproximatorGMR::normalPDFDamped
 
 \section Features
 
@@ -82,6 +86,7 @@ See \ref page_serialization
 \li Regularization of optimization in Python, but in C++ too?
 <ul>
 <li> implement generic regularization in Task
+<li> check  DemoCostFunctionDistanceToPoint(const VectorXd& point, double regularization_weight)
 </ul>
 
 \li DmpExtendedDimensions (started it, has separate branch)

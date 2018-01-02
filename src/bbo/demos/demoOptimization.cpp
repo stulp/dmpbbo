@@ -56,6 +56,7 @@ class DemoCostFunctionDistanceToPoint : public CostFunction
 public:
   /** Constructor.
    * \param[in] point Point to which distance must be minimized.
+   * \param[in] regularization_weight Regularization penalty on the parameter vector.
    */
   DemoCostFunctionDistanceToPoint(const VectorXd& point, double regularization_weight)
   {
@@ -66,7 +67,7 @@ public:
   /** The cost function which defines the cost_function.
    *
    * \param[in] sample The sample 
-   * \return The scalar cost for each sample.
+   * \param[out] cost The scalar cost for each sample.
    */
   void evaluate(const VectorXd& sample, VectorXd& cost) const 
   {

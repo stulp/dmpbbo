@@ -66,6 +66,10 @@ public:
     std::vector<Eigen::VectorXd> mu_ys, std::vector<Eigen::MatrixXd> sigma_xs,
     std::vector<Eigen::MatrixXd> sigma_ys, std::vector<Eigen::MatrixXd> sigma_x_ys);
 
+  /** 
+   * Get the number of Gaussians in the GMM.
+   * \return The number of Gaussians in the GMM.
+   */ 
   inline unsigned int getNumberOfGaussians(void) const 
   {
     return priors_.size();
@@ -121,6 +125,8 @@ public:
    *
    * \param[out] gmm_as_matrix The Gaussian Mixture Model as one big matrix
    *
+   * In combination with ModelParametersGMR::saveGMMToMatrix() and ModelParametersGMR::loadGMMFromMatrix(), this hacky function allowed for easier exchange with some Matlab code we wrote.
+   *
    * This matrix contains the following rows (example for two Gaussians, with dimensionality 3)
    * 
 \verbatim
@@ -142,14 +148,31 @@ __________________________
    *
    * Thus, the number of rows in the Matrix is 2 (for meta-data) + n_gaussians * (1+1+n_dims)
    *
-   * In combination with ModelParametersGMR::saveGMMToMatrix and ModelParametersGMR::loadGMMToMatrix, this hacky function allowed for easier exchange with some Matlab code we wrote.
    *
    */
   void toMatrix(Eigen::MatrixXd& gmm_as_matrix) const;
+  
+  
+  /** Initialize a GMM from a matrix.
+   * \see toMatrix() for the format of the file
+   *  \param[in] gmm_matrix The GMM, represented as a matrix.
+   *  \return The model parameters of the GMM.
+   */
   static ModelParametersGMR* fromMatrix(const Eigen::MatrixXd& gmm_matrix);
   
+  /** Save the GMM as a matrix in an ASCII file.
+   * \see toMatrix() for the format of the file
+   *  \param[in] filename The name of the file to save the GMM to.
+   *  \param[in] overwrite Whether to overwrite the file if it already exists.
+   *  \return true if saving was successful, false otherwise.
+   */
   bool saveGMMToMatrix(std::string filename, bool overwrite=false) const; 
   
+  /** Load the GMM from a matrix in an ASCII file.
+   * \see toMatrix() for the format of the file
+   *  \param[in] filename The name of the file to load the GMM from.
+   *  \return The model parameters of the GMM.
+   */
   static ModelParametersGMR* loadGMMFromMatrix(std::string filename);
 
   
