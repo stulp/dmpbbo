@@ -79,23 +79,18 @@ See \ref page_serialization
 
 \section Features
 
-\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
-
-\li Regularization of optimization in Python, but in C++ too?
-<ul>
-<li> implement generic regularization in Task
-<li> check  DemoCostFunctionDistanceToPoint(const VectorXd& point, double regularization_weight)
-</ul>
+\li Implement CMA-ES and CEM weighting schemes in C++
 
 \li DmpExtendedDimensions (started it, has separate branch)
+
+
+\section after Features (after paper)
 
 \li L2 Regularization in all functionapproximators (copy from RRRFF)
 <ul>
 <li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
 <li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
 </ul>
-
-\section after Features (after paper)
 
 \li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
 
