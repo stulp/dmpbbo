@@ -50,7 +50,8 @@ DmpContextualTwoStep::DmpContextualTwoStep(int n_dims_dmp, std::vector<FunctionA
 }
 
 // Overloads in DMP computeFunctionApproximatorOutput
-void DmpContextualTwoStep::computeFunctionApproximatorOutput(const MatrixXd& phase_state, MatrixXd& fa_output) const
+void DmpContextualTwoStep::computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const
 {
   int n_time_steps = phase_state.rows(); 
   fa_output.resize(n_time_steps,dim_orig());

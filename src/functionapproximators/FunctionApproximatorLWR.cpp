@@ -51,12 +51,24 @@ FunctionApproximatorLWR::FunctionApproximatorLWR(const MetaParametersLWR *const 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
+  if (model_parameters!=NULL)
+    preallocateMemory(model_parameters->getNumberOfBasisFunctions());
 }
 
 FunctionApproximatorLWR::FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
+  preallocateMemory(model_parameters->getNumberOfBasisFunctions());
+}
+
+void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
+{
+  lines_one_prealloc_ = MatrixXd(1,n_basis_functions);
+  activations_one_prealloc_ = MatrixXd(1,n_basis_functions);
+  
+  lines_prealloc_ = MatrixXd(1,n_basis_functions);
+  activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
 
@@ -96,7 +108,7 @@ FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
 //  return true;
 //}
 
-void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -114,10 +126,14 @@ void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targ
   VectorXd min = inputs.colwise().minCoeff();
   VectorXd max = inputs.colwise().maxCoeff();
   
-  MatrixXd centers, widths, activations;
+  MatrixXd centers, widths;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
   bool normalize_activations = true; 
   bool asym_kernels = meta_parameters_lwr->asymmetric_kernels(); 
+  
+  int n_samples = inputs.rows();
+  int n_kernels = centers.rows(); 
+  MatrixXd activations(n_samples,n_kernels);
   BasisFunction::Gaussian::activations(centers,widths,inputs,activations,normalize_activations,asym_kernels);
   
   // Make the design matrix
@@ -125,9 +141,9 @@ void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targ
   X.leftCols(inputs.cols()) = inputs;
   
   
-  int n_kernels = activations.cols();
+  //int n_kernels = activations.cols();
+  //int n_samples = X.rows(); 
   int n_betas = X.cols(); 
-  int n_samples = X.rows(); 
   MatrixXd W;
   MatrixXd beta(n_kernels,n_betas);
   
@@ -206,16 +222,18 @@ void FunctionApproximatorLWR::train(const MatrixXd& inputs, const MatrixXd& targ
   
   setModelParameters(new ModelParametersLWR(centers,widths,slopes,offsets,asym_kernels));
   
+  preallocateMemory(n_kernels);
 }
 
-void FunctionApproximatorLWR::predict(const MatrixXd& inputs, MatrixXd& output)
+void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
+
   if (!isTrained())  
   {
     cerr << "WARNING: You may not call FunctionApproximatorLWPR::predict if you have not trained yet. Doing nothing." << endl;
     return;
   }
-
+  
   // The following line of code took a long time to decide on.
   // The member FunctionApproximator::model_parameters_ (which we access through
   // getModelParameters()) is of class ModelParameters, not ModelParametersLWR.
@@ -248,15 +266,42 @@ void FunctionApproximatorLWR::predict(const MatrixXd& inputs, MatrixXd& output)
   // There, ~30 lines of comment for one line of code ;-) 
   //                                            (mostly for me to remember why it is like this) 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
-
-  MatrixXd lines;
-  model_parameters_lwr->getLines(inputs, lines);
-
-  // Weight the values for each line with the normalized basis function activations  
-  MatrixXd activations;
-  model_parameters_lwr->kernelActivations(inputs,activations);
   
-  output = (lines.array()*activations.array()).rowwise().sum();
+  bool only_one_sample = (inputs.rows()==1);
+  if (only_one_sample)
+  {
+    ENTERING_REAL_TIME_CRITICAL_CODE
+
+    // Only 1 sample, so real-time execution is possible. No need to allocate memory.
+    model_parameters_lwr->getLines(inputs, lines_one_prealloc_);
+
+    // Weight the values for each line with the normalized basis function activations  
+    model_parameters_lwr->kernelActivations(inputs,activations_one_prealloc_);
+  
+    outputs = (lines_one_prealloc_.array()*activations_one_prealloc_.array()).rowwise().sum();  
+    
+    EXITING_REAL_TIME_CRITICAL_CODE
+    
+  }
+  else
+  {
+    
+    int n_time_steps = inputs.rows();
+    int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
+    
+    // The next two lines are not be real-time, as they allocate memory
+    lines_prealloc_.resize(n_time_steps,n_basis_functions);
+    activations_prealloc_.resize(n_time_steps,n_basis_functions);
+    outputs.resize(n_time_steps,getExpectedOutputDim());
+    
+    model_parameters_lwr->getLines(inputs, lines_prealloc_);
+
+    // Weight the values for each line with the normalized basis function activations  
+    model_parameters_lwr->kernelActivations(inputs,activations_prealloc_);
+  
+    outputs = (lines_prealloc_.array()*activations_prealloc_.array()).rowwise().sum();  
+    
+  }
   
 }
 
@@ -270,13 +315,16 @@ bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& 
 
   const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
   
-  MatrixXd lines;
+  int n_samples = inputs.rows();
+  int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
+  
+  MatrixXd lines(n_samples,n_basis_functions);
   model_parameters_lwr->getLines(inputs, lines);
   
-  MatrixXd unnormalized_activations;
+  MatrixXd unnormalized_activations(n_samples,n_basis_functions);
   model_parameters_lwr->unnormalizedKernelActivations(inputs, unnormalized_activations);
 
-  MatrixXd activations;
+  MatrixXd activations(n_samples,n_basis_functions);
   model_parameters_lwr->kernelActivations(inputs, activations);
 
   MatrixXd predictions = (lines.array()*activations.array()).rowwise().sum();

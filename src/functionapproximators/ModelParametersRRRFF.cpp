@@ -1,6 +1,6 @@
 /**
- * @file   ModelParametersIRFRLS.cpp
- * @brief  ModelParametersIRFRLS class source file.
+ * @file   ModelParametersRRRFF.cpp
+ * @brief  ModelParametersRRRFF class source file.
  * @author Freek Stulp, Thibaut Munzer
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -26,11 +26,11 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/ModelParametersIRFRLS.hpp"
+#include "functionapproximators/ModelParametersRRRFF.hpp"
 
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersIRFRLS);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRRRFF);
 
 #include <iostream>
 
@@ -45,7 +45,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::VectorXd weights, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
+ModelParametersRRRFF::ModelParametersRRRFF(Eigen::VectorXd weights, Eigen::MatrixXd cosines_periodes, Eigen::VectorXd cosines_phase)
 :
   weights_(weights),
   cosines_periodes_(cosines_periodes),
@@ -64,12 +64,12 @@ ModelParametersIRFRLS::ModelParametersIRFRLS(Eigen::VectorXd weights, Eigen::Mat
   all_values_vector_size_ += cosines_periodes_.rows() * cosines_periodes_.cols();
 };
 
-ModelParameters* ModelParametersIRFRLS::clone(void) const 
+ModelParameters* ModelParametersRRRFF::clone(void) const 
 {
-  return new ModelParametersIRFRLS(weights_, cosines_periodes_, cosines_phase_); 
+  return new ModelParametersRRRFF(weights_, cosines_periodes_, cosines_phase_); 
 }
 
-void ModelParametersIRFRLS::cosineActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& cosine_activations) const
+void ModelParametersRRRFF::cosineActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& cosine_activations) const
 {
   if (caching_)
   {
@@ -98,13 +98,13 @@ void ModelParametersIRFRLS::cosineActivations(const Eigen::MatrixXd& inputs, Eig
   
 }
 
-int ModelParametersIRFRLS::getExpectedInputDim(void) const  
+int ModelParametersRRRFF::getExpectedInputDim(void) const  
 {
   return nb_in_dim_;
 };
 
 template<class Archive>
-void ModelParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
+void ModelParametersRRRFF::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
@@ -116,13 +116,13 @@ void ModelParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
 }
 
-string ModelParametersIRFRLS::toString(void) const 
+string ModelParametersRRRFF::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersIRFRLS");
+  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRRRFF");
 };
 
 
-void ModelParametersIRFRLS::getSelectableParameters(set<string>& selected_values_labels) const 
+void ModelParametersRRRFF::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
   selected_values_labels.insert("weights");
@@ -130,7 +130,7 @@ void ModelParametersIRFRLS::getSelectableParameters(set<string>& selected_values
   selected_values_labels.insert("periods");
 }
 
-void ModelParametersIRFRLS::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
+void ModelParametersRRRFF::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
 {
   selected_mask.resize(getParameterVectorAllSize());
   selected_mask.fill(0);
@@ -156,7 +156,7 @@ void ModelParametersIRFRLS::getParameterVectorMask(const std::set<std::string> s
   assert(offset == getParameterVectorAllSize()); 
 }
 
-void ModelParametersIRFRLS::getParameterVectorAll(VectorXd& values) const
+void ModelParametersRRRFF::getParameterVectorAll(VectorXd& values) const
 {
   values.resize(getParameterVectorAllSize());
   int offset = 0;
@@ -180,7 +180,7 @@ void ModelParametersIRFRLS::getParameterVectorAll(VectorXd& values) const
   
 };
 
-void ModelParametersIRFRLS::setParameterVectorAll(const VectorXd& values)
+void ModelParametersRRRFF::setParameterVectorAll(const VectorXd& values)
 {
   if (all_values_vector_size_ != values.size())
   {
@@ -207,7 +207,7 @@ void ModelParametersIRFRLS::setParameterVectorAll(const VectorXd& values)
   assert(offset == getParameterVectorAllSize());   
 };
 
-UnifiedModel* ModelParametersIRFRLS::toUnifiedModel(void) const
+UnifiedModel* ModelParametersRRRFF::toUnifiedModel(void) const
 {
   return new UnifiedModel(cosines_periodes_, cosines_phase_, weights_); 
 }

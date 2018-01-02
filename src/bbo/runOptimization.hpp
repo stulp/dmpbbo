@@ -44,6 +44,7 @@ class CostFunction;
  * \param[in] n_samples_per_update The number of samples per update
  * \param[in] save_directory Optional directory to save to (default: don't save)
  * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \param[in] only_learning_curve Write only the learning curve, not the samples/costs (default: false)
  */
 void runOptimization(
   const CostFunction* const cost_function, 
@@ -54,11 +55,33 @@ void runOptimization(
   std::string save_directory=std::string(""),
   bool overwrite=false,bool only_learning_curve=false);
 
-/** Save all the information relevant to an update to a directory as text files.
+/**
+ * Save an optimization update to a directory.
+ * \param[in] directory The directory to save to
+ * \param[in] i_update The update counter
+ * \param[in] distribution The Gaussian distribution before the update
+ * \param[in] cost_eval The cost of the mean of the distribution, i.e. without exploration
+ * \param[in] samples The samples taken from the distribution 
+ * \param[in] costs The costs of each sample in samples
+ * \param[in] weights The weights, computed from each cost
+ * \param[in] distribution_new The Gaussian distribution after reward-weighted averaging
+ * \param[in] overwrite Function overwrites existing files if overwrite is true
+ * \return true if writing the files succeeded, false otherwise.
  */
 bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Eigen::VectorXd& cost_eval, const Eigen::MatrixXd& samples, const Eigen::MatrixXd& costs, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
 
-/** Save all the information relevant to an update to a directory as text files.
+/**
+ * Save an optimization update to a directory.
+ * \param[in] directory The directory to save to
+ * \param[in] i_update The update counter
+ * \param[in] distributions The Gaussian distributions before the update
+ * \param[in] cost_eval The cost of the mean of the distribution, i.e. without exploration
+ * \param[in] samples The samples taken from the distribution 
+ * \param[in] costs The costs of each sample in samples
+ * \param[in] weights The weights, computed from each cost
+ * \param[in] distributions_new The Gaussian distributions after reward-weighted averaging
+ * \param[in] overwrite Function overwrites existing files if overwrite is true
+ * \return true if writing the files succeeded, false otherwise.
  */
 bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, const Eigen::VectorXd&  cost_eval, const Eigen::MatrixXd& samples, const Eigen::MatrixXd& costs, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
 

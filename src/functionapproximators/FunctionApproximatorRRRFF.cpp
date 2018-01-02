@@ -1,5 +1,5 @@
 /**
- * @file   FunctionApproximatorIRFRLS.cpp
+ * @file   FunctionApproximatorRRRFF.cpp
  * @brief  FunctionApproximator class source file.
  * @author Thibaut Munzer, Freek Stulp
  *
@@ -26,14 +26,14 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
+#include "functionapproximators/FunctionApproximatorRRRFF.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorIRFRLS);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRRRFF);
 
 #include "functionapproximators/BasisFunction.hpp"
-#include "functionapproximators/MetaParametersIRFRLS.hpp"
-#include "functionapproximators/ModelParametersIRFRLS.hpp"
+#include "functionapproximators/MetaParametersRRRFF.hpp"
+#include "functionapproximators/ModelParametersRRRFF.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
@@ -53,33 +53,33 @@ using namespace std;
 
 namespace DmpBbo {
 
-FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(const MetaParametersIRFRLS *const meta_parameters, const ModelParametersIRFRLS *const model_parameters) 
+FunctionApproximatorRRRFF::FunctionApproximatorRRRFF(const MetaParametersRRRFF *const meta_parameters, const ModelParametersRRRFF *const model_parameters) 
 :
   FunctionApproximator(meta_parameters,model_parameters)
 {
 }
 
-FunctionApproximatorIRFRLS::FunctionApproximatorIRFRLS(const ModelParametersIRFRLS *const model_parameters) 
+FunctionApproximatorRRRFF::FunctionApproximatorRRRFF(const ModelParametersRRRFF *const model_parameters) 
 :
   FunctionApproximator(model_parameters)
 {
 }
 
 
-FunctionApproximator* FunctionApproximatorIRFRLS::clone(void) const {
+FunctionApproximator* FunctionApproximatorRRRFF::clone(void) const {
   // All error checking and cloning is left to the FunctionApproximator constructor.
-  return new FunctionApproximatorIRFRLS(
-    dynamic_cast<const MetaParametersIRFRLS*>(getMetaParameters()),
-    dynamic_cast<const ModelParametersIRFRLS*>(getModelParameters())
+  return new FunctionApproximatorRRRFF(
+    dynamic_cast<const MetaParametersRRRFF*>(getMetaParameters()),
+    dynamic_cast<const ModelParametersRRRFF*>(getModelParameters())
     );
 };
 
 
-void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorRRRFF::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
-    cerr << "WARNING: You may not call FunctionApproximatorIRFRLS::train more than once. Doing nothing." << endl;
+    cerr << "WARNING: You may not call FunctionApproximatorRRRFF::train more than once. Doing nothing." << endl;
     cerr << "   (if you really want to retrain, call reTrain function instead)" << endl;
     return;
   }
@@ -87,16 +87,16 @@ void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& t
   assert(inputs.rows() == targets.rows()); // Must have same number of examples
   assert(inputs.cols()==getExpectedInputDim());
   
-  const MetaParametersIRFRLS* meta_parameters_irfrls = 
-    static_cast<const MetaParametersIRFRLS*>(getMetaParameters());
+  const MetaParametersRRRFF* meta_parameters_RRRFF = 
+    static_cast<const MetaParametersRRRFF*>(getMetaParameters());
 
-  int nb_cos = meta_parameters_irfrls->number_of_basis_functions_;
+  int nb_cos = meta_parameters_RRRFF->number_of_basis_functions_;
 
   // Init random generator.
   boost::mt19937 rng(getpid() + time(0));
 
   // Draw periodes
-  boost::normal_distribution<> twoGamma(0, sqrt(2 * meta_parameters_irfrls->gamma_));
+  boost::normal_distribution<> twoGamma(0, sqrt(2 * meta_parameters_RRRFF->gamma_));
   boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > genPeriods(rng, twoGamma);
   MatrixXd cosines_periodes(nb_cos, inputs.cols());
   for (int r = 0; r < nb_cos; r++)
@@ -114,31 +114,31 @@ void FunctionApproximatorIRFRLS::train(const MatrixXd& inputs, const MatrixXd& t
   BasisFunction::Cosine::activations(cosines_periodes,cosines_phase,inputs,proj_inputs);
   
   // Compute linear model analatically
-  double lambda = meta_parameters_irfrls->lambda_;
+  double lambda = meta_parameters_RRRFF->lambda_;
   MatrixXd toInverse = lambda * MatrixXd::Identity(nb_cos, nb_cos) + proj_inputs.transpose() * proj_inputs;
   VectorXd linear_model = toInverse.inverse() *
     (proj_inputs.transpose() * targets);
 
-  setModelParameters(new ModelParametersIRFRLS(linear_model, cosines_periodes, cosines_phase));
+  setModelParameters(new ModelParametersRRRFF(linear_model, cosines_periodes, cosines_phase));
 }
 
-void FunctionApproximatorIRFRLS::predict(const MatrixXd& input, MatrixXd& output)
+void FunctionApproximatorRRRFF::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs)
 {
   if (!isTrained())  
   {
-    cerr << "WARNING: You may not call FunctionApproximatorIRFRLS::predict if you have not trained yet. Doing nothing." << endl;
+    cerr << "WARNING: You may not call FunctionApproximatorRRRFF::predict if you have not trained yet. Doing nothing." << endl;
     return;
   }
   
-  const ModelParametersIRFRLS* model = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
+  const ModelParametersRRRFF* model = static_cast<const ModelParametersRRRFF*>(getModelParameters());
 
   MatrixXd proj_inputs;
-  model->cosineActivations(input,proj_inputs);
+  model->cosineActivations(inputs,proj_inputs);
   
-  output = proj_inputs * model->weights_;
+  outputs = proj_inputs * model->weights_;
 }
 
-bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
+bool FunctionApproximatorRRRFF::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
   if (save_directory.empty())
     return true;
@@ -146,17 +146,17 @@ bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorX
   MatrixXd inputs_grid;
   FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs_grid);
       
-  const ModelParametersIRFRLS* model_parameters_irfrls = static_cast<const ModelParametersIRFRLS*>(getModelParameters());
+  const ModelParametersRRRFF* model_parameters_RRRFF = static_cast<const ModelParametersRRRFF*>(getModelParameters());
   
   MatrixXd activations_grid;
-  model_parameters_irfrls->cosineActivations(inputs_grid, activations_grid);
+  model_parameters_RRRFF->cosineActivations(inputs_grid, activations_grid);
   
   saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
   saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
   saveMatrix(save_directory,"activations_grid.txt",activations_grid,overwrite);
 
   // Weight the basis function activations  
-  VectorXd weights = model_parameters_irfrls->weights();
+  VectorXd weights = model_parameters_RRRFF->weights();
   for (int b=0; b<activations_grid.cols(); b++)
     activations_grid.col(b).array() *= weights(b);
   saveMatrix(save_directory,"activations_weighted_grid.txt",activations_grid,overwrite);
@@ -170,7 +170,7 @@ bool FunctionApproximatorIRFRLS::saveGridData(const VectorXd& min, const VectorX
 }
 
 template<class Archive>
-void FunctionApproximatorIRFRLS::serialize(Archive & ar, const unsigned int version)
+void FunctionApproximatorRRRFF::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);

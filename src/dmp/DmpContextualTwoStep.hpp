@@ -55,7 +55,8 @@ public:
   DmpContextualTwoStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, FunctionApproximator* policy_parameter_function, DmpType dmp_type=KULVICIUS_2012_JOINING);
   
   // Overloads Dmp::computeFunctionApproximatorOutput
-  void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
+  void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const;
 
   // Overloads Dmp::train
   void  train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory="", bool overwrite = true);

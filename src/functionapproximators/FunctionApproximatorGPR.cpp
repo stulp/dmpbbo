@@ -68,7 +68,7 @@ FunctionApproximator* FunctionApproximatorGPR::clone(void) const {
     );
 };
 
-void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targets)
+void FunctionApproximatorGPR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (isTrained())  
   {
@@ -104,7 +104,7 @@ void FunctionApproximatorGPR::train(const MatrixXd& inputs, const MatrixXd& targ
   
 }
 
-void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
+void FunctionApproximatorGPR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
   if (!isTrained())  
   {
@@ -119,8 +119,9 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   
   outputs.resize(n_samples,1);
   
-  MatrixXd ks;
+  MatrixXd ks(n_samples,n_samples);
   model_parameters_gpr->kernelActivations(inputs, ks);
+  
   
   VectorXd weights = model_parameters_gpr->weights();
   for (unsigned int ii=0; ii<n_samples; ii++)
@@ -128,7 +129,7 @@ void FunctionApproximatorGPR::predict(const MatrixXd& inputs, MatrixXd& outputs)
   
 }
 
-void FunctionApproximatorGPR::predictVariance(const MatrixXd& inputs, MatrixXd& variances)
+void FunctionApproximatorGPR::predictVariance(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& variances)
 {
   if (!isTrained())  
   {

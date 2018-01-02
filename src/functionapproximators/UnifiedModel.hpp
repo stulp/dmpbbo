@@ -68,7 +68,7 @@ public:
    */
   UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation=false);
 
-  /** Constructor for the unified model parameters. This version is used by for example IRFRLS 
+  /** Constructor for the unified model parameters. This version is used by for example RRRFF 
    *  \param[in] angular_frequencies Angular frequency for each dimension and each cosine basis function  (n_bfs X n_input_dims)
    *  \param[in] phases  Phase of each cosine basis function (n_bfs X 1)
    *  \param[in] weights Weights of each basis function (n_bfs X 1)
@@ -118,20 +118,20 @@ public:
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    */
-  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
   
   /** Get the output of each linear model (unweighted) for the given inputs.
    * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
-   * \param[out] lines The output of the linear models (size: n_samples X n_output_dim) 
+   * \param[out] lines The output of the linear models (size: n_samples X n_basis_functions) 
    */
-  void getLines(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& lines) const;
+  void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
   
   /** Compute the sum of the locally weighted lines. 
    * \param[in] inputs The inputs for which to compute the output (size: n_samples X  n_input_dims)
    * \param[out] output The weighted linear models (size: n_samples X n_output_dim) 
    *
    */
-  void evaluate(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& output) const;
+  void evaluate(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
   

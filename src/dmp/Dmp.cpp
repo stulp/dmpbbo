@@ -202,6 +202,15 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
   gating_system_ = gating_system;
   gating_system_->set_name(name()+"_gating");
   
+  // Pre-allocate memory for real-time execution
+  attractor_state_prealloc_ = VectorXd(dim_orig());
+  initial_state_prealloc_ = VectorXd(dim_orig());
+  fa_outputs_one_prealloc_ = MatrixXd(1,dim_orig());
+  fa_outputs_prealloc_ = MatrixXd(1,dim_orig());
+  fa_output_prealloc_ = MatrixXd(1,dim_orig()); 
+  forcing_term_prealloc_ = VectorXd(dim_orig());
+  g_minus_y0_prealloc_ = VectorXd(dim_orig());
+  
 }
 
 void Dmp::set_damping_coefficient(double damping_coefficient)
@@ -302,47 +311,64 @@ bool Dmp::isTrained(void) const
 }
 */
 
-void Dmp::computeFunctionApproximatorOutput(const MatrixXd& phase_state, MatrixXd& fa_output) const
+void Dmp::computeFunctionApproximatorOutput(const Ref<const MatrixXd>& phase_state, MatrixXd& fa_output) const
 {
   int T = phase_state.rows();
   fa_output.resize(T,dim_orig());
   fa_output.fill(0.0);
   
-  MatrixXd output(T,1);
+  if (T>1) {
+    fa_outputs_prealloc_.resize(T,dim_orig());
+  }
+  
   for (int i_dim=0; i_dim<dim_orig(); i_dim++)
   {
     if (function_approximators_[i_dim]!=NULL)
     {
       if (function_approximators_[i_dim]->isTrained()) 
       {
-        function_approximators_[i_dim]->predict(phase_state,output);
-        fa_output.col(i_dim) = output;
+        if (T==1)
+        {
+          function_approximators_[i_dim]->predict(phase_state,fa_outputs_one_prealloc_);
+          fa_output.col(i_dim) = fa_outputs_one_prealloc_;
+        }
+        else
+        {
+          function_approximators_[i_dim]->predict(phase_state,fa_outputs_prealloc_);
+          fa_output.col(i_dim) = fa_outputs_prealloc_;
+        }
       }
     }
   }
 }
 
-void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
+void Dmp::differentialEquation(
+  const Eigen::Ref<const Eigen::VectorXd>& x, 
+  Eigen::Ref<Eigen::VectorXd> xd) const
 {
   
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
+  attractor_state(attractor_state_prealloc_);  
   if (goal_system_==NULL)
   {
     // If there is no dynamical system for the delayed goal, the goal is
     // simply the attractor state
-    spring_system_->set_attractor_state(attractor_state());
+    spring_system_->set_attractor_state(attractor_state_prealloc_);
     // with zero change
     xd.GOAL.fill(0);
   } 
   else
   {
     // Integrate goal system and get current goal state
-    goal_system_->set_attractor_state(attractor_state());
+    goal_system_->set_attractor_state(attractor_state_prealloc_);
     goal_system_->differentialEquation(x.GOAL, xd.GOAL);
     // The goal state is the attractor state of the spring-damper system
     spring_system_->set_attractor_state(x.GOAL);
-        
+    
   }
 
+  
   // Integrate spring damper system
   // Forcing term is added to spring_state later
   spring_system_->differentialEquation(x.SPRING, xd.SPRING);
@@ -352,30 +378,33 @@ void Dmp::differentialEquation(const VectorXd& x, Ref<VectorXd> xd) const
   phase_system_->differentialEquation(x.PHASE, xd.PHASE);
   gating_system_->differentialEquation(x.GATING, xd.GATING);
 
-  MatrixXd phase_state(1,1);
-  phase_state = x.PHASE;
-  MatrixXd fa_output(1,dim_orig());
-  computeFunctionApproximatorOutput(phase_state, fa_output); 
+
+  //MatrixXd phase_state(1,1);
+  //phase_state = x.PHASE;
+  computeFunctionApproximatorOutput(x.PHASE, fa_output_prealloc_); 
 
   // Gate the output of the function approximators
-  int t0 = 0;
+  int t0 = 0; 
   double gating = (x.GATING)[0];
-  VectorXd forcing_term = gating*fa_output.row(t0);
+  forcing_term_prealloc_ = gating*fa_output_prealloc_.row(t0);
+  
   
   // Scale the forcing term, if necessary
   if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
   {
-    VectorXd g_minus_y0 = (attractor_state()-initial_state()).transpose();
-    forcing_term = forcing_term.array()*g_minus_y0.array();
+    initial_state(initial_state_prealloc_);  
+    g_minus_y0_prealloc_ = (attractor_state_prealloc_-initial_state_prealloc_).transpose();
+    forcing_term_prealloc_ = forcing_term_prealloc_.array()*g_minus_y0_prealloc_.array();
   }
   else if (forcing_term_scaling_==AMPLITUDE_SCALING)
   {
-    forcing_term = forcing_term.array()*trajectory_amplitudes_.array();
+    forcing_term_prealloc_ = forcing_term_prealloc_.array()*trajectory_amplitudes_.array();
   }
 
   // Add forcing term to the ZD component of the spring state
-  xd.SPRING_Z = xd.SPRING_Z + forcing_term/tau();
+  xd.SPRING_Z = xd.SPRING_Z + forcing_term_prealloc_/tau();
 
+  EXITING_REAL_TIME_CRITICAL_CODE
 
 }
 

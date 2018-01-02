@@ -93,8 +93,11 @@ int main(int n_args, char** args)
   // CONSTRUCT AND TRAIN THE DMP
   
   // Initialize the DMP
-  Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
+  Dmp::DmpType dmp_type = Dmp::KULVICIUS_2012_JOINING;
+  //dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
+  Dmp* dmp = new Dmp(n_dims, function_approximators, dmp_type);
 
+  cout << "** Train DMP." << endl;
   // And train it. Passing the save_directory will make sure the results are saved to file.
   bool overwrite = true;
   dmp->train(trajectory,save_directory,overwrite);
@@ -102,6 +105,7 @@ int main(int n_args, char** args)
   
   // INTEGRATE DMP TO GET REPRODUCED TRAJECTORY
   
+  cout << "** Integrate DMP analytically." << endl;
   Trajectory traj_reproduced;
   tau = 0.9;
   n_time_steps = 91;
@@ -122,6 +126,40 @@ int main(int n_args, char** args)
   saveMatrix(save_directory,"reproduced_xs_xds.txt",output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
+
+
+  // INTEGRATE STEP BY STEP
+  cout << "** Integrate DMP step-by-step." << endl;
+  VectorXd x(dmp->dim(),1);
+  VectorXd xd(dmp->dim(),1);
+  VectorXd x_updated(dmp->dim(),1);
+
+  MatrixXd xs_step(n_time_steps,x.size());
+  MatrixXd xds_step(n_time_steps,xd.size());
+  
+  cout << std::setprecision(3) << std::fixed << std::showpos;
+  double dt = ts[1];
+  dmp->integrateStart(x,xd);
+  xs_step.row(0) = x;
+  xds_step.row(0) = xd;
+  for (int t=1; t<n_time_steps; t++)
+  {
+    dmp->integrateStep(dt,x,x_updated,xd); 
+    x = x_updated;
+    xs_step.row(t) = x;
+    xds_step.row(t) = xd;
+    if (save_directory.empty())
+    {
+      // Not writing to file, output on cout instead.
+      //cout << x.transpose() << " | " << xd.transpose() << endl;
+    }
+  } 
+
+  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols());
+  output_step << xs_step, xds_step, ts;
+  saveMatrix(save_directory,"reproduced_step_xs_xds.txt",output_step,overwrite);
+
+  
 
   delete meta_parameters;
   delete fa_lwr;

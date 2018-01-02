@@ -65,6 +65,7 @@ public:
    *  \param[in] a a in \f$ y = a*x^2 + c \f$
    *  \param[in] c c in \f$ y = a*x^2 + c \f$
    *  \param[in] inputs x in \f$ y = a*x^2 + c \f$
+   * \param[in] regularization_weight Regularization penalty on the parameter vector.
    */
   DemoTaskApproximateQuadraticFunction(double a, double c, const VectorXd& inputs,double regularization_weight) 
   {

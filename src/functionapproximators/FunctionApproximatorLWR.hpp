@@ -61,9 +61,20 @@ public:
 
 	FunctionApproximator* clone(void) const;
   
-	void train(const Eigen::MatrixXd& input, const Eigen::MatrixXd& target);
+	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 
-	void predict(const Eigen::MatrixXd& input, Eigen::MatrixXd& output);
+  /** Query the function approximator to make a prediction
+   *  \param[in]  inputs   Input values of the query
+   *  \param[out] outputs  Predicted output values
+   *
+   * \remark This method should be const. But third party functions which is called in this function
+   * have not always been implemented as const (Examples: LWPRObject::predict).
+   * Therefore, this function cannot be const.
+   *
+   * This function is realtime if inputs.rows()==1 (i.e. only one input sample is provided), and the
+   * memory for outputs is preallocated.
+   */
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs);
   
 	inline std::string getName(void) const {
     return std::string("LWR");  
@@ -90,7 +101,21 @@ private:
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
-
+  
+  void preallocateMemory(int n_basis_functions);
+  
+  /** Preallocated memory for one time step, required to make the predict() function real-time. */
+  mutable Eigen::MatrixXd lines_one_prealloc_;
+  
+  /** Preallocated memory for one time step, required to make the predict() function real-time. */
+  mutable Eigen::MatrixXd activations_one_prealloc_;
+  
+  /** Preallocated memory to make things more efficient. */
+  mutable Eigen::MatrixXd lines_prealloc_;
+  
+  /** Preallocated memory to make things more efficient. */
+  mutable Eigen::MatrixXd activations_prealloc_;
+  
 };
 
 }

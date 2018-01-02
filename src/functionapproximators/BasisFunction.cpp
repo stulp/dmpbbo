@@ -40,7 +40,7 @@ void Gaussian::activations(
     const std::vector<Eigen::VectorXd>& mus, 
     const std::vector<Eigen::MatrixXd>& covars, 
     std::vector<double> priors, 
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& kernel_activations, 
     bool normalized_basis_functions)
 {
@@ -107,8 +107,9 @@ void Gaussian::activations(
   
 }
 
-void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions, bool asymmetric_kernels)
+void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations, bool normalized_basis_functions, bool asymmetric_kernels)
 {
+  ENTERING_REAL_TIME_CRITICAL_CODE
   
   // Check and set sizes
   // centers     = n_basis_functions x n_dim
@@ -120,6 +121,9 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
   int n_dims            = centers.cols();
   assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
   assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
+  
+  // If kernel_activations is passed with the right size, this
+  // function will not allocate memory.
   kernel_activations.resize(n_samples,n_basis_functions);  
 
   if (normalized_basis_functions && n_basis_functions==1)
@@ -131,8 +135,10 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
     // set the normalized kernels to 1 here, to avoid numerical issues in the normalization below.
     // (normalizing a Gaussian basis function with itself leads to 1 everywhere).
     kernel_activations.fill(1.0);
+    EXITING_REAL_TIME_CRITICAL_CODE
     return;
   }  
+  
   
   double c,w,x;
   for (int bb=0; bb<n_basis_functions; bb++)
@@ -164,25 +170,34 @@ void Gaussian::activations(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
     }
   }
 
+  
   if (normalized_basis_functions)
   {
-    // Compute sum for each row (each value in input_vector)
-    MatrixXd sum_kernel_activations = kernel_activations.rowwise().sum(); // n_samples x 1
-  
-    // Add small number to avoid division by zero. Not full-proof...  
-    if ((sum_kernel_activations.array()==0).any())
-      sum_kernel_activations.array() += sum_kernel_activations.maxCoeff()/100000.0;
-    
-    // Normalize for each row (each value in input_vector)  
-    kernel_activations = kernel_activations.array()/sum_kernel_activations.replicate(1,n_basis_functions).array();
+    // Normalize the basis value; they should sum to 1.0 for each time step.
+    double sum_kernel_activations;
+    for (int i_sample=0; i_sample<n_samples; i_sample++)
+    {
+      sum_kernel_activations = kernel_activations.row(i_sample).sum();
+      for (int i_basis=0; i_basis<n_basis_functions; i_basis++)
+      {
+        if (sum_kernel_activations==0.0)
+          // Apparently, no basis function was active. Set all to same value
+          kernel_activations(i_sample,i_basis) = 1.0/n_basis_functions;
+        else
+          // Standard case, normalize so that they sum to 1.0
+          kernel_activations(i_sample,i_basis) /= sum_kernel_activations;
+        
+      }
+    }
   }
-
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void Cosine::activations(
     const std::vector<Eigen::MatrixXd>& angular_frequencies,
     const std::vector<Eigen::VectorXd>& phases,
-    const Eigen::MatrixXd& inputs, 
+    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& activations)
 {
   unsigned int n_basis_functions = angular_frequencies.size();
@@ -210,7 +225,7 @@ void Cosine::activations(
 void Cosine::activations(
   const Eigen::MatrixXd& angular_frequencies,
   const Eigen::VectorXd& phases,
-  const Eigen::MatrixXd& inputs, 
+  const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   Eigen::MatrixXd& activations)
 {
   // Activations for each basis function are computed with:

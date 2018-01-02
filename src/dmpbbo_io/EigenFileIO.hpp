@@ -49,6 +49,7 @@ bool loadMatrix(std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,Col
  * \param[in] matrix The matrix to save to file
  * \param[in] overwrite Whether to overwrite any existing files
  * \return true if saving was successful, false otherwise
+ * \todo Make matrix const ref
  */ 
 template<typename Scalar, int RowsAtCompileTime, int ColsAtCompileTime>
 bool saveMatrix(std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,ColsAtCompileTime> matrix, bool overwrite=false);
@@ -59,6 +60,7 @@ bool saveMatrix(std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,Col
  * \param[in] matrix The matrix to save to file
  * \param[in] overwrite Whether to overwrite any existing files
  * \return true if saving was successful, false otherwise
+ * \todo Make matrix const ref
  */ 
 template<typename Scalar, int RowsAtCompileTime, int ColsAtCompileTime>
 bool saveMatrix(std::string directory, std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,ColsAtCompileTime> matrix, bool overwrite=false);

@@ -81,7 +81,7 @@ public:
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The normalized kernel activations, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
    */
-  void kernelActivations(const Eigen::MatrixXd& inputs, Eigen::MatrixXd& kernel_activations) const;
+  void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
 
   UnifiedModel* toUnifiedModel(void) const;
   
