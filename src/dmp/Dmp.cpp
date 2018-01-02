@@ -105,7 +105,7 @@ Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximato
    ForcingTermScaling scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
   goal_system_(goal_system),
-  phase_system_(phase_system), gating_system_(gating_system), function_approximators_(function_approximators),
+  phase_system_(phase_system), gating_system_(gating_system),
   forcing_term_scaling_(scaling)
 {
   initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
