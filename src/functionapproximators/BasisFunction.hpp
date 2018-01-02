@@ -54,8 +54,8 @@ namespace Gaussian {
     bool normalized_basis_functions=false);
 
   /** Get the kernel activations for given centers, widths and inputs
-   * \param[in] centers The center of the basis function (size: n_basis_functions X n_dims)
-   * \param[in] widths The width of the basis function (size: n_basis_functions X n_dims)
+   * \param[in] mus The center of the basis function (size: n_basis_functions X n_dims)
+   * \param[in] sigmas The width of the basis function (size: n_basis_functions X n_dims)
    * \param[in] inputs The input data (size: n_samples X n_dims)
    * \param[out] kernel_activations The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
    * \param[in] normalized_basis_functions Whether to normalize the basis functions

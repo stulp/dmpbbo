@@ -51,6 +51,9 @@ public:
     evaluateRollout(cost_vars,sample,task_parameters,costs);
   };
   
+  /** Get the number of individual cost components that constitute the final total cost.
+   * \return The number of cost components.
+   */
   virtual unsigned int getNumberOfCostComponents(void) const = 0;
   
   /** The cost function which defines the task.

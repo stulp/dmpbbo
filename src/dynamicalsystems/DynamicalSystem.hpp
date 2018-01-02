@@ -563,7 +563,7 @@ The state \f$x\f$ need not be a scalar, but may be a vector. This then represent
 Dynamical system that do not depend on time are called \em autonomous. For instance, the formula \f$ \dot{x}  = -\alpha x\f$ does not depend on time, which means the exponential system is autonomous.
 
 
-\subsection Implementation
+\subsection sec_implementation_dyn_sys_1 Implementation
 <em>
 The attractor state and time constant of a dynamical system are usually passed to the constructor. They can be changed afterwards with with DynamicalSystem::set_attractor_state and DynamicalSystem::set_tau. Before integration starts, the initial state can be set with  DynamicalSystem::set_initial_state. This influences the output of DynamicalSystem::integrateStart, but not DynamicalSystem::integrateStep.
 
@@ -609,7 +609,7 @@ For implementation purposes, it is more convenient to work only with 1st order s
 
 With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state:
 
-\subsection Implementation
+\subsection sec_implementation_dyn_sys_2 Implementation
 <em>
 The constructor DynamicalSystem::DynamicalSystem immediately converts second order systems into first order systems with an expanded state.
 

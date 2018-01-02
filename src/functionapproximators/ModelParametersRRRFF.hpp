@@ -68,6 +68,11 @@ public:
    */
   const Eigen::VectorXd& weights(void) const { return weights_; }  
 
+  
+  /** Get the values of the cosine basis functions for given inputs
+   * \param[in] inputs The input data (size: n_samples X n_dims)
+   * \param[out] cosine_activations The cosine values, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
+   */
   void cosineActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& cosine_activations) const;
   
 protected:

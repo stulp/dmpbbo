@@ -103,6 +103,10 @@ public:
   {
     return all_values_vector_size_;
   }
+  
+  /** Get the number of basis functions in this model.
+   * \return The number of basis functions.
+   */
   inline unsigned int getNumberOfBasisFunctions() const
   {
     return centers_.rows();

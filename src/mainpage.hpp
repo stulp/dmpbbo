@@ -75,8 +75,6 @@ See \ref page_serialization
 
 \section Documentation
 
-\li Fix license files so that Github recognizes it: https://github.com/stulp/dmpbbo/issues/18
-
 \li Add licence to .py files
 
 \li document Python classes/functions

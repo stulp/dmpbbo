@@ -73,6 +73,7 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
    Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
      std::vector<FunctionApproximator*> function_approximators,
@@ -89,6 +90,7 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
    Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
      double alpha_spring_damper, DynamicalSystem* goal_system,
@@ -102,6 +104,7 @@ public:
    *  \param y_attr    Attractor state
    *  \param function_approximators Function approximators for the forcing term
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
     std::vector<FunctionApproximator*> function_approximators, 
@@ -115,6 +118,7 @@ public:
    *  \param n_dims_dmp      Dimensionality of the DMP
    *  \param function_approximators Function approximators for the forcing term
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
+   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
    */
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
     DmpType dmp_type=KULVICIUS_2012_JOINING, ForcingTermScaling scaling=NO_SCALING);      
@@ -536,7 +540,7 @@ So far, the graphs have shown 1-dimensional systems. To generate D-dimensional t
 
 <em>
 
-\subsection Implementation
+\subsection sec_implementation_dmp Implementation
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).
 
