@@ -30,6 +30,27 @@ class Updater:
         raise NotImplementedError('subclasses must override updateDistribution()!')
 
 
+class UpdaterMean(Updater):
+            
+    def __init__(self,eliteness = 10, weighting_method = 'PI-BB'):
+        self.eliteness = eliteness
+        self.weighting_method = weighting_method
+
+    def updateDistribution(self,distribution, samples, costs):
+    
+        weights = costsToWeights(costs,self.weighting_method,self.eliteness);
+    
+        # Compute new mean with reward-weighed averaging
+        # mean    = 1 x n_dims
+        # weights = 1 x n_samples
+        # samples = n_samples x n_dims
+        mean_new = np.average(samples,0,weights)
+      
+        # Update the covariance matrix
+        distribution_new = DistributionGaussian(mean_new, distribution.covar)
+    
+        return distribution_new, weights
+        
 class UpdaterCovarDecay(Updater):
             
     def __init__(self,eliteness = 10, weighting_method = 'PI-BB', covar_decay_factor = 0.8):
@@ -54,12 +75,69 @@ class UpdaterCovarDecay(Updater):
     
         return distribution_new, weights
 
+class UpdaterCovarAdaptation(Updater):
+            
+    def __init__(self,eliteness = 10, weighting_method = 'PI-BB',base_level_diagonal=None,diag_only=False,learning_rate=1.0):
+        self.eliteness = eliteness
+        self.weighting_method = weighting_method
+        self.base_level_diagonal = base_level_diagonal
+        self.diag_only = diag_only
+        if (learning_rate>1.0):
+            learning_rate=1.0
+        elif (learning_rate<0.0):
+            learning_rate=0.0
+        self.learning_rate = learning_rate
+
+    def updateDistribution(self,distribution, samples, costs):
+        
+        mean_cur = distribution.mean
+        covar_cur = distribution.covar
+        n_samples = samples.shape[0]
+        n_dims = samples.shape[1]
+    
+        weights = costsToWeights(costs,self.weighting_method,self.eliteness);
+    
+        # Compute new mean with reward-weighed averaging
+        # mean    = 1 x n_dims
+        # weights = 1 x n_samples
+        # samples = n_samples x n_dims
+        mean_new = np.average(samples,0,weights)
+        
+        #np.set_printoptions(precision=4, suppress=True)
+        eps = samples - np.tile(mean_cur,(n_samples,1))
+        weights_tiled = np.tile(np.asarray([weights]).transpose(),(1,n_dims))
+        weighted_eps = np.multiply(weights_tiled,eps)
+        covar_new = np.dot(weighted_eps.transpose(),eps)
+    
+        # Remove non-diagonal values
+        if (self.diag_only):
+            diag_vec = np.diag(covar_new)
+            covar_new = np.diag(diag_vec)
+        
+        # Low-pass filter for covariance matrix, i.e. weight between current
+        # and new covariance matrix.
+        
+        if (self.learning_rate<1.0):
+            lr = self.learning_rate # For legibility
+            covar_new = (1-lr)*covar_cur + lr*covar_new;
+            
+        # Add a base_level to avoid pre-mature convergence
+        if (self.base_level_diagonal is not None):
+            for ii in range(n_dims):
+                if covar_new[ii,ii]<self.base_level_diagonal[ii]:
+                    covar_new[ii,ii]=self.base_level_diagonal[ii]
+
+        # Update the covariance matrix
+        distribution_new = DistributionGaussian(mean_new, covar_new)
+    
+        return distribution_new, weights
+
 def costsToWeights(costs, weighting_method, eliteness):
     
     # Costs can be a 2D array or a list of lists. In this case, the first
     # column is the sum of the other columns (which contain the different cost
     # components). In this  case, we should use only the first column.
-    costs = [np.atleast_1d(x)[0] for x in costs]
+    costs = np.asarray([np.atleast_1d(x)[0] for x in costs])
 
     if weighting_method == 'PI-BB':
         # PI^2 style weighting: continuous, cost exponention
@@ -68,9 +146,9 @@ def costsToWeights(costs, weighting_method, eliteness):
         if costs_range==0:
             weights = np.full(costs.shape,1.0)
         else:
-            costs_norm = [-h*(x-min(costs))/costs_range for x in costs]
+            costs_norm = np.asarray([-h*(x-min(costs))/costs_range for x in costs])
             weights = np.exp(costs_norm)
-            
+
     else:
         print("WARNING: Unknown weighting method '", weighting_method, "'. Calling with PI-BB weighting."); 
         return costsToWeights(costs, 'PI-BB', eliteness);
@@ -88,5 +166,5 @@ def costsToWeights(costs, weighting_method, eliteness):
 
     # Normalize weights
     weights = weights/sum(weights)
-
+    
     return weights
