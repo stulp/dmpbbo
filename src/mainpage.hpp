@@ -69,8 +69,6 @@ See \ref page_serialization
 
 \section Documentation
 
-\li Add licence to .py files
-
 \li document Python classes/functions
 
 \li Fix warnings in "make Docs" (currently 2)
