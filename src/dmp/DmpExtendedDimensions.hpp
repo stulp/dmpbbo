@@ -45,86 +45,15 @@ class Trajectory;
  * \brief Implementation of Dynamical Movement Primitives with extended dimensions
  * \ingroup DmpExtendedDimensionss
  */
-class DmpExtendedDimensions : public DynamicalSystem
+class DmpExtendedDimensions : public Dmp
 {
 public:
   
-  /**
-   *  Initialization constructor.
-   *  \param tau             Time constant
-   *  \param y_init          Initial state
-   *  \param y_attr          Attractor state
-   *  \param function_approximators Function approximators for the forcing term
-   *  \param alpha_spring_damper \f$\alpha\f$ in the spring-damper system of the dmp
-   *  \param goal_system     Dynamical system to compute delayed goal
-   *  \param phase_system    Dynamical system to compute the phase
-   *  \param gating_system   Dynamical system to compute the gating term
-   *  \param function_approximators_extended Function approximators for the extended dimensions
-   */
-   DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
-     std::vector<FunctionApproximator*> function_approximators,
-     double alpha_spring_damper, DynamicalSystem* goal_system,
-     DynamicalSystem* phase_system, DynamicalSystem* gating_system, 
-     std::vector<FunctionApproximator*> function_approximators_extended,
-     Dmp::ForcingTermScaling scaling=Dmp::NO_SCALING);
-  
-  /**
-   *  Initialization constructor for DmpExtendedDimensionss of known dimensionality, but with unknown initial and
-   *  attractor states.
-   *  \param n_dims_dmp      Dimensionality of the DMP
-   *  \param function_approximators Function approximators for the forcing term
-   *  \param alpha_spring_damper \f$\alpha\f$ in the spring-damper system of the dmp
-   *  \param goal_system     Dynamical system to compute delayed goal
-   *  \param phase_system    Dynamical system to compute the phase
-   *  \param gating_system   Dynamical system to compute the gating term
-   *  \param function_approximators_extended Function approximators for the extended dimensions
-   */
-   DmpExtendedDimensions(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
-     double alpha_spring_damper, DynamicalSystem* goal_system,
-     DynamicalSystem* phase_system, DynamicalSystem* gating_system,
-     std::vector<FunctionApproximator*> function_approximators_extended,
-     Dmp::ForcingTermScaling scaling=Dmp::NO_SCALING);
-    
-  /**
-   *  Constructor that initializes the DMP with default dynamical systems.
-   *  \param tau       Time constant
-   *  \param y_init    Initial state
-   *  \param y_attr    Attractor state
-   *  \param function_approximators Function approximators for the forcing term
-   *  \param function_approximators_extended Function approximators for the extended dimensions
-   *  \param dmp_type  The type of DMP, see DmpExtendedDimensions::DmpType    
-   */
-  DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
-    std::vector<FunctionApproximator*> function_approximators, 
-    std::vector<FunctionApproximator*> function_approximators_extended,
-    Dmp::DmpType dmp_type=Dmp::KULVICIUS_2012_JOINING,
-    Dmp::ForcingTermScaling scaling=Dmp::NO_SCALING);
-
-  
-  /**
-   *  Initialization constructor for DmpExtendedDimensionss of known dimensionality, but with unknown initial and
-   *  attractor states. Initializes the DMP with default dynamical systems.
-   *  \param n_dims_dmp      Dimensionality of the DMP
-   *  \param function_approximators Function approximators for the forcing term
-   *  \param function_approximators_extended Function approximators for the extended dimensions
-   *  \param dmp_type  The type of DMP, see DmpExtendedDimensions::DmpType    
-   */
-  DmpExtendedDimensions(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
-    std::vector<FunctionApproximator*> function_approximators_extended,
-    Dmp::DmpType dmp_type=Dmp::KULVICIUS_2012_JOINING, 
-    Dmp::ForcingTermScaling scaling=Dmp::NO_SCALING);      
+ DmpExtendedDimensions(
+   Dmp* dmp,
+   std::vector<FunctionApproximator*> function_approximators_extended
+   );
    
-  /**
-   *  Initialization constructor for DmpExtendedDimensionss without a forcing term.
-   *  \param tau             Time constant
-   *  \param y_init          Initial state
-   *  \param y_attr          Attractor state
-   *  \param alpha_spring_damper \f$\alpha\f$ in the spring-damper system of the dmp
-   *  \param goal_system     Dynamical system to compute delayed goal
-   *  \param function_approximators_extended Function approximators for the extended dimensions
-   */
-  DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system,
-  std::vector<FunctionApproximator*> function_approximators_extended);
   
   /** Destructor. */
   ~DmpExtendedDimensions(void);
@@ -242,7 +171,7 @@ private:
   /** The function approximators, one for each extended dimension. */
   std::vector<FunctionApproximator*> function_approximators_ext_dims_;
   
-  void initFunctionApproximators(std::vector<FunctionApproximator*> function_approximators);
+  void initFunctionApproximatorsExtDims(std::vector<FunctionApproximator*> function_approximators);
   
   
 protected:

@@ -51,153 +51,128 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::DmpExtendedDimensions);
 
 using namespace std;
 using namespace Eigen;
-using namespace Dmp;
 
-Here's how to do it
+/** Extracts the phase variable (1-D) from a state vector, e.g. state.PHASE */ 
+#define PHASE     segment(3*dim_orig()+0,       1)
+/** Extracts first T (time steps) states of the phase system, e.g. states.PHASEM(100) */ 
+#define PHASEM(T)     block(0,3*dim_orig()+0,T,       1)
 
-Implement: extra states with an attractor. 
-
-Option 1: Part of DMP. 
-  Advantage: better integration
-  Downside: code becomes larges, no separation of basic/advanced code.
+//Implement: extra states with an attractor. 
+//
+//Option 1: Part of DMP. 
+//  Advantage: better integration
+//  Downside: code becomes larges, no separation of basic/advanced code.
+//  
+//Option 2: Subclass of DMP
+//  Advantage: Advanced feature separated
+//  Downside: ??
   
-Option 2: Subclass of DMP
-  Advantage: Advanced feature separated
-  Downside: ??
-  
-DMPExtendedState
-
-DMPExtended(.....,fas)
-  DMP(....)
-  {
-    local_fas = fas
-  }
-
-train(xs,targets,xs_extra)
-
-differentialEquation(xs,xds,xs_extra)
-  Dmp::differentialEquation(xs,xds)
-  for fa in fas
-    xs_extra.row() = fa.predict(xs[0])
-  
-
-    
-    
 namespace DmpBbo {
 
-DmpExtendedDimensions::DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
-         std::vector<FunctionApproximator*> function_approximators,
-         double alpha_spring_damper, 
-         DynamicalSystem* goal_system,
-         DynamicalSystem* phase_system, 
-         DynamicalSystem* gating_system,     
-         ForcingTermScaling scaling)
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"),
-  goal_system_(goal_system),
-  phase_system_(phase_system), gating_system_(gating_system), 
-  forcing_term_scaling_(scaling)
+//train(xs,targets,xs_extra)
+//
+//differentialEquation(xs,xds,xs_extra)
+//  Dmp::differentialEquation(xs,xds)
+//  for fa in fas
+//    xs_extra.row() = fa.predict(xs[0])
+//  
+
+DmpExtendedDimensions::DmpExtendedDimensions(
+  Dmp* dmp,
+  std::vector<FunctionApproximator*> function_approximators_ext_dims
+) : Dmp(*dmp) 
 {
-  initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
-  initFunctionApproximators(function_approximators);
+  initFunctionApproximatorsExtDims(function_approximators_ext_dims);
+}
+  
+    
+    
+/*
+DmpExtendedDimensions::DmpExtendedDimensions(
+  double tau, 
+  Eigen::VectorXd y_init, 
+  Eigen::VectorXd y_attr, 
+  std::vector<FunctionApproximator*> function_approximators,
+  double alpha_spring_damper, 
+  DynamicalSystem* goal_system,
+  DynamicalSystem* phase_system, 
+  DynamicalSystem* gating_system,     
+  std::vector<FunctionApproximator*> function_approximators_ext_dims,
+  ForcingTermScaling scaling)
+  : Dmp( tau, y_init, y_attr,function_approximators,alpha_spring_damper,goal_system,phase_system,gating_system,scaling) 
+{
+  initFunctionApproximatorsExtDims(function_approximators_ext_dims);
 }
 
   
 DmpExtendedDimensions::DmpExtendedDimensions(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
    double alpha_spring_damper, DynamicalSystem* goal_system,
    DynamicalSystem* phase_system, DynamicalSystem* gating_system,     
+   std::vector<FunctionApproximator*> function_approximators_ext_dims,
    ForcingTermScaling scaling)
-  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
-  goal_system_(goal_system),
-  phase_system_(phase_system), gating_system_(gating_system), function_approximators_(function_approximators),
-  forcing_term_scaling_(scaling)
+  : Dmp(n_dims_dmp,function_approximators,alpha_spring_damper,goal_system,phase_system,gating_system,scaling) 
 {
-  initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
-  initFunctionApproximators(function_approximators);
+  initFunctionApproximatorsExtDims(function_approximators_ext_dims);
 }
     
 DmpExtendedDimensions::DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
          std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type,     
+         std::vector<FunctionApproximator*> function_approximators_ext_dims,
          ForcingTermScaling scaling)
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"),
+  : Dmp(tau, y_init, y_attr,function_approximators,dmp_type,scaling),
     forcing_term_scaling_(scaling)
 {  
-  initSubSystems(dmp_type);
-  initFunctionApproximators(function_approximators);
+  initFunctionApproximatorsExtDims(function_approximators_ext_dims);
 }
   
 DmpExtendedDimensions::DmpExtendedDimensions(int n_dims_dmp, 
          std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type, ForcingTermScaling scaling)
-  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
-    forcing_term_scaling_(scaling)
+  : Dmp(n_dims_dmp, function_approximators, dmp_type,scaling)
 {
-  initSubSystems(dmp_type);
-  initFunctionApproximators(function_approximators);
+  initFunctionApproximatorsExtDims(function_approximators_ext_dims);
 }
 
-DmpExtendedDimensions::DmpExtendedDimensions(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"), forcing_term_scaling_(NO_SCALING)
+*/
+
+void DmpExtendedDimensions::initFunctionApproximatorsExtDims(vector<FunctionApproximator*> function_approximators_ext_dims)
 {
-  
-  VectorXd one_1 = VectorXd::Ones(1);
-  VectorXd one_0 = VectorXd::Zero(1);
-  DynamicalSystem* phase_system  = new ExponentialSystem(tau,one_1,one_0,4);
-  DynamicalSystem* gating_system = new ExponentialSystem(tau,one_1,one_0,4); 
-  initSubSystems(alpha_spring_damper, goal_system, phase_system, gating_system);
-
-  vector<FunctionApproximator*> function_approximators(y_init.size());    
-  for (int dd=0; dd<y_init.size(); dd++)
-    function_approximators[dd] = NULL;
-  initFunctionApproximators(function_approximators);  
-}
-
-
-
-void DmpExtendedDimensions::initFunctionApproximators(vector<FunctionApproximator*> function_approximators_ext_dim)
-{
-  if (function_approximators.empty())
+  if (function_approximators_ext_dims.empty())
     return;
   
   // Doesn't necessarily have to be the same
   //assert(dim_orig()==(int)function_approximators_exdim.size());
   
-  function_approximators_ = vector<FunctionApproximator*>(function_approximators_ext_dim.size());
-  for (unsigned int dd=0; dd<function_approximators_ext_dim.size(); dd++)
+  function_approximators_ext_dims_ = vector<FunctionApproximator*>(function_approximators_ext_dims.size());
+  for (unsigned int dd=0; dd<function_approximators_ext_dims.size(); dd++)
   {
-    if (function_approximators_ext_dim[dd]==NULL)
-      function_approximators_ext_dim_[dd] = NULL;
+    if (function_approximators_ext_dims[dd]==NULL)
+      function_approximators_ext_dims_[dd] = NULL;
     else
-      function_approximators_ext_dim_[dd] = function_approximators_ext_dim[dd]->clone();
+      function_approximators_ext_dims_[dd] = function_approximators_ext_dims[dd]->clone();
   }
 
 }
 
-DmpExtendedDimensions::~Dmp(void)
+DmpExtendedDimensions::~DmpExtendedDimensions(void)
 {
-  delete goal_system_;   
-  delete spring_system_;
-  delete phase_system_;
-  delete gating_system_;
-  for (unsigned int ff=0; ff<function_approximators_ext_dim_.size(); ff++)
-    delete (function_approximators_ext_dim_[ff]);
+  for (unsigned int ff=0; ff<function_approximators_ext_dims_.size(); ff++)
+    delete (function_approximators_ext_dims_[ff]);
 }
 
-Dmp* DmpExtendedDimensions::clone(void) const {
-  vector<FunctionApproximator*> function_approximators_ext_dim;
-  for (unsigned int ff=0; ff<function_approximators_ext_dim_.size(); ff++)
-    function_approximators_ext_dim.push_back(function_approximators_ext_dim_[ff]->clone());
+DmpExtendedDimensions* DmpExtendedDimensions::clone(void) const {
   
-  return new DmpExtendedDimensions(tau(), initial_state(), attractor_state(), function_approximators,
-   spring_system_->damping_coefficient(), goal_system_->clone(),
-   phase_system_->clone(), gating_system_->clone(), function_approximators_ext_dim);
+  vector<FunctionApproximator*> function_approximators_ext_dims;
+  for (unsigned int ff=0; ff<function_approximators_ext_dims_.size(); ff++)
+    function_approximators_ext_dims.push_back(function_approximators_ext_dims_[ff]->clone());
+  
+  return new DmpExtendedDimensions(Dmp::clone(), function_approximators_ext_dims);
 }
 
 
 void DmpExtendedDimensions::computeFunctionApproximatorOutputExtendedDimensions(const Ref<const MatrixXd>& phase_state, MatrixXd& fa_output) const
 {
-  /* 
-  yyy
   int T = phase_state.rows();
   fa_output.resize(T,dim_orig());
   fa_output.fill(0.0);
@@ -208,24 +183,23 @@ void DmpExtendedDimensions::computeFunctionApproximatorOutputExtendedDimensions(
   
   for (int i_dim=0; i_dim<dim_orig(); i_dim++)
   {
-    if (function_approximators_[i_dim]!=NULL)
+    if (function_approximators_ext_dims_[i_dim]!=NULL)
     {
-      if (function_approximators_[i_dim]->isTrained()) 
+      if (function_approximators_ext_dims_[i_dim]->isTrained()) 
       {
         if (T==1)
         {
-          function_approximators_ext_dim_[i_dim]->predict(phase_state,fa_outputs_one_prealloc_);
+          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_outputs_one_prealloc_);
           fa_output.col(i_dim) = fa_outputs_one_prealloc_;
         }
         else
         {
-          function_approximators_ext_dim_[i_dim]->predict(phase_state,fa_outputs_prealloc_);
+          function_approximators_ext_dims_[i_dim]->predict(phase_state,fa_outputs_prealloc_);
           fa_output.col(i_dim) = fa_outputs_prealloc_;
         }
       }
     }
   }
-    */
 }
 
 void DmpExtendedDimensions::differentialEquation(
@@ -236,8 +210,11 @@ void DmpExtendedDimensions::differentialEquation(
   ENTERING_REAL_TIME_CRITICAL_CODE
   Dmp::differentialEquation(x,xd);
   
-  computeFunctionApproximatorOutputExtendedDimensions(x.PHASE, extended_dimensions); 
-
+  MatrixXd phase = x.PHASE;
+  MatrixXd extended_dimensions_prealloc(phase.rows(),function_approximators_ext_dims_.size());
+  computeFunctionApproximatorOutputExtendedDimensions(phase, extended_dimensions_prealloc); 
+  extended_dimensions = extended_dimensions_prealloc;
+  
   EXITING_REAL_TIME_CRITICAL_CODE
 
 }
@@ -247,15 +224,16 @@ void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Eigen:
 {
   Eigen::MatrixXd forcing_terms, fa_output;
   analyticalSolution(ts, xs, xds, forcing_terms, fa_output);
+  
   computeFunctionApproximatorOutputExtendedDimensions(xs.PHASE, fa_extended_output); 
   // get phase from xs
   // compute output of fa_extended_output
 }
 
-void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Trajectory& trajectory) const;
+void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Trajectory& trajectory) const
 {
   Eigen::MatrixXd xs,  xds;
-  analyticalSolution(ts, xs, xds);
+  Dmp::analyticalSolution(ts, xs, xds);
   statesAsTrajectory(ts, xs, xds, trajectory);
 
   // add output fa_extended_output as misc variables
@@ -269,59 +247,69 @@ void DmpExtendedDimensions::train(const Trajectory& trajectory)
 
 void DmpExtendedDimensions::train(const Trajectory& trajectory, std::string save_directory, bool overwrite)
 {
+  // First, train the DMP
   Dmp::train(trajectory,save_directory,overwrite);
-
-  // Get phase from trajectory
-  // Get targets from trajectory
-  // Train each fa_ext_dim, see below
-  // Save results
-
-  /*
-  // Some checks before training function approximators
-  assert(!function_approximators_.empty());
   
-  for (unsigned int dd=0; dd<function_approximators_.size(); dd++)
+  // Get phase from trajectory
+  // Integrate analytically to get phase states
+  MatrixXd xs_ana;
+  MatrixXd xds_ana;
+  Dmp::analyticalSolution(trajectory.ts(),xs_ana,xds_ana);
+  MatrixXd xs_phase  = xs_ana.PHASEM(trajectory.length());
+
+
+  // Get targets from trajectory
+  MatrixXd targets = trajectory.misc();
+  
+  // The dimensionality of the extra variables in the trajectory must be the same as the number of
+  // function approximators.
+  assert(targets.cols()==(int)function_approximators_ext_dims_.size());
+  
+  // Train each fa_ext_dim, see below
+  // Some checks before training function approximators
+  assert(!function_approximators_ext_dims_.empty());
+  
+  for (unsigned int dd=0; dd<function_approximators_ext_dims_.size(); dd++)
   {
     // This is just boring stuff to figure out if and where to store the results of training
     string save_directory_dim;
     if (!save_directory.empty())
     {
-      if (function_approximators_.size()==1)
+      if (function_approximators_ext_dims_.size()==1)
         save_directory_dim = save_directory;
       else
-        save_directory_dim = save_directory + "/dim" + to_string(dd);
+        save_directory_dim = save_directory + "/ext_dim" + to_string(dd);
     }
     
     // Actual training is happening here.
-    VectorXd fa_target = f_target.col(dd);
-    if (function_approximators_[dd]==NULL)
+    VectorXd cur_target = targets.col(dd);
+    if (function_approximators_ext_dims_[dd]==NULL)
     {
       cerr << __FILE__ << ":" << __LINE__ << ":";
       cerr << "WARNING: function approximator cannot be trained because it is NULL." << endl;
     }
     else
     {
-      if (function_approximators_[dd]->isTrained())
-        function_approximators_[dd]->reTrain(fa_input_phase,fa_target,save_directory_dim,overwrite);
+      if (function_approximators_ext_dims_[dd]->isTrained())
+        function_approximators_ext_dims_[dd]->reTrain(xs_phase,cur_target,save_directory_dim,overwrite);
       else
-        function_approximators_[dd]->train(fa_input_phase,fa_target,save_directory_dim,overwrite);
+        function_approximators_ext_dims_[dd]->train(xs_phase,cur_target,save_directory_dim,overwrite);
     }
 
   }
-  */
 }
 
 /*
 void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_values_labels) const {
-  assert(function_approximators_.size()>0);
+  assert(function_approximators_ext_dims_.size()>0);
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    if (function_approximators_[dd]!=NULL)
+    if (function_approximators_ext_dims_[dd]!=NULL)
     {
-      if (function_approximators_[dd]->isTrained())
+      if (function_approximators_ext_dims_[dd]->isTrained())
       {
         set<string> cur_labels;
-        function_approximators_[dd]->getSelectableParameters(cur_labels);
+        function_approximators_ext_dims_[dd]->getSelectableParameters(cur_labels);
         selectable_values_labels.insert(cur_labels.begin(), cur_labels.end());
       }
     }
@@ -337,11 +325,11 @@ void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_valu
 
 void DmpExtendedDimensions::setSelectedParameters(const set<string>& selected_values_labels)
 {
-  assert(function_approximators_.size()>0);
+  assert(function_approximators_ext_dims_.size()>0);
   for (int dd=0; dd<dim_orig(); dd++)
-    if (function_approximators_[dd]!=NULL)
-      if (function_approximators_[dd]->isTrained())
-        function_approximators_[dd]->setSelectedParameters(selected_values_labels);
+    if (function_approximators_ext_dims_[dd]!=NULL)
+      if (function_approximators_ext_dims_[dd]->isTrained())
+        function_approximators_ext_dims_[dd]->setSelectedParameters(selected_values_labels);
 
   // Call superclass for initializations
   Parameterizable::setSelectedParameters(selected_values_labels);
@@ -349,9 +337,9 @@ void DmpExtendedDimensions::setSelectedParameters(const set<string>& selected_va
   VectorXi lengths_per_dimension = VectorXi::Zero(dim_orig());
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    if (function_approximators_[dd]!=NULL)
-      if (function_approximators_[dd]->isTrained())
-        lengths_per_dimension[dd] = function_approximators_[dd]->getParameterVectorSelectedSize();
+    if (function_approximators_ext_dims_[dd]!=NULL)
+      if (function_approximators_ext_dims_[dd]->isTrained())
+        lengths_per_dimension[dd] = function_approximators_ext_dims_[dd]->getParameterVectorSelectedSize();
     
     if (selected_values_labels.find("goal")!=selected_values_labels.end())
       lengths_per_dimension[dd]++;
@@ -363,11 +351,11 @@ void DmpExtendedDimensions::setSelectedParameters(const set<string>& selected_va
 
 void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
 {
-  assert(function_approximators_.size()>0);
+  assert(function_approximators_ext_dims_.size()>0);
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    assert(function_approximators_[dd]!=NULL);
-    assert(function_approximators_[dd]->isTrained());
+    assert(function_approximators_ext_dims_[dd]!=NULL);
+    assert(function_approximators_ext_dims_[dd]->isTrained());
   }
 
   selected_mask.resize(getParameterVectorAllSize());
@@ -378,7 +366,7 @@ void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> s
   VectorXi cur_mask;
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    function_approximators_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
+    function_approximators_ext_dims_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
 
     // This makes sure that the indices for each function approximator are different    
     int mask_offset = selected_mask.maxCoeff(); 
@@ -408,8 +396,8 @@ void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> s
 int DmpExtendedDimensions::getParameterVectorAllSize(void) const
 {
   int total_size = 0;
-  for (unsigned int dd=0; dd<function_approximators_.size(); dd++)
-    total_size += function_approximators_[dd]->getParameterVectorAllSize();
+  for (unsigned int dd=0; dd<function_approximators_ext_dims_.size(); dd++)
+    total_size += function_approximators_ext_dims_[dd]->getParameterVectorAllSize();
   
   // For the goal
   total_size += dim_orig();
@@ -425,7 +413,7 @@ void DmpExtendedDimensions::getParameterVectorAll(VectorXd& values) const
   VectorXd attractor = attractor_state();
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    function_approximators_[dd]->getParameterVectorAll(cur_values);
+    function_approximators_ext_dims_[dd]->getParameterVectorAll(cur_values);
     values.segment(offset,cur_values.size()) = cur_values;
     offset += cur_values.size();
 
@@ -442,9 +430,9 @@ void DmpExtendedDimensions::setParameterVectorAll(const VectorXd& values)
   VectorXd attractor(dim_orig());
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    int n_parameters_required = function_approximators_[dd]->getParameterVectorAllSize();
+    int n_parameters_required = function_approximators_ext_dims_[dd]->getParameterVectorAllSize();
     cur_values = values.segment(offset,n_parameters_required);
-    function_approximators_[dd]->setParameterVectorAll(cur_values);
+    function_approximators_ext_dims_[dd]->setParameterVectorAll(cur_values);
     offset += n_parameters_required;
     
     attractor(dd) = values(offset);
@@ -463,7 +451,7 @@ void DmpExtendedDimensions::serialize(Archive & ar, const unsigned int version)
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Dmp);
   
-  ar & BOOST_SERIALIZATION_NVP(function_approximators_ext_dim_);
+  ar & BOOST_SERIALIZATION_NVP(function_approximators_ext_dims_);
 }
 
 }
