@@ -29,7 +29,7 @@ if (not os.path.isfile(executable)):
 main_directory = "/tmp/demoDmpContextualGoal"
 
 # Test both 1-step and 2-step Dmps
-for n_dmp_contextual_step in [1, 2]:
+for n_dmp_contextual_step in [2]:
     print("_______________________________________________________________")
     print("Demo for "+str(n_dmp_contextual_step)+"-step contextual Dmp")
     

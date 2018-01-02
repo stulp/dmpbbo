@@ -67,12 +67,6 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-\section Fixes 
-
-\li Why does it compile in Debug mode, but not in optimized mode?
-
-\li test DmpContextualOneStep
-
 \section Documentation
 
 \li Add licence to .py files

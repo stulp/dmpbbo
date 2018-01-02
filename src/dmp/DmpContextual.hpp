@@ -102,8 +102,8 @@ public:
   void set_policy_parameter_function_duration(FunctionApproximator* function_approximator);
   
   // Overrides Dmp::computeFunctionApproximatorOutput
-  virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const = 0;
-  
+  virtual void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const = 0;
 
 protected:
   // TODO: Document. Trains goal and duration first, then calls training for rest. 
