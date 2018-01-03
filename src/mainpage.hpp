@@ -67,55 +67,37 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-
-\section Paper
-
-\li Python/C++ what to use for what?
-\li functionapproximator: Parameterizable
-\li functionapproximator: Unified Model
-\li functionapproximator: Model/Meta/Algorithm
-\li functionapproximator: Regularized Least Squares FunctionApproximatorRLS
-\li dynamicalsystems: differentialEquation vs analyticalSolution
-\li dmp: is a dynamical system (no analyticalSolution)
-\li dmp: is Parameterizable.
-\li dmp: DmpContextual
-\li bbo: Has nothing to do with DMPs. "Minimal CMA-ES"
-\li dmp_bbo: task and task solver
-
-\section Fixes 
-
-\li test DmpContextualOneStep
-\li The I in IRFRLS is not correct
-
 \section Documentation
-
-\li Add licence to .py files
 
 \li document Python classes/functions
 
-\li Fix warnings in "make Docs"
+\li Fix warnings in "make Docs" (currently 2)
+
+\li Gennaro: document FunctionApproximatorGMR::trainIncremental
+
+\li Gennaro: document FunctionApproximatorGMR::normalPDFDamped
 
 \section Features
 
-\li Add FunctionapproximatorRLS
+\li Implement CMA-ES and CEM weighting schemes in C++
 
-\li Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
+\li DmpExtendedDimensions (started it, has separate branch)
 
-\li Regularization in functionapproximator
 
-\li Regularization of optimization in Python, but in C++ too?
+\section after Features (after paper)
 
-\li implement generic regularization in Task
-
-\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
+\li L2 Regularization in all functionapproximators (copy from RRRFF)
+<ul>
+<li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
+<li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
+</ul>
 
 \li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
 
 \li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
 
-\li DmpExtendedDimensions (started it, has separate branch)
 
-\section Restructuring
+\section sec_restructuring Restructuring (after paper)
 
 \li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
 
@@ -127,6 +109,8 @@ http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I
 \li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
 \li setColor on ellipses?
+
+
 
  */ 
 

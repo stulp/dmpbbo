@@ -54,7 +54,8 @@ public:
     DmpType dmp_type=KULVICIUS_2012_JOINING);
     
   // Overrides DmpContextual::computeFunctionApproximatorOutput
-  void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const;
+  void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const;
 
   // Overloads Dmp::train
   void  train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory="", bool overwrite=false);

@@ -44,14 +44,14 @@ public:
   /** Constructor for the algorithmic meta-parameters of the GPR function approximator.
    * \param[in] expected_input_dim Expected input dimensionality. Useful for debugging.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
-   *  \param[in] sigma    Standard deviation in the isotropic covariance function, i.e.  \$f e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\$f, with \$f \mathbf{W} = \sigma^2 * \mathbf{I} \$f
+   *  \param[in] sigma    Standard deviation in the isotropic covariance function, i.e.  \f$ e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\f$, with \f$ \mathbf{W} = \sigma^2 * \mathbf{I} \f$
    */
   MetaParametersGPR(int expected_input_dim, double maximum_covariance, double sigma);
   
   /** Constructor for the algorithmic meta-parameters of the GPR function approximator.
    * \param[in] expected_input_dim Expected input dimensionality. Useful for debugging.
    *  \param[in] maximum_covariance The maximum allowable covariance of the covar function (aka sigma)
-   *  \param[in] sigmas    Standard deviation in the isotropic covariance function, i.e.  \$f e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\$f, with \$f \mathbf{W} = sigmas.asDiagonal()\$f
+   *  \param[in] sigmas    Standard deviation in the isotropic covariance function, i.e.  \f$ e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\f$, with \f$ \mathbf{W} = sigmas.asDiagonal()\f$
    */
   MetaParametersGPR(int expected_input_dim, double maximum_covariance, const Eigen::VectorXd& sigmas);
 		 

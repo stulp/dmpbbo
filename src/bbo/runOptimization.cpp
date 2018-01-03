@@ -43,7 +43,7 @@ using namespace Eigen;
 namespace DmpBbo {
 
 bool saveToDirectory(
-  string directory, 
+  std::string directory, 
   int i_update, 
   const DistributionGaussian& distribution, 
   const Eigen::VectorXd& cost_eval, 

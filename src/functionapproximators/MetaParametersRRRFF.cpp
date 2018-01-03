@@ -1,6 +1,6 @@
 /**
- * @file   MetaParametersIRFRLS.cpp
- * @brief  MetaParametersIRFRLS class source file.
+ * @file   MetaParametersRRRFF.cpp
+ * @brief  MetaParametersRRRFF class source file.
  * @author Freek Stulp, Thibaut Munzer
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -26,10 +26,10 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/MetaParametersIRFRLS.hpp"
+#include "functionapproximators/MetaParametersRRRFF.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersIRFRLS);
+BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersRRRFF);
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
@@ -41,7 +41,7 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersIRFRLS::MetaParametersIRFRLS(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma) 
+MetaParametersRRRFF::MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma) 
 	:
     MetaParameters(expected_input_dim),
     number_of_basis_functions_(number_of_basis_functions),
@@ -50,13 +50,13 @@ MetaParametersIRFRLS::MetaParametersIRFRLS(int expected_input_dim, int number_of
 {
 }
 		
-MetaParametersIRFRLS* MetaParametersIRFRLS::clone(void) const 
+MetaParametersRRRFF* MetaParametersRRRFF::clone(void) const 
 {
-  return new MetaParametersIRFRLS(getExpectedInputDim(),number_of_basis_functions_,lambda_,gamma_);
+  return new MetaParametersRRRFF(getExpectedInputDim(),number_of_basis_functions_,lambda_,gamma_);
 }
 
 template<class Archive>
-void MetaParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
+void MetaParametersRRRFF::serialize(Archive & ar, const unsigned int version)
 {
   // serialize base class information
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
@@ -66,9 +66,9 @@ void MetaParametersIRFRLS::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(gamma_);
 }
 
-string MetaParametersIRFRLS::toString(void) const 
+string MetaParametersRRRFF::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersIRFRLS");
+  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersRRRFF");
 }
 
 }

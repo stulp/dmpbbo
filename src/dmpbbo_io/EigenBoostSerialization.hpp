@@ -32,7 +32,10 @@
 #include <boost/serialization/level.hpp>
 
 namespace Eigen {
-/** Convert an Eigen matrix to a string. */
+/** Convert an Eigen matrix to a string. 
+ * \param[in] matrix The matrix to convert to a string.
+ * \return A string representation of the matrix
+ */
 template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 std::string toString(const Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols> & matrix);
 }  // namespace Eigen
@@ -40,7 +43,11 @@ std::string toString(const Eigen::Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRo
 namespace boost { 
 namespace serialization {
   
-/** Serialize an Eigen matrix. */
+/** Serialize an Eigen matrix to an archive.
+ * \param[in,out] ar The archive to serialize to
+ * \param[in] matrix The matrix to serialize
+ * \param[in] file_version The file version
+ */
 template<class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 inline void save(
     Archive & ar, 
@@ -48,7 +55,11 @@ inline void save(
     const unsigned int file_version
 );
 
-/** Deserialize an Eigen matrix. */
+/** Load ("deserialize") an Eigen matrix from an archive.
+ * \param[in,out] ar The archive to serialize from
+ * \param[in,out] matrix The matrix that was read from the archive
+ * \param[in] file_version The file version
+ */
 template<class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 inline void load(
     Archive & ar, 
@@ -56,7 +67,11 @@ inline void load(
     const unsigned int file_version
 );
 
-/** Serialize an Eigen matrix. */
+/** Serialize an Eigen matrix to an archive.
+ * \param[in,out] ar The archive to serialize to
+ * \param[in] t The matrix to serialize
+ * \param[in] file_version The file version
+ */
 template<class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 inline void serialize(
     Archive & ar,

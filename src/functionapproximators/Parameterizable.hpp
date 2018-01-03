@@ -210,18 +210,26 @@ public:
    */
   void setParameterVectorModifier(std::string modifier, bool new_value);
   
-  
-  /**
-   * \todo Document this
+  /** The vector (VectorXd) with parameter values can be split into different parts (as vector<VectorXd>; this function specifices the length of each sub-vector.
+   * 
+   * For instance if the parameter vector is of length 12, getParameterVectorSelected(VectorXd) would return a VectorXd of size 12.
+   * If you would like these 16 values to be split into 4 VectorXd of length 3, you would set 
+   * setVectorLengthsPerDimension([3 3 3 3]).
+   * getParameterVectorSelected(VectorXd) would still return a VectorXd of size 12, but getParameterVectorSelected(std::vector<Eigen::VectorXd>&) would return a std::vector of length 4, with each VectorXd of size 3.
+   *
+   * This is a convenience function to be able to use vector<VectorXd> instead of VectorXd when getting/setting parameter values.
+   *
+   * \param[in] lengths_per_dimension The length of each vector in each dimension.
    */
   void setVectorLengthsPerDimension(const Eigen::VectorXi& lengths_per_dimension)
   {
     assert(lengths_per_dimension.sum()==getParameterVectorSelectedSize());
     lengths_per_dimension_ = lengths_per_dimension;
   }
-  
-  /**
-   * \todo Document this
+
+  /** Get the specified length of each vector in each dimension.
+   * \see setVectorLengthsPerDimension()
+   * \return The length of each vector in each dimension.
    */
   Eigen::VectorXi getVectorLengthsPerDimension(void) const
   {

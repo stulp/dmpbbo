@@ -61,6 +61,9 @@ public:
     return centers_.cols();
   };
   
+  /** Get the number of basis functions in this model.
+   * \return The number of basis functions.
+   */
   inline unsigned int getNumberOfBasisFunctions() const
   {
     return centers_.rows();
@@ -88,7 +91,7 @@ public:
   const Eigen::VectorXd& weights(void) const { return weights_; }  
   
   /** Return the weights of the basis functions.
-   * \return weights of the basis functions.
+   * \param[out] weights of the basis functions.
    */
   inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
 

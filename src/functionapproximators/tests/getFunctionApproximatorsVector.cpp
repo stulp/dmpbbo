@@ -26,8 +26,8 @@
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
-#include "functionapproximators/MetaParametersIRFRLS.hpp"
-#include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
+#include "functionapproximators/MetaParametersRRRFF.hpp"
+#include "functionapproximators/FunctionApproximatorRRRFF.hpp"
 #include "functionapproximators/MetaParametersGPR.hpp"
 #include "functionapproximators/FunctionApproximatorGPR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
@@ -52,7 +52,7 @@ void getFunctionApproximatorsVector(int input_dim, std::vector<FunctionApproxima
   names.push_back("LWR");
   names.push_back("LWPR");
   names.push_back("GMR");
-  names.push_back("IRFRLS");
+  names.push_back("RRRFF");
   names.push_back("RBFN");
   names.push_back("GPR");
 
@@ -105,14 +105,14 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
     return new MetaParametersGMR(input_dim,number_of_gaussians);
   }
   
-  if (name.compare("IRFRLS")==0)
+  if (name.compare("RRRFF")==0)
   {
-    // IRFRLS
+    // RRRFF
     int number_of_basis_functions=18;
     if (input_dim==2) number_of_basis_functions = 100;
     double lambda=0.2;
     double gamma=5;
-    return new MetaParametersIRFRLS(input_dim,number_of_basis_functions,lambda,gamma);
+    return new MetaParametersRRRFF(input_dim,number_of_basis_functions,lambda,gamma);
   }
 
 
@@ -154,8 +154,8 @@ FunctionApproximator* getFunctionApproximatorByName(string name, int input_dim)
     fa = new FunctionApproximatorLWR(dynamic_cast<MetaParametersLWR*>(meta_parameters));
   if (name.compare("GMR")==0)
     fa = new FunctionApproximatorGMR(dynamic_cast<MetaParametersGMR*>(meta_parameters));
-  if (name.compare("IRFRLS")==0)
-    fa = new FunctionApproximatorIRFRLS(dynamic_cast<MetaParametersIRFRLS*>(meta_parameters));
+  if (name.compare("RRRFF")==0)
+    fa = new FunctionApproximatorRRRFF(dynamic_cast<MetaParametersRRRFF*>(meta_parameters));
   if (name.compare("RBFN")==0)
     fa = new FunctionApproximatorRBFN(dynamic_cast<MetaParametersRBFN*>(meta_parameters));
   if (name.compare("GPR")==0)

@@ -550,7 +550,7 @@ FILE_VERSION_FILTER    =
 
 LAYOUT_FILE            =
 
-CITE_BIB_FILES         = dmp.bib
+CITE_BIB_FILES         = ../docs/dmp.bib
 
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages

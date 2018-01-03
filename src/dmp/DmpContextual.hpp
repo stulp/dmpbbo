@@ -102,11 +102,20 @@ public:
   void set_policy_parameter_function_duration(FunctionApproximator* function_approximator);
   
   // Overrides Dmp::computeFunctionApproximatorOutput
-  virtual void computeFunctionApproximatorOutput(const Eigen::MatrixXd& phase_state, Eigen::MatrixXd& fa_output) const = 0;
-  
+  virtual void computeFunctionApproximatorOutput(
+    const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const = 0;
 
 protected:
-  // TODO: Document. Trains goal and duration first, then calls training for rest. 
+  
+  /** Train a contextual DMP.
+   * All other train functions in this class directly or indirectly call this function. 
+   * This function trains the function approximators for the policy parameter function for the goal and tau parameters. 
+   * It then calls the train function in the subclasses (e.g. DmpContextualOneStep::train() or DmpContextualTwoStep::train() to train the forcing term. 
+   * \param[in] trajectories The set of trajectories
+   * \param[in] task_parameters The task parameters for each of the trajectories.
+   * \param[in] save_directory Directory to which to save intermediate results.
+   * \param[in] overwrite Overwrite existing files in the directory above
+   */
   void  trainLocal(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory, bool overwrite);
 
 public:

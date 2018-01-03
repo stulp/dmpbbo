@@ -52,7 +52,7 @@ int main(int n_args, char** args)
   else
   {
     fa_names.push_back("LWR");
-    fa_names.push_back("IRFRLS");
+    fa_names.push_back("RRRFF");
     fa_names.push_back("LWPR");
     fa_names.push_back("GMR");
   }

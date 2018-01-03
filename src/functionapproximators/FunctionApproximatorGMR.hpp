@@ -136,7 +136,7 @@ public:
    *  \param[out] outputs_dot  Predicted derivate values
    * 
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
    * Therefore, this function cannot be const.
    */
   void predictDot(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot);
@@ -148,7 +148,7 @@ public:
    *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
    *
    * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or IRFRLS::predict ).
+   * have not always been implemented as const (Examples: LWPRObject::predict).
    * Therefore, this function cannot be const.
    */
   void predictDot(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances);

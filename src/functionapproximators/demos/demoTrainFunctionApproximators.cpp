@@ -32,13 +32,13 @@
 #include <boost/filesystem.hpp>
 
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
-#include "functionapproximators/FunctionApproximatorIRFRLS.hpp"
+#include "functionapproximators/FunctionApproximatorRRRFF.hpp"
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #include "functionapproximators/FunctionApproximatorGPR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
-#include "functionapproximators/MetaParametersIRFRLS.hpp"
+#include "functionapproximators/MetaParametersRRRFF.hpp"
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
@@ -141,12 +141,12 @@ int main(int n_args, char** args)
   delete meta_parameters_lwr;
 
   
-  // IRFRLS
+  // RRRFF
   int number_of_basis_functions=100;
   double lambda=0.2;
   double gamma=10;
-  MetaParametersIRFRLS* meta_parameters_irfrls = new MetaParametersIRFRLS(n_input_dims,number_of_basis_functions,lambda,gamma);
-  fa = new FunctionApproximatorIRFRLS(meta_parameters_irfrls);
+  MetaParametersRRRFF* meta_parameters_RRRFF = new MetaParametersRRRFF(n_input_dims,number_of_basis_functions,lambda,gamma);
+  fa = new FunctionApproximatorRRRFF(meta_parameters_RRRFF);
   
   cout << "_____________________________________" << endl << fa->getName() << endl;
   cout << "    Training"  << endl;
@@ -158,7 +158,7 @@ int main(int n_args, char** args)
   cout << endl << endl;
   
   delete fa;
-  delete meta_parameters_irfrls;
+  delete meta_parameters_RRRFF;
   
   
   
