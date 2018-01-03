@@ -1,11 +1,11 @@
 /**
- * @file   FunctionApproximatorRLS.cpp
- * @brief  FunctionApproximatorRLS class source file.
+ * @file   leastSquares.hpp
+ * @brief  Source file for various least squares functions.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.
- * Copyright (C) 2014 Freek Stulp, ENSTA-ParisTech
+ * Copyright (C) 2018 Freek Stulp
  * 
  * DmpBbo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by

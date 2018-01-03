@@ -28,7 +28,7 @@
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 
-#include "functionapproximators/LeastSquares.hpp"
+#include "functionapproximators/leastSquares.hpp"
 
 #include "../demos/targetFunction.hpp"
 
