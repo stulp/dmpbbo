@@ -49,52 +49,58 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height)
+MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height, double regularization)
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Zero(0)),
   centers_per_dim_(centers_per_dim),
-  intersection_height_(intersection_height)
+  intersection_height_(intersection_height),
+  regularization_(regularization)
 {
   assert(expected_input_dim==(int)centers_per_dim_.size());
   for (unsigned int dd=0; dd<centers_per_dim_.size(); dd++)
     assert(centers_per_dim_[dd].size()>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 }
   
-MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height) 
+MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, double regularization) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(n_bfs_per_dim),
   centers_per_dim_(std::vector<Eigen::VectorXd>(0)),
-  intersection_height_(intersection_height)
+  intersection_height_(intersection_height),
+  regularization_(regularization)  
 {
   assert(expected_input_dim==n_bfs_per_dim_.size());
   for (int dd=0; dd<n_bfs_per_dim_.size(); dd++)
     assert(n_bfs_per_dim_[dd]>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 };
 
-MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, int n_bfs, double intersection_height) 
+MetaParametersRBFN::MetaParametersRBFN(int expected_input_dim, int n_bfs, double intersection_height, double regularization) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Constant(1,n_bfs)),
   centers_per_dim_(std::vector<Eigen::VectorXd>(0)),
-  intersection_height_(intersection_height)
+  intersection_height_(intersection_height),
+  regularization_(regularization)
 {
   assert(expected_input_dim==n_bfs_per_dim_.size());
   for (int dd=0; dd<n_bfs_per_dim_.size(); dd++)
     assert(n_bfs_per_dim_[dd]>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 };
 
 MetaParametersRBFN* MetaParametersRBFN::clone(void) const
 {
   MetaParametersRBFN* cloned;
   if (centers_per_dim_.size()>0)
-    cloned =  new MetaParametersRBFN(getExpectedInputDim(),centers_per_dim_,intersection_height_);
+    cloned =  new MetaParametersRBFN(getExpectedInputDim(),centers_per_dim_,intersection_height_,regularization_);
   else
-    cloned =  new MetaParametersRBFN(getExpectedInputDim(),n_bfs_per_dim_,intersection_height_);
+    cloned =  new MetaParametersRBFN(getExpectedInputDim(),n_bfs_per_dim_,intersection_height_,regularization_);
   
   return cloned;
 }
@@ -197,6 +203,7 @@ void MetaParametersRBFN::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(n_bfs_per_dim_);
   ar & BOOST_SERIALIZATION_NVP(centers_per_dim_);
   ar & BOOST_SERIALIZATION_NVP(intersection_height_);
+  ar & BOOST_SERIALIZATION_NVP(regularization_);
 }
 
 string MetaParametersRBFN::toString(void) const

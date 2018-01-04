@@ -90,7 +90,7 @@ public:
 	/** Accessor function for regularization.
 	 * \return Regularization parameter.
 	 */
-  bool regularization(void) const
+  double regularization(void) const
   {
     return regularization_;
   }

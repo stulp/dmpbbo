@@ -124,7 +124,8 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
     int n_rfs = 9;
     if (input_dim==2) n_rfs = 5;
     VectorXi num_rfs_per_dim = VectorXi::Constant(input_dim,n_rfs);
-    return new MetaParametersRBFN(input_dim,num_rfs_per_dim,intersection);
+    double regularization = 0.0;
+    return new MetaParametersRBFN(input_dim,num_rfs_per_dim,intersection,regularization);
   }
     
   if (name.compare("GPR")==0)
