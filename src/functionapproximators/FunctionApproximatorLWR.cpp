@@ -140,7 +140,7 @@ void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   
   // Parameters for the weighted least squares regressions
   bool use_offset = true;
-  double regularization = 0.0;
+  double regularization = meta_parameters_lwr->regularization();
   double min_weight = 0.000001*activations.maxCoeff();
 
   // Prepare matrices

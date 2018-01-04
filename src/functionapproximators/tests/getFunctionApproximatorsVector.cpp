@@ -76,7 +76,8 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
       num_rfs_per_dim[0] = 7;
       num_rfs_per_dim[1] = 5;
     }
-    return new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection);
+    double regularization = 0.0;
+    return new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection,regularization);
   } 
 
   if (name.compare("LWPR")==0)

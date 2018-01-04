@@ -73,7 +73,8 @@ int main(int n_args, char** args)
       if (!directory.empty())
         save_directory = directory+(input_dim==1?"/1D":"/2D")+(asymmetric_kernels==1?"_Asymmetric":"_symmetric");
       
-      MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,centers_per_dim,intersection_height,asymmetric_kernels==1);
+      double regularization = 0.0;
+      MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,centers_per_dim,intersection_height,regularization,asymmetric_kernels==1);
    
       FunctionApproximator* fa = new FunctionApproximatorLWR(meta_parameters);
       fa->train(inputs,targets,save_directory,overwrite);
