@@ -49,11 +49,7 @@ Eigen::MatrixXd leastSquares(
   const Eigen::Ref<const Eigen::MatrixXd>& targets,
   bool use_offset=true,
   double regularization=0.0
-  )
-{
-  Eigen::VectorXd weights = Eigen::VectorXd::Ones(inputs.rows());
-  return weightedLeastSquares(inputs,targets,weights,use_offset,regularization);
-}
+  );
 
 /** Linear prediction */
 void linearPrediction(

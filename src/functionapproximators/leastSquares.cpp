@@ -22,6 +22,7 @@
  */
 
 
+#include "functionapproximators/leastSquares.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
@@ -32,6 +33,17 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
+
+Eigen::MatrixXd leastSquares(
+  const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
+  const Eigen::Ref<const Eigen::MatrixXd>& targets,
+  bool use_offset,
+  double regularization
+  )
+{
+  Eigen::VectorXd weights = Eigen::VectorXd::Ones(inputs.rows());
+  return weightedLeastSquares(inputs,targets,weights,use_offset,regularization);
+}
 
 Eigen::MatrixXd weightedLeastSquares(
   const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
@@ -46,9 +58,7 @@ Eigen::MatrixXd weightedLeastSquares(
   assert(inputs.rows() == targets.rows());
   
   int n_samples = inputs.rows();
-  
-  cout << "  use_offset=" << use_offset << endl;
-  
+
   // Make the design matrix
   MatrixXd X;
   if (use_offset)
@@ -63,7 +73,6 @@ Eigen::MatrixXd weightedLeastSquares(
   }
   
   int n_betas = X.cols(); 
-  cout << "  n_betas=" << n_betas << endl;
   MatrixXd W;
   
   if (min_weight<=0.0)
