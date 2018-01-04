@@ -34,6 +34,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRBFN);
 #include "functionapproximators/ModelParametersRBFN.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/BasisFunction.hpp"
+#include "functionapproximators/leastSquares.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
@@ -92,13 +93,14 @@ void FunctionApproximatorRBFN::train(const Eigen::Ref<const Eigen::MatrixXd>& in
 
   const MetaParametersRBFN* meta_parameters_lwr = 
     dynamic_cast<const MetaParametersRBFN*>(getMetaParameters());
-  
+                      
+  // Determine the centers and widths of the basis functions, given the range of the input data
   VectorXd min = inputs.colwise().minCoeff();
   VectorXd max = inputs.colwise().maxCoeff();
-  
   MatrixXd centers, widths;
   meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
 
+  // Get the activations of the basis functions 
   bool normalized_basis_functions=false;  
   bool asymmetric_kernels=false;  
   int n_samples = inputs.rows();
@@ -106,12 +108,11 @@ void FunctionApproximatorRBFN::train(const Eigen::Ref<const Eigen::MatrixXd>& in
   MatrixXd activations(n_samples,n_kernels);
   BasisFunction::Gaussian::activations(centers,widths,inputs,activations,
     normalized_basis_functions,asymmetric_kernels);
-  
-  // The design matrix
-  MatrixXd X = activations;
 
-  // Least squares
-  VectorXd weights = (X.transpose()*X).inverse()*X.transpose()*targets;
+  // Least squares, with activations as design matrix
+  bool use_offset=false;
+  double regularization=0.0;
+  VectorXd weights = leastSquares(activations,targets,use_offset,regularization);
 
   setModelParameters(new ModelParametersRBFN(centers,widths,weights));
   
