@@ -153,8 +153,10 @@ int main(int n_args, char* args[])
   DistributionGaussian* distribution = new DistributionGaussian(mean_init, covar_init); 
   
   Updater* updater = NULL;
-  double eliteness = 10;
   string weighting_method = "PI-BB";
+  double eliteness = 10;
+  //weighting_method = "CEM"; eliteness = 5;
+  //weighting_method = "CMA-ES"; eliteness = 5;
     
   if (covar_update.compare("none")==0)
   {
@@ -168,7 +170,6 @@ int main(int n_args, char* args[])
   else 
   {
     VectorXd base_level = VectorXd::Constant(n_dims,0.000001);
-    eliteness = 10;
     bool diag_only = false;
     double learning_rate = 0.75;
     updater = new UpdaterCovarAdaptation(eliteness,weighting_method,base_level,diag_only,learning_rate);  
