@@ -115,9 +115,9 @@ void FunctionApproximatorRRRFF::train(const Eigen::Ref<const Eigen::MatrixXd>& i
   BasisFunction::Cosine::activations(cosines_periodes,cosines_phase,inputs,proj_inputs);
   
   // Compute linear model analatically with least squares
-  double lambda = meta_parameters_RRRFF->lambda_;
+  double regularization = meta_parameters_RRRFF->regularization_;
   bool use_offset = false;
-  VectorXd linear_model =  leastSquares(proj_inputs,targets,use_offset,lambda);
+  VectorXd linear_model =  leastSquares(proj_inputs,targets,use_offset,regularization);
   
   setModelParameters(new ModelParametersRRRFF(linear_model, cosines_periodes, cosines_phase));
 }

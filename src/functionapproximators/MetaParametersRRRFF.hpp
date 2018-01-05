@@ -43,10 +43,10 @@ public:
   /** Constructor for the algorithmic meta-parameters of the RRRFF function approximator
    *  \param[in] expected_input_dim Expected dimensionality of the input data
    *  \param[in] number_of_basis_functions Number of basis functions
-   *  \param[in] lambda Ridge regression coefficient, tradeoff between data fit and model complexity
+   *  \param[in] regularization Ridge regression coefficient, tradeoff between data fit and model complexity
    *  \param[in] gamma Cosines periodes distribution standard derivation
    */
-	MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma);
+	MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double regularization, double gamma);
 	
 	MetaParametersRRRFF* clone(void) const;
 	
@@ -58,7 +58,7 @@ private:
   int number_of_basis_functions_;
 
   /** Ridge regression coefficient, tradeoff between data fit and model complexity */
-  double lambda_;
+  double regularization_;
 
   /** Cosines periodes distribution standard derivation */
   double gamma_;

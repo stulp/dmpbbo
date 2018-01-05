@@ -111,9 +111,9 @@ MetaParameters* getMetaParametersByName(string name, int input_dim)
     // RRRFF
     int number_of_basis_functions=18;
     if (input_dim==2) number_of_basis_functions = 100;
-    double lambda=0.2;
+    double regularization=0.2;
     double gamma=5;
-    return new MetaParametersRRRFF(input_dim,number_of_basis_functions,lambda,gamma);
+    return new MetaParametersRRRFF(input_dim,number_of_basis_functions,regularization,gamma);
   }
 
 

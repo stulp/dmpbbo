@@ -143,9 +143,9 @@ int main(int n_args, char** args)
   
   // RRRFF
   int number_of_basis_functions=100;
-  double lambda=0.2;
+  double regularization=0.2;
   double gamma=10;
-  MetaParametersRRRFF* meta_parameters_RRRFF = new MetaParametersRRRFF(n_input_dims,number_of_basis_functions,lambda,gamma);
+  MetaParametersRRRFF* meta_parameters_RRRFF = new MetaParametersRRRFF(n_input_dims,number_of_basis_functions,regularization,gamma);
   fa = new FunctionApproximatorRRRFF(meta_parameters_RRRFF);
   
   cout << "_____________________________________" << endl << fa->getName() << endl;
