@@ -26,6 +26,9 @@
 #include <string>
 #include <ctime>
 
+// This must be included before any Eigen header files are included
+#include "eigen_realtime/eigen_realtime_check.hpp"
+
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include "functionapproximators/leastSquares.hpp"
@@ -45,7 +48,7 @@ int main(int n_args, char** args)
   for (int n_input_dims=1; n_input_dims<=2; n_input_dims++)
   {
     // Prepare data
-    MatrixXd inputs, targets, outputs;
+    MatrixXd inputs, targets;
     if (n_input_dims==2) 
     {
       VectorXi n_samples_per_dim = VectorXi::Constant(2,10);
@@ -53,7 +56,7 @@ int main(int n_args, char** args)
     }
     else
     {
-      int n_samples = 30;
+      int n_samples = 21;
       inputs.resize(n_samples,1);
       targets.resize(n_samples,1);
       inputs = VectorXd::LinSpaced(n_samples,0.0,2.0);
@@ -71,8 +74,12 @@ int main(int n_args, char** args)
     cout << "Least squares on " << n_input_dims << "D data...\t";
     VectorXd beta = weightedLeastSquares(inputs,targets,weights,use_offset,regularization,min_weight);
 
-    cout << "  beta=" << beta << endl;
+    cout << "  beta=" << beta.transpose() << endl;
+    
+    MatrixXd outputs(n_samples,1); 
+    ENTERING_REAL_TIME_CRITICAL_CODE
     linearPrediction(inputs,beta,outputs);
+    EXITING_REAL_TIME_CRITICAL_CODE
     
     // Prepare directory
     string save_directory;

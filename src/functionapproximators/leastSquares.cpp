@@ -159,15 +159,14 @@ void linearPrediction(
 
   if (n_input_dims==n_beta)
   {
-    outputs = inputs*beta;
+    outputs.noalias() = inputs*beta;
   }
   else
   {
+    // There is an offset (AKA bias or intercept)
     assert(n_input_dims==(n_beta-1)); 
-    // There is an offset (AKA bias or intercept), so add a column with 1s
-    MatrixXd X = MatrixXd::Ones(inputs.rows(),inputs.cols()+1);
-    X.leftCols(inputs.cols()) = inputs;
-    outputs = X*beta;
+    outputs.noalias() = inputs*beta.segment(0,n_beta-1);
+    outputs.array() += beta(n_beta-1);
   }
       
 }
