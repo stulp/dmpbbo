@@ -26,17 +26,36 @@ sys.path.append(lib_path)
 from bbo.distribution_gaussian import DistributionGaussian
 
 class Updater:
+    """ Virtual class for updating a Gaussian distribution with reward-weighted averaging.
+    """
     def updateDistribution(distribution, samples, costs):
+        """ Update a distribution with reward-weighted averaging.
+        \param[in] distribution Distribution before the update
+        \param[in] samples Samples in parameter space.
+        \param[in] costs The cost of each sample.
+        \return The updated distribution.
+        """
         raise NotImplementedError('subclasses must override updateDistribution()!')
 
 
 class UpdaterMean(Updater):
+    """ Updater that updates the mean of the distribution only."""
             
     def __init__(self,eliteness = 10, weighting_method = 'PI-BB'):
+        """ Initialize an UpdaterMean object.
+        \param[in] eliteness The eliteness parameter (see costsToWeights(...))
+        \param[in] weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costsToWeights(...))
+        """
         self.eliteness = eliteness
         self.weighting_method = weighting_method
 
     def updateDistribution(self,distribution, samples, costs):
+        """ Update a distribution with reward-weighted averaging.
+        \param[in] distribution Distribution before the update
+        \param[in] samples Samples in parameter space.
+        \param[in] costs The cost of each sample.
+        \return The updated distribution.
+        """
     
         weights = costsToWeights(costs,self.weighting_method,self.eliteness);
     
@@ -52,13 +71,25 @@ class UpdaterMean(Updater):
         return distribution_new, weights
         
 class UpdaterCovarDecay(Updater):
+    """ Updater that updates the mean of the distribution, and decays the covariance matrix of the distribution."""
             
     def __init__(self,eliteness = 10, weighting_method = 'PI-BB', covar_decay_factor = 0.8):
+        """ Initialize an UpdaterCovarDecay object.
+        \param[in] eliteness The eliteness parameter (see costsToWeights(...))
+        \param[in] weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costsToWeights(...))
+        \param[in] covar_decay_factor Factor with which to decay the covariance matrix (i.e. covar_decay_factor*covar_decay_factor*C at each update)
+        """
         self.eliteness = eliteness
         self.weighting_method = weighting_method
         self.covar_decay_factor = covar_decay_factor
 
     def updateDistribution(self,distribution, samples, costs):
+        """ Update a distribution with reward-weighted averaging.
+        \param[in] distribution Distribution before the update
+        \param[in] samples Samples in parameter space.
+        \param[in] costs The cost of each sample.
+        \return The updated distribution.
+        """
     
         weights = costsToWeights(costs,self.weighting_method,self.eliteness);
     
@@ -76,8 +107,16 @@ class UpdaterCovarDecay(Updater):
         return distribution_new, weights
 
 class UpdaterCovarAdaptation(Updater):
+    """ Updater that updates the mean of the distribution, and uses covariance matrix adaptation to update the covariance matrix of the distribution."""
             
     def __init__(self,eliteness = 10, weighting_method = 'PI-BB',base_level_diagonal=None,diag_only=False,learning_rate=1.0):
+        """ Constructor
+        \param[in] eliteness The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
+        \param[in] weighting_method ('PI-BB' = PI^2 style weighting)
+        \param[in] base_level Small covariance matrix that is added after each update to avoid premature convergence
+        \param[in] diag_only Update only the diagonal of the covariance matrix (true) or the full matrix (false)
+        \param[in] learning_rate Low pass filter on the covariance updates. In range [0.0-1.0] with 0.0 = no updating, 1.0  = complete update by ignoring previous covar matrix. 
+        """
         self.eliteness = eliteness
         self.weighting_method = weighting_method
         self.base_level_diagonal = base_level_diagonal
@@ -89,6 +128,12 @@ class UpdaterCovarAdaptation(Updater):
         self.learning_rate = learning_rate
 
     def updateDistribution(self,distribution, samples, costs):
+        """ Update a distribution with reward-weighted averaging.
+        \param[in] distribution Distribution before the update
+        \param[in] samples Samples in parameter space.
+        \param[in] costs The cost of each sample.
+        \return The updated distribution.
+        """
         
         mean_cur = distribution.mean
         covar_cur = distribution.covar
@@ -133,6 +178,12 @@ class UpdaterCovarAdaptation(Updater):
         return distribution_new, weights
 
 def costsToWeights(costs, weighting_method, eliteness):
+    """ Convert costs to weights using different weighting methods.
+    \param[in] costs A vector of costs.
+    \param[in] weighting_method The weighting method ('PI-BB','CMA-ES','CEM')
+    \param[in] eliteness The eliteness parameter (h in PI-BB, mu in CMA-ES)
+    \return A vector of weights (they always sum to 1).
+    """
     
     # Costs can be a 2D array or a list of lists. In this case, the first
     # column is the sum of the other columns (which contain the different cost

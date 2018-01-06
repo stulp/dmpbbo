@@ -29,6 +29,20 @@ from bbo.bbo_plotting import saveUpdate, saveLearningCurve, saveExplorationCurve
 from bbo.distribution_gaussian import DistributionGaussian
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
+    """ Run an evolutionary optimization process, see \ref page_bbo
+    \param[in] cost_function The cost function to optimize
+    \param[in] initial_distribution The initial parameter distribution
+    \param[in] updater The Updater used to update the parameters
+    \param[in] n_updates The number of updates to perform
+    \param[in] n_samples_per_update The number of samples per update
+    \param[in] fig Optional figure to plot the optimization.
+    \param[in] directory Optional directory to save to (default: don't save)     
+    \return A learning curve that has the following format
+        #rows is number of optimization updates
+        column 0: Number of samples at which the cost was evaluated
+        column 1: The total cost 
+        column 2...: Individual cost components (column 1 is their sum)
+    """
     
     distribution = initial_distribution
     
