@@ -32,6 +32,18 @@
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include <boost/serialization/assume_abstract.hpp>
 
+/*
+Alternative: move into Dmp
+
+Dmp::setFunctionApproximatorsExtendedDims()
+Dmp::trainExtendedDims()
+Dmp::analyticalSolutionExtendedDims(const Eigen::VectorXd& ts, Trajectory& trajectory) const;
+Dmp::analyticalSolutionExtendedDims(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& fa_extended_output) const;
+Dmp::trainExtendedDims(const Trajectory& trajectory);
+Dmp::trainExtendedDims(const Trajectory& trajectory, std::string save_directory, bool overwrite=false);
+Dmp::predictExtendedDims(const Eigen::VectorXd& phases, Eigen::MatrixXd& output_extended_dims)
+*/
+
 namespace DmpBbo {
   
 // forward declaration
