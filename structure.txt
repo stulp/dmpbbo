@@ -1,0 +1,17 @@
+src/
+  functionapproximators/  
+    tests/
+  dynamicalsystems/  
+    tests/    
+    
+python/
+  functionapproximators/  
+    plot*.py
+  dynamicalsystems/  
+    plot*.py
+
+demos/
+  functionapproximators/  
+    demo*.py (call pure python and cpp, same visualization)
+  dynamicalsystems/  
+    demo*.py
