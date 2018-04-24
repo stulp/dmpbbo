@@ -41,62 +41,38 @@ using namespace DmpBbo;
 
 int main(int n_args, char** args)
 {
-  string directory;
-  if (n_args>1)
-    directory = string(args[1]);
+  bool use_offset = false;
+  double regularization = 0.0;
+  string directory = string(args[1]);
+  if (n_args>2)
+    regularization = atof(args[2]);
+  if (n_args>3)
+    use_offset = true;
   
-  for (int n_input_dims=1; n_input_dims<=2; n_input_dims++)
-  {
-    // Prepare data
-    MatrixXd inputs, targets;
-    if (n_input_dims==2) 
-    {
-      VectorXi n_samples_per_dim = VectorXi::Constant(2,10);
-      targetFunction(n_samples_per_dim,inputs,targets);
-    }
-    else
-    {
-      int n_samples = 21;
-      inputs.resize(n_samples,1);
-      targets.resize(n_samples,1);
-      inputs = VectorXd::LinSpaced(n_samples,0.0,2.0);
-      targets = 2.0*inputs.array() + 3.0;
-      targets += 0.25*MatrixXd::Random(n_samples,1);
-    }
+  MatrixXd inputs;
+  MatrixXd targets;
+  VectorXd weights;
+  directory += "/";
+  if (!loadMatrix(directory+"inputs.txt", inputs)) return -1;
+  if (!loadMatrix(directory+"targets.txt", targets)) return -1;
+  if (!loadMatrix(directory+"weights.txt", weights)) return -1;
+  
+  int n_input_dims = inputs.cols();
+  cout << "Least squares on " << n_input_dims << "D data ("<< regularization << " " << use_offset << ")\t";
+  VectorXd beta = weightedLeastSquares(inputs,targets,weights,use_offset,regularization);
 
-    // Parameters for least squares 
-    int n_samples = inputs.rows();
-    VectorXd weights = VectorXd::Ones(n_samples);
-    bool use_offset = true;
-    double regularization = 0.1;
-    double min_weight = 0.0;
-      
-    cout << "Least squares on " << n_input_dims << "D data...\t";
-    VectorXd beta = weightedLeastSquares(inputs,targets,weights,use_offset,regularization,min_weight);
-
-    cout << "  beta=" << beta.transpose() << endl;
-    
-    MatrixXd outputs(n_samples,1); 
-    ENTERING_REAL_TIME_CRITICAL_CODE
-    linearPrediction(inputs,beta,outputs);
-    EXITING_REAL_TIME_CRITICAL_CODE
-    
-    // Prepare directory
-    string save_directory;
-    if (!directory.empty())
-      save_directory = directory+"/"+(n_input_dims==1?"1D":"2D");
-    bool overwrite = true;
-    
-    saveMatrix(save_directory,"inputs.txt",inputs,overwrite);
-    saveMatrix(save_directory,"weights.txt",weights,overwrite);
-    saveMatrix(save_directory,"targets.txt",targets,overwrite);
-    VectorXd tmp = VectorXd::Constant(1,regularization);
-    saveMatrix(save_directory,"regularization.txt",tmp,overwrite);
-    saveMatrix(save_directory,"beta.txt",beta,overwrite);
-    saveMatrix(save_directory,"outputs.txt",outputs,overwrite);
-    
-    cout << endl;
-  }
+  cout << "  beta=" << beta.transpose() << endl;
+  
+  MatrixXd outputs;
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  linearPrediction(inputs,beta,outputs);
+  EXITING_REAL_TIME_CRITICAL_CODE
+  
+  bool overwrite = true;
+  saveMatrix(directory,"beta.txt",beta,overwrite);
+  saveMatrix(directory,"outputs.txt",outputs,overwrite);
+  
+  cout << endl;
   
   return 0;
 }
