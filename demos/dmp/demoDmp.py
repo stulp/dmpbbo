@@ -28,13 +28,15 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../plotting')
+lib_path = os.path.abspath('../../src/dmp/plotting')
+sys.path.append(lib_path)
+lib_path = os.path.abspath('../../src/dynamicalsystems/plotting')
 sys.path.append(lib_path)
 
 from plotTrajectory import plotTrajectoryFromFile
 from plotDmp import plotDmp
 
-executable = "../../../bin/demoDmp"
+executable = "../../bin/demoDmp"
 
 if (not os.path.isfile(executable)):
     print("")

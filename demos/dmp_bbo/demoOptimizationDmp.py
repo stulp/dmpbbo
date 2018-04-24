@@ -29,7 +29,7 @@ import subprocess
 
 # Add relative path if PYTHONPATH is not set
 import os, sys
-lib_path = os.path.abspath('../../../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
@@ -45,7 +45,7 @@ def plotRollout(cost_vars,ax):
     return line_handles
 
 if __name__=='__main__':
-    executable = "../../../bin/demoOptimizationDmp"
+    executable = "../../bin/demoOptimizationDmp"
     
     if (not os.path.isfile(executable)):
         print("")

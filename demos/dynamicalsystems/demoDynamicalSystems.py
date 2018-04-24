@@ -28,7 +28,7 @@ import numpy
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../plotting')
+lib_path = os.path.abspath('../../src/dynamicalsystems/plotting/')
 sys.path.append(lib_path)
 
 from plotDynamicalSystem import plotDynamicalSystem
@@ -36,7 +36,7 @@ from plotDynamicalSystemComparison import plotDynamicalSystemComparison
 
 
 if __name__=='__main__':
-    executable = "../../../bin/demoDynamicalSystems"
+    executable = "../../bin/demoDynamicalSystems"
     
     if (not os.path.isfile(executable)):
         print("")

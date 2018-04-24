@@ -27,7 +27,7 @@ import numpy
 import matplotlib.pyplot as plt
 import os, sys, subprocess
 
-executable = "../../../bin/demoDmpTrainFromTrajectoryFile"
+executable = "../../bin/demoDmpTrainFromTrajectoryFile"
 
 if (not os.path.isfile(executable)):
     print("")
