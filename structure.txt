@@ -26,6 +26,4 @@ Move functionapproximator tests into demos:
   testFunctionApproximatorTraining.py => Merge with demos, random needs fixing
   testToUnifiedModel.py
 
-testFunctionApproximatorTraining.py and testPerturbModelParameterLWR.py are broken (random)
-
 Document dmp_bbo_robot and make arm example instead (copy from experiments)

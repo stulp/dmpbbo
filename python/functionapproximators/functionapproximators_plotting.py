@@ -21,6 +21,7 @@ import numpy
 import math
 import matplotlib.pyplot as plt                                               
 import sys
+import random
 
 # 
 def plotData(inputs,outputs,ax):
