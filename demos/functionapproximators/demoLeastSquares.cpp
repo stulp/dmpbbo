@@ -1,5 +1,5 @@
 /**
- * \file testFunctionApproximatorTraining.cpp
+ * \file demoLeastSquares.cpp
  * \author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -33,7 +33,7 @@
 
 #include "functionapproximators/leastSquares.hpp"
 
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "targetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;

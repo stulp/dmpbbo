@@ -20,15 +20,10 @@ demos/
 ________________________________________________________________________________
 TODO
 
-Make Python file names consistent (bbo dmp_bbo)  
-
 Then merge py files (Python and C++ in one)
 
-Fix python/dmp_bbo/demos: where does it go?
-
 Move functionapproximator tests into demos:
-  testFunctionApproximatorTraining.py => Merge with demos
-  testLeastSquares.py
+  testFunctionApproximatorTraining.py => Merge with demos, random needs fixing
   testToUnifiedModel.py
 
 testFunctionApproximatorTraining.py and testPerturbModelParameterLWR.py are broken (random)

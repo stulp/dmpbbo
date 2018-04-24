@@ -1,7 +1,3 @@
-add_executable(testLeastSquares testLeastSquares.cpp getFunctionApproximatorsVector.cpp)
-target_link_libraries(testLeastSquares functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-install(TARGETS testLeastSquares DESTINATION bin_test)
-
 add_executable(testFunctionApproximatorCloning testFunctionApproximatorCloning.cpp getFunctionApproximatorsVector.cpp)
 target_link_libraries(testFunctionApproximatorCloning functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS testFunctionApproximatorCloning DESTINATION bin_test)

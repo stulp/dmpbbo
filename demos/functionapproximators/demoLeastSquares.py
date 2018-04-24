@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *
@@ -32,7 +32,7 @@ from functionapproximators.functionapproximators_plotting import *
 if __name__=='__main__':
     """Run some training sessions and plot results."""
 
-    executable = "../../../bin_test/testLeastSquares"
+    executable = "../../bin/demoLeastSquares"
     
     if (not os.path.isfile(executable)):
         print("")
@@ -42,7 +42,7 @@ if __name__=='__main__':
         sys.exit(-1);
     
     fig_number = 1;     
-    directory = "/tmp/testLeastSquares/"
+    directory = "/tmp/demoLeastSquares/"
     
     # Call the executable with the directory to which results should be written
     command = executable+" "+directory
