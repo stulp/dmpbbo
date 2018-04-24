@@ -24,12 +24,12 @@ lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 
-from bbo.distribution_gaussian import DistributionGaussian
-from bbo.updater import UpdaterCovarDecay
+from bbo.DistributionGaussian import DistributionGaussian
+from bbo.updaters import UpdaterCovarDecay
 
-from dmp_bbo.run_optimization_task import runOptimizationTask
-from dmp_bbo.task import Task
-from dmp_bbo.task_solver import TaskSolver
+from dmp_bbo.runOptimizationTask import runOptimizationTask
+from dmp_bbo.Task import Task
+from dmp_bbo.TaskSolver import TaskSolver
 
 def quadraticFunction(a, c, inputs):
     """ Target function \f$ y = a*x^2 + c \f$

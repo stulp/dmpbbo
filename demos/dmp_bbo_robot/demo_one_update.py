@@ -24,8 +24,8 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('../../../python')
 sys.path.append(lib_path)
 
-from bbo.distribution_gaussian import DistributionGaussian
-from bbo.updater import UpdaterCovarDecay
+from bbo.DistributionGaussian import DistributionGaussian
+from bbo.updaters import UpdaterCovarDecay
 from dmp_bbo.task import Task
 
 from dmp_bbo.run_one_update import runOptimizationTaskOneUpdate

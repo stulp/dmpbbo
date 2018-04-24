@@ -23,7 +23,7 @@ import os
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.distribution_gaussian import DistributionGaussian
+from bbo.DistributionGaussian import DistributionGaussian
 
 class Updater:
     """ Virtual class for updating a Gaussian distribution with reward-weighted averaging.

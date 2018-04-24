@@ -26,7 +26,7 @@ from matplotlib.patches import Ellipse
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.distribution_gaussian import DistributionGaussian
+from bbo.DistributionGaussian import DistributionGaussian
 
 def setColor(handle,i_update,n_updates):
     """ Set the color of an object, according to how far the optimization has proceeded.

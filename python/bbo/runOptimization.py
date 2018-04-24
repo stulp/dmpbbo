@@ -25,7 +25,7 @@ lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.bbo_plotting import *
-from bbo.distribution_gaussian import DistributionGaussian
+from bbo.DistributionGaussian import DistributionGaussian
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
     """ Run an evolutionary optimization process, see \ref page_bbo
