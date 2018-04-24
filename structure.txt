@@ -1,9 +1,0 @@
-TODO
-
-Then merge py files (Python and C++ in one)
-
-Move functionapproximator tests into demos:
-  testFunctionApproximatorTraining.py => Merge with demos, random needs fixing
-  testToUnifiedModel.py
-
-Document dmp_bbo_robot and make arm example instead (copy from experiments)
