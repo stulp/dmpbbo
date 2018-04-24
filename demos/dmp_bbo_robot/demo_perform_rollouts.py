@@ -20,7 +20,7 @@ import os
 import sys
 import numpy as np
 
-lib_path = os.path.abspath('../../../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from dmp_bbo.task_solver import TaskSolver

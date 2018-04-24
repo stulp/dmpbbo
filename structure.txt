@@ -20,7 +20,7 @@ demos/
 ________________________________________________________________________________
 TODO
 
-Move python demos to demos/ directory (Python)
+Make Python file names consistent (bbo dmp_bbo)  
 
 Then merge py files (Python and C++ in one)
 
@@ -32,3 +32,5 @@ Move functionapproximator tests into demos:
   testToUnifiedModel.py
 
 testFunctionApproximatorTraining.py and testPerturbModelParameterLWR.py are broken (random)
+
+Document dmp_bbo_robot and make arm example instead (copy from experiments)
