@@ -26,8 +26,8 @@ sys.path.append(lib_path)
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from plotDynamicalSystem import plotDynamicalSystem
-from plotDynamicalSystemComparison import plotDynamicalSystemComparison
+from dynamicalsystems.dynamicalsystems_plotting import * 
+
 from ExponentialSystem import ExponentialSystem
 
 if __name__=='__main__':

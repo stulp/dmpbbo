@@ -28,13 +28,10 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../../src/dmp/plotting')
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../src/dynamicalsystems/plotting')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
-from plotTrajectory import plotTrajectoryFromFile
-from plotDmp import plotDmp
+from dmp.dmp_plotting import * 
 
 executable = "../../bin/demoDmpContextual"
 

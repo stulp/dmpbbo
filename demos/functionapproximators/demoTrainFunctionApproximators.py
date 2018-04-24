@@ -27,12 +27,10 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../src/functionapproximators/plotting')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
-from plotData import plotDataFromDirectory
-from plotData import getDataDimFromDirectory
-from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
-from plotBasisFunctions import plotBasisFunctionsFromDirectory
+
+from functionapproximators.functionapproximators_plotting import *
 
 if __name__=='__main__':
     executable = "../../bin/demoTrainFunctionApproximators"

@@ -21,12 +21,11 @@ import numpy
 import matplotlib.pyplot as plt                                               
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../plotting')
+# Include scripts for plotting
+lib_path = os.path.abspath('../../../python')
 sys.path.append(lib_path)
 
-from plotData import getDataDimFromDirectory
-from plotData import plotDataFromDirectory
-from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
+from functionapproximators.functionapproximators_plotting import *
 
 
 
