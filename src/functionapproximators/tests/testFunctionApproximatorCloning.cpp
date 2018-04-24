@@ -23,7 +23,7 @@
 #include "getFunctionApproximatorsVector.hpp"
 
 #include "functionapproximators/FunctionApproximator.hpp"
-#include "../demos/targetFunction.hpp"
+#include "../../../demos/functionapproximators/targetFunction.hpp"
 
 #include <iostream>
 #include <fstream>

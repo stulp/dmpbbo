@@ -32,7 +32,7 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 
 #include "getFunctionApproximatorsVector.hpp"
-#include "../demos/targetFunction.hpp"
+#include "../../../demos/functionapproximators/targetFunction.hpp"
 
 #include <boost/archive/xml_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>

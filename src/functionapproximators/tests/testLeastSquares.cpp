@@ -33,7 +33,7 @@
 
 #include "functionapproximators/leastSquares.hpp"
 
-#include "../demos/targetFunction.hpp"
+#include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;

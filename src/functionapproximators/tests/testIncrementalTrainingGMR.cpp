@@ -32,7 +32,7 @@
 #include "functionapproximators/ModelParametersGMR.hpp"
 
 #include "getFunctionApproximatorsVector.hpp"
-#include "../demos/targetFunction.hpp"
+#include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace DmpBbo;
 using namespace Eigen;

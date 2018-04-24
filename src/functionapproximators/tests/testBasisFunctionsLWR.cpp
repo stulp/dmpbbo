@@ -28,7 +28,7 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-#include "../demos/targetFunction.hpp"
+#include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;

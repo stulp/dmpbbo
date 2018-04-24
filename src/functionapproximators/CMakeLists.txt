@@ -14,7 +14,7 @@ if(LWPR_FOUND)
 endif()
 install(FILES ${HEADERS} DESTINATION ${INCLUDE_INSTALL_DIR}/functionapproximators)
 
-add_subdirectory(demos)
+#add_subdirectory(demos)
 IF(CMAKE_BUILD_TYPE MATCHES Debug)
     add_subdirectory(tests)
 ENDIF(CMAKE_BUILD_TYPE MATCHES Debug) 
