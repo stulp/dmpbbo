@@ -21,15 +21,12 @@ import numpy as np
 import matplotlib.pyplot as plt                                               
 import os, sys
 
-lib_path = os.path.abspath('../../../src/functionapproximators/plotting') # zzz
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../../python/')
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../../python/functionapproximators/')
+# Include scripts for plotting
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from plotBasisFunctions import plotBasisFunctions
-from BasisFunction import Gaussian
+from functionapproximators.functionapproximators_plotting import *
+from functionapproximators.BasisFunction import Gaussian
 
 
 if __name__=='__main__':

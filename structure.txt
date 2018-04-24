@@ -24,6 +24,7 @@ Move python demos to demos/ directory (Python)
 
 Then merge py files (Python and C++ in one)
 
+Fix python/dmp_bbo/demos: where does it go?
 
 Move functionapproximator tests into demos:
   testFunctionApproximatorTraining.py => Merge with demos

@@ -27,7 +27,7 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../python')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *

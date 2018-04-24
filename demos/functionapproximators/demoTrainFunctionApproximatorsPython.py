@@ -21,18 +21,12 @@ import numpy as np
 import matplotlib.pyplot as plt                                               
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../../../src/functionapproximators/plotting') # zzz
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../../python/')
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../../python/functionapproximators/')
+# Include scripts for plotting
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from plotData import *
-from plotLocallyWeightedLines import plotLocallyWeightedLines
-from FunctionApproximatorLWR import FunctionApproximatorLWR
-
-
+from functionapproximators.functionapproximators_plotting import *
+from functionapproximators.FunctionApproximatorLWR import *
 
 
 if __name__=='__main__':

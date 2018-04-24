@@ -21,32 +21,34 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../../src/dmp/plotting/')
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../../src/dynamicalsystems/plotting/')
-sys.path.append(lib_path)
-lib_path = os.path.abspath('../functionapproximators/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from plotTrajectory import plotTrajectoryFromFile
-from plotDmp import plotDmp
-from Dmp import Dmp
-from FunctionApproximatorLWR import FunctionApproximatorLWR
+from dmp.dmp_plotting import *
+from dmp.Dmp import *
+from dmp.Trajectory import *
+from functionapproximators.FunctionApproximatorLWR import *
 
 if __name__=='__main__':
 
     tau = 0.5
     n_dims = 2
+    n_time_steps = 51
+
     y_init = np.linspace(0.0,0.7,n_dims)
     y_attr = np.linspace(0.4,0.5,n_dims)
+    
+    ts = np.linspace(0,tau,n_time_steps)
+    y_yd_ydd_viapoint = np.array([-0.2,0.4, 0.0,0.0, 0,0])
+    viapoint_time = 0.4*ts[-1]
+    traj = Trajectory.generatePolynomialTrajectoryThroughViapoint(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
+    
 
     #function_apps = [None]*n_dims
-    function_apps = [ FunctionApproximatorLWR(5), FunctionApproximatorLWR(6)]
-    for fa in function_apps:
-        fa.train(np.linspace(0,1,100),np.zeros(100))
-        fa.model_offsets_ = 10*np.random.normal(size=fa.model_offsets_.size)
-        
+    function_apps = [ FunctionApproximatorLWR(10), FunctionApproximatorLWR(10)]
     dmp = Dmp(tau, y_init, y_attr, function_apps)
+    
+    dmp.train(traj)
 
     tau_exec = 0.7
     n_time_steps = 71
@@ -66,22 +68,19 @@ if __name__=='__main__':
 
     print("Plotting")
     
-    #fig = plt.figure(1)
-    #axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
-    #
-    #lines = plotTrajectoryFromFile(directory+"/demonstration_traj.txt",axs)
-    #plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
-    #
-    #lines = plotTrajectoryFromFile(directory+"/reproduced_traj.txt",axs)
-    #plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
-    #
-    #plt.legend()
-    #fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
-    #
-    ## Read data
-    #xs_xds        = numpy.loadtxt(directory+'/reproduced_xs_xds.txt')
-    #forcing_terms = numpy.loadtxt(directory+'/reproduced_forcing_terms.txt')
-    #fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
+    fig = plt.figure(1)
+    axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
+    
+    lines = plotTrajectory(traj.asMatrix(),axs)
+    plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
+
+    traj_reproduced = dmp.statesAsTrajectory(ts,xs_step,xds_step)
+    lines = plotTrajectory(traj_reproduced.asMatrix(),axs)
+    plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
+    
+    plt.legend()
+    fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
+    
     
     fig = plt.figure(2)
     xs_xds = np.column_stack((xs_ana,xds_ana,ts))

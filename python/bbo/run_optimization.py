@@ -24,8 +24,7 @@ import sys
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.bbo_plotting import plotUpdate, plotLearningCurve, plotExplorationCurve
-from bbo.bbo_plotting import saveUpdate, saveLearningCurve, saveExplorationCurve
+from bbo.bbo_plotting import *
 from bbo.distribution_gaussian import DistributionGaussian
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):

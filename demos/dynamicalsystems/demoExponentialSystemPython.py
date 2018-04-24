@@ -21,14 +21,12 @@ import numpy as np
 import os, sys
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../src/dynamicalsystems/plotting') # zzz
-sys.path.append(lib_path)
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
-from ExponentialSystem import ExponentialSystem
+from dynamicalsystems.ExponentialSystem import ExponentialSystem
 
 if __name__=='__main__':
     # Settings for the exponential system

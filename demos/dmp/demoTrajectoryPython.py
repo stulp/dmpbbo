@@ -21,11 +21,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../../src/dmp/plotting/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from plotTrajectory import plotTrajectory
-from Trajectory import Trajectory
+from dmp.dmp_plotting import *
+from dmp.Trajectory import *
 
 if __name__=='__main__':
 

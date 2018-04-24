@@ -20,16 +20,16 @@ import numpy as np
 import sys
 import os
 
-lib_path = os.path.abspath('../../python/dynamicalsystems')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from Trajectory import Trajectory
+from dmp.Trajectory import Trajectory
 
-from DynamicalSystem import DynamicalSystem
-from ExponentialSystem import ExponentialSystem
-from SigmoidSystem import SigmoidSystem
-from TimeSystem import TimeSystem
-from SpringDamperSystem import SpringDamperSystem
+from dynamicalsystems.DynamicalSystem import DynamicalSystem
+from dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dynamicalsystems.TimeSystem import TimeSystem
+from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 
 class Dmp(DynamicalSystem):

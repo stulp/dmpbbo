@@ -17,11 +17,11 @@
 
 import os, sys
 
-lib_path = os.path.abspath('../../../python/functionapproximators/')
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from BasisFunction import Gaussian
-from leastSquares import *
+from functionapproximators.BasisFunction import Gaussian
+from functionapproximators.leastSquares import *
 
 class FunctionApproximatorLWR:
     
