@@ -26,11 +26,10 @@ import inspect
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from dmp_bbo.rollout import loadRolloutFromDirectory, loadRolloutsFromDirectory 
+from dmp_bbo.Rollout import * 
 from dmp_bbo.dmp_bbo_plotting import saveUpdateRollouts
-from bbo.DistributionGaussian import DistributionGaussian
-from bbo.DistributionGaussian import loadDistributionGaussianFromDirectory
-from dmp_bbo.task import Task
+from bbo.DistributionGaussian import *
+from dmp_bbo.Task import Task
 
 def prepareOptimization(directory,task,initial_distribution,updater,    n_samples_per_update):
     

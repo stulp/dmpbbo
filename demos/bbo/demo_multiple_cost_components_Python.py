@@ -21,7 +21,7 @@ import sys
 import numpy as np
 
 # Add relative path, in case PYTHONPATH is not set
-lib_path = os.path.abspath('../../../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.CostFunction import CostFunction

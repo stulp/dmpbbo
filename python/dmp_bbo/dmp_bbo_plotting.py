@@ -24,9 +24,9 @@ lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.DistributionGaussian import DistributionGaussian
-from bbo.bbo_plotting import plotUpdate, plotLearningCurve, plotExplorationCurve, setColor, saveUpdate
-from bbo.bbo_plotting import loadLearningCurve, loadExplorationCurve
-from dmp_bbo.rollout import Rollout, loadRolloutFromDirectory
+from dmp_bbo.Rollout import Rollout, loadRolloutFromDirectory
+
+from bbo.bbo_plotting import *
 
 def containsNewDistribution(directory):
     if os.path.exists(directory+"/distribution_new_mean.txt"):
