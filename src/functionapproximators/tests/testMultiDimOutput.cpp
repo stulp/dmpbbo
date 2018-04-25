@@ -31,7 +31,7 @@
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
 
-#include "../../../demos/functionapproximators/getFunctionApproximatorsVector.hpp"
+#include "getFunctionApproximatorsVector.hpp"
 #include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace std;

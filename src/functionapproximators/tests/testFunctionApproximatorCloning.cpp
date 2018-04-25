@@ -20,7 +20,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../../../demos/functionapproximators/getFunctionApproximatorsVector.hpp"
+#include "getFunctionApproximatorsVector.hpp"
 
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "../../../demos/functionapproximators/targetFunction.hpp"
