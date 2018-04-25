@@ -26,10 +26,10 @@ sys.path.append(lib_path)
 
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
-from ExponentialSystem import ExponentialSystem
-from SigmoidSystem import SigmoidSystem
-from TimeSystem import TimeSystem
-from SpringDamperSystem import SpringDamperSystem
+from dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dynamicalsystems.TimeSystem import TimeSystem
+from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 
 def runDynamicalSystemTest(dyn_system, demo_label):
