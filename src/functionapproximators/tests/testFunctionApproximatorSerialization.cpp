@@ -31,7 +31,7 @@
 #include "functionapproximators/MetaParameters.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
 
-#include "getFunctionApproximatorsVector.hpp"
+#include "../../../demos/functionapproximators/getFunctionApproximatorsVector.hpp"
 #include "../../../demos/functionapproximators/targetFunction.hpp"
 
 #include <boost/archive/xml_oarchive.hpp>

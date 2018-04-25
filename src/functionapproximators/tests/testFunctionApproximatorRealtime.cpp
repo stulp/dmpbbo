@@ -29,7 +29,7 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
-#include "getFunctionApproximatorsVector.hpp"
+#include "../../../demos/functionapproximators/getFunctionApproximatorsVector.hpp"
 #include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace std;

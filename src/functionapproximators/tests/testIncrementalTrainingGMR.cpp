@@ -31,7 +31,6 @@
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/ModelParametersGMR.hpp"
 
-#include "getFunctionApproximatorsVector.hpp"
 #include "../../../demos/functionapproximators/targetFunction.hpp"
 
 using namespace DmpBbo;

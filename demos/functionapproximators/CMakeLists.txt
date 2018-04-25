@@ -1,8 +1,13 @@
+add_executable(demoLeastSquares demoLeastSquares.cpp)
+target_link_libraries(demoLeastSquares functionapproximators ${Boost_LIBRARIES})
+install(TARGETS demoLeastSquares DESTINATION bin)
+
 add_executable(demoTrainFunctionApproximators demoTrainFunctionApproximators.cpp)
 target_link_libraries(demoTrainFunctionApproximators functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS demoTrainFunctionApproximators DESTINATION bin)
 
-add_executable(demoLeastSquares demoLeastSquares.cpp)
-target_link_libraries(demoLeastSquares functionapproximators ${Boost_LIBRARIES})
-install(TARGETS demoLeastSquares DESTINATION bin)
+add_executable(testFunctionApproximatorTraining testFunctionApproximatorTraining.cpp)
+target_link_libraries(testFunctionApproximatorTraining functionapproximators ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
+install(TARGETS testFunctionApproximatorTraining DESTINATION bin)
+
 

@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *
@@ -43,7 +43,7 @@ def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
 if __name__=='__main__':
     """Run some training sessions and plot results."""
 
-    executable = "../../../bin_test/testFunctionApproximatorTraining"
+    executable = "../../bin/testFunctionApproximatorTraining"
     
     if (not os.path.isfile(executable)):
         print("")

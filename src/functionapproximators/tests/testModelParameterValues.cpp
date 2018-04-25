@@ -27,7 +27,6 @@
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/ModelParametersRRRFF.hpp"
-#include "getFunctionApproximatorsVector.hpp"
 
 using namespace std;
 using namespace Eigen;
