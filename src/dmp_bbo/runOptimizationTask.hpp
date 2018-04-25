@@ -210,7 +210,7 @@ cost_vars should contain all variables that are relevant to computing the cost. 
 
 \section sec_bbo_one_update One update at a time with Task/TaskSolver
 
-\b Note: this is currently only implemented in python/dmp_bbo/
+\b Note: this is currently only implemented in python/dmp_bbo/, with a demo in demos/dmp_bbo_robot
 
 When running an optimization on a real robot, it is convenient to seperate it in two alternating steps:
 
