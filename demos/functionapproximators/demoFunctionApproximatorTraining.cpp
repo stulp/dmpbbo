@@ -1,5 +1,5 @@
 /**
- * \file testFunctionApproximatorTraining.cpp
+ * \file demoFunctionApproximatorTraining.cpp
  * \author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -154,7 +154,7 @@ VectorXd meanAbsoluteErrorPerOutputDimension(const MatrixXd& mat1, const MatrixX
   cout << "         Mean absolute error ";
   if (mean_abs_error_per_output_dim.size()>1) cout << " (per dimension)";
   cout << ": " << mean_abs_error_per_output_dim.transpose();      
-  cout << "   \t(range of target data is " << mat1.colwise().maxCoeff().array()-mat1.colwise().minCoeff().array() << ")";
+  cout << "   \t(range of target data is " << mat1.colwise().maxCoeff().array()-mat1.colwise().minCoeff().array() << ")" << endl;
   
   return mean_abs_error_per_output_dim;
 }
@@ -217,7 +217,6 @@ int main(int n_args, char** args)
       cur_fa->predict(inputs,outputs);
 
       meanAbsoluteErrorPerOutputDimension(targets,outputs);
-      cout << endl << endl;
       
 #ifdef NDEBUG
       // Here, we time the predict function on single inputs, i.e. typical usage in a
@@ -239,10 +238,8 @@ int main(int n_args, char** args)
       double time_sec = (double)(end - begin) / static_cast<double>( CLOCKS_PER_SEC );
       cout << "  time for " << n_calls << " calls of predict: "<< time_sec;
       double time_per_call = time_sec/n_calls; 
-      cout << " => " << (int)(1.0/(time_per_call*1000)) << "kHz";
+      cout << " => " << (int)(1.0/(time_per_call*1000)) << "kHz" << endl;
 #endif
-
-      cout << endl;
       
       delete cur_fa;
 

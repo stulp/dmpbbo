@@ -60,10 +60,11 @@ if __name__=='__main__':
       
         # Call the executable with the directory to which results should be written
         command = executable+" "+directory+" "+fa_name
-        print(command)
+        #print(command)
         subprocess.call(command, shell=True)
     
-    for fa_name in fa_names:
+    
+    for fa_name in fa_names:prtin
         print("Plotting "+fa_name+" results")
         fig = plt.figure(fig_number,figsize=(15,5))
         fig_number = fig_number+1
