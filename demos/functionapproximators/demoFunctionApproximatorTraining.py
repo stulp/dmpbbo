@@ -64,7 +64,7 @@ if __name__=='__main__':
         subprocess.call(command, shell=True)
     
     
-    for fa_name in fa_names:prtin
+    for fa_name in fa_names:
         print("Plotting "+fa_name+" results")
         fig = plt.figure(fig_number,figsize=(15,5))
         fig_number = fig_number+1
