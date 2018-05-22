@@ -43,7 +43,7 @@ def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
 if __name__=='__main__':
     """Run some training sessions and plot results."""
 
-    executable = "../../bin/testFunctionApproximatorTraining"
+    executable = "../../bin/demoFunctionApproximatorTraining"
     
     if (not os.path.isfile(executable)):
         print("")
@@ -53,7 +53,7 @@ if __name__=='__main__':
         sys.exit(-1);
     
     fig_number = 1;     
-    directory = "/tmp/testFunctionApproximatorTraining/"
+    directory = "/tmp/demoFunctionApproximatorTraining/"
     
     fa_names = ["RBFN","GPR","RRRFF","LWR", "LWPR", "GMR"] 
     for fa_name in fa_names:
