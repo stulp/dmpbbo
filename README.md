@@ -60,20 +60,11 @@ documentation and tutorial here:
 
 To delve into the code a bit deeper, each module has a set of demos, e.g.
 
-+ `src/dynamicalsystems/demos/`
++ `demos/dynamicalsystems/`
   The demos do not show all the functionality, but are well
   documented and a good place to understand how the code can be 
   used. There are python scripts that call the right executables, and
   do some plotting.
-
-For more advanced stuff, you can also have a look at the tests, e.g. 
-
-+ `src/dynamicalsystems/tests/`
-  These are not unit tests per se, but more debugging tools that visualize the 
-  results of an experiment or parameter setting. The tests 
-  are not well documented, but exploit more of the functionality of 
-  the code. Note that the test binaries are only built in debug 
-  mode (in bin_test)
 
 # Why?
 
@@ -91,6 +82,11 @@ For our own use, the aims of coding this were the following:
 + Enabling the optimization of different parameter subsets of function approximators.
     
 + Running dynamical movement primitives on real robots.
+
+
+# Why Python and C++?
+
+A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-)  The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment.
 
 ### Build Status
 
