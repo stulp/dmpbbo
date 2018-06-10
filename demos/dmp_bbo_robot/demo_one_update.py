@@ -69,19 +69,8 @@ a*x^2 + c \f$ best matches a set of target values y_target for a set of input va
         ax.plot(self.inputs,self.targets,'-o',color='k',linewidth=2)
         return line_handles
 
-
-if __name__=="__main__":
-    # See if input directory was passed
-    if (len(sys.argv)>=2):
-        directory = str(sys.argv[1])
-    else:
-        print('\nUsage: '+sys.argv[0]+' <directory> [plot_results]\n')
-        sys.exit()
-
-    plot_results = False
-    if (len(sys.argv)>=3):
-        plot_results = True
-        
+def oneUpdate(directory,plot_results=False):
+    
     inputs = np.linspace(-1.5,1.5,21);
     a = 2.0
     c = -1.0
@@ -110,3 +99,17 @@ if __name__=="__main__":
         plotOptimizationRollouts(directory,fig,task.plotRollout)
         plt.show()
 
+
+if __name__=="__main__":
+    # See if input directory was passed
+    if (len(sys.argv)>=2):
+        directory = str(sys.argv[1])
+    else:
+        print('\nUsage: '+sys.argv[0]+' <directory> [plot_results]\n')
+        sys.exit()
+
+    plot_results = False
+    if (len(sys.argv)>=3):
+        plot_results = True
+        
+    oneUpdate(directory,plot_results)
