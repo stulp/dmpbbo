@@ -86,7 +86,7 @@ if __name__=='__main__':
         np.savetxt(directory+"inputs.txt",inputs)
         np.savetxt(directory+"targets.txt",targets)
         
-        executable = "../../bin/demoLWRTraining"
+        executable = "../../bin/demoTrainingCompareCppPython"
         
         if (not os.path.isfile(executable)):
             print("")
