@@ -27,6 +27,7 @@ sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *
 from functionapproximators.FunctionApproximatorLWR import *
+from functionapproximators.FunctionApproximatorRBFN import *
 
 
 if __name__=='__main__':
@@ -37,72 +38,85 @@ if __name__=='__main__':
     inputs = np.linspace(0.0, 2.0,n_samples_per_dim)
     targets = 3*np.exp(-inputs)*np.sin(2*np.square(inputs))
     
-    # Initialize function approximator
-    intersection = 0.5;
-    n_rfs = 9;
-    fa = FunctionApproximatorLWR(n_rfs,intersection)
+    fa_names = ["RBFN","LWR"]
+    for fa_index in range(len(fa_names)):
+        fa_name = fa_names[fa_index]
+        
+        # Initialize function approximator
+        intersection = 0.5;
+        n_rfs = 9;
+        if fa_name=="LWR":
+            fa = FunctionApproximatorLWR(n_rfs,intersection)
+        else:
+            fa = FunctionApproximatorRBFN(n_rfs,intersection)
+        
+        # Train function approximator with data
+        fa.train(inputs,targets)
+        
+        # Make predictions for the targets
+        outputs = fa.predict(inputs)
+        
+        # Make predictions on a grid
+        n_samples_grid = 200
+        inputs_grid = np.linspace(0.0, 2.0,n_samples_grid)
+        outputs_grid = fa.predict(inputs_grid)
+        if fa_name=="LWR":
+            lines_grid = fa.getLines(inputs_grid)
+        activations_grid = fa.getActivations(inputs_grid)
+        
+        # Plotting
+        fig = plt.figure(fa_index,figsize=(15,5))
+        fig.canvas.set_window_title(fa_name) 
+        ax = fig.add_subplot(121)
+        ax.set_title('Python')
+        plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
+        plotDataResiduals(inputs,targets,outputs,ax)
+        plotDataTargets(inputs,targets,ax)
+        if fa_name=="LWR":
+            plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_grid,activations_grid)
+        
     
-    # Train function approximator with data
-    fa.train(inputs,targets)
-    
-    # Make predictions for the targets
-    outputs = fa.predict(inputs)
-    
-    # Make predictions on a grid
-    n_samples_grid = 200
-    inputs_grid = np.linspace(0.0, 2.0,n_samples_grid)
-    outputs_grid = fa.predict(inputs_grid)
-    lines_grid = fa.getLines(inputs_grid)
-    activations_grid = fa.getActivations(inputs_grid)
-    
-    # Plotting
-    fig = plt.figure(1,figsize=(15,5))
-    ax = fig.add_subplot(121)
-    ax.set_title('Python')
-    plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
-    plotDataResiduals(inputs,targets,outputs,ax)
-    plotDataTargets(inputs,targets,ax)
-    plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_grid,activations_grid)
-    
-
-    # Here comes the same, but then in C++
-    # Here, we will call the executable compiled from demoLWRTraining.cpp
-    
-    #Save training data to file
-    directory = "/tmp/demoLWRTraining/"
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    np.savetxt(directory+"inputs.txt",inputs)
-    np.savetxt(directory+"targets.txt",targets)
-    
-    executable = "../../bin/demoLWRTraining"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
-    
-    # Call the executable with the directory to which results should be written
-    command = executable+" "+directory
-    print(command)
-    subprocess.call(command, shell=True)
-    
-    outputs = np.loadtxt(directory+"outputs.txt")
-    inputs_grid = np.loadtxt(directory+"inputs_grid.txt")
-    outputs_grid = np.loadtxt(directory+"predictions_grid.txt")
-    lines_grid = np.loadtxt(directory+"lines_grid.txt")
-    activations_grid = np.loadtxt(directory+"activations_grid.txt")
-    activations_unnormalized_grid = np.loadtxt(directory+"activations_unnormalized_grid.txt")
-    
-    n_samples_grid = outputs_grid.size
-    ax = fig.add_subplot(122)
-    ax.set_title('C++')
-    plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
-    plotDataResiduals(inputs,targets,outputs,ax)
-    plotDataTargets(inputs,targets,ax)
-    plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_grid,activations_grid,activations_unnormalized_grid)
+        # Here comes the same, but then in C++
+        # Here, we will call the executable compiled from demoLWRTraining.cpp
+        
+        #Save training data to file
+        directory = "/tmp/demoTrain"+fa_name+"/"
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        np.savetxt(directory+"inputs.txt",inputs)
+        np.savetxt(directory+"targets.txt",targets)
+        
+        executable = "../../bin/demoLWRTraining"
+        
+        if (not os.path.isfile(executable)):
+            print("")
+            print("ERROR: Executable '"+executable+"' does not exist.")
+            print("Please call 'make install' in the build directory first.")
+            print("")
+            sys.exit(-1);
+        
+        # Call the executable with the directory to which results should be written
+        command = executable+" "+fa_name+" "+directory
+        print(command)
+        subprocess.call(command, shell=True)
+        
+        outputs = np.loadtxt(directory+"outputs.txt")
+        inputs_grid = np.loadtxt(directory+"inputs_grid.txt")
+        outputs_grid = np.loadtxt(directory+"predictions_grid.txt")
+        activations_grid = np.loadtxt(directory+"activations_grid.txt")
+        
+        n_samples_grid = outputs_grid.size
+        ax = fig.add_subplot(122)
+        ax.set_title('C++')
+        plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
+        plotDataResiduals(inputs,targets,outputs,ax)
+        plotDataTargets(inputs,targets,ax)
+        if fa_name=="LWR":
+            lines_grid = np.loadtxt(directory+"lines_grid.txt")
+            activations_unnormalized_grid = np.loadtxt(directory+"activations_unnormalized_grid.txt")
+            plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_grid,activations_grid,activations_unnormalized_grid)
+        if fa_name=="RBFN":
+            plotBasisFunctions(inputs_grid,activations_grid,ax,n_samples_grid)
     
     plt.show()
 

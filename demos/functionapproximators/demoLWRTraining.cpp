@@ -30,6 +30,8 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
+#include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorRBFN.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 
@@ -42,11 +44,12 @@ int main(int n_args, char** args)
 {
   double intersection = 0.5;
   double n_rfs = 9;
-  string directory = string(args[1]);
-  if (n_args>2)
-    intersection = atof(args[2]);
+  string fa_name = string(args[1]);
+  string directory = string(args[2]);
   if (n_args>3)
-    n_rfs = atoi(args[3]);
+    intersection = atof(args[3]);
+  if (n_args>4)
+    n_rfs = atoi(args[4]);
   
   // Load training data 
   MatrixXd inputs;
@@ -57,8 +60,17 @@ int main(int n_args, char** args)
   int input_dim = inputs.cols();
 
   // Initialize function approximator
-  MetaParametersLWR* meta_params = new MetaParametersLWR(input_dim,n_rfs,intersection);
-  FunctionApproximator* fa = new FunctionApproximatorLWR(meta_params);
+  FunctionApproximator* fa;
+  if (fa_name.compare("LWR")==0)
+  {
+    MetaParametersLWR* meta_params = new MetaParametersLWR(input_dim,n_rfs,intersection);
+    fa = new FunctionApproximatorLWR(meta_params);
+  }
+  else
+  {
+    MetaParametersRBFN* meta_params = new MetaParametersRBFN(input_dim,n_rfs,intersection);
+    fa = new FunctionApproximatorRBFN(meta_params);
+  }
 
   // Train function approximator with data
   bool overwrite = true;
