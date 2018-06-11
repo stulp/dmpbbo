@@ -22,4 +22,9 @@ class Parameterizable:
     
     def setParameterVectorSelected(self,values):
         raise NotImplementedError('subclasses must override setParameterVectorSelected()!')
+        
+    def getParameterVectorSelectedSize(self):
+        raise NotImplementedError('subclasses must override getParameterVectorSelectedSize()!')
+        
+        
 

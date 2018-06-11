@@ -116,7 +116,10 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         
     def setParameterVectorSelected(self,values):
         if self.is_trained_:
-            assert(len(values)==len(self.model_weights_))
+            assert(len(values)==self.getParameterVectorSelectedSize())
             self.model_weights_ = values
         else:
             warning('FunctionApproximatorRBFN is not trained.')
+            
+    def getParameterVectorSelectedSize(self):
+        return len(self.model_weights_)

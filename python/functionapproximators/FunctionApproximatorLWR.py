@@ -132,6 +132,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
     def isTrained(self):
         return self.is_trained_
 
+
     def getParameterVectorSelected(self):
         if self.is_trained_:
             return self.model_offsets_
@@ -141,7 +142,10 @@ class FunctionApproximatorLWR(FunctionApproximator):
         
     def setParameterVectorSelected(self,values):
         if self.is_trained_:
-            assert(len(values)==len(self.model_offsets_))
+            assert(len(values)==self.getParameterVectorSelectedSize())
             self.model_offsets_ = values
         else:
             warning('FunctionApproximatorLWR is not trained.')
+
+    def getParameterVectorSelectedSize(self):
+        return len(self.model_offsets_)
