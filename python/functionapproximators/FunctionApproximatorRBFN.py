@@ -46,6 +46,22 @@ class FunctionApproximatorRBFN:
         n_centers = self.meta_n_basis_functions_per_dim_
         centers = np.linspace(min_vals,max_vals,n_centers)
         widths = np.ones(n_centers)
+        if n_centers>1:
+            # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
+            # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
+            # And we want the activation at x to be 'intersection'. So
+            #            y = exp(-0.5(x-c0)^2/w^2)
+            # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
+            # intersection = exp(-0.5((0.5*c1-0.5*c0)^2/w^2))
+            # intersection = exp(-0.5((0.5*(c1-c0))^2/w^2))
+            # intersection = exp(-0.5(0.25*(c1-c0)^2/w^2))
+            # intersection = exp(-0.125((c1-c0)^2/w^2))
+            #            w = sqrt((c1-c0)^2/-8*ln(intersection))
+            for cc in range(n_centers-1):
+                w = np.sqrt(np.square(centers[cc+1]-centers[cc])/(-8*np.log(self.meta_intersection_height_)))
+                widths[cc] = w
+                
+            widths[n_centers-1] = widths[n_centers-2]
        
         # Get the activations of the basis functions 
         self.model_widths_ = widths

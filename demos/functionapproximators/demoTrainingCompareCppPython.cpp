@@ -83,7 +83,7 @@ int main(int n_args, char** args)
 
   VectorXd min(1); min << 0.0;
   VectorXd max(1); max << 2.0;
-  VectorXi n_samples_grid(1); n_samples_grid << 200;
+  VectorXi n_samples_grid(1); n_samples_grid << 201;
   fa->saveGridData(min, max, n_samples_grid, directory, overwrite);
 
   delete fa;
