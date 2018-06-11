@@ -336,3 +336,27 @@ class Dmp(DynamicalSystem):
         # Left column is time
         return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self.tau_)
   
+    def getParameterVectorSelected(self):
+        values = np.empty(0)
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                values = np.append(values,fa.getParameterVectorSelected())
+        return values
+        
+    def setParameterVectorSelected(self,values):
+        size = self.getParameterVectorSelectedSize()
+        assert(len(values)==size)
+        offset = 0
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                cur_size = fa.getParameterVectorSelectedSize()
+                cur_values = values[offset:offset+cur_size]
+                fa.setParameterVectorSelected(cur_values)                
+                offset += cur_size
+            
+    def getParameterVectorSelectedSize(self):
+        size = 0
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                size += fa.getParameterVectorSelectedSize()
+        return size
