@@ -20,10 +20,11 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
+from functionapproximators.FunctionApproximator import FunctionApproximator
 from functionapproximators.BasisFunction import Gaussian
 from functionapproximators.leastSquares import *
 
-class FunctionApproximatorRBFN:
+class FunctionApproximatorRBFN(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
         
@@ -105,3 +106,17 @@ class FunctionApproximatorRBFN:
     def isTrained(self):
         return self.is_trained_
 
+
+    def getParameterVectorSelected(self):
+        if self.is_trained_:
+            return self.model_weights_
+        else:
+            warning('FunctionApproximatorRBFN is not trained.')
+            return [];
+        
+    def setParameterVectorSelected(self,values):
+        if self.is_trained_:
+            assert(len(values)==len(self.model_weights_))
+            self.model_weights_ = values
+        else:
+            warning('FunctionApproximatorRBFN is not trained.')

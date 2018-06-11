@@ -20,10 +20,11 @@ import os, sys
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
+from functionapproximators.FunctionApproximator import FunctionApproximator
 from functionapproximators.BasisFunction import Gaussian
 from functionapproximators.leastSquares import *
 
-class FunctionApproximatorLWR:
+class FunctionApproximatorLWR(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
         
@@ -131,3 +132,16 @@ class FunctionApproximatorLWR:
     def isTrained(self):
         return self.is_trained_
 
+    def getParameterVectorSelected(self):
+        if self.is_trained_:
+            return self.model_offsets_
+        else:
+            warning('FunctionApproximatorLWR is not trained.')
+            return [];
+        
+    def setParameterVectorSelected(self,values):
+        if self.is_trained_:
+            assert(len(values)==len(self.model_offsets_))
+            self.model_offsets_ = values
+        else:
+            warning('FunctionApproximatorLWR is not trained.')
