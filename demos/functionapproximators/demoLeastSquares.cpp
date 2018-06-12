@@ -33,28 +33,21 @@
 
 #include "functionapproximators/leastSquares.hpp"
 
-#include "targetFunction.hpp"
-
 using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
+
+void process_arguments(int n_args, char** args, double& regularization, bool& use_offset, string& directory);
+
 
 int main(int n_args, char** args)
 {
   string directory;
   bool use_offset = false;
   double regularization = 0.0;
+  process_arguments(n_args,args,regularization,use_offset,directory);
   
-  if (n_args>1)
-    regularization = atof(args[1]);
-  if (n_args>2)
-  {
-    int use_offset_int = atoi(args[2]);
-    use_offset = (use_offset_int!=0);
-  }
-  if (n_args>3)
-    directory = string(args[3]);
-  
+  // Make inputs and targets, or read them from file (depending on whether directory is passed)
   MatrixXd inputs;
   MatrixXd targets;
   VectorXd weights;
@@ -76,14 +69,18 @@ int main(int n_args, char** args)
   
   int n_input_dims = inputs.cols();
   cout << "Least squares on " << n_input_dims << "D data ("<< regularization << " " << use_offset << ")\t";
+  
+  // Call least squares
   VectorXd beta = weightedLeastSquares(inputs,targets,weights,use_offset,regularization);
 
   cout << "  beta=" << beta.transpose() << endl;
-  
+
+  // Make predictions for the inputs
   MatrixXd outputs;
   ENTERING_REAL_TIME_CRITICAL_CODE
   linearPrediction(inputs,beta,outputs);
   EXITING_REAL_TIME_CRITICAL_CODE
+  
   
   bool overwrite = true;
   saveMatrix(directory,"beta.txt",beta,overwrite);
@@ -95,3 +92,15 @@ int main(int n_args, char** args)
 }
 
 
+void process_arguments(int n_args, char** args, double& regularization, bool& use_offset, string& directory)
+{
+  if (n_args>1)
+    regularization = atof(args[1]);
+  if (n_args>2)
+  {
+    int use_offset_int = atoi(args[2]);
+    use_offset = (use_offset_int!=0);
+  }
+  if (n_args>3)
+    directory = string(args[3]);
+}

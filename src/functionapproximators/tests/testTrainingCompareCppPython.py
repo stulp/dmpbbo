@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../python/')
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *
@@ -96,7 +96,7 @@ if __name__=='__main__':
         np.savetxt(directory+"inputs.txt",inputs)
         np.savetxt(directory+"targets.txt",targets)
         
-        executable = "../../bin/demoTrainingCompareCppPython"
+        executable = "../../../bin_test/testTrainingCompareCppPython"
         
         if (not os.path.isfile(executable)):
             print("")

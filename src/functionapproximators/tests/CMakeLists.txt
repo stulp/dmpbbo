@@ -1,3 +1,7 @@
+add_executable(testTrainingCompareCppPython testTrainingCompareCppPython.cpp)
+target_link_libraries(testTrainingCompareCppPython functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS testTrainingCompareCppPython DESTINATION bin_test)
+
 add_executable(testFunctionApproximatorCloning testFunctionApproximatorCloning.cpp)
 target_link_libraries(testFunctionApproximatorCloning functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS testFunctionApproximatorCloning DESTINATION bin_test)
