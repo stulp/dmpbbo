@@ -41,21 +41,38 @@ using namespace DmpBbo;
 
 int main(int n_args, char** args)
 {
+  string directory;
   bool use_offset = false;
   double regularization = 0.0;
-  string directory = string(args[1]);
+  
+  if (n_args>1)
+    regularization = atof(args[1]);
   if (n_args>2)
-    regularization = atof(args[2]);
+  {
+    int use_offset_int = atoi(args[2]);
+    use_offset = (use_offset_int!=0);
+  }
   if (n_args>3)
-    use_offset = true;
+    directory = string(args[3]);
   
   MatrixXd inputs;
   MatrixXd targets;
   VectorXd weights;
-  directory += "/";
-  if (!loadMatrix(directory+"inputs.txt", inputs)) return -1;
-  if (!loadMatrix(directory+"targets.txt", targets)) return -1;
-  if (!loadMatrix(directory+"weights.txt", weights)) return -1;
+  
+  if (directory.empty())
+  {
+    int n_samples = 25;
+    inputs = VectorXd::LinSpaced(n_samples,0.0,2.0);
+    targets = 2.0*inputs.array()+ 3.0;
+    weights = VectorXd::Ones(n_samples);
+  }
+  else
+  {
+    directory += "/";
+    if (!loadMatrix(directory+"inputs.txt", inputs)) return -1;
+    if (!loadMatrix(directory+"targets.txt", targets)) return -1;
+    if (!loadMatrix(directory+"weights.txt", weights)) return -1;
+  }
   
   int n_input_dims = inputs.cols();
   cout << "Least squares on " << n_input_dims << "D data ("<< regularization << " " << use_offset << ")\t";

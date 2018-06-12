@@ -69,10 +69,13 @@ def runLeastSquares(n_dims,use_offset,ax,directory=None):
         directory = "/tmp/demoLeastSquares/"
         
         # Call the executable with the directory to which results should be written
-        command = executable+" "+cur_dir
-        command += " {:.6f}".format(regularization)
+        command = executable+" "
+        command += " {:.8f}".format(regularization)
         if (use_offset):
-            command += ' use_offset'
+            command += ' 1'
+        else:
+            command += ' 0'
+        command += " "+cur_dir
         print(command)
         subprocess.call(command, shell=True)
         
