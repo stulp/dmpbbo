@@ -31,8 +31,8 @@ class Trajectory:
         assert(n_time_steps==ys.shape[0])
         assert(n_time_steps==yds.shape[0])
         assert(n_time_steps==ydds.shape[0])
-        if misc:
-            assert(n_time_steps==misc_.shape[0])
+        if misc is not None:
+            assert(n_time_steps==misc.shape[0])
             
         self.dim_ = 1
         if ys.ndim==2:
@@ -44,6 +44,31 @@ class Trajectory:
         self.ydds_ = ydds
         self.misc_ = misc
 
+    def setMisc(self,misc):
+        assert(misc.shape[0]==self.ts_.shape[0])
+        self.misc_ = misc
+
+    def length(self):
+        return self.ts_.shape[0]
+
+    def duration(self):
+        return self.ts_[-1]-self.ts_[0]
+
+    def dim(self):
+        return self.dim_
+            
+    def dim_misc(self):
+        if self.misc_ is None:
+            return 0
+        else:
+            return self.misc_.shape[1]
+            
+    def initial_y(self):
+        return self.ys_[0]
+        
+    def final_y(self):
+        return self.ys_[-1]
+            
     def generatePolynomialTrajectory(ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
         
         a0 = y_from
@@ -147,8 +172,24 @@ class Trajectory:
         
     def asMatrix(self):
         as_matrix = np.column_stack((self.ts_, self.ys_, self.yds_, self.ydds_))
-        if self.misc_:
+        if self.misc_ is not None:
             np.column_stack((as_matrix,self.misc_))
         return as_matrix
 
+    def saveToFile(self,directory, filename):
+        np.savetxt(directory+"/"+filename,self.asMatrix(),fmt='%1.7f')
+   
+    @staticmethod
+    def readFromFile(filename, n_dims_misc=0):
+        data = np.loadtxt(filename)
         
+        (n_time_steps, n_cols) = data.shape
+        n_dims = (n_cols-1-n_dims_misc)//3
+        
+        ts   = data[:,0]
+        ys   = data[:,1          :1*n_dims+1]
+        yds  = data[:,1*n_dims+1 :2*n_dims+1]
+        ydds = data[:,2*n_dims+1 :3*n_dims+1]
+        misc = data[:,3*n_dims+1 :]
+
+        return Trajectory(ts,ys,yds,ydds,misc)
