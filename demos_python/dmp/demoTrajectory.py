@@ -60,3 +60,8 @@ if __name__=='__main__':
     fig.canvas.set_window_title('polynomial viapoint trajectory') 
 
     plt.show()
+
+    traj.saveToFile('/tmp/','trajectory1.txt')
+    traj_load = Trajectory.readFromFile('/tmp/trajectory1.txt',traj.dim_misc())
+    traj_load.saveToFile('/tmp/','trajectory2.txt')
+
