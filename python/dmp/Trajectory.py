@@ -19,18 +19,34 @@
 import numpy as np
 import sys
 import os
+import matplotlib.pyplot as plt
+from scipy.signal import butter, lfilter, filtfilt
 
-#lib_path = os.path.abspath('../../python/dynamicalsystems')
-#sys.path.append(lib_path)
+lib_path = os.path.abspath('../../python/')
+sys.path.append(lib_path)
+
+from dmp.dmp_plotting import plotTrajectory
 
 
 class Trajectory:
 
-    def __init__(self,  ts, ys, yds, ydds, misc=None):
+    def __init__(self,  ts, ys, yds=None, ydds=None, misc=None):
+        
         n_time_steps = ts.size
         assert(n_time_steps==ys.shape[0])
-        assert(n_time_steps==yds.shape[0])
-        assert(n_time_steps==ydds.shape[0])
+        
+        if yds is None:
+            dt_mean = np.mean(np.diff(ts))
+            yds = diffnc(ys,dt_mean)
+        else:
+            assert(ys.shape==yds.shape)
+        
+        if ydds is None:
+            dt_mean = np.mean(np.diff(ts))
+            ydds = diffnc(yds,dt_mean)
+        else:
+            assert(ys.shape==ydds.shape)
+        
         if misc is not None:
             assert(n_time_steps==misc.shape[0])
             
@@ -193,3 +209,57 @@ class Trajectory:
         misc = data[:,3*n_dims+1 :]
 
         return Trajectory(ts,ys,yds,ydds,misc)
+        
+        
+    def applyLowPassFilter(self,cutoff,order=3,axs=None):
+        
+        # Plot before filtering
+        if axs is not None:
+            lines = plotTrajectory(self.asMatrix(),axs)
+            plt.setp(lines, linestyle='-',  linewidth=2, color=(0.6,0.6,1.0))
+        
+        
+        # Sample rate and desired cutoff frequencies (in Hz).
+        dt_mean = np.mean(np.diff(self.ts_))
+        sample_freq = 1.0/dt_mean
+        self.ys_  = butter_lowpass_filter(self.ys_, cutoff, sample_freq, order)
+        self.yds_  = diffnc(self.ys_,dt_mean)
+        self.ydds_ = diffnc(self.yds_,dt_mean)
+        
+        if axs is not None:
+            lines = plotTrajectory(self.asMatrix(),axs)
+            plt.setp(lines, linestyle='-',  linewidth=1, color=(0.8,0.2,0.2))
+        
+
+
+def diffnc(X,dt):
+    # [X] = diffc(X,dt) does non causal differentiation with time interval
+    # dt between data points. The returned vector (matrix) is of the same length
+    # as the original one
+    #
+    # Stefan Schaal December 29, 1995. Converted to Python by Freek Stulp
+    
+    (n_samples, n_dims)  = X.shape
+    fil = np.array([1.0,0.0,-1.0])/2/dt
+    XX = np.empty([n_samples+2, n_dims])
+    for i_dim in range(n_dims):
+        XX[:,i_dim] = np.convolve(X[:,i_dim],fil)
+    
+    X = XX[1:-1,:]
+    X[0,:] = X[1,:]
+    X[-1,:] = X[-2,:]
+    return X
+
+def butter_lowpass(cutoff, fs, order=3):
+    # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
+    nyq = 0.5 * fs
+    cut = cutoff / nyq
+    b, a = butter(order, cut, btype='low',analog=False)
+    return b, a
+
+
+def butter_lowpass_filter(data, cutoff, fs, order=3):
+    # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
+    b, a = butter_lowpass(cutoff, fs, order=order)
+    y = filtfilt(b, a, data, axis=0)
+    return y

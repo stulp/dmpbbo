@@ -39,8 +39,8 @@ if __name__=='__main__':
     
     fig = plt.figure(1)
     axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
-    traj = Trajectory.generateMinJerkTrajectory(ts, y_first, y_last);
-    plotTrajectory(traj.asMatrix(),axs)
+    traj_minjerk = Trajectory.generateMinJerkTrajectory(ts, y_first, y_last);
+    plotTrajectory(traj_minjerk.asMatrix(),axs)
     fig.canvas.set_window_title('min-jerk trajectory') 
 
     fig = plt.figure(2)
@@ -59,9 +59,21 @@ if __name__=='__main__':
     axs[0].plot(viapoint_time,y_yd_ydd_viapoint[1],'or')
     fig.canvas.set_window_title('polynomial viapoint trajectory') 
 
-    plt.show()
 
     traj.saveToFile('/tmp/','trajectory1.txt')
     traj_load = Trajectory.readFromFile('/tmp/trajectory1.txt',traj.dim_misc())
     traj_load.saveToFile('/tmp/','trajectory2.txt')
 
+    # Do low-pass filtering
+    fig = plt.figure(4)
+    axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
+    
+    # Make a noisy trajectory
+    y_noisy = traj_minjerk.ys_ + 0.001*np.random.random_sample(traj_minjerk.ys_.shape)
+    traj = Trajectory(ts,y_noisy)
+
+    cutoff = 10.0
+    order = 3
+    traj.applyLowPassFilter(cutoff,order,axs)
+    
+    plt.show()
