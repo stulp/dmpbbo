@@ -25,6 +25,8 @@ sys.path.append(lib_path)
 
 from dmp.Trajectory import Trajectory
 
+from functionapproximators.Parameterizable import Parameterizable
+
 from dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dynamicalsystems.SigmoidSystem import SigmoidSystem
@@ -32,16 +34,16 @@ from dynamicalsystems.TimeSystem import TimeSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 
-class Dmp(DynamicalSystem):
+class Dmp(DynamicalSystem,Parameterizable):
 
-    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp"):
+    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20):
         
         super().__init__(1, tau, y_init, y_attr, name)
         
         dim_orig = self.dim_orig_
 
         self.goal_system_  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
-        self.gating_system_ = SigmoidSystem(tau,np.ones(1),-20,0.9*tau,'gating') 
+        self.gating_system_ = SigmoidSystem(tau,np.ones(1),sigmoid_max_rate,0.9*tau,'gating') 
         self.phase_system_  = TimeSystem(tau,False,'phase')
         alpha = 20.0
         self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
