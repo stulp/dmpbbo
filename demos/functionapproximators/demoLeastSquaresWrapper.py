@@ -119,7 +119,6 @@ if __name__=='__main__':
     parser.add_argument("--directory", help="directory",default='/tmp/demoLeastSquares/')
     parser.add_argument("--figure_number", type=int, help="figure number",default=1)
     parser.add_argument("--regularization", type=float, help="regularization term",default=0.0)
-    parser.add_argument('--feature', dest='feature', action='store_true')
     args = parser.parse_args()
     
     runLeastSquaresDemo(args.n_dims, args.use_offset, args.regularization, args.directory, args.figure_number)   
