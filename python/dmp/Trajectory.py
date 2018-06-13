@@ -84,6 +84,20 @@ class Trajectory:
         
     def final_y(self):
         return self.ys_[-1]
+        
+    def startTimeAtZero(self):
+        self.ts_ = self.ts_ - self.ts_[0]
+        
+    def crop(self,from_index,to_index):
+        assert(from_index<to_index)
+        assert(to_index<self.length())
+        self.ts_ = self.ts_[from_index:to_index]
+        self.ys_ = self.ys_[from_index:to_index,:]
+        self.yds_ = self.yds_[from_index:to_index,:]
+        self.ydds_ = self.ydds_[from_index:to_index,:]
+        if self.misc_ is not None:
+            self.misc_ = self.misc_[from_index:to_index,:]
+        
             
     def generatePolynomialTrajectory(ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
         
