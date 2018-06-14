@@ -26,7 +26,7 @@ from functionapproximators.leastSquares import *
 
 class FunctionApproximatorRBFN(FunctionApproximator):
     
-    def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
+    def __init__(self,n_basis_functions_per_dim, intersection_height=0.7, regularization=0.0):
         
         self.meta_n_basis_functions_per_dim_ = n_basis_functions_per_dim
         self.meta_intersection_height_ = intersection_height
