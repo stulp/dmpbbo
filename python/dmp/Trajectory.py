@@ -34,15 +34,14 @@ class Trajectory:
         
         n_time_steps = ts.size
         assert(n_time_steps==ys.shape[0])
+        dt_mean = np.mean(np.diff(ts))
         
         if yds is None:
-            dt_mean = np.mean(np.diff(ts))
             yds = diffnc(ys,dt_mean)
         else:
             assert(ys.shape==yds.shape)
         
         if ydds is None:
-            dt_mean = np.mean(np.diff(ts))
             ydds = diffnc(yds,dt_mean)
         else:
             assert(ys.shape==ydds.shape)
@@ -55,6 +54,7 @@ class Trajectory:
             self.dim_ = ys.shape[1]
             
         self.ts_ = ts
+        self.dt_mean = dt_mean
         self.ys_ = ys
         self.yds_ = yds
         self.ydds_ = ydds
@@ -224,7 +224,10 @@ class Trajectory:
 
         return Trajectory(ts,ys,yds,ydds,misc)
         
-        
+    def recomputeDerivatives(self):
+        self.yds_  = diffnc(self.ys_,self.dt_mean)
+        self.ydds_ = diffnc(self.yds_,self.dt_mean)
+
     def applyLowPassFilter(self,cutoff,order=3,axs=None):
         
         # Plot before filtering
@@ -237,8 +240,7 @@ class Trajectory:
         dt_mean = np.mean(np.diff(self.ts_))
         sample_freq = 1.0/dt_mean
         self.ys_  = butter_lowpass_filter(self.ys_, cutoff, sample_freq, order)
-        self.yds_  = diffnc(self.ys_,dt_mean)
-        self.ydds_ = diffnc(self.yds_,dt_mean)
+        self.recomputeDerivatives()
         
         if axs is not None:
             lines = plotTrajectory(self.asMatrix(),axs)
