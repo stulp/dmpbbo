@@ -49,6 +49,8 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
         
         self.function_approximators_ = function_apps
+        
+        self.ts_train_ = None
 
         # Make room for the subsystems
         self.dim_ = 3*dim_orig+2
@@ -168,7 +170,15 @@ class Dmp(DynamicalSystem,Parameterizable):
                     fa_output[:,i_fa] = self.function_approximators_[i_fa].predict(phase_state)
         return fa_output
         
-    def analyticalSolution(self,ts):
+    def analyticalSolution(self,ts=None):
+        if ts is None:
+            if self.ts_train_ is None:
+                print("Neither the argument 'ts' nor the member variable self.ts_train_ was set. Returning None.")
+                return None
+            else:
+                # Set the times to the ones the Dmp was trained on.
+                ts = self.ts_train_
+
 
         n_time_steps = ts.size
         
@@ -291,6 +301,11 @@ class Dmp(DynamicalSystem,Parameterizable):
 
             fa_target = f_target[:,dd]
             self.function_approximators_[dd].train(fa_input_phase,fa_target)
+        
+        # Save the times steps on which the Dmp was trained.
+        # This is just a convenience function to be able to call 
+        # analyticalSolution without the "ts" argument.
+        self.ts_train_ = trajectory.ts_
             
     def computeFunctionApproximatorInputsAndTargets(self,trajectory):
         n_time_steps = trajectory.ts_.size
