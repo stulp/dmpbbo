@@ -88,15 +88,31 @@ class Trajectory:
     def startTimeAtZero(self):
         self.ts_ = self.ts_ - self.ts_[0]
         
-    def crop(self,from_index,to_index):
-        assert(from_index<to_index)
-        assert(to_index<self.length())
-        self.ts_ = self.ts_[from_index:to_index]
-        self.ys_ = self.ys_[from_index:to_index,:]
-        self.yds_ = self.yds_[from_index:to_index,:]
-        self.ydds_ = self.ydds_[from_index:to_index,:]
+    def crop(self,fro,to,as_times=False):        
+        # Crop trajectory from 'fro' to 'to'
+        # if as_times is False, 'fro' to 'to' are interpreted as indices 
+        # if as_times is True, 'fro' to 'to' are interpreted as times
+        
+        assert(fro<to)
+        
+        if as_times:
+            if (fro>self.ts_[-1]):
+                print("WARNING: Argument 'fro' out of range, because "+str(fro)+" > "+str(self.ts_[-1])+". Not cropping")
+                return 
+                
+            fro = np.argmax(self.ts_>fro)
+            to = np.argmax(self.ts_>=to)
+            print(fro)
+            print(to)
+            
+        assert(to<self.length())
+        self.ts_ = self.ts_[fro:to]
+        self.ys_ = self.ys_[fro:to,:]
+        self.yds_ = self.yds_[fro:to,:]
+        self.ydds_ = self.ydds_[fro:to,:]
         if self.misc_ is not None:
-            self.misc_ = self.misc_[from_index:to_index,:]
+            self.misc_ = self.misc_[fro:to,:]
+            
         
             
     def generatePolynomialTrajectory(ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
