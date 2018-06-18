@@ -41,9 +41,16 @@ def plotRollout(cost_vars,ax):
     y = cost_vars[:,0:n_dofs]
     if n_dofs==1:
         line_handles = ax.plot(y,linewidth=0.5)
+        viapoint_time = 0.5
+        viapoint_x = 2.5
+        ax.plot(viapoint_time,viapoint_x,'ok')
     else:
         line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
+        viapoint_x = 2.5
+        viapoint_y = 2.0
+        ax.plot(viapoint_x,viapoint_y,'ok')
     return line_handles
+
 
 if __name__=='__main__':
     # Call the executable with the directory to which results should be written

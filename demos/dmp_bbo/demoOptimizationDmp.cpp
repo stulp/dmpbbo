@@ -40,6 +40,8 @@
 #include "bbo/Updater.hpp"
 #include "bbo/updaters/UpdaterCovarDecay.hpp"
 
+#include "dmpbbo_io/EigenFileIO.hpp"
+
 using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
@@ -69,7 +71,8 @@ int main(int n_args, char* args[])
   // Make the task
   int n_dims = 2;
   VectorXd viapoint = VectorXd::Constant(n_dims,2.0);
-  double viapoint_time = 0.3;
+  viapoint[0] = 2.5;
+  double viapoint_time = 0.5;
   TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
   
   // Some DMP parameters
@@ -119,6 +122,7 @@ int main(int n_args, char* args[])
   int n_updates = 40;
   int n_samples_per_update = 15;
   bool overwrite = true;
+  saveMatrix(directory, "viapoint.txt",viapoint,overwrite);
   runOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }
