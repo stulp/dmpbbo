@@ -19,30 +19,18 @@
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt                                               
-import os, sys, subprocess
+import os, sys
 import argparse
 
-# Include scripts for plotting
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from functionapproximators.functionapproximators_plotting import *
 from functionapproximators.leastSquares import *
-
-def execute_binary(executable_name,arguments):
-    
-    if (not os.path.isfile(executable_name)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
-        
-    command = executable_name+" "+arguments
-    
-    subprocess.call(command, shell=True)
-    
-    return command
 
 
 def runLeastSquaresDemo(n_dims, use_offset, regularization, directory, figure_number):   
@@ -69,6 +57,8 @@ def runLeastSquaresDemo(n_dims, use_offset, regularization, directory, figure_nu
         targets[dd] = targets[dd] + 0.25*np.random.rand()
 
     # Save the data to file
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     np.savetxt(directory+"/inputs.txt",inputs)
     np.savetxt(directory+"/targets.txt",targets)
     np.savetxt(directory+"/weights.txt",weights)
@@ -77,7 +67,7 @@ def runLeastSquaresDemo(n_dims, use_offset, regularization, directory, figure_nu
     arguments = " {:.8f}".format(regularization)
     arguments += " "+str(int(use_offset))
     arguments += " "+directory
-    execute_binary("../../bin/demoLeastSquares",arguments)
+    executeBinary("../../bin/demoLeastSquares",arguments)
     
     # Results from file
     beta = np.loadtxt(directory+"/beta.txt")

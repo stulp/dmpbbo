@@ -19,12 +19,14 @@
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy                                                                  
 import matplotlib.pyplot as plt                                               
-import os, sys, subprocess
+import os, sys
 
-# Include scripts for plotting
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
-
 from functionapproximators.functionapproximators_plotting import *
 
 
@@ -43,25 +45,16 @@ def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
 if __name__=='__main__':
     """Run some training sessions and plot results."""
 
-    executable = "../../bin/demoFunctionApproximatorTraining"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
-    
     fig_number = 1;     
+    executable = "../../bin/demoFunctionApproximatorTraining"
     directory = "/tmp/demoFunctionApproximatorTraining/"
     
     fa_names = ["RBFN","GPR","RRRFF","LWR", "LWPR", "GMR"] 
     for fa_name in fa_names:
       
         # Call the executable with the directory to which results should be written
-        command = executable+" "+directory+" "+fa_name
-        #print(command)
-        subprocess.call(command, shell=True)
+        arguments = directory+" "+fa_name
+        executeBinary(executable, arguments)
     
     
     for fa_name in fa_names:

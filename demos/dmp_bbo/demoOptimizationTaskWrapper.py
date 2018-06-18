@@ -25,13 +25,14 @@
 
 import matplotlib.pyplot as plt
 import numpy
-import subprocess
-
-# Add relative path if PYTHONPATH is not set
 import os, sys
+
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
-
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 
 def plotRollout(cost_vars,ax):
@@ -39,25 +40,17 @@ def plotRollout(cost_vars,ax):
     return line_handles
 
 if __name__=='__main__':
-    executable = "../../bin/demoOptimizationTask"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
-    
     covar_updates = ["none","decay","adaptation"]
 
     figure_number = 1;
     for covar_update in covar_updates:
       # Call the executable with the directory to which results should be written
+      executable = "../../bin/demoOptimizationTask"
       directory = "/tmp/demoOptimizationTask/"+covar_update
-      command = executable+" "+directory+" "+covar_update
-      print(command)
-      subprocess.call(command, shell=True)
+      arguments = directory+" "+covar_update
+      executeBinary(executable,arguments,True)
       
+      print("    Plotting")
       fig = plt.figure(figure_number,figsize=(12, 4))
       figure_number += 1;
       plotOptimizationRollouts(directory,fig,plotRollout)

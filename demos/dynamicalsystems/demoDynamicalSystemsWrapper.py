@@ -25,25 +25,20 @@
 
 import matplotlib.pyplot as plt
 import numpy
-import os, sys, subprocess
+import os, sys
 
-# Include scripts for plotting
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
-
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
 
 
 if __name__=='__main__':
     executable = "../../bin/demoDynamicalSystems"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
     
     # See if input directory was passed
     if (len(sys.argv)<2 or len(sys.argv)>3):
@@ -66,13 +61,12 @@ if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/demoDynamicalSystems"
-    command = executable+" "+directory
+    arguments = directory
     for demo_label in demo_labels:
-      command += " "+demo_label
+      arguments += " "+demo_label
      
     print("____________________________________________________________________")
-    print(command)
-    subprocess.call(command, shell=True)
+    executeBinary(executable, arguments, True)
     
     figure_number = 1;
     directories = os.listdir(directory) 

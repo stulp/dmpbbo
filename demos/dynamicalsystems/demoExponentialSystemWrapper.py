@@ -25,27 +25,22 @@
 
 import matplotlib.pyplot as plt
 import numpy
-import os, sys, subprocess
+import os, sys
 
-# Include scripts for plotting
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
-
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
 if __name__=='__main__':
-    executable = "../../bin/demoExponentialSystem"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
     
     # Call the executable with the directory to which results should be written
+    executable = "../../bin/demoExponentialSystem"
     directory = "/tmp/demoExponentialSystem"
-    subprocess.call([executable, directory])
+    executeBinary(executable, directory)
     
     fig = plt.figure(1)
     data_ana = numpy.loadtxt(directory+"/analytical.txt")

@@ -25,13 +25,14 @@
 
 import matplotlib.pyplot as plt
 import numpy
-import subprocess
-
-# Add relative path if PYTHONPATH is not set
 import os, sys
+
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
-
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 
 def plotRollout(cost_vars,ax):
@@ -45,20 +46,10 @@ def plotRollout(cost_vars,ax):
     return line_handles
 
 if __name__=='__main__':
-    executable = "../../bin/demoOptimizationDmp"
-    
-    if (not os.path.isfile(executable)):
-        print("")
-        print("ERROR: Executable '"+executable+"' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1);
-    
     # Call the executable with the directory to which results should be written
+    executable = "../../bin/demoOptimizationDmp"
     directory = "/tmp/demoOptimizationDmp"
-    command = executable+" "+directory
-    print(command)
-    subprocess.call(command, shell=True)
+    executeBinary(executable, directory)
       
     fig = plt.figure(1,figsize=(12, 4))
     plotOptimizationRollouts(directory,fig,plotRollout)
