@@ -18,7 +18,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
-import os, sys, subprocess
+import os, sys
 
 # Include scripts for plotting
 lib_path = os.path.abspath('../../python/')

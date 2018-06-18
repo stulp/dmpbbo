@@ -21,7 +21,6 @@ import os
 import sys
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
-import subprocess
 
 def plotDynamicalSystem(data,axs):
   
