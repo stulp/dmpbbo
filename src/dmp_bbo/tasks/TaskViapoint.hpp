@@ -118,6 +118,11 @@ public:
    */
   bool savePlotRolloutScript(std::string directory) const;
 
+  void set_time_first(bool time_first)
+  {
+    time_first_ = time_first;
+  }
+  
 private:
   Eigen::VectorXd viapoint_;
   double   viapoint_time_;
@@ -129,6 +134,8 @@ private:
   double   viapoint_weight_;
   double   acceleration_weight_;
   double   goal_weight_;
+  
+  mutable bool time_first_;
   
   /**
    * Default constructor.

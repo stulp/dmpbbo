@@ -99,8 +99,9 @@ int main(int n_args, char* args[])
   double dt=0.01;
   double integrate_dmp_beyond_tau_factor=1.2;
   bool use_normalized_parameter=true;  
+  bool time_first = false; 
   TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize,
-                                       dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter);
+                                       dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter,time_first);
   // task_solver->set_perturbation(1.0); // Add perturbations
   
   // Make the initial distribution
@@ -116,6 +117,10 @@ int main(int n_args, char* args[])
   double covar_decay_factor = 0.8;
   string weighting_method("PI-BB");
   Updater* updater = new UpdaterCovarDecay(eliteness, covar_decay_factor, weighting_method);
+  
+  
+  task.set_time_first(time_first);
+  task_solver->set_time_first(time_first);
   
   // Run the optimization
   int n_updates = 40;

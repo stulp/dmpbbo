@@ -53,6 +53,7 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(0.0)
 {
   assert(viapoint_radius_>=0.0);
+  time_first_ = false;
 }
 
 TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal,  double goal_time)
@@ -61,6 +62,7 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
   viapoint_weight_(1.0), acceleration_weight_(0.0001),  goal_weight_(1.0)
 {
   assert(viapoint_.size()==goal.size());
+  time_first_ = false;
 }
 
 TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal,  double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight)
@@ -70,6 +72,7 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
 {
   assert(viapoint_radius_>=0.0);
   assert(viapoint.size()==goal.size());
+  time_first_ = false;
 }
 
 void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
@@ -79,6 +82,12 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1  forcing_1..forcing_D
   //  |    |     |     |      |     |     |      |          |
   // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T  forcing_1..forcing_D
+  
+  // if time_first is true, cost_vars is assumed to have following structure
+  // t=0  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  // t=1  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  //  |    |    |     |     |      |     |       |          |
+  // t=T  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
   
   
   int n_dims = viapoint_.size();
@@ -97,14 +106,21 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   
   // rollout is of size   n_time_steps x n_cost_vars
   VectorXd ts = cost_vars.col(3 * n_dims);
-
+  MatrixXd y = cost_vars.block(0, 0, n_time_steps, n_dims);
+  MatrixXd ydd = cost_vars.block(0,2*n_dims,n_time_steps,n_dims);
+  if (time_first_)
+  {
+    ts = cost_vars.col(0);
+    y = cost_vars.block(0, 1, n_time_steps, n_dims);
+    ydd = cost_vars.block(0,1+2*n_dims,n_time_steps,n_dims);
+  }
+  
   double dist_to_viapoint = 0.0;
   if (viapoint_weight_!=0.0)
   {
     if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
     {
       // Don't compute the distance at some time, but rather get the minimum distance
-      const MatrixXd y = cost_vars.block(0, 0, n_time_steps, n_dims);
       dist_to_viapoint = (y.rowwise() - viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
     }
     else
@@ -118,7 +134,7 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
 
       assert(viapoint_time_step < ts.size());
 
-      VectorXd y_via = cost_vars.row(viapoint_time_step).segment(0,n_dims);
+      VectorXd y_via = y.row(viapoint_time_step);
       dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
     }
     
@@ -134,7 +150,6 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   double sum_ydd = 0.0;
   if (acceleration_weight_!=0.0)
   {
-    MatrixXd ydd = cost_vars.block(0,2*n_dims,n_time_steps,n_dims);
     // ydd = n_time_steps x n_dims
     sum_ydd = ydd.array().pow(2).sum();
   }
@@ -146,8 +161,13 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     while (goal_time_step < ts.size() && ts[goal_time_step] < goal_time_)
       goal_time_step++;
 
-    const MatrixXd y_after_goal = cost_vars.block(goal_time_step, 0,
+    MatrixXd y_after_goal = cost_vars.block(goal_time_step, 0,
       n_time_steps - goal_time_step, n_dims);
+    if (time_first_)
+    {
+      y_after_goal = cost_vars.block(goal_time_step, 1,
+        n_time_steps - goal_time_step, n_dims);
+    }
 
     delay_cost = (y_after_goal.rowwise() - goal_.transpose()).rowwise().squaredNorm().sum();
   }

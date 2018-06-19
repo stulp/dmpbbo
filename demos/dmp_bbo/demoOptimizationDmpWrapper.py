@@ -35,6 +35,7 @@ lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
+from dmp_bbo.dmp_bbo_plotting import plotOptimizationRolloutsTask
 
 def plotRollout(cost_vars,ax):
     """Simple script to plot y of DMP trajectory"""
@@ -77,7 +78,9 @@ if __name__=='__main__':
         executeBinary(executable, str(n_dims)+" "+directory)
         
         print("  Plotting")
-        fig = plt.figure(n_dims,figsize=(12, 4))
+        #fig = plt.figure(2*n_dims+0,figsize=(12, 4))
+        #plotOptimizationRolloutsTask(directory,fig,task)
+        fig = plt.figure(2*n_dims+1,figsize=(12, 4))
         plotOptimizationRollouts(directory,fig,plotRollout)
 
     print("Showing")
