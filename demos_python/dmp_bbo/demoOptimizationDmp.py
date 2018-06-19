@@ -48,17 +48,6 @@ if __name__=="__main__":
         directory = sys.argv[1]
 
     for n_dims in [1,2]:
-        # Make the task
-        viapoint = 3*np.ones(n_dims)
-        viapoint_time = 0.3
-        if n_dims==2:
-            # Do not pass through viapoint at a specific time, but rather pass
-            # through it at any time.
-            viapoint_time = None
-        viapoint_radius=0.1
-        viapoint_weight=1.0
-        acceleration_weight=0.0001
-        task = TaskViapoint(viapoint,viapoint_time, viapoint_radius, viapoint_weight, acceleration_weight)
         
         # Some DMP parameters
         tau = 0.5
@@ -74,6 +63,22 @@ if __name__=="__main__":
         # Initialize Dmp
         dmp = Dmp(tau, y_init, y_attr, function_apps)
     
+        # Make the task
+        viapoint = 3*np.ones(n_dims)
+        viapoint_time = 0.3
+        if n_dims==2:
+            # Do not pass through viapoint at a specific time, but rather pass
+            # through it at any time.
+            viapoint_time = None
+        viapoint_radius=0.1
+        goal=y_attr
+        goal_time=1.1*tau
+        viapoint_weight=1.0
+        acceleration_weight=0.0001
+        goal_weight=0.0
+        task = TaskViapoint(viapoint,viapoint_time, viapoint_radius, goal,goal_time,viapoint_weight, acceleration_weight,goal_weight)
+
+
         # Make task solver, based on a Dmp
         dt = 0.01
         integrate_dmp_beyond_tau_factor = 1.5
