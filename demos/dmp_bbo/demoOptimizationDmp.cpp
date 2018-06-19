@@ -67,10 +67,14 @@ int main(int n_args, char* args[])
   }
 
   // Make the task
-  VectorXd viapoint = VectorXd::Constant(n_dims,2.0);
-  viapoint[0] = 2.5;
-  double viapoint_time = 0.5;
-  TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
+  //VectorXd viapoint = VectorXd::Constant(n_dims,2.0);
+  //viapoint[0] = 2.5;
+  //double viapoint_time = 0.5;
+  //if (n_dims==2)
+  //  viapoint_time = -1;
+  //TaskViapoint* task = new TaskViapoint(viapoint,viapoint_time);
+  
+  TaskViapoint task = TaskViapoint::readFromFile(directory+"viapoint_task.txt");
   
   // Some DMP parameters
   double tau = 1;
@@ -117,7 +121,6 @@ int main(int n_args, char* args[])
   int n_updates = 40;
   int n_samples_per_update = 15;
   bool overwrite = true;
-  saveMatrix(directory, "viapoint.txt",viapoint,overwrite);
-  runOptimizationTask(task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
+  runOptimizationTask(&task, task_solver, distribution, updater, n_updates, n_samples_per_update,directory,overwrite);
   
 }

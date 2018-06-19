@@ -59,9 +59,10 @@ if __name__=='__main__':
     for n_dims in [1,2]:
         
         # Initialize a viapoint task and save it to file
-        viapoint = 3*np.ones(n_dims)
-        viapoint_time = 0.3
-        viapoint_radius = 0.1
+        viapoint = 2*np.ones(n_dims)
+        viapoint[0] = 2.5
+        viapoint_time = 0.5
+        viapoint_radius = 0.0
         if n_dims==2:
             # Do not pass through viapoint at a specific time, but rather pass
             # through it at any time.
@@ -71,13 +72,15 @@ if __name__=='__main__':
         task.saveToFile(directory,"viapoint_task.txt")
         
         # Call the executable with the directory to which results should be written
+        print("Call executable to run optimization with "+str(n_dims)+"D viapoint.")
         executable = "../../bin/demoOptimizationDmp"
         executeBinary(executable, str(n_dims)+" "+directory)
         
-        
+        print("  Plotting")
         fig = plt.figure(n_dims,figsize=(12, 4))
         plotOptimizationRollouts(directory,fig,plotRollout)
 
+    print("Showing")
     plt.show()
     
 
