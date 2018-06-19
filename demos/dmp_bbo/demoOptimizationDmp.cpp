@@ -33,8 +33,8 @@
 #include "dmp_bbo/runOptimizationTask.hpp"
 
 #include "dmp/Dmp.hpp"
-#include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/FunctionApproximatorLWR.hpp"
+#include "functionapproximators/ModelParametersRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorRBFN.hpp"
 
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
@@ -77,23 +77,21 @@ int main(int n_args, char* args[])
   VectorXd y_init = VectorXd::Constant(n_dims,1.0);
   VectorXd y_attr = VectorXd::Constant(n_dims,3.0);
   
-  // Make the initial function approximators (LWR with zero slopes)
-  int n_basis_functions = 4;
-  VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0,1);
+  // Make the initial function approximators (RBFN with zero slopes)
+  int n_basis_functions = 8;
+  VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0.0,1.0);
   VectorXd widths  = VectorXd::Constant(n_basis_functions,0.2);
-  VectorXd slopes  = VectorXd::Zero(n_basis_functions);
-  VectorXd offsets = VectorXd::Zero(n_basis_functions);
-  ModelParametersLWR* model_parameters = new ModelParametersLWR(centers,widths,slopes,offsets);
+  VectorXd weights = VectorXd::Zero(n_basis_functions);
+  ModelParametersRBFN* model_parameters = new ModelParametersRBFN(centers,widths,weights);
   vector<FunctionApproximator*> function_approximators(n_dims);
   for (int i_dim=0; i_dim<n_dims; i_dim++)
-    function_approximators[i_dim] = new FunctionApproximatorLWR(model_parameters);
+    function_approximators[i_dim] = new FunctionApproximatorRBFN(model_parameters);
   
   Dmp* dmp = new Dmp(tau, y_init, y_attr, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
   // Make the task solver
   set<string> parameters_to_optimize;
-  parameters_to_optimize.insert("offsets");
-  parameters_to_optimize.insert("slopes");
+  parameters_to_optimize.insert("weights");
   double dt=0.01;
   double integrate_dmp_beyond_tau_factor=1.2;
   bool use_normalized_parameter=true;  
