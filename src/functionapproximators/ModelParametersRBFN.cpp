@@ -160,12 +160,10 @@ void ModelParametersRBFN::getParameterVectorMask(const std::set<std::string> sel
     selected_mask.segment(offset,size).fill(2);
   offset += size;
   
-  // Offsets
+  // Weights
   size = weights_.rows()*weights_.cols();
   if (selected_values_labels.find("weights")!=selected_values_labels.end())
     selected_mask.segment(offset,size).fill(3);
-  offset += size;
-
   offset += size;
 
   assert(offset == getParameterVectorAllSize());   
