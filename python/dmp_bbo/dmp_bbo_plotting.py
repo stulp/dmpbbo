@@ -35,6 +35,9 @@ def containsNewDistribution(directory):
         return True
     return False
 
+def plotOptimizationRolloutsTask(directory,fig,task,plot_all_rollouts=False):
+    plotOptimizationRollouts(directory,fig,task.plotRollout,plot_all_rollouts)
+
 def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False):
     
     if not fig:    
