@@ -215,8 +215,6 @@ TaskViapoint TaskViapoint::readFromFile(std::string filename)
 {
   MatrixXd matrix;
   loadMatrix(filename, matrix);
-  cout << "  matrix=" << matrix << endl;
-  cout << "  matrix=" << matrix.rows() << " X " << matrix.cols() << endl;
   VectorXd vector = matrix.row(0);
   
   // 6 doubles and two vectors of size n_dims 
