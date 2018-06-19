@@ -223,7 +223,9 @@ TaskViapoint TaskViapoint::readFromFile(std::string filename)
   int n_dims = (vector.size()-6)/2;
   
   VectorXd viapoint = vector.head(n_dims);
-  double viapoint_time = vector[n_dims];    
+  double viapoint_time = vector[n_dims];
+  if (viapoint_time<0.0)
+    viapoint_time = TIME_AT_MINIMUM_DIST;
   double viapoint_radius = vector[n_dims+1];    
   VectorXd goal = vector.segment(n_dims+2,n_dims);
   double goal_time = vector[2*n_dims+2];
