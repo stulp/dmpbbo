@@ -37,17 +37,6 @@ from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRolloutsTask
 from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 
-def plotRollout(cost_vars,ax):
-    """Simple script to plot y of DMP trajectory"""
-    n_dofs = (cost_vars.shape[1]-1)//4
-    y = cost_vars[:,0:n_dofs]
-    if n_dofs==1:
-        line_handles = ax.plot(y,linewidth=0.5)
-    else:
-        line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
-        ax.plot(1.5,2,'o');
-    return line_handles
-
 if __name__=='__main__':
     
     # Initialize a viapoint task and save it to file
@@ -64,7 +53,6 @@ if __name__=='__main__':
     executeBinary(executable, directory)
       
     fig = plt.figure(1,figsize=(12, 4))
-    #plotOptimizationRollouts(directory,fig,plotRollout)
     plotOptimizationRolloutsTask(directory,fig,task)
     plt.show()
     

@@ -97,8 +97,6 @@ int main(int n_args, char* args[])
   parameters_to_optimize.insert("offsets");
   
   TaskSolverDmp* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
-  task_solver->set_time_first(true);
-  task->set_time_first(true);
   
 
   // Make the initial distribution

@@ -46,7 +46,6 @@ private:
   int n_time_steps_;
   double integrate_time_;
   bool use_normalized_parameter_;
-  bool time_first_;
   
 public:
   /** Constructor.
@@ -55,9 +54,8 @@ public:
    * \param[in] dt Integration time steps
    * \param[in] integrate_dmp_beyond_tau_factor If you want to integrate the Dmp for a longer duration than the tau with which it was trained, set this value larger than 1. I.e. integrate_dmp_beyond_tau_factor=1.5 will integrate for 3 seconds, if the original tau of the Dmp was 2.
    * \param[in] use_normalized_parameter Use normalized parameters, cf. sec_fa_changing_modelparameters
-   * \param[in] time_first Whether time should be stored in the first column in cost_vars, which is the new norm. The default is false for now for backwards compatibilty, but in future versions it time will always be stored in the first column, and time_first will always be true (and removed as an argument here).
    */
-  TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false, bool time_first=false);
+  TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
   virtual void performRollout(const Eigen::VectorXd& samples, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
@@ -74,11 +72,6 @@ public:
    */
   void set_perturbation(double perturbation_standard_deviation);
 
-  void set_time_first(bool time_first)
-  {
-    time_first_ = time_first;
-  }
-  
 private:
   /**
    * Default constructor.
@@ -106,7 +99,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(n_time_steps_);    
     ar & BOOST_SERIALIZATION_NVP(integrate_time_);
     ar & BOOST_SERIALIZATION_NVP(use_normalized_parameter_);
-    ar & BOOST_SERIALIZATION_NVP(time_first_);
   }
 
 };

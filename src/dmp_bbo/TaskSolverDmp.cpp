@@ -55,7 +55,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter, bool time_first)
+TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)
 {
   dmp_->setSelectedParameters(optimize_parameters);
@@ -63,12 +63,6 @@ TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters
   integrate_time_ = dmp_->tau() * integrate_dmp_beyond_tau_factor;
   n_time_steps_ = (integrate_time_/dt)+1;
   use_normalized_parameter_ = use_normalized_parameter;
-  time_first_ = time_first;
-  if (!time_first)
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ": Warning: ";
-    cerr << "Not having time in the first column will be deprecated soon." << endl;
-  }
 }
 
 void TaskSolverDmp::set_perturbation(double perturbation_standard_deviation)
@@ -105,17 +99,7 @@ void TaskSolverDmp::performRollout(const Eigen::VectorXd& sample, const Eigen::V
 
   int n_cost_vars = 4*n_dofs+1;
   cost_vars.resize(n_time_steps_,n_cost_vars); 
-  if (time_first_)
-  {
-    cost_vars << ts, ys_ana, yds_ana, ydds_ana, forcing_terms;
-  }
-  else
-  {
-    cost_vars << ys_ana, yds_ana, ydds_ana, ts, forcing_terms;
-  }
-  cout << "===============" << endl;
-  cout << "  time_first_=" << time_first_ << endl;
-  cout << cost_vars.topRows(10) << endl;
+  cost_vars << ts, ys_ana, yds_ana, ydds_ana, forcing_terms;
   //int offset = 0;
   //for (int tt=0; tt<n_time_steps_; tt++)
   //{
