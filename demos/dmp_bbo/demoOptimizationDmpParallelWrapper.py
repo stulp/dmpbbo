@@ -24,7 +24,7 @@
 ## \ingroup DMP_BBO
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import os, sys
 
 lib_path = os.path.abspath('../')
@@ -34,6 +34,8 @@ from executeBinary import executeBinary
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
+from dmp_bbo.dmp_bbo_plotting import plotOptimizationRolloutsTask
+from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 
 def plotRollout(cost_vars,ax):
     """Simple script to plot y of DMP trajectory"""
@@ -43,16 +45,27 @@ def plotRollout(cost_vars,ax):
         line_handles = ax.plot(y,linewidth=0.5)
     else:
         line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
+        ax.plot(1.5,2,'o');
     return line_handles
 
 if __name__=='__main__':
+    
+    # Initialize a viapoint task and save it to file
+    n_dims = 2
+    viapoint = np.linspace(1.5,2,n_dims)
+    viapoint_time = 0.2
+    viapoint_radius = 0.0
+    task = TaskViapoint(viapoint,viapoint_time, viapoint_radius)
+    directory = "/tmp/demoOptimizationDmpParallel/"+str(n_dims)+"D/"
+    task.saveToFile(directory,"viapoint_task.txt")
+    
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoOptimizationDmpParallel"
     executable = "../../bin/demoOptimizationDmpParallel"
     executeBinary(executable, directory)
       
     fig = plt.figure(1,figsize=(12, 4))
-    plotOptimizationRollouts(directory,fig,plotRollout)
+    #plotOptimizationRollouts(directory,fig,plotRollout)
+    plotOptimizationRolloutsTask(directory,fig,task)
     plt.show()
     
 

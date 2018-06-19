@@ -96,7 +96,10 @@ int main(int n_args, char* args[])
   set<string> parameters_to_optimize;
   parameters_to_optimize.insert("offsets");
   
-  TaskSolver* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
+  TaskSolverDmp* task_solver = new TaskSolverDmp(dmp, parameters_to_optimize, dt, integrate_dmp_beyond_tau_factor);
+  task_solver->set_time_first(true);
+  task->set_time_first(true);
+  
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;

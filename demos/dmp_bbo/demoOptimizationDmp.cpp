@@ -98,10 +98,12 @@ int main(int n_args, char* args[])
   parameters_to_optimize.insert("weights");
   double dt=0.01;
   double integrate_dmp_beyond_tau_factor=1.2;
-  bool use_normalized_parameter=true;  
-  bool time_first = true; 
+  bool use_normalized_parameter=true;
   TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize,
-                                       dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter,time_first);
+                                       dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter);
+  bool time_first = true; 
+  task.set_time_first(time_first);
+  task_solver->set_time_first(time_first);
   // task_solver->set_perturbation(1.0); // Add perturbations
   
   // Make the initial distribution
@@ -119,8 +121,6 @@ int main(int n_args, char* args[])
   Updater* updater = new UpdaterCovarDecay(eliteness, covar_decay_factor, weighting_method);
   
   
-  task.set_time_first(time_first);
-  task_solver->set_time_first(time_first);
   
   // Run the optimization
   int n_updates = 40;
