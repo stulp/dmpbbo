@@ -38,6 +38,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapoint);
 #include <iomanip>
 #include <eigen3/Eigen/Core>
 
+#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
@@ -61,7 +62,16 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
 {
   assert(viapoint_.size()==goal.size());
 }
-  
+
+TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal,  double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight)
+: viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius),
+  goal_(goal), goal_time_(goal_time),
+  viapoint_weight_(viapoint_weight), acceleration_weight_(acceleration_weight),  goal_weight_(goal_weight)
+{
+  assert(viapoint_radius_>=0.0);
+  assert(viapoint.size()==goal.size());
+}
+
 void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
 {
   // cost_vars is assumed to have following structure
@@ -199,6 +209,47 @@ void TaskViapoint::serialize(Archive & ar, const unsigned int version)
 
 string TaskViapoint::toString(void) const {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapoint");
+}
+
+TaskViapoint TaskViapoint::readFromFile(std::string filename)
+{
+  MatrixXd matrix;
+  loadMatrix(filename, matrix);
+  cout << "  matrix=" << matrix << endl;
+  cout << "  matrix=" << matrix.rows() << " X " << matrix.cols() << endl;
+  VectorXd vector = matrix.row(0);
+  
+  // 6 doubles and two vectors of size n_dims 
+  int n_dims = (vector.size()-6)/2;
+  
+  VectorXd viapoint = vector.head(n_dims);
+  double viapoint_time = vector[n_dims];    
+  double viapoint_radius = vector[n_dims+1];    
+  VectorXd goal = vector.segment(n_dims+2,n_dims);
+  double goal_time = vector[2*n_dims+2];
+  double viapoint_weight = vector[2*n_dims+3];    
+  double acceleration_weight = vector[2*n_dims+4];
+  double goal_weight = vector[2*n_dims+5];
+  
+  return TaskViapoint(viapoint,viapoint_time,viapoint_radius,goal,goal_time,viapoint_weight,acceleration_weight,goal_weight);
+}
+
+bool TaskViapoint::writeToFile(std::string filename) const
+{
+  ofstream myfile;
+  myfile.open(filename, ios::out);
+  for (int ii=0; ii<viapoint_.size(); ii++)
+    myfile << viapoint_[ii] << " ";
+  myfile << viapoint_time_ << " ";    
+  myfile << viapoint_radius_ << " ";    
+  for (int ii=0; ii<goal_.size(); ii++)
+    myfile << goal_[ii] << " ";
+  myfile << goal_time_ << " ";
+  myfile << viapoint_weight_ << " ";    
+  myfile << acceleration_weight_ << " ";
+  myfile << goal_weight_ << " ";
+  myfile.close();
+  return true;
 }
 
 
