@@ -24,7 +24,7 @@
 ## \ingroup DMP_BBO
 
 import matplotlib.pyplot as plt
-import numpy
+import numpy as np
 import os, sys
 
 lib_path = os.path.abspath('../')
@@ -33,6 +33,7 @@ from executeBinary import executeBinary
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
+from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 
 def plotRollout(cost_vars,ax):
@@ -40,7 +41,8 @@ def plotRollout(cost_vars,ax):
     n_dofs = (cost_vars.shape[1]-1)//4
     y = cost_vars[:,0:n_dofs]
     if n_dofs==1:
-        line_handles = ax.plot(y,linewidth=0.5)
+        t = cost_vars[:,3*n_dofs]
+        line_handles = ax.plot(t,y,linewidth=0.5)
         viapoint_time = 0.5
         viapoint_x = 2.5
         ax.plot(viapoint_time,viapoint_x,'ok')
@@ -53,13 +55,28 @@ def plotRollout(cost_vars,ax):
 
 
 if __name__=='__main__':
-    # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoOptimizationDmp"
-    directory = "/tmp/demoOptimizationDmp"
-    executeBinary(executable, directory)
-      
-    fig = plt.figure(1,figsize=(12, 4))
-    plotOptimizationRollouts(directory,fig,plotRollout)
+    
+    for n_dims in [1,2]:
+        
+        # Initialize a viapoint task and save it to file
+        viapoint = 3*np.ones(n_dims)
+        viapoint_time = 0.3
+        viapoint_radius = 0.1
+        if n_dims==2:
+            # Do not pass through viapoint at a specific time, but rather pass
+            # through it at any time.
+            viapoint_time = None
+        task = TaskViapoint(viapoint,viapoint_time, viapoint_radius)
+        directory = "/tmp/demoOptimizationDmp/"+str(n_dims)+"D/"
+        task.saveToFile(directory,"viapoint_task.txt")
+        
+        # Call the executable with the directory to which results should be written
+        executable = "../../bin/demoOptimizationDmp"
+        executeBinary(executable, str(n_dims)+" "+directory)
+        
+        
+        fig = plt.figure(n_dims,figsize=(12, 4))
+        plotOptimizationRollouts(directory,fig,plotRollout)
 
     plt.show()
     

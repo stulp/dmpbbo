@@ -53,23 +53,20 @@ using namespace DmpBbo;
  */
 int main(int n_args, char* args[])
 {
-  // If program has an argument, it is a directory to which to save files too (or --help)
+  int n_dims = 1;
   string directory;
-  if (n_args>1)
+  if (n_args!=3)
   {
-    if (string(args[1]).compare("--help")==0)
-    {
-      cout << "Usage: " << args[0] << " [directory]         (directory: optional directory to save data to)" << endl;
-      return 0;
-    }
-    else
-    {
-      directory = string(args[1]);
-    }
+      cout << "Usage: " << args[0] << " n_dims directory" << endl;
+      return -1;
+  }
+  else
+  {
+    n_dims = atoi(args[1]);
+    directory = string(args[2]);
   }
 
   // Make the task
-  int n_dims = 2;
   VectorXd viapoint = VectorXd::Constant(n_dims,2.0);
   viapoint[0] = 2.5;
   double viapoint_time = 0.5;
