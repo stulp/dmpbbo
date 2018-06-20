@@ -60,7 +60,7 @@ if __name__=='__main__':
         executeBinary(executable, str(n_dims)+" "+directory)
         
         print("  Plotting")
-        fig = plt.figure(2*n_dims+0,figsize=(12, 4))
+        fig = plt.figure(n_dims,figsize=(12, 4))
         plotOptimizationRolloutsTask(directory,fig,task)
 
     print("Showing")
