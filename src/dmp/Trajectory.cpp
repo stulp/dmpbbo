@@ -233,6 +233,11 @@ Trajectory Trajectory::generatePolynomialTrajectoryThroughViapoint(const VectorX
   return traj;
 }
 
+void Trajectory::asMatrix(MatrixXd& as_matrix) const
+{
+  as_matrix.resize(length(),1+3*dim()+dim_misc());
+  as_matrix << ts_, ys_, yds_, ydds_, misc_; 
+}
 
 ostream& operator<<(std::ostream& output, const Trajectory& trajectory) {
   MatrixXd traj_matrix(trajectory.length(),1+3*trajectory.dim()+trajectory.dim_misc());
@@ -243,8 +248,8 @@ ostream& operator<<(std::ostream& output, const Trajectory& trajectory) {
 
 bool Trajectory::saveToFile(string directory, string filename, bool overwrite) const
 {
-  MatrixXd traj_matrix(length(),1+3*dim()+dim_misc());
-  traj_matrix << ts_, ys_, yds_, ydds_, misc_; 
+  MatrixXd traj_matrix;
+  asMatrix(traj_matrix);
   return saveMatrix(directory, filename, traj_matrix, overwrite);  
 }
 
