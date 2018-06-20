@@ -81,7 +81,9 @@ public:
 
   virtual ~TaskViapoint(void) {}
   
-  void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
+  void computeCosts(const Eigen::VectorXd& ts, const Eigen::MatrixXd& y, const Eigen::MatrixXd& ydd, Eigen::VectorXd& costs) const;
+
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   unsigned int getNumberOfCostComponents(void) const;
   
@@ -118,7 +120,7 @@ public:
    */
   bool savePlotRolloutScript(std::string directory) const;
   
-private:
+protected:
   Eigen::VectorXd viapoint_;
   double   viapoint_time_;
   double   viapoint_radius_;
@@ -139,6 +141,7 @@ private:
   TaskViapoint(void) {};
   
 
+private:
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   

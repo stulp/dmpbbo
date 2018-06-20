@@ -72,34 +72,11 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
   assert(viapoint.size()==goal.size());
 }
 
-void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
-{
-  // cost_vars is assumed to have following structure
-  // t=0  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
-  // t=1  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
-  //  |    |    |     |     |      |     |       |          |
-  // t=T  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
-  
-  
-  int n_dims = viapoint_.size();
-  int n_time_steps = cost_vars.rows();
-  int n_cost_vars = cost_vars.cols();
-  
 
-  //cout << "  n_dims=" << n_dims << endl;
-  //cout << "  n_time_steps=" << n_time_steps << endl;
-  //cout << "  n_cost_vars=" << n_cost_vars << endl;
-  
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t forcing_term_1..forcing_term_D
-  assert(n_cost_vars==(4*n_dims + 1));
-  
-  
-  
-  // rollout is of size   n_time_steps x n_cost_vars
-  VectorXd ts = cost_vars.col(0);
-  MatrixXd y = cost_vars.block(0, 1, n_time_steps, n_dims);
-  MatrixXd ydd = cost_vars.block(0,1+2*n_dims,n_time_steps,n_dims);
-  
+void TaskViapoint::computeCosts(const VectorXd& ts, const MatrixXd& y, const MatrixXd& ydd, VectorXd& costs) const
+{
+  int n_time_steps = ts.size();
+
   double dist_to_viapoint = 0.0;
   if (viapoint_weight_!=0.0)
   {
@@ -132,11 +109,11 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     }
   }
   
-  double sum_ydd = 0.0;
+  double mean_ydd = 0.0;
   if (acceleration_weight_!=0.0)
   {
     // ydd = n_time_steps x n_dims
-    sum_ydd = ydd.array().pow(2).sum();
+    mean_ydd = ydd.array().pow(2).sum()/n_time_steps;
   }
 
   double delay_cost = 0.0;
@@ -146,8 +123,9 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     while (goal_time_step < ts.size() && ts[goal_time_step] < goal_time_)
       goal_time_step++;
 
-    MatrixXd y_after_goal = cost_vars.block(goal_time_step, 1,
-        n_time_steps - goal_time_step, n_dims);
+    MatrixXd y_after_goal = y.bottomRows(n_time_steps - goal_time_step);
+    //cost_vars.block(goal_time_step, 0,
+    //    n_time_steps - goal_time_step, n_dims);
 
     delay_cost = (y_after_goal.rowwise() - goal_.transpose()).rowwise().squaredNorm().sum();
   }
@@ -155,9 +133,28 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   int n_cost_components = 3;
   costs.resize(1+n_cost_components); // costs[0] = sum(costs[1:end])
   costs[1] = viapoint_weight_*dist_to_viapoint;
-  costs[2] = acceleration_weight_*sum_ydd/n_time_steps;
+  costs[2] = acceleration_weight_*mean_ydd;
   costs[3] = goal_weight_*delay_cost;
-  costs[0] = costs[1] +  costs[2] +  costs[3];
+  costs[0] = costs[1] +  costs[2] +  costs[3];  
+}
+
+void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
+{
+  // cost_vars is assumed to have following structure
+  // t=0  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  // t=1  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  //  |    |    |     |     |      |     |       |          |
+  // t=T  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  int n_dims = viapoint_.size();
+  int n_time_steps = cost_vars.rows();
+  int n_cost_vars = cost_vars.cols();
+  assert(n_cost_vars==(1+4*n_dims));
+  
+  // rollout is of size   n_time_steps x n_cost_vars
+  VectorXd ts = cost_vars.col(0);
+  MatrixXd y = cost_vars.block(0, 1, n_time_steps, n_dims);
+  MatrixXd ydd = cost_vars.block(0,1+2*n_dims,n_time_steps,n_dims);
+  computeCosts(ts,y,ydd,costs);         
 }
 
 unsigned int TaskViapoint::getNumberOfCostComponents(void) const
