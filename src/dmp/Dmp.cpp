@@ -691,6 +691,18 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
         function_approximators_[dd]->train(fa_input_phase,fa_target,save_directory_dim,overwrite);
     }
   }
+  
+  if (!save_directory.empty())
+  {
+    int n_time_steps = 101;
+    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau());
+    Trajectory traj_reproduced;
+    analyticalSolution(ts,traj_reproduced);
+    
+    trajectory.saveToFile(save_directory,"traj_demonstration.txt");
+    traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt");
+  }
+  
 }
 
 void Dmp::getSelectableParameters(set<string>& selectable_values_labels) const {
