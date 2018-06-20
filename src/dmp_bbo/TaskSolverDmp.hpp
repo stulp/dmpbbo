@@ -41,7 +41,7 @@ class Dmp;
  */
 class TaskSolverDmp : public TaskSolver
 {
-private:
+protected:
   Dmp* dmp_;
   int n_time_steps_;
   double integrate_time_;
@@ -57,7 +57,7 @@ public:
    */
   TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
-  virtual void performRollout(const Eigen::VectorXd& samples, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
+  virtual void performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
   //virtual void performRollout(const std::vector<Eigen::MatrixXd>& samples_parallel, const Eigen::MatrixXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
 
@@ -72,7 +72,7 @@ public:
    */
   void set_perturbation(double perturbation_standard_deviation);
 
-private:
+protected:
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this
@@ -81,6 +81,7 @@ private:
    */
   TaskSolverDmp(void) {};
 
+private:
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   
