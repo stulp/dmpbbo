@@ -6,6 +6,10 @@ add_executable(demoOptimizationDmp demoOptimizationDmp.cpp)
 target_link_libraries( demoOptimizationDmp taskviapoint dmp functionapproximators dynamicalsystems dmp_bbo bbo  ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS demoOptimizationDmp DESTINATION bin)
  
+add_executable(demoOptimizationDmpArm2D demoOptimizationDmpArm2D.cpp)
+target_link_libraries( demoOptimizationDmpArm2D taskviapointarm2d taskviapoint tasksolverdmparm2d dmp functionapproximators dynamicalsystems dmp_bbo bbo  ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS demoOptimizationDmpArm2D DESTINATION bin)
+ 
 add_executable( demoOptimizationDmpParallel demoOptimizationDmpParallel.cpp ) 
 target_link_libraries( demoOptimizationDmpParallel taskviapoint dmp functionapproximators dynamicalsystems dmp_bbo bbo  ${LWPR_LIBRARIES} ${Boost_LIBRARIES} )
 install(TARGETS demoOptimizationDmpParallel DESTINATION bin)
