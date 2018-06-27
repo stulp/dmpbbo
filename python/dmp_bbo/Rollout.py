@@ -36,13 +36,13 @@ class Rollout:
       return string
   
   def total_cost(self):
-      if self.cost:
+      if self.cost is not None:
           if len(self.cost)>=1:
               return self.cost[0]
       return None      
   
   def n_cost_components(self):
-      if cost:
+      if cost is not None:
           return len(self.cost)
   
   def saveToDirectory(self,directory):
