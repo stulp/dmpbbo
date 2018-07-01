@@ -65,6 +65,9 @@ public:
 
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
   
+	/** Preallocate memory to make certain functions real-time.
+	 * \param[in] n_basis_functions Number of basis functions in the RBFN.
+	 */
   void preallocateMemory(int n_basis_functions);
   
 	inline std::string getName(void) const {

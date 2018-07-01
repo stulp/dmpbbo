@@ -42,9 +42,13 @@ class Dmp;
 class TaskSolverDmp : public TaskSolver
 {
 protected:
+  /** The DMP that is integrated in this task solver. */
   Dmp* dmp_;
+  /** Number of time steps to integrate. */
   int n_time_steps_;
+  /** Time to integrate. */
   double integrate_time_;
+  /** Use normalized parameters. See Parameterizable class. */
   bool use_normalized_parameter_;
   
 public:

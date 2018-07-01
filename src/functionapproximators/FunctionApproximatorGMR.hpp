@@ -127,6 +127,13 @@ protected:
    */
   static double normalPDF(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input);
 
+  /** The damped probability density function (PDF) of the multi-variate normal distribution
+   * \param[in] mu The mean of the normal distribution
+   * \param[in] covar The covariance matrix of the normal distribution 
+   * \param[in] input The input data vector for which the PDF will be computed.
+   * \return The PDF value for the input
+   * \author Gennaro Raiola
+   */
   static double normalPDFDamped(const Eigen::VectorXd& mu, const Eigen::MatrixXd& covar, const Eigen::VectorXd& input);
 
 public:
@@ -153,6 +160,10 @@ public:
    */
   void predictDot(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, Eigen::MatrixXd& outputs_dot, Eigen::MatrixXd& variances);
 
+  /** Train the function approximator incrementally with corresponding input and target examples.
+   *  \param[in] inputs  Input values of the training examples
+   *  \param[in] targets Target values of the training examples
+   */
   void trainIncremental(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 
 

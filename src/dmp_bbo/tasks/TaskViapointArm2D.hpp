@@ -30,6 +30,11 @@
 
 namespace DmpBbo {
 
+/**
+ * Task where a articulated arm should pass through a viapoint.
+ * For more details, see the Appendix of the paper "Freek Stulp and Olivier Sigaud. Robot Skill Learning: From Reinforcement Learning to Evolution Strategies. Paladyn. Journal of Behavioral Robotics, 4(1):49–61, September 2013.", where it is Task 4 and 5.
+ https://www.degruyter.com/view/j/pjbr.2013.4.issue-1/pjbr-2013-0003/pjbr-2013-0003.xml
+ */
 class TaskViapointArm2D : public TaskViapoint
 {
   

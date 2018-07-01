@@ -54,6 +54,10 @@ public:
     
   virtual void performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
+  /** Get the positions of the links given the joint angles by using forward kinematics.
+   * \param[in] angles Angles of the joints
+   * \param[out] link_positions Get the position of each of the joints.
+   */
   void anglesToLinkPositions(const Eigen::MatrixXd& angles, Eigen::MatrixXd& link_positions) const;
   
   /** Returns a string representation of the object.
@@ -61,8 +65,17 @@ public:
    */
 	std::string toString(void) const;      
   
+	/** Get the initial angles of the arm. 
+	 * \param[in] n_dofs Number of degrees of freedom of the arm.
+	 * \param[out] initial_angles The initial angles.
+	 */
   static void getInitialAngles(unsigned int n_dofs, Eigen::VectorXd& initial_angles);
-  static void getFinalAngles(unsigned int n_dofs, Eigen::VectorXd& initial_angles);
+  
+	/** Get the final angles of the arm, at the end of the trajectory. 
+	 * \param[in] n_dofs Number of degrees of freedom of the arm.
+	 * \param[out] final_angles The angles at the end of the trajectory.
+	 */
+  static void getFinalAngles(unsigned int n_dofs, Eigen::VectorXd& final_angles);
 
 
 private:
