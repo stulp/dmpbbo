@@ -81,8 +81,6 @@ public:
 
   virtual ~TaskViapoint(void) {}
   
-  void computeCosts(const Eigen::VectorXd& ts, const Eigen::MatrixXd& y, const Eigen::MatrixXd& ydd, Eigen::VectorXd& costs) const;
-
   virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   unsigned int getNumberOfCostComponents(void) const;
@@ -121,15 +119,35 @@ public:
   bool savePlotRolloutScript(std::string directory) const;
   
 protected:
-  Eigen::VectorXd viapoint_;
+  
+  /** Helper function to compute the costs.
+   *  \param[in] ts Time stamps of the trajectory
+   *  \param[in] y Positions along the trajectory
+   *  \param[in] ydd Accelerations along the trajectory
+   *  \param[out] costs The costs
+   */
+  void computeCosts(const Eigen::VectorXd& ts, const Eigen::MatrixXd& y, const Eigen::MatrixXd& ydd, Eigen::VectorXd& costs) const;
+
+  /** Viapoint through which the trajectory should pass. */
+  Eigen::VectorXd viapoint_; 
+  /** Time at which the trajectory should pass through the viapoint.
+   *  If the time does not matter, its value if TIME_AT_MINIMUM_DIST. In this case, the minimum
+   *  distance between the viapoint and the trajectory is computed.
+   */
   double   viapoint_time_;
+  /** The distance to the viapoint within which this cost is 0. */
   double   viapoint_radius_;
   
+  /** The goal to reach at the end of the movement. */
   Eigen::VectorXd goal_;
+  /** The time at which the goal should have been reached. */
   double   goal_time_;
   
+  /** Weight for the cost related to not passing through the viapoint. */
   double   viapoint_weight_;
+  /** Weight for the cost of accelerations. */
   double   acceleration_weight_;
+  /** Weight for the cost of not being at the goal at the end of the movement. */
   double   goal_weight_;
   
   /**
