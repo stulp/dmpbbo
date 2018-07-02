@@ -93,17 +93,34 @@ class Trajectory:
         # if as_times is False, 'fro' to 'to' are interpreted as indices 
         # if as_times is True, 'fro' to 'to' are interpreted as times
         
+        # No need to crop empty trajectory
+        if self.ts_.size==0:
+            return
+        
         assert(fro<to)
         
         if as_times:
             if (fro>self.ts_[-1]):
                 print("WARNING: Argument 'fro' out of range, because "+str(fro)+" > "+str(self.ts_[-1])+". Not cropping")
                 return 
+            if (to<self.ts_[0]):
+                print("WARNING: Argument 'to' out of range, because "+str(to)+" < "+str(self.ts_[0])+". Not cropping")
+                return 
                 
-            fro = np.argmax(self.ts_>fro)
-            to = np.argmax(self.ts_>=to)
-            print(fro)
-            print(to)
+            # Convert time 'fro' to index 'fro' 
+            if fro<=self.ts_[0]:
+                # Time 'fro' lies before first time in trajectory
+                fro = 0 
+            else:
+                # Get first index when time is larger than 'fro'                
+                fro = np.argmax(self.ts_>=fro)
+                
+            if to>=self.ts_[-1]:
+                # Time 'to' is larger than the last time in the trajectory
+                to = len(self.ts_)-1
+            else:
+                # Get first index when time is smaller than 'to'                
+                to = np.argmax(self.ts_>=to)
             
         assert(to<self.length())
         self.ts_ = self.ts_[fro:to]
