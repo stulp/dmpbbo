@@ -60,7 +60,11 @@ def weightedLeastSquares(inputs, targets, weights, use_offset=True, regularizati
         X = np.atleast_2d(X).T
 
     # Least squares then is a one-liner
-    betas = np.linalg.inv(X.T@W@X + Gamma)@X.T@W@targets
+    # Apparently, not everybody has python3.5 installed, so don't use @
+    # betas = np.linalg.inv(X.T@W@X + Gamma)@X.T@W@targets
+    # In python<=3.4, it is not a one-liner
+    to_invert = np.dot(np.dot(X.T,W),X) + Gamma
+    betas = np.dot(np.dot(np.dot(np.linalg.inv(to_invert),X.T),W),targets)
     
     return betas
 
@@ -75,10 +79,14 @@ def linearPrediction(inputs,betas):
     n_beta = betas.size
     
     if n_input_dims==n_beta:
-        outputs = inputs@betas
+        # Apparently, not everybody has python3.5 installed, so don't use @
+        #outputs = inputs@betas
+        outputs = np.dot(inputs,betas)
     else:
         # There is an offset (AKA bias or intercept)
         assert(n_input_dims==(n_beta-1)) 
-        outputs = inputs@betas[0:n_beta-1] + betas[-1]
+        # Apparently, not everybody has python3.5 installed, so don't use @
+        #outputs = inputs@betas[0:n_beta-1] + betas[-1]
+        outputs = np.dot(inputs,betas[0:n_beta-1]) + betas[-1]
     
     return outputs

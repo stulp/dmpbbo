@@ -107,7 +107,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
         n_samples = inputs.shape[0]
         lines = np.zeros([n_samples,n_lines])
         for i_line in range(n_lines):
-            lines[:,i_line] =  inputs@slopes[i_line,:].T + offsets[i_line]
+            # Apparently, not everybody has python3.5 installed, so don't use @
+            #lines[:,i_line] =  inputs@slopes[i_line,:].T + offsets[i_line]
+            lines[:,i_line] = np.dot(inputs,slopes[i_line,:].T) + offsets[i_line]
 
         return lines
 
