@@ -402,6 +402,9 @@ void Dmp::differentialEquation(
 
   // Add forcing term to the ZD component of the spring state
   xd.SPRING_Z = xd.SPRING_Z + forcing_term_prealloc_/tau();
+  
+  if (limits_.size()>0)
+    limitAccelerations(xd.SPRING_Z); // Not real-time yet!
 
   EXITING_REAL_TIME_CRITICAL_CODE
 
@@ -568,6 +571,14 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eig
       
     // Add forcing term to the acceleration of the spring state
     xds.row(tt).SPRING_Z = xds.row(tt).SPRING_Z + forcing_terms.row(tt)/tau() + perturbation;
+
+    if (limits_.size()>0)
+    {
+      VectorXd spring_z = xds.row(tt).SPRING_Z;
+      limitAccelerations(spring_z);
+      xds.row(tt).SPRING_Z = spring_z;
+    }
+    
     // Compute y component from z
     xds.row(tt).SPRING_Y = xs.row(tt).SPRING_Z/tau();
     
@@ -702,6 +713,30 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
     trajectory.saveToFile(save_directory,"traj_demonstration.txt");
     traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt");
   }
+  
+}
+
+void Dmp::limitAccelerations(Ref<VectorXd> spring_z) const
+{
+  if (limits_.size()>0)
+  {
+    spring_z /= tau(); // Divide by tau to go from z to y space
+    for (int i_dim=0; i_dim<dim_orig(); i_dim++)
+    {
+      // This is a bit hacky; could be done better with indexing.
+      if (spring_z[i_dim] < limits_(i_dim,0))
+        spring_z[i_dim] = limits_(i_dim,0);
+      if (spring_z[i_dim] > limits_(i_dim,1))
+        spring_z[i_dim] = limits_(i_dim,1);
+    }
+    spring_z *= tau(); // Multiply with tau to go from y to z space
+  }
+}
+
+void Dmp::setAccelerationLimits(const MatrixXd& limits)
+{
+  assert(limits.rows()==dim_orig());
+  limits_ = limits;
   
 }
 

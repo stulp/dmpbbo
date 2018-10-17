@@ -319,6 +319,9 @@ public:
   virtual void computeFunctionApproximatorOutput(
     const Eigen::Ref<const Eigen::MatrixXd>& phase_state, Eigen::MatrixXd& fa_output) const;
   
+  void setAccelerationLimits(const Eigen::MatrixXd& limits);
+  void limitAccelerations(Eigen::Ref<Eigen::VectorXd> spring_z) const;
+
   /** Add a perturbation to the forcing term when computing the analytical solution.
    * This is only relevant for off-line experiments, i.e. not on a robot, for testing how
    * the system responds to perturbations. Does not affect the output of Dmp::differentialEquation(), only of Dmp::analyticalSolution().
@@ -378,8 +381,10 @@ private:
   
   /** @see Dmp::set_perturbation_analytical_solution() **/
   double perturbation_standard_deviation_ = 0.0;
-
+  
   /** @} */ // end of group_nonlinear
+  
+  Eigen::MatrixXd limits_;
   
   /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time. */
   mutable Eigen::VectorXd attractor_state_prealloc_;
