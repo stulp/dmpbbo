@@ -240,6 +240,8 @@ class Trajectory:
         return as_matrix
 
     def saveToFile(self,directory, filename):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         np.savetxt(directory+"/"+filename,self.asMatrix(),fmt='%1.7f')
    
     @staticmethod
