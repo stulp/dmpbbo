@@ -36,7 +36,7 @@ from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 class Dmp(DynamicalSystem,Parameterizable):
 
-    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20):
+    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20,forcing_term_scaling="NO_SCALING"):        
         
         super().__init__(1, tau, y_init, y_attr, name)
         
@@ -49,6 +49,8 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
         
         self.function_approximators_ = function_apps
+        
+        self.forcing_term_scaling_ = forcing_term_scaling
         
         self.ts_train_ = None
 
@@ -143,16 +145,19 @@ class Dmp(DynamicalSystem,Parameterizable):
         
   
         #// Scale the forcing term, if necessary
-        #if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #{
-        #initial_state(initial_state_prealloc_)  
-        #g_minus_y0_prealloc_ = (attractor_state_prealloc_-initial_state_prealloc_).transpose()
-        #forcing_term_prealloc_ = forcing_term_prealloc_.array()*g_minus_y0_prealloc_.array()
-        #}
-        #else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #{
-        #forcing_term_prealloc_ = forcing_term_prealloc_.array()*trajectory_amplitudes_.array()
-        #}
+        self.forcing_term_scaling_ = "G_MINUS_Y0_SCALING"
+        #print(self.forcing_term_scaling_)
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            #print(self.initial_state_)
+            #print(self.attractor_state_)
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            #print(g_minus_y0)
+            #print(forcing_term)
+            forcing_term = forcing_term*g_minus_y0
+            #print(forcing_term)
+        
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            forcing_term = forcing_term*self.trajectory_amplitudes_
 
         # Add forcing term to the ZD component of the spring state
         xd[self.SPRING_Z] += np.squeeze(forcing_term)/self.tau_
@@ -293,7 +298,7 @@ class Dmp(DynamicalSystem,Parameterizable):
 
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
-        # zzz trajectory_amplitudes_ = trajectory.getRangePerDim()
+        self.trajectory_amplitudes_ = trajectory.getRangePerDim()
   
         (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
   
