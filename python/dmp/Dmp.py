@@ -36,7 +36,7 @@ from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 class Dmp(DynamicalSystem,Parameterizable):
 
-    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20):
+    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20,forcing_term_scaling="NO_SCALING"):        
         
         super().__init__(1, tau, y_init, y_attr, name)
         
@@ -49,6 +49,8 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
         
         self.function_approximators_ = function_apps
+        
+        self.forcing_term_scaling_ = forcing_term_scaling
         
         self.ts_train_ = None
 
@@ -142,17 +144,13 @@ class Dmp(DynamicalSystem,Parameterizable):
         forcing_term = gating*fa_output
         
   
-        #// Scale the forcing term, if necessary
-        #if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #{
-        #initial_state(initial_state_prealloc_)  
-        #g_minus_y0_prealloc_ = (attractor_state_prealloc_-initial_state_prealloc_).transpose()
-        #forcing_term_prealloc_ = forcing_term_prealloc_.array()*g_minus_y0_prealloc_.array()
-        #}
-        #else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #{
-        #forcing_term_prealloc_ = forcing_term_prealloc_.array()*trajectory_amplitudes_.array()
-        #}
+        # Scale the forcing term, if necessary
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            forcing_term = forcing_term*g_minus_y0
+        
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            forcing_term = forcing_term*self.trajectory_amplitudes_
 
         # Add forcing term to the ZD component of the spring state
         xd[self.SPRING_Z] += np.squeeze(forcing_term)/self.tau_
@@ -197,16 +195,14 @@ class Dmp(DynamicalSystem,Parameterizable):
         forcing_terms = fa_outputs*xs_gating
   
         # Scale the forcing term, if necessary
-        #if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #{
-        #MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1)
-        #forcing_terms = forcing_terms.array()*g_minus_y0_rep.array()
-        #}
-        #else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #{
-        #MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1)
-        #forcing_terms = forcing_terms.array()*trajectory_amplitudes_rep.array()
-        #}
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
+            forcing_terms *= g_minus_y0_rep
+            
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
+            forcing_terms *= trajectory_amplitudes_rep
   
   
         # Get current delayed goal
@@ -293,7 +289,7 @@ class Dmp(DynamicalSystem,Parameterizable):
 
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
-        # zzz trajectory_amplitudes_ = trajectory.getRangePerDim()
+        self.trajectory_amplitudes_ = trajectory.getRangePerDim()
   
         (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
   
@@ -334,17 +330,16 @@ class Dmp(DynamicalSystem,Parameterizable):
         for dd in range(self.dim_orig_):
             f_target[:,dd] = f_target[:,dd]/np.squeeze(xs_gating)
   
-        #  // Factor out scaling
-        #  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #  {
-        #    MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1)
-        #    f_target = f_target.array()/g_minus_y0_rep.array()
-        #  }
-        #  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #  {
-        #    MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1)
-        #    f_target = f_target.array()/trajectory_amplitudes_rep.array()
-        #  }
+
+        # Factor out scaling
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
+            f_target /= g_minus_y0_rep
+            
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
+            f_target /= trajectory_amplitudes_rep
  
         return  (fa_inputs_phase, f_target)
 

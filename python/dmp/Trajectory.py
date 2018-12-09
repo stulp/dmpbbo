@@ -88,6 +88,9 @@ class Trajectory:
     def startTimeAtZero(self):
         self.ts_ = self.ts_ - self.ts_[0]
         
+    def getRangePerDim(self):
+        return self.ys_.max(axis=0)-self.ys_.min(axis=0)
+        
     def crop(self,fro,to,as_times=False):        
         # Crop trajectory from 'fro' to 'to'
         # if as_times is False, 'fro' to 'to' are interpreted as indices 
@@ -240,6 +243,8 @@ class Trajectory:
         return as_matrix
 
     def saveToFile(self,directory, filename):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         np.savetxt(directory+"/"+filename,self.asMatrix(),fmt='%1.7f')
    
     @staticmethod
