@@ -144,17 +144,10 @@ class Dmp(DynamicalSystem,Parameterizable):
         forcing_term = gating*fa_output
         
   
-        #// Scale the forcing term, if necessary
-        self.forcing_term_scaling_ = "G_MINUS_Y0_SCALING"
-        #print(self.forcing_term_scaling_)
+        # Scale the forcing term, if necessary
         if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
-            #print(self.initial_state_)
-            #print(self.attractor_state_)
             g_minus_y0 = (self.attractor_state_-self.initial_state_)
-            #print(g_minus_y0)
-            #print(forcing_term)
             forcing_term = forcing_term*g_minus_y0
-            #print(forcing_term)
         
         elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
             forcing_term = forcing_term*self.trajectory_amplitudes_
@@ -202,16 +195,14 @@ class Dmp(DynamicalSystem,Parameterizable):
         forcing_terms = fa_outputs*xs_gating
   
         # Scale the forcing term, if necessary
-        #if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #{
-        #MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1)
-        #forcing_terms = forcing_terms.array()*g_minus_y0_rep.array()
-        #}
-        #else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #{
-        #MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1)
-        #forcing_terms = forcing_terms.array()*trajectory_amplitudes_rep.array()
-        #}
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
+            forcing_terms *= g_minus_y0_rep
+            
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
+            forcing_terms *= trajectory_amplitudes_rep
   
   
         # Get current delayed goal
@@ -339,17 +330,16 @@ class Dmp(DynamicalSystem,Parameterizable):
         for dd in range(self.dim_orig_):
             f_target[:,dd] = f_target[:,dd]/np.squeeze(xs_gating)
   
-        #  // Factor out scaling
-        #  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
-        #  {
-        #    MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1)
-        #    f_target = f_target.array()/g_minus_y0_rep.array()
-        #  }
-        #  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
-        #  {
-        #    MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1)
-        #    f_target = f_target.array()/trajectory_amplitudes_rep.array()
-        #  }
+
+        # Factor out scaling
+        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+            g_minus_y0 = (self.attractor_state_-self.initial_state_)
+            g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
+            f_target /= g_minus_y0_rep
+            
+        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+            trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
+            f_target /= trajectory_amplitudes_rep
  
         return  (fa_inputs_phase, f_target)
 

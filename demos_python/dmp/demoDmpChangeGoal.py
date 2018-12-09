@@ -47,7 +47,7 @@ def getDemoTrajectory(ts):
     if (use_viapoint_traj):
         n_dims = 2
         y_first = np.zeros(n_dims)
-        y_last  = 0.1*np.zeros(n_dims)
+        y_last  = 0.1*np.ones(n_dims)
         if (n_dims==2):
             y_last[1] = -0.8
             viapoint_time = 0.25
@@ -77,6 +77,10 @@ if __name__=='__main__':
     y_init = trajectory.initial_y()
     y_attr = trajectory.final_y()
     
+    #fig = plt.figure(1)
+    #axs1 = [ fig.add_subplot(231), fig.add_subplot(132), fig.add_subplot(133) ] 
+    #lines = plotTrajectory(trajectory.asMatrix(),axs1)
+    #plt.show()    
     
     n_dims = trajectory.dim()
 
@@ -91,11 +95,11 @@ if __name__=='__main__':
         
         # MAKE THE FUNCTION APPROXIMATORS
         function_apps = [ FunctionApproximatorLWR(10), FunctionApproximatorLWR(10)]
-        dmp = Dmp(tau, y_init, y_attr, function_apps,scaling)
+        sigmoid_max_rate=-20
+        dmp = Dmp(tau, y_init, y_attr, function_apps, "Dmp", sigmoid_max_rate, scaling)
 
         # CONSTRUCT AND TRAIN THE DMP
         directory_scaling = directory +"/"+ scaling
-        #    dmp->train(trajectory,directory_scaling,overwrite)
         dmp.train(trajectory)
         
         tau_exec = 0.7
@@ -111,11 +115,10 @@ if __name__=='__main__':
             # 4 => -0.5
             # 5 => -1.0
             # 6 => -1.5                         
-            y_attr  = trajectory.final_y()
-            y_attr *= (0.5*(goal_number-3))
+            y_attr_scaled = y_attr * (0.5*(goal_number-3))
            
             # ANALYTICAL SOLUTION 
-            dmp.set_attractor_state(y_attr)
+            dmp.set_attractor_state(y_attr_scaled)
             ( xs, xds, forcing_terms, fa_outputs) = dmp.analyticalSolution(ts)
             traj_reproduced = dmp.statesAsTrajectory(ts,xs,xds)
             basename = "reproduced" + str(goal_number)
@@ -125,6 +128,7 @@ if __name__=='__main__':
             xs_step = np.zeros([n_time_steps,dmp.dim_])
             xds_step = np.zeros([n_time_steps,dmp.dim_])
         
+            dmp.set_attractor_state(y_attr_scaled)
             (x,xd) = dmp.integrateStart()
             xs_step[0,:] = x
             xds_step[0,:] = xd
