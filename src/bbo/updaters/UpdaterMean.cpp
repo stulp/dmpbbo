@@ -70,7 +70,6 @@ void UpdaterMean::updateDistributionMean(const VectorXd& mean, const MatrixXd& s
 }
 
 
-/** \todo Implement other weighting schemes */  
 void  UpdaterMean::costsToWeights(const VectorXd& costs, string weighting_method, double eliteness, VectorXd& weights) const
 {
   weights.resize(costs.size());
