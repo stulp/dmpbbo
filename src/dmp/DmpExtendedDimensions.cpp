@@ -207,25 +207,34 @@ void DmpExtendedDimensions::computeFunctionApproximatorOutputExtendedDimensions(
   }
 }
 
-void DmpExtendedDimensions::integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> extended_dimensions) const
+void DmpExtendedDimensions::integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd, Eigen::Ref<Eigen::VectorXd> extended_dims) const
+{
+  Dmp::integrateStart(x,xd);
+  MatrixXd phase = x.PHASE;
+  MatrixXd extended_dimensions_prealloc(1,function_approximators_ext_dims_.size());
+  computeFunctionApproximatorOutputExtendedDimensions(phase, extended_dimensions_prealloc); 
+  extended_dims = extended_dimensions_prealloc.transpose();
+}
+
+
+void DmpExtendedDimensions::integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> extended_dims) const
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
   Dmp::integrateStep(dt,x,x_updated,xd_updated);
   
   MatrixXd phase = x_updated.PHASE;
-  MatrixXd extended_dimensions_prealloc(phase.rows(),function_approximators_ext_dims_.size());
+  MatrixXd extended_dimensions_prealloc(1,function_approximators_ext_dims_.size());
   computeFunctionApproximatorOutputExtendedDimensions(phase, extended_dimensions_prealloc); 
-  extended_dimensions = extended_dimensions_prealloc;
+  extended_dims = extended_dimensions_prealloc.transpose();
   
   EXITING_REAL_TIME_CRITICAL_CODE
 
 }
 
 
-void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& fa_extended_output) const
+void DmpExtendedDimensions::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_output, Eigen::MatrixXd& fa_extended_output) const
 {
-  Eigen::MatrixXd forcing_terms, fa_output;
-  analyticalSolution(ts, xs, xds, forcing_terms, fa_output);
+  Dmp::analyticalSolution(ts, xs, xds, forcing_terms, fa_output);
   computeFunctionApproximatorOutputExtendedDimensions(xs.PHASEM(xs.rows()), fa_extended_output); 
 }
 

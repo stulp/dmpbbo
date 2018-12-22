@@ -75,6 +75,8 @@ public:
    */
   DmpExtendedDimensions* clone(void) const;
   
+  void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd, Eigen::Ref<Eigen::VectorXd> extended_dims) const;
+
   void integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> extended_dimensions) const;
   
   /**
@@ -90,34 +92,6 @@ public:
    * \remarks The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
    */
   void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_output, Eigen::MatrixXd& fa_extended_output) const;
-  
-  /**
-   * Return analytical solution of the system at certain times (and return forcing terms)
-   *
-   * \param[in]  ts  A vector of times for which to compute the analytical solutions
-   * \param[out] xs  Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-   * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-   * \param[out] forcing_terms The forcing terms for each dimension, for debugging purposes only.
-   * \param[out] fa_extended_output The output of the function approximators for the extended dimensions.
-   *
-   * \remarks The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
-   */
-  inline void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& forcing_terms, Eigen::MatrixXd& fa_extended_output) const
-  {
-    Eigen::MatrixXd fa_output;
-    analyticalSolution(ts, xs, xds, forcing_terms, fa_output);
-  }
-
-  /**
-   * Return analytical solution of the system at certain times (and return extended dimensions)
-   *
-   * \param[in]  ts  A vector of times for which to compute the analytical solutions
-   * \param[out] xs  Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-   * \param[out] xds Sequence of state vectors (rates of change). T x D or D x T matrix, where T is    * \param[out] fa_extended_output The output of the function approximators for the extended dimensions.
-   *
-   * \remarks The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
-   */
-  void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds, Eigen::MatrixXd& fa_extended_output) const;
 
   /**
    * Return analytical solution of the system at certain times

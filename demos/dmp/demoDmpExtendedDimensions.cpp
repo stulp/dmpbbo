@@ -75,7 +75,6 @@ int main(int n_args, char** args)
   VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau); // Time steps
   Trajectory trajectory = getDemoTrajectory(ts); // getDemoTrajectory() is implemented below main()
   int n_dims = trajectory.dim();
-
   
   // MAKE THE FUNCTION APPROXIMATORS
   
@@ -124,8 +123,8 @@ int main(int n_args, char** args)
   dmp_ext_dims->analyticalSolution(ts,traj_reproduced);
 
   // Integrate again, but this time get more information
-  MatrixXd xs_ana, xds_ana, forcing_terms_ana, fa_output_ana;
-  dmp_ext_dims->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana);
+  MatrixXd xs_ana, xds_ana, forcing_terms_ana, fa_output_ana, fa_extended_output;
+  dmp_ext_dims->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana,fa_extended_output);
 
   
   // WRITE THINGS TO FILE
@@ -137,6 +136,7 @@ int main(int n_args, char** args)
   saveMatrix(save_directory,"reproduced_xs_xds.txt",output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
+  saveMatrix(save_directory,"reproduced_fa_extended.txt",fa_extended_output,overwrite);
 
 
   // INTEGRATE STEP BY STEP
@@ -148,18 +148,21 @@ int main(int n_args, char** args)
 
   MatrixXd xs_step(n_time_steps,x.size());
   MatrixXd xds_step(n_time_steps,xd.size());
+  MatrixXd ext_dim_all(n_time_steps,ext_dims.size());
   
   cout << std::setprecision(3) << std::fixed << std::showpos;
   double dt = ts[1];
-  dmp_ext_dims->integrateStart(x,xd);
+  dmp_ext_dims->integrateStart(x,xd,ext_dims);
   xs_step.row(0) = x;
   xds_step.row(0) = xd;
+  ext_dim_all.row(0) = ext_dims;
   for (int t=1; t<n_time_steps; t++)
   {
     dmp_ext_dims->integrateStep(dt,x,x_updated,xd,ext_dims); 
     x = x_updated;
     xs_step.row(t) = x;
     xds_step.row(t) = xd;
+    ext_dim_all.row(t) = ext_dims;
     if (save_directory.empty())
     {
       // Not writing to file, output on cout instead.
@@ -167,14 +170,13 @@ int main(int n_args, char** args)
     }
   } 
 
-  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols());
-  output_step << xs_step, xds_step, ts;
+  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols()+ext_dim_all.cols());
+  output_step << ts, xs_step, xds_step, ext_dim_all;
   saveMatrix(save_directory,"reproduced_step_xs_xds.txt",output_step,overwrite);
 
   
   delete meta_parameters;
   delete fa_lwr;
-  delete dmp_tmp;
   delete dmp_ext_dims;
 
   return 0;
@@ -182,7 +184,7 @@ int main(int n_args, char** args)
 
 Trajectory getDemoTrajectory(const VectorXd& ts)
 {
-  bool use_viapoint_traj= true;
+  bool use_viapoint_traj= false;
   Trajectory trajectory;
   int n_dims=0;
   if (use_viapoint_traj)

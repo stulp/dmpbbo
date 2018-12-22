@@ -26,10 +26,10 @@ sys.path.append(lib_path)
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
 
-def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
+def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[]):
 
     # Number of columns in the data
-    n_cols = data.shape[1]             
+    n_cols = data.shape[1]
     # Dimensionality of dynamical system. -1 because of time, /2 because both x and xd are stored.
     n_state_length = (n_cols-1)//2      
     # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
@@ -104,7 +104,14 @@ def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
         ax.set_xlabel(r'time ($s$)');
         ax.set_ylabel(r'$v\cdot f_{\mathbf{\theta}}('+system_varname[0]+')$');
     
-    
+    if (len(ext_dims)>1):
+        ax = fig.add_subplot(3,5,13)
+        ax.plot(ts,ext_dims)
+        x = numpy.mean(ax.get_xlim())
+        y = numpy.mean(ax.get_ylim())
+        ax.text(x,y,'extended dims', horizontalalignment='center');                                        
+        ax.set_xlabel(r'time ($s$)');
+        ax.set_ylabel(r'unknown');
 
 
 if __name__=='__main__':
@@ -130,9 +137,10 @@ if __name__=='__main__':
     plt.show()                                                                      
 
 
-def plotTrajectory(trajectory,axs):
+def plotTrajectory(trajectory,axs,n_misc=0):
     """Plot a trajectory"""
-    n_dims = (len(trajectory[0])-1)//3 # -1 for time, /3 because contains y,yd,ydd
+    n_dims = (len(trajectory[0])-1-n_misc)//3 
+    # -1 for time, /3 because contains y,yd,ydd
     time_index = 0;
     lines = axs[0].plot(trajectory[:,time_index],trajectory[:,1:n_dims+1], '-')
     axs[0].set_xlabel('time (s)');
@@ -146,13 +154,19 @@ def plotTrajectory(trajectory,axs):
       axs[2].set_xlabel('time (s)');
       axs[2].set_ylabel('ydd');
       
+    if n_misc>0 and len(axs)>3:
+      lines[len(lines):] = axs[3].plot(trajectory[:,time_index],trajectory[:,3*n_dims+1:], '-')
+      axs[3].set_xlabel('time (s)');
+      axs[3].set_ylabel('misc');
+        
+      
     return lines
 
-def plotTrajectoryFromFile(filename,axs):
+def plotTrajectoryFromFile(filename,axs,n_misc=0):
     """Read trajectory, and plot it."""
     # Read data
     trajectory   = numpy.loadtxt(filename)
-    lines = plotTrajectory(trajectory,axs)
+    lines = plotTrajectory(trajectory,axs,n_misc)
     return lines
 
 #if __name__=='__main__':

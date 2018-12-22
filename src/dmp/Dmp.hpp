@@ -189,7 +189,7 @@ public:
    * \param[in]  ts  A vector of times for which to compute the analytical solutions
    * \param[out] trajectory The computed states as a trajectory.
    */
-  void analyticalSolution(const Eigen::VectorXd& ts, Trajectory& trajectory) const
+  virtual void analyticalSolution(const Eigen::VectorXd& ts, Trajectory& trajectory) const
   {
     Eigen::MatrixXd xs,  xds;
     analyticalSolution(ts, xs, xds);
