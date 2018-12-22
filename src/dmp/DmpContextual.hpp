@@ -39,7 +39,9 @@ class FunctionApproximator;
  * \brief Implementation of Contextual Dynamical Movement Primitives.
  *
  * Contextual Dmp extends a 'standard' Dmp by adapting to task parameters.
-
+ *
+ * See \cite stulp13learning, \cite matsubara11learning, \cite silva12learning, \cite kulvicius12joining
+ 
 This is how a 'standard' Dmp would be integrated
 \code 
 VectorXd x, xd, x_updated;

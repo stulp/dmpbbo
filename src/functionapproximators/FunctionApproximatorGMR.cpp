@@ -206,6 +206,8 @@ void FunctionApproximatorGMR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   //delete covars[i];
 }
 
+/** \todo Document FunctionApproximatorGMR::trainIncremental 
+ */
 void FunctionApproximatorGMR::trainIncremental(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
 {
   if (!isTrained())
@@ -289,6 +291,9 @@ double FunctionApproximatorGMR::normalPDF(const VectorXd& mu, const MatrixXd& co
   return output;
 }
 
+
+/** \todo Document FunctionApproximatorGMR::normalPDFDamped
+ */
 double FunctionApproximatorGMR::normalPDFDamped(const VectorXd& mu, const MatrixXd& covar, const VectorXd& input)
 {
   if(covar.determinant() > 0) // It is invertible

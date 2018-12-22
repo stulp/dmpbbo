@@ -224,6 +224,8 @@ void runOptimizationTask(ExperimentBBO* experiment, std::string save_directory, 
    only_learning_curve);
 }
 
+/** \todo Get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
+*/
 void runOptimizationParallelDeprecated(
   Task* task, 
   TaskSolver* task_solver, 

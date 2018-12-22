@@ -200,6 +200,7 @@ public:
   
   /** The expected dimensionality of the output data.
    * \return Expected dimensionality of the output data
+   * \todo "int getExpectedOutputDim(void) const" should be pure virtual
    */
   int getExpectedOutputDim(void) const;
   

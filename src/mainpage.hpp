@@ -69,44 +69,18 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-\section Documentation
+\todo Documentation: Write a related pages with a table on which functionality is implemented in Python/Cpp
 
-\li document Python classes/functions
-
-\li Fix warnings in "make Docs" (currently 2)
-
-\li Gennaro: document FunctionApproximatorGMR::trainIncremental
-
-\li Gennaro: document FunctionApproximatorGMR::normalPDFDamped
-
-\section Features
-
-\li DmpExtendedDimensions (started it, has separate branch)
+\todo Documentation: document Python classes/functions
 
 
-\section after Features (after paper)
-
-\li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
-
-\li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
+\todo Features: DmpExtendedDimensions (started it, has separate branch)
 
 
-\section sec_restructuring Restructuring (after paper)
 
-\li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
+\todo Documentation: Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
-\li "virtual int getExpectedOutputDim(void) const" should be pure virtual
-
-\li Optimizations: Remove all occurences of inverse() in leastSquares.cpp
-http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I.27m_accidentally_triggering_dynamic_memory_allocation_in_a_time_critical_block_of_code.3F  
-use jacobiSvd or another on from the least squares page of Eigen 3.3
-
-\li Look for "but Eigen is not good with splicing" and see if splicing can be done more easily
-
-\li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
-
-\li setColor on ellipses?
-
+\todo Plotting: setColor on ellipses?
 
 
  */ 
