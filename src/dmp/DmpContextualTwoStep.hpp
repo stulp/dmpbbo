@@ -33,9 +33,6 @@ namespace DmpBbo {
 class FunctionApproximator;
 class FunctionApproximatorLWR;
 
-/** \defgroup Dmps Dynamic Movement Primitives
- */
-
 /** 
  * \brief Implementation of Contextual Dynamical Movement Primitives.
  * \ingroup Dmps

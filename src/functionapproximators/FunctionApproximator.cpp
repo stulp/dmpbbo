@@ -40,7 +40,7 @@ using namespace std;
 using namespace Eigen;
 
 
-/** \defgroup FunctionApproximators Function Approximators
+/** \ingroup FunctionApproximators
  */
 
 namespace DmpBbo { 

@@ -38,6 +38,7 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapoint);
 #include <iomanip>
 #include <eigen3/Eigen/Core>
 
+#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
@@ -61,32 +62,20 @@ TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_tim
 {
   assert(viapoint_.size()==goal.size());
 }
-  
-void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
-{
-  // cost_vars is assumed to have following structure
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=0  forcing_1..forcing_D
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=1  forcing_1..forcing_D
-  //  |    |     |     |      |     |     |      |          |
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t=T  forcing_1..forcing_D
-  
-  
-  int n_dims = viapoint_.size();
-  int n_time_steps = cost_vars.rows();
-  int n_cost_vars = cost_vars.cols();
-  
 
-  //cout << "  n_dims=" << n_dims << endl;
-  //cout << "  n_time_steps=" << n_time_steps << endl;
-  //cout << "  n_cost_vars=" << n_cost_vars << endl;
-  
-  // y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  t forcing_term_1..forcing_term_D
-  assert(n_cost_vars==(4*n_dims + 1));
-  
-  
-  
-  // rollout is of size   n_time_steps x n_cost_vars
-  VectorXd ts = cost_vars.col(3 * n_dims);
+TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal,  double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight)
+: viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius),
+  goal_(goal), goal_time_(goal_time),
+  viapoint_weight_(viapoint_weight), acceleration_weight_(acceleration_weight),  goal_weight_(goal_weight)
+{
+  assert(viapoint_radius_>=0.0);
+  assert(viapoint.size()==goal.size());
+}
+
+
+void TaskViapoint::computeCosts(const VectorXd& ts, const MatrixXd& y, const MatrixXd& ydd, VectorXd& costs) const
+{
+  int n_time_steps = ts.size();
 
   double dist_to_viapoint = 0.0;
   if (viapoint_weight_!=0.0)
@@ -94,7 +83,6 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     if (viapoint_time_ == TIME_AT_MINIMUM_DIST)
     {
       // Don't compute the distance at some time, but rather get the minimum distance
-      const MatrixXd y = cost_vars.block(0, 0, n_time_steps, n_dims);
       dist_to_viapoint = (y.rowwise() - viapoint_.transpose()).rowwise().squaredNorm().minCoeff();
     }
     else
@@ -108,7 +96,7 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
 
       assert(viapoint_time_step < ts.size());
 
-      VectorXd y_via = cost_vars.row(viapoint_time_step).segment(0,n_dims);
+      VectorXd y_via = y.row(viapoint_time_step);
       dist_to_viapoint = sqrt((y_via-viapoint_).array().pow(2).sum());
     }
     
@@ -121,12 +109,11 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     }
   }
   
-  double sum_ydd = 0.0;
+  double mean_ydd = 0.0;
   if (acceleration_weight_!=0.0)
   {
-    MatrixXd ydd = cost_vars.block(0,2*n_dims,n_time_steps,n_dims);
     // ydd = n_time_steps x n_dims
-    sum_ydd = ydd.array().pow(2).sum();
+    mean_ydd = ydd.array().pow(2).sum()/n_time_steps;
   }
 
   double delay_cost = 0.0;
@@ -136,8 +123,9 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
     while (goal_time_step < ts.size() && ts[goal_time_step] < goal_time_)
       goal_time_step++;
 
-    const MatrixXd y_after_goal = cost_vars.block(goal_time_step, 0,
-      n_time_steps - goal_time_step, n_dims);
+    MatrixXd y_after_goal = y.bottomRows(n_time_steps - goal_time_step);
+    //cost_vars.block(goal_time_step, 0,
+    //    n_time_steps - goal_time_step, n_dims);
 
     delay_cost = (y_after_goal.rowwise() - goal_.transpose()).rowwise().squaredNorm().sum();
   }
@@ -145,9 +133,28 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   int n_cost_components = 3;
   costs.resize(1+n_cost_components); // costs[0] = sum(costs[1:end])
   costs[1] = viapoint_weight_*dist_to_viapoint;
-  costs[2] = acceleration_weight_*sum_ydd/n_time_steps;
+  costs[2] = acceleration_weight_*mean_ydd;
   costs[3] = goal_weight_*delay_cost;
-  costs[0] = costs[1] +  costs[2] +  costs[3];
+  costs[0] = costs[1] +  costs[2] +  costs[3];  
+}
+
+void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
+{
+  // cost_vars is assumed to have following structure
+  // t=0  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  // t=1  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  //  |    |    |     |     |      |     |       |          |
+  // t=T  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
+  int n_dims = viapoint_.size();
+  int n_time_steps = cost_vars.rows();
+  int n_cost_vars = cost_vars.cols();
+  assert(n_cost_vars==(1+4*n_dims));
+  
+  // rollout is of size   n_time_steps x n_cost_vars
+  VectorXd ts = cost_vars.col(0);
+  MatrixXd y = cost_vars.block(0, 1, n_time_steps, n_dims);
+  MatrixXd ydd = cost_vars.block(0,1+2*n_dims,n_time_steps,n_dims);
+  computeCosts(ts,y,ydd,costs);         
 }
 
 unsigned int TaskViapoint::getNumberOfCostComponents(void) const
@@ -199,6 +206,47 @@ void TaskViapoint::serialize(Archive & ar, const unsigned int version)
 
 string TaskViapoint::toString(void) const {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapoint");
+}
+
+TaskViapoint TaskViapoint::readFromFile(std::string filename)
+{
+  MatrixXd matrix;
+  loadMatrix(filename, matrix);
+  VectorXd vector = matrix.row(0);
+  
+  // 6 doubles and two vectors of size n_dims 
+  int n_dims = (vector.size()-6)/2;
+  
+  VectorXd viapoint = vector.head(n_dims);
+  double viapoint_time = vector[n_dims];
+  if (viapoint_time<0.0)
+    viapoint_time = TIME_AT_MINIMUM_DIST;
+  double viapoint_radius = vector[n_dims+1];    
+  VectorXd goal = vector.segment(n_dims+2,n_dims);
+  double goal_time = vector[2*n_dims+2];
+  double viapoint_weight = vector[2*n_dims+3];    
+  double acceleration_weight = vector[2*n_dims+4];
+  double goal_weight = vector[2*n_dims+5];
+  
+  return TaskViapoint(viapoint,viapoint_time,viapoint_radius,goal,goal_time,viapoint_weight,acceleration_weight,goal_weight);
+}
+
+bool TaskViapoint::writeToFile(std::string filename) const
+{
+  ofstream myfile;
+  myfile.open(filename, ios::out);
+  for (int ii=0; ii<viapoint_.size(); ii++)
+    myfile << viapoint_[ii] << " ";
+  myfile << viapoint_time_ << " ";    
+  myfile << viapoint_radius_ << " ";    
+  for (int ii=0; ii<goal_.size(); ii++)
+    myfile << goal_[ii] << " ";
+  myfile << goal_time_ << " ";
+  myfile << viapoint_weight_ << " ";    
+  myfile << acceleration_weight_ << " ";
+  myfile << goal_weight_ << " ";
+  myfile.close();
+  return true;
 }
 
 

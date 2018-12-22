@@ -185,7 +185,6 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
     
   spring_system_ = new SpringDamperSystem(tau(),initial_state(),attractor_state(),alpha_spring_damper);  
   spring_system_->set_name(name()+"_spring-damper");
-  analytical_solution_perturber_ = NULL; // Do not perturb spring-damper as default
 
   goal_system_ = goal_system;
   if (goal_system!=NULL)
@@ -537,6 +536,14 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eig
 
   // Add forcing term to the acceleration of the spring state  
   xds.SPRINGM_Z(1) = xds.SPRINGM_Z(1) + forcing_terms.row(t0)/tau();
+
+  // Initialize perturber, if necessary
+  if (analytical_solution_perturber_==NULL && perturbation_standard_deviation_>0.0)
+  {
+    boost::normal_distribution<> normal(0, perturbation_standard_deviation_);
+    analytical_solution_perturber_ = new boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >(rng, normal);
+  }
+ 
   
   for (int tt=1; tt<n_time_steps; tt++)
   {
@@ -684,6 +691,18 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
         function_approximators_[dd]->train(fa_input_phase,fa_target,save_directory_dim,overwrite);
     }
   }
+  
+  if (!save_directory.empty())
+  {
+    int n_time_steps = 101;
+    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau());
+    Trajectory traj_reproduced;
+    analyticalSolution(ts,traj_reproduced);
+    
+    trajectory.saveToFile(save_directory,"traj_demonstration.txt");
+    traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt");
+  }
+  
 }
 
 void Dmp::getSelectableParameters(set<string>& selectable_values_labels) const {
@@ -864,6 +883,12 @@ void Dmp::set_attractor_state(const VectorXd& y_attr) {
 
 }    
 
+void Dmp::set_perturbation_analytical_solution(double perturbation_standard_deviation)
+{
+  perturbation_standard_deviation_ = perturbation_standard_deviation;
+  analytical_solution_perturber_ = NULL;
+}
+
 
 string Dmp::toString(void) const
 {
@@ -883,6 +908,11 @@ void Dmp::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(phase_system_);
   ar & BOOST_SERIALIZATION_NVP(gating_system_);
   ar & BOOST_SERIALIZATION_NVP(function_approximators_);
+  
+  ar & BOOST_SERIALIZATION_NVP(forcing_term_scaling_);
+  ar & BOOST_SERIALIZATION_NVP(trajectory_amplitudes_);
+  
+  ar & BOOST_SERIALIZATION_NVP(perturbation_standard_deviation_);
 }
 
 }

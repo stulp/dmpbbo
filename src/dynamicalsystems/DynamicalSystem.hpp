@@ -34,7 +34,7 @@
 
 namespace DmpBbo {
 
-/** \defgroup DynamicalSystems Dynamical Systems
+/** \defgroup DynamicalSystems Dynamical Systems Module
  */
 
 /** \brief Interface for implementing dynamical systems. Other dynamical systems should inherit from this class.
@@ -413,7 +413,9 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::DynamicalSystem,boost::serialization::object_
 
 
 
-/** \page page_dyn_sys Dynamical Systems Module
+/** \page page_dyn_sys Dynamical Systems
+
+This page explains dynamical systems, and their implementation in DmpBbo
 
 \section sec_dyn_sys_intro Introduction
 

@@ -49,6 +49,19 @@ int main(int n_args, char* args[])
   
   int n_dims = 1;
 
+  /*
+  // Test writing/reading with txt files
+  VectorXd viapoint_io = VectorXd::LinSpaced(n_dims,0.0,0.1);
+  VectorXd goal_io = VectorXd::LinSpaced(n_dims,1.0,1.1);
+  TaskViapoint task_io = TaskViapoint(viapoint_io, 0.2, 0.3, goal_io, 0.4, 0.5, 0.6, 0.7);
+  string filename = "/tmp/task_viapoint.txt";
+  cout << task_io.toString() << endl;
+  task_io.writeToFile(filename);
+  TaskViapoint task_read = TaskViapoint::readFromFile(filename);
+  cout << task_read.toString() << endl;
+  return 0;
+  */
+
   VectorXd viapoint = VectorXd::Constant(n_dims,0.5);
   double viapoint_time = 0.5;
   TaskViapoint task = TaskViapoint(viapoint, viapoint_time);
@@ -136,5 +149,7 @@ int main(int n_args, char* args[])
     cout << "  filename_xml=" << filename_xml << endl;
     cout << task << endl;
     cout << task_out << endl;
-  
+
+
+    
 }

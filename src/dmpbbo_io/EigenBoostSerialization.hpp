@@ -115,6 +115,8 @@ namespace boost {
 
 /**
  * \page page_serialization Serialization
+
+This page explains the rationale for the serialization approach in DmpBbo.
  
 Serialization and deserialization of objects serves two purposes in this code: 
 

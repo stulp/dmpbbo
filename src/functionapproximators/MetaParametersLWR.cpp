@@ -49,55 +49,61 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height, bool asymmetric_kernels)
+MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height, double regularization, bool asymmetric_kernels)
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Zero(0)),
   centers_per_dim_(centers_per_dim),
   intersection_height_(intersection_height),
+  regularization_(regularization),
   asymmetric_kernels_(asymmetric_kernels)
 {
   assert(expected_input_dim==(int)centers_per_dim_.size());
   for (unsigned int dd=0; dd<centers_per_dim_.size(); dd++)
     assert(centers_per_dim_[dd].size()>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 }
   
-MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, bool asymmetric_kernels) 
+MetaParametersLWR::MetaParametersLWR(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, double regularization, bool asymmetric_kernels) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(n_bfs_per_dim),
   centers_per_dim_(std::vector<Eigen::VectorXd>(0)),
   intersection_height_(intersection_height),
+  regularization_(regularization),
   asymmetric_kernels_(asymmetric_kernels)
 {
   assert(expected_input_dim==n_bfs_per_dim_.size());
   for (int dd=0; dd<n_bfs_per_dim_.size(); dd++)
     assert(n_bfs_per_dim_[dd]>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 };
 
-MetaParametersLWR::MetaParametersLWR(int expected_input_dim, int n_bfs, double intersection_height, bool asymmetric_kernels) 
+MetaParametersLWR::MetaParametersLWR(int expected_input_dim, int n_bfs, double intersection_height, double regularization, bool asymmetric_kernels) 
 :
   MetaParameters(expected_input_dim),
   n_bfs_per_dim_(VectorXi::Constant(1,n_bfs)),
   centers_per_dim_(std::vector<Eigen::VectorXd>(0)),
   intersection_height_(intersection_height),
+  regularization_(regularization),
   asymmetric_kernels_(asymmetric_kernels)
 {
   assert(expected_input_dim==n_bfs_per_dim_.size());
   for (int dd=0; dd<n_bfs_per_dim_.size(); dd++)
     assert(n_bfs_per_dim_[dd]>0);
   assert(intersection_height_>0 && intersection_height_<1);
+  assert(regularization>=0.0);
 };
 
 MetaParametersLWR* MetaParametersLWR::clone(void) const
 {
   MetaParametersLWR* cloned;
   if (centers_per_dim_.size()>0)
-    cloned =  new MetaParametersLWR(getExpectedInputDim(),centers_per_dim_,intersection_height_,asymmetric_kernels_);
+    cloned =  new MetaParametersLWR(getExpectedInputDim(),centers_per_dim_,intersection_height_,regularization_,asymmetric_kernels_);
   else
-    cloned =  new MetaParametersLWR(getExpectedInputDim(),n_bfs_per_dim_,intersection_height_,asymmetric_kernels_);
+    cloned =  new MetaParametersLWR(getExpectedInputDim(),n_bfs_per_dim_,intersection_height_,regularization_,asymmetric_kernels_);
   
   return cloned;
 }
@@ -200,6 +206,7 @@ void MetaParametersLWR::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_NVP(n_bfs_per_dim_);
   ar & BOOST_SERIALIZATION_NVP(centers_per_dim_);
   ar & BOOST_SERIALIZATION_NVP(intersection_height_);
+  ar & BOOST_SERIALIZATION_NVP(regularization_);
   ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
 }
 

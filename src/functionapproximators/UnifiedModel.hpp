@@ -33,9 +33,10 @@
 
 namespace DmpBbo {
 
-/** \page page_unified_model Unified Model
- * 
-Whilst coding this library and numerous discussion with Olivier Sigaud, it became apparent that the latent function representations of all the function approximators in this library all use the same generic model. Each specific model (i.e. as used in GPR, GMR, LWR, etc.) is a special case of the Unified Model. We discuss this in a forthcoming paper titled: "Many Regression Algorithms, One Unified Model - A Review, Freek Stulp and Olivier Sigaud", which you should be able to find in an on-line search.
+/** \page page_unified_model Unified Model for Function Approximators
+ * The unified model is a unified representation for the different model parameters used by the different function approximators.
+ 
+Whilst coding this library and numerous discussion with Olivier Sigaud, it became apparent that the latent function representations of all the function approximators in this library all use the same generic model. Each specific model (i.e. as used in GPR, GMR, LWR, etc.) is a special case of the Unified Model. We discuss this in the paper titled: "Many Regression Algorithms, One Unified Model - A Review, Freek Stulp and Olivier Sigaud", which you should be able to find in an on-line search.
  *
  */
 

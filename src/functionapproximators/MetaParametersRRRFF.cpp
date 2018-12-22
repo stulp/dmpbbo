@@ -41,18 +41,18 @@ using namespace std;
 
 namespace DmpBbo {
 
-MetaParametersRRRFF::MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double lambda, double gamma) 
+MetaParametersRRRFF::MetaParametersRRRFF(int expected_input_dim, int number_of_basis_functions, double regularization, double gamma) 
 	:
     MetaParameters(expected_input_dim),
     number_of_basis_functions_(number_of_basis_functions),
-    lambda_(lambda),
+    regularization_(regularization),
     gamma_(gamma)
 {
 }
 		
 MetaParametersRRRFF* MetaParametersRRRFF::clone(void) const 
 {
-  return new MetaParametersRRRFF(getExpectedInputDim(),number_of_basis_functions_,lambda_,gamma_);
+  return new MetaParametersRRRFF(getExpectedInputDim(),number_of_basis_functions_,regularization_,gamma_);
 }
 
 template<class Archive>
@@ -62,7 +62,7 @@ void MetaParametersRRRFF::serialize(Archive & ar, const unsigned int version)
   ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
 
   ar & BOOST_SERIALIZATION_NVP(number_of_basis_functions_);
-  ar & BOOST_SERIALIZATION_NVP(lambda_);
+  ar & BOOST_SERIALIZATION_NVP(regularization_);
   ar & BOOST_SERIALIZATION_NVP(gamma_);
 }
 

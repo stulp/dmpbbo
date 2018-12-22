@@ -45,20 +45,22 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers_per_dim' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] centers_per_dim Centers of the basis functions, one VectorXd for each dimension.
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not (to be documented, default is false)
    */
-   MetaParametersLWR(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height=0.5, bool asymmetric_kernels=false);
+   MetaParametersLWR(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
 		 
   /** Constructor for the algorithmic meta-parameters of the LWR function approximator.
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] n_basis_functions_per_dim  Number of basis functions
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not (to be documented, default is false)
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()
    */
-  MetaParametersLWR(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, bool asymmetric_kernels=false);
+  MetaParametersLWR(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
   
   
   /** Constructor for the algorithmic meta-parameters of the LWR function approximator.
@@ -66,12 +68,13 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Since this constructor is for 1-D input data only, we simply check if this argument is equal to 1.
    *  \param[in] n_basis_functions  Number of basis functions for the one dimension
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not (to be documented, default is false)
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()
    */
-	MetaParametersLWR(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5, bool asymmetric_kernels=false);
+	MetaParametersLWR(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
 
 	/** Get the centers and widths of the basis functions.
 	 *  \param[in] min Minimum values of input data (one value for each dimension).
@@ -84,6 +87,14 @@ public:
 	 */
 	void getCentersAndWidths(const Eigen::VectorXd& min, const Eigen::VectorXd& max, Eigen::MatrixXd& centers, Eigen::MatrixXd& widths) const;
 	
+	/** Accessor function for regularization.
+	 * \return Regularization parameter.
+	 */
+  double regularization(void) const
+  {
+    return regularization_;
+  }
+
 	/** Accessor function for asymmetric_kernels.
 	 * \return true if asymmetric kernels are used, false if symmetric kernels are used.
 	 * \todo Document this. In the literature, only symmetric kernels are used.
@@ -101,6 +112,7 @@ private:
   Eigen::VectorXi n_bfs_per_dim_; // should be const
   std::vector<Eigen::VectorXd> centers_per_dim_; // should be const
   double intersection_height_; // should be const
+  double regularization_; // should be const
   bool asymmetric_kernels_; // should be const
 
   /**

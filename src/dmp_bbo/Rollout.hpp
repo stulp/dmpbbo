@@ -32,7 +32,7 @@
 
 namespace DmpBbo {
   
-/** Class for storing the information in a Rollout */
+/** Class for storing the information in a rollout, the result of executing a policy once. */
 class Rollout {
   
 public:

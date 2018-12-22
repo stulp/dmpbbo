@@ -33,6 +33,8 @@ Some general considerations on the design of the library are here \ref page_desi
 
 /** \page page_design Design Rationale
 
+This page explains the overal design rationale for DmpBbo
+
 \section sec_remarks General Remarks
 
 \li Code legibility is more important to me than absolute execution speed (except for those parts of the code likely to be called in a time-critical context) or using all of the design patterns known to man (that is why I do not use PIMPL; it is not so legible for the uninitiated user. Also, I do not use the factory design pattern, but rather have clone() functions in classes ).
@@ -67,54 +69,18 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-\section Documentation
+\todo Documentation: Write a related pages with a table on which functionality is implemented in Python/Cpp
 
-\li document Python classes/functions
-
-\li Fix warnings in "make Docs" (currently 2)
-
-\li Gennaro: document FunctionApproximatorGMR::trainIncremental
-
-\li Gennaro: document FunctionApproximatorGMR::normalPDFDamped
-
-\section Features
-
-\li CMA/CEM in Python (implement covar adaptation in python als (with blocks too))
-
-\li Regularization of optimization in Python, but in C++ too?
-<ul>
-<li> implement generic regularization in Task
-<li> check  DemoCostFunctionDistanceToPoint(const VectorXd& point, double regularization_weight)
-</ul>
-
-\li DmpExtendedDimensions (started it, has separate branch)
-
-\li L2 Regularization in all functionapproximators (copy from RRRFF)
-<ul>
-<li> Add FunctionapproximatorRLS: see branch FunctionapproximatorRLS
-<li> Add UnifiedModel* ModelParametersRLS::toUnifiedModel(void) const
-</ul>
-
-\section after Features (after paper)
-
-\li Gaussian Mixture Regression: 1) plot covariance matrices in Python 2) parameterizable: mu and priors, but not covars
-
-\li in demoDmpChangeGoal: loop over 4 scaling methods. scaling method enumerator: NONE, AMPLITUDE, GOAL
+\todo Documentation: document Python classes/functions
 
 
-\section sec_restructuring Restructuring (after paper)
+\todo Features: DmpExtendedDimensions (started it, has separate branch)
 
-\li get rid of runOptimizationParallelDeprecated(), and implement in UpdaterCovarAdapation
 
-\li "virtual int getExpectedOutputDim(void) const" should be pure virtual
 
-\li Optimizations: Remove all occurences of inverse()
-http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I.27m_accidentally_triggering_dynamic_memory_allocation_in_a_time_critical_block_of_code.3F  
+\todo Documentation: Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
-\li Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
-
-\li setColor on ellipses?
-
+\todo Plotting: setColor on ellipses?
 
 
  */ 

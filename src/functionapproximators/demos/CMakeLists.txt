@@ -1,4 +1,0 @@
-add_executable(demoTrainFunctionApproximators demoTrainFunctionApproximators.cpp)
-target_link_libraries(demoTrainFunctionApproximators functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-install(TARGETS demoTrainFunctionApproximators DESTINATION bin)
-

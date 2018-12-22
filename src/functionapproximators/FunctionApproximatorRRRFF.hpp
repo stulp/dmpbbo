@@ -27,7 +27,7 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 
 
-/** @defgroup RRRFF Incremental Random Features Regularized Least Squares (RRRFF)
+/** @defgroup RRRFF Ridge Regression with Random Fourier Features (RRRFF)
  *  @ingroup FunctionApproximators
  */
 

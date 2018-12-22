@@ -33,7 +33,7 @@
 
 namespace DmpBbo {
 
-/** \brief A class for storing trajectories, i.e. positions, velocities and accelerations of
+/** \brief A class for storing trajectories: positions, velocities and accelerations of
  *  variables over time.
  *
  * A trajectory is essentially a matrix of following form:
@@ -131,6 +131,10 @@ public:
    */
   void append(const Trajectory& trajectory);
   
+  /** Return the trajectory as one large matrix. 
+   */
+  void asMatrix(Eigen::MatrixXd& as_matrix) const;
+
   /** Get the range of ys per dimension.
    *
    * \return The range of ys, one value for each dimension.

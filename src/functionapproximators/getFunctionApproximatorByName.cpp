@@ -140,15 +140,15 @@ FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], 
   {
     // RRRFF
     int n_basis_functions = 20;
-    double lambda=0.2;
+    double regularization=0.2;
     double gamma=5;
     for (int aa=1; aa<n_args; aa++)
     {
       if (string(args[aa]).compare("n_basis_functions")==0)  n_basis_functions = stoi(args[++aa]);
-      if (string(args[aa]).compare("lambda")==0)  lambda = stod(args[++aa]);
+      if (string(args[aa]).compare("regularization")==0)  regularization = stod(args[++aa]);
       if (string(args[aa]).compare("gamma")==0)  gamma = stod(args[++aa]);
     }
-    MetaParametersRRRFF* pars = new MetaParametersRRRFF(n_input_dims,n_basis_functions,lambda,gamma);
+    MetaParametersRRRFF* pars = new MetaParametersRRRFF(n_input_dims,n_basis_functions,regularization,gamma);
     return new FunctionApproximatorRRRFF(pars);
   }
 

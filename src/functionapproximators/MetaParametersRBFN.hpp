@@ -45,18 +45,20 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers_per_dim' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] centers_per_dim Centers of the basis functions, one VectorXd for each dimension.
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    */
-   MetaParametersRBFN(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height=0.5);
+   MetaParametersRBFN(int expected_input_dim, const std::vector<Eigen::VectorXd>& centers_per_dim, double intersection_height=0.5, double regularization=0.0);
 		 
   /** Constructor for the algorithmic meta-parameters of the RBFN function approximator.
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Although this information is already contained in the 'centers' argument, we ask the user to pass it explicitly so that various checks on the arguments may be conducted.
    *  \param[in] n_basis_functions_per_dim  Number of basis functions
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()
    */
-  MetaParametersRBFN(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5);
+  MetaParametersRBFN(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, double regularization=0.0);
   
   
   /** Constructor for the algorithmic meta-parameters of the RBFN function approximator.
@@ -64,12 +66,21 @@ public:
    *  \param[in] expected_input_dim         The dimensionality of the data this function approximator expects. Since this constructor is for 1-D input data only, we simply check if this argument is equal to 1.
    *  \param[in] n_basis_functions  Number of basis functions for the one dimension
    *  \param[in] intersection_height The value at which two neighbouring basis functions will intersect.
+   * \param[in] regularization Regularization parameter
    *
    *  The centers and widths of the basis functions are determined from these parameters once the
    *  range of the input data is known, see also setInputMinMax()
    */
-	MetaParametersRBFN(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5);
+	MetaParametersRBFN(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5, double regularization=0.0);
 
+	/** Accessor function for regularization.
+	 * \return Regularization parameter.
+	 */
+  double regularization(void) const
+  {
+    return regularization_;
+  }
+  
 	/** Get the centers and widths of the basis functions.
 	 *  \param[in] min Minimum values of input data (one value for each dimension).
 	 *  \param[in] max Maximum values of input data (one value for each dimension).
@@ -89,6 +100,7 @@ private:
   Eigen::VectorXi n_bfs_per_dim_; // should be const
   std::vector<Eigen::VectorXd> centers_per_dim_; // should be const
   double intersection_height_; // should be const
+  double regularization_; // should be const
 
   /**
    * Default constructor.

@@ -67,9 +67,21 @@ public:
    */
   TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, const Eigen::VectorXd& goal, double goal_time=-1);
 
+    /** Constructor.
+   * \param[in] viapoint The viapoint to which to pass through.
+   * \param[in] viapoint_time The time at which to pass through the viapoint.
+   * \param[in] viapoint_radius The distance to the viapoint within which this cost is 0
+   * \param[in] goal The goal to reach at the end of the movement
+   * \param[in] goal_time The time at which the goal should have been reached
+   * \param[in] viapoint_weight Weight for the cost related to not passing through the viapoint
+   * \param[in] acceleration_weight Weight for the cost of accelerations
+   * \param[in] goal_weight Weight for the cost of not being at the goal at the end of the movement
+   */
+  TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal, double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight);
+
   virtual ~TaskViapoint(void) {}
   
-  void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   unsigned int getNumberOfCostComponents(void) const;
   
@@ -87,23 +99,55 @@ public:
    */
 	std::string toString(void) const;
 
+  /** Read a task from a txt file. 
+   * \param[in] filename Filename from which to read the task
+   * \return A TaskViapoint object
+   */
+  static TaskViapoint readFromFile(std::string filename);
+  
+  /** Read a task from a txt file. 
+   * \param[in] filename Filename from which to read the task
+   * \return true if saving the file was successful, false otherwise
+   */
+  bool writeToFile(std::string filename) const;
+  
   /** Save a python script that is able to visualize the rollouts, given the cost-relevant variables
    *  stored in a file.
    *  \param[in] directory Directory in which to save the python script
    *  \return true if saving the script was successful, false otherwise
    */
   bool savePlotRolloutScript(std::string directory) const;
+  
+protected:
+  
+  /** Helper function to compute the costs.
+   *  \param[in] ts Time stamps of the trajectory
+   *  \param[in] y Positions along the trajectory
+   *  \param[in] ydd Accelerations along the trajectory
+   *  \param[out] costs The costs
+   */
+  void computeCosts(const Eigen::VectorXd& ts, const Eigen::MatrixXd& y, const Eigen::MatrixXd& ydd, Eigen::VectorXd& costs) const;
 
-private:
-  Eigen::VectorXd viapoint_;
+  /** Viapoint through which the trajectory should pass. */
+  Eigen::VectorXd viapoint_; 
+  /** Time at which the trajectory should pass through the viapoint.
+   *  If the time does not matter, its value if TIME_AT_MINIMUM_DIST. In this case, the minimum
+   *  distance between the viapoint and the trajectory is computed.
+   */
   double   viapoint_time_;
+  /** The distance to the viapoint within which this cost is 0. */
   double   viapoint_radius_;
   
+  /** The goal to reach at the end of the movement. */
   Eigen::VectorXd goal_;
+  /** The time at which the goal should have been reached. */
   double   goal_time_;
   
+  /** Weight for the cost related to not passing through the viapoint. */
   double   viapoint_weight_;
+  /** Weight for the cost of accelerations. */
   double   acceleration_weight_;
+  /** Weight for the cost of not being at the goal at the end of the movement. */
   double   goal_weight_;
   
   /**
@@ -113,7 +157,9 @@ private:
    * friend)
    */
   TaskViapoint(void) {};
+  
 
+private:
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
   

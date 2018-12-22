@@ -34,6 +34,15 @@ namespace DmpBbo {
 
 void Parameterizable::setSelectedParameters(const std::set<std::string>& selected_values_labels)
 {
+  
+  // Check if all labels passed are actually possible
+  set<string> possible_values_labels;
+  getSelectableParameters(possible_values_labels);
+  set<string>::iterator it;
+  for (it = selected_values_labels.begin(); it != selected_values_labels.end(); ++it)
+    if (possible_values_labels.count(*it)==0)
+      cout << "WARNING: '" << *it << "' is an unknown label in Parameterizable." << endl;
+
   getParameterVectorMask(selected_values_labels,selected_mask_);
 }
 

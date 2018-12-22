@@ -31,6 +31,7 @@
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
 BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRRRFF);
 
+#include "functionapproximators/leastSquares.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/MetaParametersRRRFF.hpp"
 #include "functionapproximators/ModelParametersRRRFF.hpp"
@@ -113,12 +114,11 @@ void FunctionApproximatorRRRFF::train(const Eigen::Ref<const Eigen::MatrixXd>& i
   MatrixXd proj_inputs;
   BasisFunction::Cosine::activations(cosines_periodes,cosines_phase,inputs,proj_inputs);
   
-  // Compute linear model analatically
-  double lambda = meta_parameters_RRRFF->lambda_;
-  MatrixXd toInverse = lambda * MatrixXd::Identity(nb_cos, nb_cos) + proj_inputs.transpose() * proj_inputs;
-  VectorXd linear_model = toInverse.inverse() *
-    (proj_inputs.transpose() * targets);
-
+  // Compute linear model analatically with least squares
+  double regularization = meta_parameters_RRRFF->regularization_;
+  bool use_offset = false;
+  VectorXd linear_model =  leastSquares(proj_inputs,targets,use_offset,regularization);
+  
   setModelParameters(new ModelParametersRRRFF(linear_model, cosines_periodes, cosines_phase));
 }
 

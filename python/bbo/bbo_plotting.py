@@ -26,9 +26,14 @@ from matplotlib.patches import Ellipse
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.distribution_gaussian import DistributionGaussian
+from bbo.DistributionGaussian import DistributionGaussian
 
 def setColor(handle,i_update,n_updates):
+    """ Set the color of an object, according to how far the optimization has proceeded.
+    \param[in] handle Handle to the object
+    \param[in] i_update Which update is the optimization at now?
+    \param[in] n_update Which is the number of updates the optimization will run?
+    """
     if (i_update==0):
         plt.setp(handle,color='r',linewidth=2)
     else:
@@ -37,6 +42,11 @@ def setColor(handle,i_update,n_updates):
         plt.setp(handle,color=cur_color)
 
 def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
+    """ Plot vertical lines when an parameter update occured during the optimization.
+    \param[in] n_samples_per_update Vector specifying how many samples were used between updates.
+    \param[in] ax Axis object to plot the lines in.
+    \param[in] y_limits Limits of the y-axis. Default is [], in which case ax.get_ylim() is used.
+    """
     if (len(y_limits)==0):
         y_limits = ax.get_ylim()
     
@@ -59,6 +69,16 @@ def plotUpdateLines(n_samples_per_update,ax,y_limits=[]):
 
 
 def plotLearningCurve(learning_curve,ax,costs_all=[],cost_labels=[]):
+    """ Plot a learning curve.
+    \param[in] learing_curve A learning curve that has the following format
+        #rows is number of optimization updates
+        column 0: Number of samples at which the cost was evaluated
+        column 1: The total cost 
+        column 2...: Individual cost components (column 1 is their sum)
+    \param[in] ax Axis to plot the learning curve on.
+    \param[in] costs_all Vector of costs of each sample (default=[])
+    \param[in] cost_labels Vector of strings for the different cost components  (default=[]).
+    """
 
     # Plot (sum of) costs of all individual samples 
     if (len(costs_all)>0):
@@ -92,6 +112,14 @@ def plotLearningCurve(learning_curve,ax,costs_all=[],cost_labels=[]):
     
     
 def plotExplorationCurve(exploration_curve,ax):    
+    """ Plot an exploration curve.
+    \param[in] exploration An exploration curve that has the following format
+        #rows is number of optimization updates
+        column 0: Number of samples at which the cost was evaluated
+        column 1: The exploration at that update 
+        column 2...: Individual cost components (column 1 is their sum)
+    \param[in] ax Axis to plot the learning curve on.
+    """
     exploration_curve = np.array(exploration_curve)
     line = ax.plot(exploration_curve[:,0],exploration_curve[:,1],'-',color='green',linewidth=2)
     ax.set_xlabel('number of evaluations')
@@ -123,19 +151,45 @@ def plotCurveDeprecated(curve,axs,costs_all=[]):
     return lines
 
 def saveLearningCurve(directory,learning_curve):
+    """ Save a learning curve to a file.
+    \param[in] directory The directory to save the file to.
+    \param[in] learning_curve The learning curve.
+    """
     np.savetxt(directory+'/learning_curve.txt',learning_curve)
     
 def loadLearningCurve(directory):
+    """ Load a learning curve from a file.
+    \param[in] directory The directory to load the file from.
+    \return The learning curve.
+    """
     return np.loadtxt(directory+'/learning_curve.txt')
 
 def saveExplorationCurve(directory,exploration_curve):
+    """ Save a exploration curve to a file.
+    \param[in] directory The directory to save the file to.
+    \param[in] exploration_curve The exploration curve.
+    """
     np.savetxt(directory+'/exploration_curve.txt',exploration_curve)
     
 def loadExplorationCurve(directory):
+    """ Load a exploration curve from a file.
+    \param[in] directory The directory to load the file from.
+    \return The exploration curve.
+    """
     return np.loadtxt(directory+'/exploration_curve.txt')
     
     
 def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new):
+    """ Save an optimization update to a directory.
+    \param[in] directory The directory to save the update to.
+    \param[in] i_update How many updates have been done so far
+    \param[in] distribution Gaussian distribution before the update
+    \param[in] cost_eval Cost of the mean of the distribution 
+    \param[in] samples The samples in the search space
+    \param[in] costs The cost of each sample 
+    \param[in] weights The weight of each sample 
+    \param[in] distribution_new Gaussian distribution after the update
+    """
 
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -159,6 +213,11 @@ def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,d
         np.savetxt(cur_dir+'/weights.txt',weights)
         
 def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
+    """ Plot multiple learning curves. Plots the mean+-std of these curves.
+    \param[in] all_eval_at_samples The number of updates at which the cost was evaluated. Matrix of size n_learning_curves X n_updates.
+    \param[in] all_costs_eval The costs of the evaluation at which the cost was evaluated. Matrix of size n_learning_curves X n_updates. 
+    \param[in] ax Axis to plot the learning curve on.
+    """
     
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.
     std_samples = all_eval_at_samples.std(0)
@@ -180,6 +239,12 @@ def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
     return (line_mean, line_std_plus, line_std_min)
 
 def plotExplorationCurves(all_covar_at_samples,all_exploration_curves,ax):
+    """ Plot multiple exploration curves. Plots the mean+-std of these curves.
+    \param[in] all_covar_at_samples The number of updates at which the cost was evaluated. Matrix of size n_exploration_curves X n_updates.
+    \param[in] all_exploration_curves The exploration when the cost was evaluated. Matrix of size n_exploration_curves X n_updates. 
+    \param[in] ax Axis to plot the exploration curve on.
+    """
+    
     # Check if all n_samples_per_update are the same. Otherwise averaging doesn't make sense.
     std_samples = all_covar_at_samples.std(0)
     if (sum(std_samples)>0.0001):
@@ -241,6 +306,17 @@ These keywords are passed to matplotlib.patches.Ellipse
     return lines
     
 def plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight=False,plot_samples=False):
+    """ Save an optimization update to a directory.
+    \param[in] distribution Gaussian distribution before the update
+    \param[in] cost_eval Cost of the mean of the distribution 
+    \param[in] samples The samples in the search space
+    \param[in] costs The cost of each sample 
+    \param[in] weights The weight of each sample 
+    \param[in] distribution_new Gaussian distribution after the update
+    \param[in] ax Axis to plot the update on.
+    \param[in] highlight Wether to highlight this update (default=False)
+    \param[in] plot_samples Whether to plot the individual samples (default=False)
+    """
 
     if samples is None:
         plot_samples = False

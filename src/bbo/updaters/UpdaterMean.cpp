@@ -69,7 +69,7 @@ void UpdaterMean::updateDistributionMean(const VectorXd& mean, const MatrixXd& s
   */
 }
 
-/** \todo Implement other weighting schemes */  
+
 void  UpdaterMean::costsToWeights(const VectorXd& costs, string weighting_method, double eliteness, VectorXd& weights) const
 {
   weights.resize(costs.size());
@@ -83,24 +83,43 @@ void  UpdaterMean::costsToWeights(const VectorXd& costs, string weighting_method
     else
       weights = (-h*(costs.array()-costs.minCoeff())/range).exp();
   } 
-  //else if (weighting_method.compare("CMA-ES")==0)
-  //{
-  //http://stackoverflow.com/questions/2686548/sorting-eigenvectors-by-their-eigenvalues-associated-sorting
-    //std::sort(v.data(), v.data()+v.size()); 
-  /*
-    elseif (strcmp(weighting_method,'CEM') || strcmp(weighting_method,'CMA-ES'))
-      % CEM/CMA-ES style weights: rank-based, uses defaults
-      mu = eliteness; % In CMA-ES, eliteness parameter is known as "mu"
-      [Ssorted indices] = sort(costs,'ascend');
-      weights = zeros(size(costs));
-      if (strcmp(weighting_method,'CEM'))
-        weights(indices(1:mu)) = 1/mu;
-      else
-        for ii=1:mu
-          weights(indices(ii)) = log(mu+1/2)-log(ii);
-        end
-      end
-  */
+  else if (weighting_method.compare("CMA-ES")==0 || weighting_method.compare("CEM")==0 )
+  {
+    // CMA-ES and CEM are rank-based, so we must first sort the costs, and the assign a weight to 
+    // each rank.
+    VectorXd costs_sorted = costs; 
+    std::sort(costs_sorted.data(), costs_sorted.data()+costs_sorted.size());
+    // In Python this is more elegant because we have argsort.
+    // indices = np.argsort(costs)
+    // It is possible to do this with fancy lambda functions or std::pair in C++ too, but  I don't
+    // mind writing two for loops instead ;-)
+    
+    weights.fill(0.0);
+    int mu = eliteness; // In CMA-ES, eliteness parameter is known as "mu"
+    assert(mu<costs.size());
+    for (int ii=0; ii<mu; ii++)
+    {
+      double cur_cost = costs_sorted[ii];
+      for (int jj=0; jj<costs.size(); jj++)
+      {
+        if (costs[jj] == cur_cost)
+        {
+          if (weighting_method.compare("CEM")==0)
+            weights[jj] = 1.0/mu; // CEM
+          else
+            weights[jj] = log(mu+0.5) - log(ii+1); // CMA-ES
+          break;
+        }
+      }
+      
+    }
+    // For debugging
+    //MatrixXd print_mat(3,costs.size());
+    //print_mat.row(0) = costs_sorted;
+    //print_mat.row(1) = costs;
+    //print_mat.row(2) = weights;
+    //cout << print_mat << endl;
+  }
   else
   {
     cout << __FILE__ << ":" << __LINE__ << ":WARNING: Unknown weighting method '" << weighting_method << "'. Calling with PI-BB weighting." << endl; 

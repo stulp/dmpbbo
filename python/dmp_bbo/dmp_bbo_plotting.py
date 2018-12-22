@@ -23,10 +23,10 @@ import sys
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.distribution_gaussian import DistributionGaussian
-from bbo.bbo_plotting import plotUpdate, plotLearningCurve, plotExplorationCurve, setColor, saveUpdate
-from bbo.bbo_plotting import loadLearningCurve, loadExplorationCurve
-from dmp_bbo.rollout import Rollout, loadRolloutFromDirectory
+from bbo.DistributionGaussian import DistributionGaussian
+from dmp_bbo.Rollout import Rollout, loadRolloutFromDirectory
+
+from bbo.bbo_plotting import *
 
 def containsNewDistribution(directory):
     if os.path.exists(directory+"/distribution_new_mean.txt"):
@@ -34,6 +34,9 @@ def containsNewDistribution(directory):
     if os.path.exists(directory+"/distribution_new_000_mean.txt"):
         return True
     return False
+
+def plotOptimizationRolloutsTask(directory,fig,task,plot_all_rollouts=False):
+    plotOptimizationRollouts(directory,fig,task.plotRollout,plot_all_rollouts)
 
 def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False):
     

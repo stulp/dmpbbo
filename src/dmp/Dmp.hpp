@@ -46,7 +46,7 @@ class FunctionApproximator;
 class SpringDamperSystem;
 class Trajectory;
 
-/** \defgroup Dmps Dynamic Movement Primitives
+/** \defgroup Dmps Dynamic Movement Primitives Module
  */
 
 /** 
@@ -325,17 +325,15 @@ public:
    * \param[in] perturbation_standard_deviation Standard deviation of the normal distribution from which perturbations will be sampled.
    * 
    */
-  void set_perturbation_analytical_solution(double perturbation_standard_deviation)
+  void set_perturbation_analytical_solution(double perturbation_standard_deviation);
+  
+  /** Get the perturbation to the forcing term when computing the analytical solution.
+   * \return Standard deviation of the normal distribution from which perturbations will be sampled.
+   * 
+   */
+  double get_perturbation_analytical_solution() const 
   {
-    if (perturbation_standard_deviation>0.0)
-    {
-      boost::normal_distribution<> normal(0, perturbation_standard_deviation);
-      analytical_solution_perturber_ = new boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >(rng, normal);
-    }
-    else
-    {
-      analytical_solution_perturber_ = NULL;
-    }
+    return perturbation_standard_deviation_;
   }
   
 protected:
@@ -377,6 +375,9 @@ private:
   
   /** Ranges of the trajectory (per dimension) for (optional) scaling of forcing term.  */
   Eigen::VectorXd trajectory_amplitudes_;
+  
+  /** @see Dmp::set_perturbation_analytical_solution() **/
+  double perturbation_standard_deviation_ = 0.0;
 
   /** @} */ // end of group_nonlinear
   
@@ -418,7 +419,7 @@ private:
   
   /** Boost's random number generator. Shared by all object instances. */
   static boost::mt19937 rng;
-  boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > *analytical_solution_perturber_;
+  mutable boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > *analytical_solution_perturber_ = NULL;
   
 protected:
    Dmp(void) {};
@@ -434,7 +435,7 @@ private:
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version);
-
+  
 };
 
 }
@@ -450,7 +451,9 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::Dmp,boost::serialization::object_serializable
 #endif // _DMP_H_
 
 
-/** \page page_dmp Dynamical Movement Primitives Module
+/** \page page_dmp Dynamical Movement Primitives
+
+This page explains the background and implementation of dynamical movement primitives.
 
 \section sec_dmp_introduction Introduction
 

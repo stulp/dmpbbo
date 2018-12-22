@@ -27,10 +27,10 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../plotting')
+lib_path = os.path.abspath('../../../python')
 sys.path.append(lib_path)
-from plotData import plotDataFromDirectory
-from plotLocallyWeightedLines import plotLocallyWeightedLinesFromDirectory
+
+from functionapproximators.functionapproximators_plotting import *
 
 if __name__=='__main__':
     executable = "../../../bin_test/testBasisFunctionsLWR"

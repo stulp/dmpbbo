@@ -113,10 +113,21 @@ int main(int n_args, char** args)
     ia >> BOOST_SERIALIZATION_NVP(dmp_out);
     ifs.close();
     
+    
     cout << "___________________________________________" << endl;
     cout << "  filename=" << filename << endl;
     cout << *dmp << endl;
     cout << *dmp_out << endl;
+    
+    int n_time_steps = 51;
+    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau); // Time steps
+    MatrixXd xs_ana;
+    MatrixXd xds_ana;
+    MatrixXd forcing_terms_ana, fa_output_ana;
+    //cout << dmp->get_perturbation_analytical_solution() << endl;
+    dmp->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana);
+    //cout << xs_ana << endl;
+    
     delete dmp_out;
   }
 
