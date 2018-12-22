@@ -1,6 +1,6 @@
 /**
- * @file runOptimization.hpp
- * @brief  Header file for function to run an evolutionary optimization process.
+ * @file runOptimizationTask.hpp
+ * @brief  Header file for function to run an evolutionary optimization process with a task.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -96,16 +96,14 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 
 #endif
 
-/** \defgroup BBO Black Box Optimization Module
- */
-
-
 /** \defgroup DMP_BBO Black Box Optimization of Dynamical Movement Primitives Module
  */
 
 /** \page page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
 
-This page assumes you have read the page on \ref page_bbo. When applying BBO to policy improvement (e.g. optimizing a DMP on a robot), the concept of a "rollout" becomes important. A rollout is the result of executing a policy (e.g. a DMP) with a certain set of policy parameters (e.g. the parameter of the DMP). Although the search space for optimization is in the space of the policy parameters, the costs are rather determined from the rollout.
+This page explains how to apply black-box optimization algorithms to the optimization of dynamical movement primitives.
+
+This page assumes you have read the page on \ref page_bbo and \ref page_dmp. When applying BBO to policy improvement (e.g. optimizing a DMP on a robot), the concept of a "rollout" becomes important. A rollout is the result of executing a policy (e.g. a DMP) with a certain set of policy parameters (e.g. the parameter of the DMP). Although the search space for optimization is in the space of the policy parameters, the costs are rather determined from the rollout.
 
 From an implementation point of view, applying BBO to policy improvement (which may execute DMPs) requires several extensions:
 

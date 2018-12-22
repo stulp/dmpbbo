@@ -24,7 +24,7 @@
 #ifndef _LEAST_SQUARES_H_
 #define _LEAST_SQUARES_H_
 
-/** @defgroup Least Squares
+/** @defgroup LeastSquares Least Squares
  *  @ingroup FunctionApproximators
  */
 

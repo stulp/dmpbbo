@@ -33,7 +33,7 @@
 
 namespace DmpBbo {
 
-/** \brief A class for storing trajectories, i.e. positions, velocities and accelerations of
+/** \brief A class for storing trajectories: positions, velocities and accelerations of
  *  variables over time.
  *
  * A trajectory is essentially a matrix of following form:

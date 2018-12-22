@@ -1,7 +1,7 @@
 /**
- * @file EigenBoostSerialization.tpp
- * @brief  Source file for serialization of Eigen matrices.
- * @author Freek Stulp
+ * \file EigenBoostSerialization.tpp
+ * \brief  Source file for serialization of Eigen matrices.
+ * \author Freek Stulp
  *
  * Implementations are in the tpp file
  *

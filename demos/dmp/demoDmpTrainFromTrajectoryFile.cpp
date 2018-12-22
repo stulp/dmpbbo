@@ -1,6 +1,10 @@
 /**
  * \file demoDmpTrainFromTrajectoryFile.cpp
  * \author Freek Stulp
+ * \brief  Demonstrates how to train a Dmp with a trajectory in a txt file.
+ *
+ * \ingroup Demos
+ * \ingroup Dmps
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.

@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** \defgroup FunctionApproximators Function Approximators
+/** \defgroup FunctionApproximators Function Approximators Module
  */
 
 #ifndef _FUNCTIONAPPROXIMATOR_H_
@@ -359,7 +359,9 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximator,boost::serialization::ob
 
 #endif // _FUNCTIONAPPROXIMATOR_H_
 
-/** \page page_func_approx Function Approximation Module
+/** \page page_func_approx Function Approximation
+
+This page explains function approximators, and their implementation in DmpBbo
 
 \section sec_fa Function Approximation
 

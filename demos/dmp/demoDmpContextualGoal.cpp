@@ -1,7 +1,7 @@
 /**
- * \file demoDmpContextual.cpp
+ * \file demoDmpContextualGoal.cpp
  * \author Freek Stulp
- * \brief  Demonstrates how to initialize, train and integrate a Contextual Dmp.
+ * \brief  Demonstrates how to initialize, train and integrate a Contextual Dmp that adapts the goal state to the task parameters.
  *
  * \ingroup Demos
  * \ingroup Dmps

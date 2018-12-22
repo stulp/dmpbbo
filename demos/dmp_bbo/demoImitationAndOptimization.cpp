@@ -1,7 +1,7 @@
 /**
  * \file demoImitationAndOptimization.cpp
  * \author Freek Stulp
- * \brief  Demonstrates how to initialize a DMP, and then optimize it with an evolution strategy.
+ * \brief  Demonstrates how to initialize a DMP with a trajectory, and then optimize it with an evolution strategy.
  *
  * \ingroup Demos
  * \ingroup DMP_BBO

@@ -37,7 +37,7 @@ namespace DmpBbo {
 // Forward definition
 class Dmp;
 
-/** Task solver for the viapoint task, that generates trajectories with a DMP. 
+/** TaskSolver for the viapoint task, that generates trajectories with a DMP. 
  */
 class TaskSolverDmp : public TaskSolver
 {

@@ -1,5 +1,5 @@
 /**
- * @file   leastSquares.hpp
+ * @file   leastSquares.cpp
  * @brief  Source file for various least squares functions.
  * @author Freek Stulp
  *

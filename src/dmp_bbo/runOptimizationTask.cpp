@@ -1,6 +1,6 @@
 /**
- * @file runOptimization.cpp
- * @brief  Source file for function to run an evolutionary optimization process.
+ * @file runOptimizationTask.cpp
+ * @brief  Source file for function to run an evolutionary optimization process with a task.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 

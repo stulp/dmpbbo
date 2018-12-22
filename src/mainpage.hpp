@@ -33,6 +33,8 @@ Some general considerations on the design of the library are here \ref page_desi
 
 /** \page page_design Design Rationale
 
+This page explains the overal design rationale for DmpBbo
+
 \section sec_remarks General Remarks
 
 \li Code legibility is more important to me than absolute execution speed (except for those parts of the code likely to be called in a time-critical context) or using all of the design patterns known to man (that is why I do not use PIMPL; it is not so legible for the uninitiated user. Also, I do not use the factory design pattern, but rather have clone() functions in classes ).

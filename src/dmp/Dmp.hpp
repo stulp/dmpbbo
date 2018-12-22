@@ -46,7 +46,7 @@ class FunctionApproximator;
 class SpringDamperSystem;
 class Trajectory;
 
-/** \defgroup Dmps Dynamic Movement Primitives
+/** \defgroup Dmps Dynamic Movement Primitives Module
  */
 
 /** 
@@ -451,7 +451,9 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::Dmp,boost::serialization::object_serializable
 #endif // _DMP_H_
 
 
-/** \page page_dmp Dynamical Movement Primitives Module
+/** \page page_dmp Dynamical Movement Primitives
+
+This page explains the background and implementation of dynamical movement primitives.
 
 \section sec_dmp_introduction Introduction
 

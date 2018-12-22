@@ -1,6 +1,10 @@
 /**
  * \file demoFunctionApproximatorTraining.cpp
  * \author Freek Stulp
+ * \brief Demonstrates how to train all functionapproximators with 1D and 2D data.
+ *
+ * \ingroup Demos
+ * \ingroup FunctionApproximators
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.

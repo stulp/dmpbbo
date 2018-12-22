@@ -21,7 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/** \defgroup FunctionApproximators Function Approximators
+/** \ingroup FunctionApproximators
  */
 
 #ifndef _GETFUNCTIONAPPROXIMATORBYNAME_H_

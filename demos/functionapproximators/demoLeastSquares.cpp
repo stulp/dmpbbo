@@ -1,6 +1,10 @@
 /**
  * \file demoLeastSquares.cpp
  * \author Freek Stulp
+ * \brief Demonstrates how to run least squares regression
+ * 
+ * \ingroup Demos
+ * \ingroup FunctionApproximators
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
  * black-box optimization of dynamical movement primitives.

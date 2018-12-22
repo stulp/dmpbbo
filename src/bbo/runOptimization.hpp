@@ -94,7 +94,7 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 
 /** \page page_bbo Black Box Optimization
 
-This module implements several <A HREF="http://en.wikipedia.org/wiki/Evolution_strategy">evolution strategies</A> for the <A HREF="http://en.wikipedia.org/wiki/Optimization_%28mathematics%29">optimization</A> of black-box <A HREF="http://en.wikipedia.org/wiki/Loss_function">cost functions</A>. Black-box in this context means that no assumptions about the cost function can be made, for example, we do not have access to its derivative, and we do not even know if it is continuous or not.
+This page explains the implementation of <A HREF="http://en.wikipedia.org/wiki/Evolution_strategy">evolution strategies</A> for the <A HREF="http://en.wikipedia.org/wiki/Optimization_%28mathematics%29">optimization</A> of black-box <A HREF="http://en.wikipedia.org/wiki/Loss_function">cost functions</A>. Black-box in this context means that no assumptions about the cost function can be made, for example, we do not have access to its derivative, and we do not even know if it is continuous or not.
 
 The evolution strategies that are implemented are all based on reward-weighted averaging (aka probablity-weighted averaging), as explained in this paper/presentation: http://icml.cc/discuss/2012/171.html
 

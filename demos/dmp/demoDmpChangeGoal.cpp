@@ -1,7 +1,7 @@
 /**
  * \file demoDmpChangeGoal.cpp
  * \author Freek Stulp
- * \brief  Demonstrates how to change the goal for a Dmp
+ * \brief  Demonstrates how to change the goal for a Dmp, and the effects of different scaling approaches.
  *
  * \ingroup Demos
  * \ingroup Dmps

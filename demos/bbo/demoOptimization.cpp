@@ -43,13 +43,7 @@ using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
 
-namespace DmpBbo 
-{
-
 /** CostFunction in which the distance to a pre-defined point must be minimized.
- *
- * \ingroup BBO
- * \ingroup Demos
  */
 class DemoCostFunctionDistanceToPoint : public CostFunction
 {
@@ -112,7 +106,7 @@ private:
   double regularization_weight_;  
 };
 
-}
+
 
 /** Main function
  * \param[in] n_args Number of arguments

@@ -1,7 +1,7 @@
 /**
- * \file demoOptimizationDmp.cpp
+ * \file demoOptimizationDmpArm2D.cpp
  * \author Freek Stulp
- * \brief  Demonstrates how to run an evolution strategy to optimize a Dmp.
+ * \brief  Demonstrates how to run an evolution strategy to optimize a Dmp, on a task with a viapoint task with a N-DOF arm in a 2D space.
  *
  * \ingroup Demos
  * \ingroup DMP_BBO                

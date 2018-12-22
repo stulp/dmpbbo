@@ -32,7 +32,7 @@ namespace DmpBbo {
 
 class FunctionApproximator;
 
-/** \defgroup Dmps Dynamic Movement Primitives
+/** \ingroup Dmps
  */
 
 /** 
