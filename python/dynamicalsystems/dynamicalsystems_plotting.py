@@ -22,22 +22,40 @@ import sys
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
+def checkIfVectorContainsTime(ts):
+    # Here we check if the first column (extracted above) represents time
+    # (i.e. is monotonically increasing, and constant dt
+    diff_ts = numpy.diff(ts)
+    monotonically_increasing = numpy.all(diff_ts>0)
+    constant_dt = numpy.std(diff_ts)<0.000001
+    if not monotonically_increasing or not constant_dt:
+        print('WARNING: First column does not seem to represent time. Please change the way plotDynamicalSystem is called, or use plotDynamicalSystemDeprecated instead.')
+
+
 def plotDynamicalSystem(data,axs):
   
+    ts  = data[:,0] # First column is time
+    data = data[:,1:] # Remove first column
+    
+    # Here comes a check just for backwards compatibility
+    # Input format for data used to be [ x_1..x_D  xd_1..xd_D  t ]
+    # Input format for data now is     [ t  x_1..x_D  xd_1..xd_D ]
+    checkIfVectorContainsTime(ts)            
+   
     # Prepare tex intepretation
     plt.rc('text', usetex=True)
     plt.rc('font', family='serif')
 
     # Get dimensionality of the dynamical system
-    #     (-1 to subtract time)/divide by 2 because we have x and xd
-    dim = (data.shape[1]-1)//2
+    #     divide by 2 because we have x and xd
+    dim = (data.shape[1])//2
 
     system_order = len(axs)-1
 
+        
     if (system_order==1):
       
-        # data has following format: [ x_1..x_D  xd_1..xd_D  t ]
-        ts  = data[:,-1] # Last column is time
+        # data has following format: [ x_1..x_D  xd_1..xd_D ]
         xs  = data[:,0*dim:1*dim]
         xds = data[:,1*dim:2*dim]
         
@@ -48,13 +66,11 @@ def plotDynamicalSystem(data,axs):
         axs[1].set_ylabel(r"$\dot{x}$")
         
     else:
-        # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D  t ]
+        # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
         
         # For second order systems, dim_orig = dim/2 (because x = [y z] and xd = [yd zd]
         dim_orig =dim//2;
         
-        # data has following format: [ x_1..x_D  xd_1..xd_D  t ]
-        ts  = data[:,-1] # Last column is time
         ys  = data[:,0*dim_orig:1*dim_orig]
         zs  = data[:,1*dim_orig:2*dim_orig]
         yds = data[:,2*dim_orig:3*dim_orig]
@@ -80,9 +96,14 @@ def plotDynamicalSystem(data,axs):
         ax.set_xlabel(r'time ($s$)')
         #ax.axis('tight')
         ax.grid()
-        
+
     return lines
 
+def plotDynamicalSystemDeprecated(data_time_last,axs):
+    # Make last column (time) the first column
+    data_time_first = numpy.roll(data_time_last, 1, axis=1)
+    return plotDynamicalSystem(data_time_first,axs)
+   
 
 def plotDynamicalSystemComparison(data1,data2,name1,name2,axs,axs_diff):
 
@@ -93,7 +114,7 @@ def plotDynamicalSystemComparison(data1,data2,name1,name2,axs,axs_diff):
     plt.legend()
     
     data_diff = data1-data2;
-    data_diff[:,-1] = data1[:,-1] # Don't subtract time...
+    data_diff[:,0] = data1[:,0] # Don't subtract time...
     lines_diff = plotDynamicalSystem(data_diff,axs_diff)
     plt.setp(lines_diff,linestyle= '-', linewidth=2, color=(0.50,0.00,0.00), label='diff')
     plt.legend()

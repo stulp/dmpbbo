@@ -62,13 +62,15 @@ if __name__=='__main__':
     
     # Plotting
     fig = plt.figure(1)
-    data_ana = np.concatenate((xs_ana,xds_ana,np.atleast_2d(ts).T),axis=1)
-    plotDynamicalSystem(data_ana,[fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)])
+    axs = [fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)]
+    data_ana = np.concatenate((np.atleast_2d(ts).T,xs_ana,xds_ana),axis=1)
+    plotDynamicalSystem(data_ana,axs)
     plt.title('analytical')
     
     fig = plt.figure(2)
-    data_num = np.concatenate((xs_num.T,xds_num.T,np.atleast_2d(ts).T),axis=1)
-    plotDynamicalSystem(data_num,[fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)])
+    axs = [fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)]
+    data_num = np.concatenate((np.atleast_2d(ts).T,xs_num.T,xds_num.T),axis=1)
+    plotDynamicalSystem(data_num,axs)
     plt.title('numerical')
     
     fig = plt.figure(3)

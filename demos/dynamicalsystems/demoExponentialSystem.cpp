@@ -86,12 +86,13 @@ int main(int n_args, char** args)
   for (int ii=0; ii<n_time_steps; ii+=(n_time_steps/20))
   {
     cout << fixed << setw(10) << setprecision(3);
+    cout << ts(ii) << " ";
     cout << xs_num.col(ii).transpose() << " " <<  xds_num.col(ii).transpose()<< " " ;
     cout << xs_ana.col(ii).transpose() << " " <<  xds_ana.col(ii).transpose() << " " ;
-    cout << ts(ii) << endl;
+    cout << endl;
   }
   
-  cout << "        x_1         x_2        xd_1        xd_2         x_1         x_2        xd_1        xd_2           t" << endl;
+  cout << "t        x_1         x_2        xd_1        xd_2         x_1         x_2        xd_1        xd_2" << endl;
   cout << "               NUMERICAL INTEGRATION            ||             ANALYTICAL SOLUTION                 ||  TIME " << endl;
   //cout << *system << endl;
     
@@ -103,13 +104,13 @@ int main(int n_args, char** args)
     bool overwrite = true;
     
     // Put the results in one matrix to facilitate the writing of the data
-    MatrixXd xs_xds_ts(ts.size(),1+2*system->dim());
+    MatrixXd ts_xs_xds(ts.size(),1+2*system->dim());
     
-    xs_xds_ts << xs_ana.transpose(), xds_ana.transpose(), ts;
-    saveMatrix(directory,"analytical.txt",xs_xds_ts,overwrite);
+    ts_xs_xds << ts, xs_ana.transpose(), xds_ana.transpose();
+    saveMatrix(directory,"analytical.txt",ts_xs_xds,overwrite);
     
-    xs_xds_ts << xs_num.transpose(), xds_num.transpose(), ts;
-    saveMatrix(directory,"numerical.txt",xs_xds_ts,overwrite);
+    ts_xs_xds << ts, xs_num.transpose(), xds_num.transpose();
+    saveMatrix(directory,"numerical.txt",ts_xs_xds,overwrite);
   }
       
   delete system; 

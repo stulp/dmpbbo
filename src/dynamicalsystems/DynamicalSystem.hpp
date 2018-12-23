@@ -477,10 +477,10 @@ delete dyn_sys;
 
 If you save the output of a dynamical in a file with format (where D is the dimensionality of the system, and T is the number of time steps)
 \verbatim
-x^0_0 x^1_0 .. x^D_0   xd^0_0 xd^1_0 .. xd^D_0   t_0   
-x^0_1 x^1_1 .. x^D_1   xd^0_1 xd^1_1 .. xd^D_1   t_1   
-   :     :       :         :      :       :       :    
-x^0_T x^1_T .. x^D_T   xd^0_T xd^1_T .. xd^D_T   t_T   
+t_0   x^0_0 x^1_0 .. x^D_0   xd^0_0 xd^1_0 .. xd^D_0     
+t_1   x^0_1 x^1_1 .. x^D_1   xd^0_1 xd^1_1 .. xd^D_1     
+ :       :     :       :         :      :       :        
+t_T   x^0_T x^1_T .. x^D_T   xd^0_T xd^1_T .. xd^D_T     
 \endverbatim
 you can plot this output with 
 \code

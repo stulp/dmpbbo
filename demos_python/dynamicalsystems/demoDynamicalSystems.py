@@ -41,7 +41,7 @@ def runDynamicalSystemTest(dyn_system, demo_label):
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
     ts = np.linspace(0.0,integration_duration,n_time_steps)
 
-
+                                       
     if demo_label == "tau":
         dyn_system.set_tau(0.5*dyn_system.tau_)
   
@@ -135,7 +135,7 @@ if __name__=='__main__':
             # RUN THE CURRENT TEST FOR THE CURRENT SYSTEM
             (xs,xds,ts) = runDynamicalSystemTest(dyn_system, demo_label)
             
-            cur_data = np.concatenate((xs,xds,np.atleast_2d(ts).T),axis=1)
+            cur_data = np.concatenate((np.atleast_2d(ts).T,xs,xds),axis=1)
             
             all_data.append(cur_data)
             
@@ -144,7 +144,8 @@ if __name__=='__main__':
         figure_number = figure_number+1
     
         if (len(demo_labels)==1):
-            plotDynamicalSystem(all_data[0],[fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)])
+            axs = [fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)]
+            plotDynamicalSystem(all_data[0],axs)
             fig.canvas.set_window_title(name+"  ("+demo_label+")") 
                 
         else:
