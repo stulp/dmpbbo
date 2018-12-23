@@ -87,7 +87,6 @@ int main(int n_args, char** args)
   cout << "Training Dmp..." << endl;
   dmp->train(trajectory);
 
-  /*
 #ifndef NDEBUG
   // boost serialization currently only works in debug mode; I have no clue why...
   cout << "Writing trained Dmp to XML file: " << output_xml_file << endl;
@@ -96,7 +95,6 @@ int main(int n_args, char** args)
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();
 #endif
-  */
     
   delete meta_parameters;
   delete fa_lwr;
