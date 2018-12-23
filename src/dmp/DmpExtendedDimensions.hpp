@@ -50,12 +50,15 @@ namespace DmpBbo {
 class FunctionApproximator;
 class Trajectory;
 
-/** \defgroup Dmps Dynamic Movement Primitives
+/** \defgroup DmpExtendedDimensions Dmp with Extended Dimensions
+ *  \ingroup Dmps
+ *  
  */
+ 
+/**
+Implementation of DMPs which contain extra dimensions which are not part of the dynamical system, but nevertheless trained from demonstrations.
 
-/** 
- * \brief Implementation of Dynamical Movement Primitives with extended dimensions
- * \ingroup DmpExtendedDimensionss
+Examples of such extra dimensions are gain schedules \cite buchli11learning or force profiles \cite kalakrishnan11learning
  */
 class DmpExtendedDimensions : public Dmp
 {
@@ -123,6 +126,10 @@ public:
     return function_approximators_ext_dims_.size();
   }
   
+  /** \todo DmpExtendedDimensions does not yet override Parameterizable interface. Thus, the functionapproximators for the extended dimensions cannot be parameterized through this interface.
+   */
+
+  /*
   void getSelectableParameters(std::set<std::string>& selectable_values_labels) const;
   void setSelectedParameters(const std::set<std::string>& selected_values_labels);
 
@@ -130,7 +137,7 @@ public:
   void getParameterVectorAll(Eigen::VectorXd& values) const;
   void setParameterVectorAll(const Eigen::VectorXd& values);
   void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-
+  */
   
   /** Compute the outputs of the function approximators.
    * \param[in] phase_state The phase states for which the outputs are computed.

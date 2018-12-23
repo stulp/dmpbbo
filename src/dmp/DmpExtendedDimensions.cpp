@@ -309,6 +309,7 @@ void DmpExtendedDimensions::train(const Trajectory& trajectory, std::string save
   }
 }
 
+/*
 void DmpExtendedDimensions::getSelectableParameters(set<string>& selectable_values_labels) const {
   
   Dmp::getSelectableParameters(selectable_values_labels);
@@ -367,42 +368,41 @@ void DmpExtendedDimensions::setSelectedParameters(const set<string>& selected_va
 void DmpExtendedDimensions::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
 {
   Dmp::getParameterVectorMask(selected_values_labels,selected_mask);
-  /*
-  assert(function_approximators_ext_dims_.size()>0);
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    assert(function_approximators_ext_dims_[dd]!=NULL);
-    assert(function_approximators_ext_dims_[dd]->isTrained());
-  }
-
-  selected_mask.resize(getParameterVectorAllSize());
-  
-  int offset = 0;
-  VectorXi cur_mask;
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    function_approximators_ext_dims_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
-
-    // This makes sure that the indices for each function approximator are different    
-    int mask_offset = selected_mask.maxCoeff(); 
-    for (int ii=0; ii<cur_mask.size(); ii++)
-      if (cur_mask[ii]!=0)
-        cur_mask[ii] += mask_offset;
-        
-    selected_mask.segment(offset,cur_mask.size()) = cur_mask;
-    offset += cur_mask.size();
+// assert(function_approximators_ext_dims_.size()>0);
+// for (int dd=0; dd<dim_orig(); dd++)
+// {
+//   assert(function_approximators_ext_dims_[dd]!=NULL);
+//   assert(function_approximators_ext_dims_[dd]->isTrained());
+// }
+//
+// selected_mask.resize(getParameterVectorAllSize());
+// 
+// int offset = 0;
+// VectorXi cur_mask;
+// for (int dd=0; dd<dim_orig(); dd++)
+// {
+//   function_approximators_ext_dims_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
+//
+//   // This makes sure that the indices for each function approximator are different    
+//   int mask_offset = selected_mask.maxCoeff(); 
+//   for (int ii=0; ii<cur_mask.size(); ii++)
+//     if (cur_mask[ii]!=0)
+//       cur_mask[ii] += mask_offset;
+//       
+//   selected_mask.segment(offset,cur_mask.size()) = cur_mask;
+//   offset += cur_mask.size();
+//   
+//   offset++;
+//   
+// }
+// assert(offset == getParameterVectorAllSize());
+// 
+// // Replace TMP_GOAL_NUMBER with current max value
+// int goal_number = selected_mask.maxCoeff() + 1; 
+// for (int ii=0; ii<selected_mask.size(); ii++)
+//   if (selected_mask[ii]==TMP_GOAL_NUMBER)
+//     selected_mask[ii] = goal_number;
     
-    offset++;
-    
-  }
-  assert(offset == getParameterVectorAllSize());
-  
-  // Replace TMP_GOAL_NUMBER with current max value
-  int goal_number = selected_mask.maxCoeff() + 1; 
-  for (int ii=0; ii<selected_mask.size(); ii++)
-    if (selected_mask[ii]==TMP_GOAL_NUMBER)
-      selected_mask[ii] = goal_number;
-    */
 }
 
 int DmpExtendedDimensions::getParameterVectorAllSize(void) const
@@ -421,7 +421,7 @@ void DmpExtendedDimensions::getParameterVectorAll(VectorXd& values) const
 
   int offset = values.size();
 
-  values.resize(getParameterVectorAllSize());
+  values.conservativeResize(getParameterVectorAllSize());
   
   VectorXd cur_values;
   for (int dd=0; dd<dim_extended(); dd++)
@@ -451,6 +451,7 @@ void DmpExtendedDimensions::setParameterVectorAll(const VectorXd& values)
   
 }
 
+*/
 
 template<class Archive>
 void DmpExtendedDimensions::serialize(Archive & ar, const unsigned int version)

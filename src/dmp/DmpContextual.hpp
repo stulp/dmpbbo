@@ -32,7 +32,8 @@ namespace DmpBbo {
 
 class FunctionApproximator;
 
-/** \ingroup Dmps
+/** \defgroup DmpContextual Contextual Dmp
+ *  \ingroup Dmps
  */
 
 /** 

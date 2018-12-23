@@ -35,7 +35,7 @@ class FunctionApproximatorLWR;
 
 /** 
  * \brief Implementation of Contextual Dynamical Movement Primitives.
- * \ingroup Dmps
+ * \ingroup DmpContextual
  */
 class DmpContextualTwoStep : public DmpContextual
 {
