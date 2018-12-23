@@ -28,14 +28,30 @@ from dynamicalsystems.dynamicalsystems_plotting import *
 
 def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
 
+    ts  = data[:,0] # First column is time
+    data = data[:,1:] # Remove first column
+    
+    # Here comes a check just for backwards compatibility
+    # Input format for data used to be [ x_1..x_D  xd_1..xd_D  t ]
+    # Input format for data now is     [ t  x_1..x_D  xd_1..xd_D ]
+    checkIfVectorContainsTime(ts)            
+    
+    
     # Number of columns in the data
     n_cols = data.shape[1]             
-    # Dimensionality of dynamical system. -1 because of time, /2 because both x and xd are stored.
-    n_state_length = (n_cols-1)//2      
+    # Dimensionality of dynamical system. /2 because both x and xd are stored.
+    n_state_length = n_cols//2      
     # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
     n_dims_dmp = (n_state_length-2)//3
     D = n_dims_dmp  # Abbreviation for convencience
-    
+
+    #define SPRING    segment(0*dim_orig()+0,2*dim_orig())
+    #define SPRING_Y  segment(0*dim_orig()+0,dim_orig())
+    #define SPRING_Z  segment(1*dim_orig()+0,dim_orig())
+    #define GOAL      segment(2*dim_orig()+0,dim_orig())
+    #define PHASE     segment(3*dim_orig()+0,       1)
+    #define GATING    segment(3*dim_orig()+1,       1)
+
     # We will loop over each of the subsystems of the DMP: prepare some variables here
     # Names of each of the subsystems
     system_names   = ['phase','gating','goal','spring'];
@@ -59,12 +75,11 @@ def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
           axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]+2))
           
         
-        indices = list(system_indices[i_system])
-        indices_xd =[i+n_state_length for i in indices] # +n_state_length because xd is in second half
-        indices.extend(indices_xd) # For derivative
-        indices.append(-1) # For time
+        indices_xs = list(system_indices[i_system])
+        indices_xds =[i+n_state_length for i in indices_xs] # +n_state_length because xd is in second half
       
-        lines = plotDynamicalSystem(data[:,indices],axs);
+        plot_data =  numpy.concatenate((numpy.atleast_2d(ts).T,data[:,indices_xs],data[:,indices_xds]),axis=1)
+        lines = plotDynamicalSystem(plot_data,axs);
         if (system_names[i_system]=='gating'):
           plt.setp(lines,color='m')
           axs[0].set_ylim([0, 1.1])
@@ -83,8 +98,6 @@ def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[]):
           if (ii==2):
               axs[ii].set_ylabel(r'$\ddot{'+system_varname[i_system]+'}$')
         
-    ts = data[:,-1];
-
     # todo Fix this
     if (len(fa_output_data)>1):
         ax = fig.add_subplot(3,5,11)

@@ -192,22 +192,12 @@ int main(int n_args, char** args)
       // WRITE RESULTS TO FILE
       
       // Put the results in one matrix to facilitate the writing of the data
-      MatrixXd xs_xds_ts(ts.size(),1+2*dyn_systems[i_system]->dim());
-      xs_xds_ts << xs.transpose(), xds.transpose(), ts;
+      MatrixXd ts_xs_xds(ts.size(),1+2*dyn_systems[i_system]->dim());
+      ts_xs_xds << ts, xs.transpose(), xds.transpose();
     
       save_directory = directory+"/"+dyn_systems[i_system]->name();
       filename = "results_"+test_labels[i_test]+".txt";
-      saveMatrix(save_directory,filename,xs_xds_ts,overwrite);
-      //saveMatrix(save_directory,"dim_orig.txt",VectorXd::Constant(1,dyn_systems[i_test]->dim_orig()),overwrite);
-
-      /*
-      cout << "Use 'cd ../plotting/ ; python plotDynamicalSystem.py " << save_directory << "/" << filename << "' to plot the results." << endl;
-      if (i_test==0)
-        first_filename = filename;
-      else
-        cout << "Use 'cd ../plotting/ ; python plotDynamicalSystemComparison.py " << save_directory << "/" << first_filename << " " << save_directory << "/" << filename << "' to plot a comparison of the results." << endl;
-      cout << endl;
-      */
+      saveMatrix(save_directory,filename,ts_xs_xds,overwrite);
 
     }
     cout << endl;

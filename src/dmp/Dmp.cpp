@@ -699,8 +699,8 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
     Trajectory traj_reproduced;
     analyticalSolution(ts,traj_reproduced);
     
-    trajectory.saveToFile(save_directory,"traj_demonstration.txt");
-    traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt");
+    trajectory.saveToFile(save_directory,"traj_demonstration.txt",overwrite);
+    traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt",overwrite);
   }
   
 }

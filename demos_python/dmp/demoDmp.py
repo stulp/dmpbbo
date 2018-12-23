@@ -79,13 +79,13 @@ if __name__=='__main__':
     #fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
     
     fig = plt.figure(2)
-    xs_xds = np.column_stack((xs_ana,xds_ana,ts))
-    plotDmp(xs_xds,fig,forcing_terms_ana,fa_outputs_ana)
+    ts_xs_xds = np.column_stack((ts,xs_ana,xds_ana))
+    plotDmp(ts_xs_xds,fig,forcing_terms_ana,fa_outputs_ana)
     fig.canvas.set_window_title('Analytical integration') 
     
     fig = plt.figure(3)
-    xs_xds = np.column_stack((xs_step,xds_step,ts))
-    plotDmp(xs_xds,fig)
+    ts_xs_xds = np.column_stack((ts,xs_step,xds_step))
+    plotDmp(ts_xs_xds,fig)
     fig.canvas.set_window_title('Step-by-step integration') 
     
     
