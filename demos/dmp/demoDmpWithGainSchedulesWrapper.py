@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-## \file demoDmp.py
+## \file demoDmpWithGainSchedulesWrapper.py
 ## \author Freek Stulp
 ## \brief  Visualizes results of demoDmp.cpp
 ## 
@@ -40,8 +40,8 @@ from dmp.dmp_plotting import *
 if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoDmpExtendedDimensions"
-    directory = "/tmp/demoDmpExtendedDimensions"
+    executable = "../../bin/demoDmpWithGainSchedules"
+    directory = "/tmp/demoDmpWithGainSchedules"
     executeBinary(executable, directory)
     
     print("Plotting")
@@ -60,23 +60,23 @@ if __name__=='__main__':
     fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
     
     # Read data
-    ts_xs_xds        = numpy.loadtxt(directory+'/reproduced_ts_xs_xds.txt')
+    ts_xs_xds     = numpy.loadtxt(directory+'/reproduced_ts_xs_xds.txt')
     forcing_terms = numpy.loadtxt(directory+'/reproduced_forcing_terms.txt')
     fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
-    fa_extended   = numpy.loadtxt(directory+'/reproduced_fa_extended.txt')
+    fa_gains      = numpy.loadtxt(directory+'/reproduced_fa_gains.txt')
 
 
     fig = plt.figure(2)
-    plotDmp(ts_xs_xds,fig,forcing_terms,fa_output,fa_extended)
+    plotDmp(ts_xs_xds,fig,forcing_terms,fa_output,fa_gains)
     fig.canvas.set_window_title('Analytical integration') 
     
     
     
-    reproduced_step = numpy.loadtxt(directory+'/reproduced_step_ts_xs_xds_ext.txt')
+    reproduced_step = numpy.loadtxt(directory+'/reproduced_step_ts_xs_xds_gains.txt')
     ts_xs_xds = reproduced_step[:,:-2]
-    fa_ext_step = reproduced_step[:,-2:]
+    fa_gains_step = reproduced_step[:,-2:]
     fig = plt.figure(3)
-    plotDmp(ts_xs_xds,fig,[],[],fa_ext_step)
+    plotDmp(ts_xs_xds,fig,[],[],fa_gains_step)
     fig.canvas.set_window_title('Step-by-step integration') 
     
     

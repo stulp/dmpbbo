@@ -73,11 +73,6 @@ See \ref page_serialization
 
 \todo Documentation: document Python classes/functions
 
-
-\todo Features: DmpExtendedDimensions (started it, has separate branch)
-
-
-
 \todo Documentation: Update documentation for parallel (No need for parallel in python, because only decay has been implemented for now)
 
 \todo Plotting: setColor on ellipses?

@@ -20,7 +20,7 @@ add_executable(demoDmpTrainFromTrajectoryFile demoDmpTrainFromTrajectoryFile.cpp
 target_link_libraries(demoDmpTrainFromTrajectoryFile dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
 install(TARGETS demoDmpTrainFromTrajectoryFile DESTINATION bin)
 
-add_executable(demoDmpExtendedDimensions demoDmpExtendedDimensions.cpp)
-target_link_libraries(demoDmpExtendedDimensions dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
-install(TARGETS demoDmpExtendedDimensions DESTINATION bin)
+add_executable(demoDmpWithGainSchedules demoDmpWithGainSchedules.cpp)
+target_link_libraries(demoDmpWithGainSchedules dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+install(TARGETS demoDmpWithGainSchedules DESTINATION bin)
 

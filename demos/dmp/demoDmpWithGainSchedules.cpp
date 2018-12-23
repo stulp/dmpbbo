@@ -1,5 +1,5 @@
 /**
- * \file demoDmpExtendedDimensions.cpp
+ * \file demoDmpWithGainSchedules.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to initialize, train and integrate a Dmp.
  *
@@ -25,7 +25,7 @@
  */
 
 #include "dmp/Dmp.hpp"
-#include "dmp/DmpExtendedDimensions.hpp"
+#include "dmp/DmpWithGainSchedules.hpp"
 #include "dmp/Trajectory.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -98,19 +98,19 @@ int main(int n_args, char** args)
   //dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
   Dmp* dmp_tmp = new Dmp(n_dims, function_approximators, dmp_type);
 
-  cout << "** Initialize DmpExtendedDimensions." << endl;
-  int n_ext_dims = trajectory.dim_misc();
-  // Clone the function approximator for each external dimension of the DMP
-  vector<FunctionApproximator*> function_approximators_ext_dims(n_ext_dims);    
-  for (int dd=0; dd<n_ext_dims; dd++)
-    function_approximators_ext_dims[dd] = fa_lwr->clone();
+  cout << "** Initialize DmpWithGainSchedules." << endl;
+  int n_gains = trajectory.dim_misc();
+  // Clone the function approximator for each extra dimension of the DMP
+  vector<FunctionApproximator*> function_approximators_gains(n_gains);    
+  for (int dd=0; dd<n_gains; dd++)
+    function_approximators_gains[dd] = fa_lwr->clone();
   
-  DmpExtendedDimensions* dmp_ext_dims = new DmpExtendedDimensions(dmp_tmp,function_approximators_ext_dims);
+  DmpWithGainSchedules* dmp_gains = new DmpWithGainSchedules(dmp_tmp,function_approximators_gains);
 
-  cout << "** Train DmpExtendedDimensions." << endl;
+  cout << "** Train DmpWithGainSchedules." << endl;
   // And train it. Passing the save_directory will make sure the results are saved to file.
   bool overwrite = true;
-  dmp_ext_dims->train(trajectory,save_directory,overwrite);
+  dmp_gains->train(trajectory,save_directory,overwrite);
 
   
   // INTEGRATE DMP TO GET REPRODUCED TRAJECTORY
@@ -120,11 +120,11 @@ int main(int n_args, char** args)
   tau = 0.9;
   n_time_steps = 91;
   ts = VectorXd::LinSpaced(n_time_steps,0,tau); // Time steps
-  dmp_ext_dims->analyticalSolution(ts,traj_reproduced);
+  dmp_gains->analyticalSolution(ts,traj_reproduced);
 
   // Integrate again, but this time get more information
-  MatrixXd xs_ana, xds_ana, forcing_terms_ana, fa_output_ana, fa_extended_output;
-  dmp_ext_dims->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana,fa_extended_output);
+  MatrixXd xs_ana, xds_ana, forcing_terms_ana, fa_output_ana, fa_gains;
+  dmp_gains->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana,fa_gains);
 
   
   // WRITE THINGS TO FILE
@@ -136,33 +136,33 @@ int main(int n_args, char** args)
   saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
-  saveMatrix(save_directory,"reproduced_fa_extended.txt",fa_extended_output,overwrite);
+  saveMatrix(save_directory,"reproduced_fa_gains.txt",fa_gains,overwrite);
 
 
   // INTEGRATE STEP BY STEP
   cout << "** Integrate DMP step-by-step." << endl;
-  VectorXd x(dmp_ext_dims->dim(),1);
-  VectorXd xd(dmp_ext_dims->dim(),1);
-  VectorXd x_updated(dmp_ext_dims->dim(),1);
-  VectorXd ext_dims(dmp_ext_dims->dim_extended(),1);
+  VectorXd x(dmp_gains->dim(),1);
+  VectorXd xd(dmp_gains->dim(),1);
+  VectorXd x_updated(dmp_gains->dim(),1);
+  VectorXd gains(dmp_gains->dim_gains(),1);
 
   MatrixXd xs_step(n_time_steps,x.size());
   MatrixXd xds_step(n_time_steps,xd.size());
-  MatrixXd ext_dim_all(n_time_steps,ext_dims.size());
+  MatrixXd gains_all(n_time_steps,gains.size());
   
   cout << std::setprecision(3) << std::fixed << std::showpos;
   double dt = ts[1];
-  dmp_ext_dims->integrateStart(x,xd,ext_dims);
+  dmp_gains->integrateStart(x,xd,gains);
   xs_step.row(0) = x;
   xds_step.row(0) = xd;
-  ext_dim_all.row(0) = ext_dims;
+  gains_all.row(0) = gains;
   for (int t=1; t<n_time_steps; t++)
   {
-    dmp_ext_dims->integrateStep(dt,x,x_updated,xd,ext_dims); 
+    dmp_gains->integrateStep(dt,x,x_updated,xd,gains); 
     x = x_updated;
     xs_step.row(t) = x;
     xds_step.row(t) = xd;
-    ext_dim_all.row(t) = ext_dims;
+    gains_all.row(t) = gains;
     if (save_directory.empty())
     {
       // Not writing to file, output on cout instead.
@@ -170,14 +170,14 @@ int main(int n_args, char** args)
     }
   } 
 
-  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols()+ext_dim_all.cols());
-  output_step << ts, xs_step, xds_step, ext_dim_all;
-  saveMatrix(save_directory,"reproduced_step_ts_xs_xds_ext.txt",output_step,overwrite);
+  MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols()+gains_all.cols());
+  output_step << ts, xs_step, xds_step, gains_all;
+  saveMatrix(save_directory,"reproduced_step_ts_xs_xds_gains.txt",output_step,overwrite);
 
   
   delete meta_parameters;
   delete fa_lwr;
-  delete dmp_ext_dims;
+  delete dmp_gains;
 
   return 0;
 }
@@ -207,7 +207,7 @@ Trajectory getDemoTrajectory(const VectorXd& ts)
     trajectory =  Trajectory::generateMinJerkTrajectory(ts, y_first, y_last);
   }
   
-  // Generated trajectory, now generate extended dimensions in width
+  // Generated trajectory, now generate extra dimensions in width
   MatrixXd misc(ts.rows(),n_dims);
   for (int ii=0; ii<misc.rows(); ii++)
   {
