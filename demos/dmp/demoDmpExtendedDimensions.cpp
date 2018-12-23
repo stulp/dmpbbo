@@ -132,8 +132,8 @@ int main(int n_args, char** args)
   traj_reproduced.saveToFile(save_directory,"reproduced_traj.txt",overwrite);
     
   MatrixXd output_ana(ts.size(),1+xs_ana.cols()+xds_ana.cols());
-  output_ana << xs_ana, xds_ana, ts;
-  saveMatrix(save_directory,"reproduced_xs_xds.txt",output_ana,overwrite);
+  output_ana << ts, xs_ana, xds_ana;
+  saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
   saveMatrix(save_directory,"reproduced_fa_extended.txt",fa_extended_output,overwrite);
@@ -172,7 +172,7 @@ int main(int n_args, char** args)
 
   MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols()+ext_dim_all.cols());
   output_step << ts, xs_step, xds_step, ext_dim_all;
-  saveMatrix(save_directory,"reproduced_step_xs_xds.txt",output_step,overwrite);
+  saveMatrix(save_directory,"reproduced_step_ts_xs_xds_ext.txt",output_step,overwrite);
 
   
   delete meta_parameters;

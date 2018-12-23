@@ -60,21 +60,23 @@ if __name__=='__main__':
     fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
     
     # Read data
-    xs_xds        = numpy.loadtxt(directory+'/reproduced_xs_xds.txt')
+    ts_xs_xds        = numpy.loadtxt(directory+'/reproduced_ts_xs_xds.txt')
     forcing_terms = numpy.loadtxt(directory+'/reproduced_forcing_terms.txt')
     fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
     fa_extended   = numpy.loadtxt(directory+'/reproduced_fa_extended.txt')
 
 
     fig = plt.figure(2)
-    plotDmp(xs_xds,fig,forcing_terms,fa_output,fa_extended)
+    plotDmp(ts_xs_xds,fig,forcing_terms,fa_output,fa_extended)
     fig.canvas.set_window_title('Analytical integration') 
     
-    reproduced_step = numpy.loadtxt(directory+'/reproduced_step_xs_xds.txt')
-    xs_xds = reproduced_step[:,:-2]
+    
+    
+    reproduced_step = numpy.loadtxt(directory+'/reproduced_step_ts_xs_xds_ext.txt')
+    ts_xs_xds = reproduced_step[:,:-2]
     fa_ext_step = reproduced_step[:,-2:]
     fig = plt.figure(3)
-    plotDmp(xs_xds,fig,[],[],fa_ext_step)
+    plotDmp(ts_xs_xds,fig,[],[],fa_ext_step)
     fig.canvas.set_window_title('Step-by-step integration') 
     
     
