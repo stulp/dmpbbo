@@ -48,6 +48,9 @@ Eigen::MatrixXd leastSquares(
 /** \todo Remove all occurences of inverse() in leastSquares.cpp
 http://eigen.tuxfamily.org/index.php?title=Talk:FAQ#Is_there_a_way_to_check_if_I.27m_accidentally_triggering_dynamic_memory_allocation_in_a_time_critical_block_of_code.3F  
 use jacobiSvd or another on from the least squares page of Eigen 3.3
+  http://eigen.tuxfamily.org/dox/group__LeastSquares.html
+  http://eigen.tuxfamily.org/dox-devel/group__DenseDecompositionBenchmark.html
+
 \todo Look for "but Eigen is not good with splicing" and see if splicing can be done more easily
 */
 Eigen::MatrixXd weightedLeastSquares(
