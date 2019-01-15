@@ -1,5 +1,5 @@
 ---
-title: 'DmpBbo: A versatile C++ library for Function Approximation, Dynamical Movement Primitives, and Black-Box Optimization'
+title: 'DmpBbo: A versatile Python/C++ library for Function Approximation, Dynamical Movement Primitives, and Black-Box Optimization'
 tags:
   - Robotics
   - Motion Primitives

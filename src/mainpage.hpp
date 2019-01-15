@@ -23,11 +23,29 @@ Each of the pages linked to above contains two sections:
 \li A tutorial that treats the concepts that are implemented 
 \li A description of how these concepts have been implemented, and why it has been done so in this fashion.
 
+
 Those parts of the code that are to be executed on a robot (those in functionapproximators/, dynamicalsystems/, and dmp/) have been implemented in C++. All other parts (bbo/ and dmpbbo/) have been implemented in C++ and Python. In many cases the Python version will be more convenient to use. For now the Python code has not been documented well, please see the C++ documentation instead (class/function names have been kept consistent).
 
 If you want a deeper understanding of the entire library, I recommend you to go through the pages in the order above. If you want to start coding immediately, I suggest to look at the \ref Demos to see how the functionality of the library may be used. The demos for each module are found in  cpp/MODULENAME/demos.
 
 Some general considerations on the design of the library are here \ref page_design
+
+\section sec_research_background Research background
+
+In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
+
+\li Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters \cite matsubara11learning \cite silva12learning \cite stulp13learning.
+
+\li Representing and optimizing gain schedules and force profiles as part of a DMP \cite buchli11learning \cite kalakrishnan11learning,
+
+
+\li Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP \cite stulp13robot, \cite stulp12policy_hal,
+
+\li Demonstrating the advantages of using covariance matrix adaptation for the policy improvement \cite stulp12path \cite stulp12adaptive \cite stulp14simultaneous 
+
+\li Using the same unified model for the model parameters of different function approximators \cite stulp15many. In fact, coding this library lead to this article, rather than vice versa.
+
+
 
 */
 
@@ -49,11 +67,11 @@ This page explains the overal design rationale for DmpBbo
 
 \section sec_naming Naming convention
 
-I mainly follow the following naming style: http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Naming
+I mainly follow the following naming style: https://google.github.io/styleguide/cppguide.html#Naming
 
 Notes:
 \li Members end with a _, i.e. <code>this_is_a_member_</code>. (Exception: members in a POD (plain old data) class, which are public, and can be accessed directly)
-\li I also use this convention: http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml#Access_Control
+\li I also use this convention: https://google.github.io/styleguide/cppguide.html#Access_Control
 \li Abbreviation is the root of all evil! Long variable names are meaningful, and thus beautiful.
 
 Exceptions to the style guide above:
