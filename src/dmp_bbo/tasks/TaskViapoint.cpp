@@ -187,23 +187,6 @@ void TaskViapoint::generateDemonstration(const MatrixXd& task_parameters, const 
 }
 
 
-template<class Archive>
-void TaskViapoint::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskWithTrajectoryDemonstrator);
-  
-  ar & BOOST_SERIALIZATION_NVP(viapoint_);
-  ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
-  ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
-  ar & BOOST_SERIALIZATION_NVP(goal_);
-  ar & BOOST_SERIALIZATION_NVP(goal_time_);
-  ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
-  ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
-  ar & BOOST_SERIALIZATION_NVP(goal_weight_);
-}
-
-
 string TaskViapoint::toString(void) const {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapoint");
 }

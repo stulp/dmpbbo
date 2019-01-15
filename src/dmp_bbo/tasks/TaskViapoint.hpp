@@ -169,7 +169,20 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version) 
+  {
+    // serialize base class information
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskWithTrajectoryDemonstrator);
+    
+    ar & BOOST_SERIALIZATION_NVP(viapoint_);
+    ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
+    ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
+    ar & BOOST_SERIALIZATION_NVP(goal_);
+    ar & BOOST_SERIALIZATION_NVP(goal_time_);
+    ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
+    ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
+    ar & BOOST_SERIALIZATION_NVP(goal_weight_);
+  }
   
 };
 
