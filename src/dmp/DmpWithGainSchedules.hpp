@@ -61,7 +61,7 @@ namespace DmpBbo {
 class FunctionApproximator;
 class Trajectory;
 
-/** \defgroup DmpWithGainSchedules Dmp with Extended Dimensions
+/** \defgroup DmpWithGainSchedules Dmp with Gain Schedules
  *  \ingroup Dmps
  *  
  */
