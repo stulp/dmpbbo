@@ -31,6 +31,10 @@ Dynamical movement primitives (DMPs) [@ijspeert02movement,@ijspeert13dynamical] 
 * `bbo/`, implementations of several stochastic optimization algorithms for the optimization of black-box cost functions (standalone module)
 * `dmp_bbo/`, applies black-box optimization to the parameters of a DMP (depends on all other modules)
 
+`dmpbbo` provides both a real-time C++ implementation, as well as an implementation in Python for non-roboticists.
+
+`dmpbbo` is accompanied by an extensive tutorial on the motivation for dynamical movement primitives, and their mathematical derivation. 
+
 ## Advanced features
 
 Several more advanced features implemented in dmpbbo are:
@@ -43,19 +47,13 @@ Several more advanced features implemented in dmpbbo are:
 
 * Covariance matrix adaptation in black-box optimization, which enables automatic exploration tuning [@stulp12adaptive]
 
-## Python and real-time C++ 
-
-`dmpbbo` provides both a real-time C++ implementation, as well as an implementation in Python for non-roboticists.
-
-## Tutorial
-
-`dmpbbo` is accompanied by an extensive tutorial on the motivation for dynamical movement primitives, and their mathematical derivation. 
 
 ## Applications
 
-This library and its predecessors were used in the following works [@stulp12adaptive,@stulp2013learning,stulp14simultaneous,@stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
+This library and its predecessors were used in the following scientific publications [@stulp12adaptive,@stulp2013learning,stulp14simultaneous,@stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
 
 * https://www.youtube.com/watch?v=R7LWkh1UMII
+* https://www.youtube.com/watch?v=MAiw3Ke7bh8
 * https://www.youtube.com/watch?v=jkaRO8J_1XI
 * https://www.youtube.com/watch?v=i_JBRojCqcc
 
