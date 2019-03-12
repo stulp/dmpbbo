@@ -11,11 +11,6 @@ C++: INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
 sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev 
 sudo apt-get install doxygen graphviz 
 
-"sudo apt-get eigen3" currently (February 2014) installs version 3.1.2. However, DmpBbo
-requires version >= 3.2. To get the latest Eigen version:
-  use this PPA: https://launchpad.net/~kalakris/+archive/eigen
-  or do a manual install: see "MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES" below
-  
 ________________________________________________________________________________    
 C++: BUILDING DMPBBO 
 
@@ -91,7 +86,7 @@ C++: BOOST (required modules: filesystem, system, serialization. version >=1.34)
   	
 ___________________________________
 C++: DOXYGEN (optional, version >1.7.5, for the \cite command)
-  http://www.stack.nl/~dimitri/doxygen/download.html#srcbin
+  http://www.doxygen.nl/download.html
 
 ___________________________________
 C++: LWPR (optional)
