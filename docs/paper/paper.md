@@ -39,7 +39,7 @@ Dynamical movement primitives (DMPs) [@ijspeert02movement,@ijspeert13dynamical] 
 
 Several more advanced features implemented in dmpbbo are:
 
-* Contextual dynamical movement primitives, which can adapt to variations of tasks [@stulp2013learning]
+* Contextual dynamical movement primitives, which can adapt to variations of tasks [@stulp13learning]
 
 * Dynamical movement primitives with gain schedules [@buchli11learning]
 
@@ -50,7 +50,7 @@ Several more advanced features implemented in dmpbbo are:
 
 ## Applications
 
-This library and its predecessors were used in the following scientific publications [@stulp12adaptive,@stulp2013learning,stulp14simultaneous,@stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
+This library and its predecessors were used in the following scientific publications [@stulp12adaptive,@stulp13learning,stulp14simultaneous,@stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
 
 * https://www.youtube.com/watch?v=R7LWkh1UMII
 * https://www.youtube.com/watch?v=MAiw3Ke7bh8
