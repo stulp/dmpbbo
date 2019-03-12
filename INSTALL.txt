@@ -1,8 +1,10 @@
 ________________________________________________________________________________    
 PYTHON
 
-dmpbbo requires python3 
+dmpbbo requires python3
 (mainly due to the way packages are imported)
+
+dmpbbo requires numpy (http://www.numpy.org/) and matplotlib (https://matplotlib.org/)
 
 ________________________________________________________________________________    
 C++: INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU) USERS
