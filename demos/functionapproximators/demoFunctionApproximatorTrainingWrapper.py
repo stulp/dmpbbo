@@ -58,6 +58,10 @@ if __name__=='__main__':
     
     
     for fa_name in fa_names:
+        cur_directory = directory+fa_name+"_1D";
+        if not os.path.exists(cur_directory):
+            break
+        
         print("Plotting "+fa_name+" results")
         fig = plt.figure(fig_number,figsize=(15,5))
         fig_number = fig_number+1
