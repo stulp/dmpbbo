@@ -26,6 +26,7 @@
 
 #include <string>
 #include <set>
+#include <boost/filesystem.hpp>
 #include <eigen3/Eigen/Core>
 
 #include "dmp_bbo/runOptimizationTask.hpp"
@@ -48,6 +49,7 @@ using namespace DmpBbo;
  * \param[in] n_args Number of arguments
  * \param[in] args Arguments themselves
  * \return Success of exection. 0 if successful.
+ * \todo To focus on the demo code, it would be nice to have the processing of arguments in a separate function.
  */
 int main(int n_args, char* args[])
 {
@@ -66,6 +68,16 @@ int main(int n_args, char* args[])
     }
   }
 
+  if (!boost::filesystem::exists(directory))
+  {
+    cerr << "Directory '" << directory << "' does not exist." << endl;
+    cerr << "HINT: The preferred way to run this demo is by calling ";
+    cerr << "python demos/dmp_bbo/" << (args[0]+2) <<"Wrapper.py, "; // +2 removes leading "./" 
+    cerr << "rather than this binary." << endl; 
+    cerr << "Abort." << endl;
+    return -1;
+  }
+  
   // Make the task
   int n_dim=2;
   
