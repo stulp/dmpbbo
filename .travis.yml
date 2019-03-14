@@ -51,14 +51,7 @@ install:
   
 ## Dependencies to download here
 ## Install Eigen 3.2.x
-  - sudo apt-get install -qq libboost-all-dev
-  - wget http://bitbucket.org/eigen/eigen/get/3.2.1.tar.gz 
-  - tar xf 3.2.1.tar.gz
-  - cd eigen-eigen-6b38706d90a9/
-  - mkdir build;cd build
-  - cmake .. && sudo make install
-  - cd ../../
-  - rm -rf 3.2.1.tar.gz eigen-eigen-6b38706d90a9/
+  - sudo apt-get install -qq libboost-all-dev libeigen3-dev
   
 script:
   # compile and install
