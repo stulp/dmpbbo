@@ -1,12 +1,19 @@
 ________________________________________________________________________________    
-INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU 16.04) USERS
+C++: INSTALLING REQUIRED/OPTIONAL PACKAGES FOR DEBIAN (UBUNTU 16.04) USERS
 (for manual installation see "MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES" below) 
 
 sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev libeigen3-dev python3-tk
 sudo apt-get install doxygen graphviz
-  
+
+PYTHON
+
+dmpbbo requires python3
+(mainly due to the way packages are imported)
+
+dmpbbo requires numpy (http://www.numpy.org/) and matplotlib (https://matplotlib.org/)
+
 ________________________________________________________________________________    
-BUILDING DMPBBO 
+C++: BUILDING DMPBBO 
 
 Please make sure you have installed all the required packages before trying to compile. 
 We assume that you use a compiler that is compatible with the C++11 standard.
@@ -23,7 +30,7 @@ To install libs in /usr/local/lib, headers in /usr/local/include and binaries in
   sudo make install
 
 ________________________________________________________________________________    
-STATIC VS SHARED LIBRARIES
+C++: STATIC VS SHARED LIBRARIES
 
 The default is to build static libraries (e.g. libdmp.a) and to statically link these 
 libraries to the demo and test executables (the reason for this is the boost bug below).
@@ -42,7 +49,7 @@ Note that the crash happens towards the very end of the program, just before ret
 
 
 ________________________________________________________________________________    
-REAL-TIME DEBUGGING BUILD
+C++: REAL-TIME DEBUGGING BUILD
 
 Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. 
 
@@ -52,25 +59,25 @@ To compile a version that has real-time checks built in:
 Note that it doesn't make sense to set -DREALTIME_CHECKS=1 without -DCMAKE_BUILD_TYPE=Debug, as asserts are only done in debug mode. 
   
 ________________________________________________________________________________    
-MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES
+C++: MANUAL INSTALLATION OF REQUIRED/OPTIONAL PACKAGES
 
 ___________________________________
-CMAKE (required)
-  http://www.cmake.org/cmake/resources/software.html
-  	
+C++: CMAKE (required)
+  http://www.cmake.org/cmake/resources/software.html	
+  
 ___________________________________
-BOOST (required modules: filesystem, system, serialization. version >=1.34) 
+C++: BOOST (required modules: filesystem, system, serialization. version >=1.34) 
   http://www.boost.org/doc/libs/1_55_0/more/getting_started/
   http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/
   http://www.boost.org/doc/libs/1_55_0/libs/system/doc/
   http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/ 
   	
 ___________________________________
-DOXYGEN (optional, version >1.7.5, for the \cite command)
-  http://www.stack.nl/~dimitri/doxygen/download.html#srcbin
+C++: DOXYGEN (optional, version >1.7.5, for the \cite command)
+  http://www.doxygen.nl/download.html
 
 ___________________________________
-LWPR (optional)
+C++: LWPR (optional)
   
 To use the Locally Weighted Projection Regression algorithm as a 
 function approximator, install the following software:
