@@ -59,6 +59,16 @@ Trajectory::Trajectory(const Eigen::VectorXd& ts, const Eigen::MatrixXd& ys,  co
     
 }
 
+double Trajectory::duration(void) const
+{ 
+  if (length()==0)
+  {
+    cout << "WARNING: ts is empty, returning duration = 0.0" << endl;
+    return 0.0;
+  }
+  return (ts_[ts_.size()-1]-ts_[0]);
+}
+
 void Trajectory::set_misc(const Eigen::MatrixXd& misc)
 {
   if (misc.rows()==ts_.size())

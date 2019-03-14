@@ -103,7 +103,7 @@ public:
   /** Get the duration of the trajectory in seconds.
    * \return The duration of the trajecory in seconds.
    */  
-  inline double duration(void) const {  return (ts_[ts_.size()-1]-ts_[0]); }
+  double duration(void) const;
   
   /** Get the dimensionality of the trajectory. 
    * \return The dimensionality of the trajectory.
