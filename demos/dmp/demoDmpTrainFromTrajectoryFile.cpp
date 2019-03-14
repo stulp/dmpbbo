@@ -45,6 +45,11 @@ using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
 
+void help(char* binary_name)
+{
+  cout << "Usage: " << binary_name << " [input trajectory (txt)] [output dmp (xml)] " << endl;
+}
+
 /** Main function
  * \param[in] n_args Number of arguments
  * \param[in] args Arguments themselves
@@ -55,13 +60,29 @@ int main(int n_args, char** args)
   string input_txt_file("trajectory.txt");
   string output_xml_file("/tmp/dmp.xml");
   if (n_args>1)
-    input_txt_file = string(args[1]);
+  {
+    if (string(args[1]).compare("--help")==0)
+    {
+      help(args[0]);
+      return 0;
+    }
+    else
+    {
+      input_txt_file = string(args[1]);
+    }
+  }
   if (n_args>2)
     output_xml_file = string(args[2]);
     
   
   cout << "Reading trajectory from TXT file: " << input_txt_file << endl;
   Trajectory trajectory = Trajectory::readFromFile(input_txt_file);
+  if (trajectory.length()==0)
+  {
+    cerr << "The TXT file " << input_txt_file << " could not be found. Aborting." << endl << endl;
+    help(args[0]);
+    return -1;
+  }
 
   //double tau = trajectory.duration();
   //int n_time_steps = trajectory.length();
