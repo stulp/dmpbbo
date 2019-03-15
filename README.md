@@ -49,7 +49,7 @@ If you use this library in the context of experiments for a scientific paper, we
 
 # How?
 
-How to install the libraries/binaries/documentation is described in INSTALL.txt
+How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
 
 To learn how to use the code, the first thing to do is look at the
 documentation and tutorial here:
