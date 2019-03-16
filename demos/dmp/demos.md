@@ -1,8 +1,29 @@
-\ref Dmps
+# Dmps Demos
 
-\li demoDmp.cpp:  Demonstrates how to initialize, train and integrate a Dmp.
-\li demoDmpTrainFromTrajectoryFile.cpp:  Demonstrates how to train a Dmp with a trajectory in a txt file.
-\li demoDmpChangeGoal.cpp:  Demonstrates how to change the goal for a Dmp, and the effects of different scaling approaches.
+## demoDmp.cpp / demoDmpWrapper.py
 
-\li demoDmpContextual.cpp:  Demonstrates how to initialize, train and integrate a Contextual Dmp.
-\li demoDmpContextualGoal.cpp:  Demonstrates how to initialize, train and integrate a Contextual Dmp that adapts the goal state to the task parameters.
+Demonstrates how to initialize, train and integrate a Dmp.
+
+## demoDmpTrainFromTrajectoryFile.cpp / demoDmpTrainFromTrajectoryFileWrapper.py
+
+Demonstrates how to train a Dmp with a trajectory in a txt file.
+
+## demoDmpChangeGoal.cpp / demoDmpChangeGoalWrapper.py
+
+Demonstrates how to change the goal for a Dmp, and the effects of different scaling approaches.
+
+# Dmp Demos for advanced features 
+
+Here are some demos for advanced Dmp features, which extend the basic Dmp formulation. For more information, see the papers cited in the main README.md.
+
+## demoDmpContextual.cpp / demoDmpContextualWrapper.py
+
+Demonstrates how to initialize, train and integrate a Contextual Dmp.
+
+## demoDmpContextualGoal.cpp / demoDmpContextualGoalWrapper.py
+
+Demonstrates how to initialize, train and integrate a Contextual Dmp that adapts the goal state to the task parameters.
+
+## demoDmpWithGainSchedulesWrapper.cpp / demoDmpWithGainSchedulesWrapper.py
+
+Demonstrates how to initialize, train and integrate a Dmp that also outputs gain schedules alongside the dynamical system.
