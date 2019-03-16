@@ -86,6 +86,8 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
+\todo Move dmp_bbo_robot explanation from doxygen to README.md file.
+
 \todo Explain why C++ implementation of bbo and dmp_bbo have only limited use.
 
 \todo Documentation: Write a related pages with a table on which functionality is implemented in Python/Cpp
