@@ -118,7 +118,9 @@ See \ref page_serialization
  * 
  * DmpBbo comes with several demos.
  * 
- * The C++ demos are located in the dmpbbo/demos/ directory. Many of the compiled executables are accompanied by a Python wrapper, which calls the executable, and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). For completeness, the pure Python demos are located in dmpbbo/demos_python.
+ * The C++ demos are located in the dmpbbo/demos/ directory. Please see the demos.md file located there.
+ *
+ * Many of the compiled executables are accompanied by a Python wrapper, which calls the executable,  and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). For completeness, the pure Python demos are located in dmpbbo/demos_python.
  *
  Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmp/demos/ directory. 
  */

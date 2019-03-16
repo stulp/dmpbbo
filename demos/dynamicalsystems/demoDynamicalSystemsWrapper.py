@@ -38,7 +38,7 @@ from dynamicalsystems.dynamicalsystems_plotting import *
 
 
 if __name__=='__main__':
-    executable = "../../bin/demoDynamicalSystems"
+    executable = "./demoDynamicalSystems"
     
     # See if input directory was passed
     if (len(sys.argv)<2 or len(sys.argv)>3):

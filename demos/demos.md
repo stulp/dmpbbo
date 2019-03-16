@@ -6,8 +6,7 @@ Many of the compiled executables are accompanied by a Python wrapper, which call
 
 If you are not interested in C++, the pure Python demos are located in dmpbbo/demos_python/.
 
-The bottom-up approach to understanding the functionality of the code would imply the following order:
-
+The bottom-up approach to understanding the functionality of the code would imply the following order (each module/directory contains its own demos.md file):
 
 * Dynamical Systems (in dynamicalsystems/) This module provides implementations of several basic dynamical systems. DMPs are combinations of such systems. This module is completely independent of all other modules.
 

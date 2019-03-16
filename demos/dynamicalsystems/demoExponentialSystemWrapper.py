@@ -38,7 +38,7 @@ from dynamicalsystems.dynamicalsystems_plotting import *
 if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoExponentialSystem"
+    executable = "./demoExponentialSystem"
     directory = "/tmp/demoExponentialSystem"
     executeBinary(executable, directory)
     
