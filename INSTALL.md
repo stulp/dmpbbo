@@ -77,7 +77,7 @@ To compile a version that has debugging symbols included, and compiles some test
 
 ### Debugging real-time code
 
-Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. 
+Many functions in dmpbbo are expected to be called in real-time loops on a robot, e.g. Dmp::differentialEquation and the predict function in various FunctionApproximators. Therefore, these function have beenoptimized so that no dynamic allocations are made in real-time critical functions (for the FunctionApproximators currently LWR, RRRFF, LWPR, GMR, but not the others). For debugging purposes, the Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. Please see a detailed explanation of this at [eigenrealtime.md](docs/eigenrealtime/eigenrealtime.md).
 
 To compile a version that has real-time checks built in:
 
