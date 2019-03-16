@@ -75,6 +75,8 @@ To compile a version that has debugging symbols included, and compiles some test
 
 `mkdir -p build_dir_debug; cd build_dir_debug; cmake .. -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1`
 
+Please note that the tests are not unit tests. Rather, they are executables that allow for debugging during development. In general, it is ensured that all test binaries compile, but they are not documented well, and may be finicky and impolite about providing the right input arguments (e.g. a core dump if you don't pass the right arguments). The sources are inluded in the master branch because advanced users may get a deeper understanding of the functionality from them, but the compiled binaries come without any guarantees.
+
 ### Debugging real-time code
 
 Many functions in dmpbbo are expected to be called in real-time loops on a robot, e.g. Dmp::differentialEquation and the predict function in various FunctionApproximators. Therefore, these function have been optimized so that no dynamic allocations are made in real-time critical functions (for the FunctionApproximators currently LWR, RRRFF, LWPR, GMR, but not the others). 
