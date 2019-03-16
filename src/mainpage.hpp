@@ -94,6 +94,20 @@ See \ref page_serialization
 
 \todo Plotting: setColor on ellipses?
 
+\todo delay_cost in C++ not the same as in Python. Take the mean (as in Python) rather than the sum.
+
+\todo Check documentation of dmp_bbo_robot
+
+
+\todo demoOptimizationTaskWrapper.py: should there be a Task there also?
+\todo clean up demoImitationAndOptimization
+\todo clean up demoOptimizationDmpParallel: remove deprecated, only covar updates matter, make a flag
+\todo FunctionApproximator::saveGridData in Python also
+\todo further compare scripts
+\todo testTrainingCompareCppPython.py => move part of it into demos/python/functionapproximators
+
+\todo Table showing which functionality is available in Python/C++
+
 
  */ 
 
