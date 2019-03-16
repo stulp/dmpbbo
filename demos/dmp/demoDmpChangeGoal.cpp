@@ -63,7 +63,7 @@ int main(int n_args, char** args)
   string save_directory;
   if (n_args!=2) 
   {
-    cerr << "Usage: " << args[0] << "<directory>" << endl;
+    cerr << "Usage: " << args[0] << " <directory>" << endl;
     return -1;
   }
   save_directory = string(args[1]);

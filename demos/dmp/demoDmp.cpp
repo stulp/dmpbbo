@@ -63,7 +63,7 @@ int main(int n_args, char** args)
   string save_directory;
   if (n_args!=2) 
   {
-    cerr << "Usage: " << args[0] << "<directory>" << endl;
+    cerr << "Usage: " << args[0] << " <directory>" << endl;
     return -1;
   }
   save_directory = string(args[1]);
@@ -116,17 +116,7 @@ int main(int n_args, char** args)
   MatrixXd xs_ana, xds_ana, forcing_terms_ana, fa_output_ana;
   dmp->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana);
 
-  
-  // WRITE THINGS TO FILE
-  trajectory.saveToFile(save_directory,"demonstration_traj.txt",overwrite);
-  traj_reproduced.saveToFile(save_directory,"reproduced_traj.txt",overwrite);
-    
-  MatrixXd output_ana(ts.size(),1+xs_ana.cols()+xds_ana.cols());
-  output_ana << ts, xs_ana, xds_ana;
-  saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
-  saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
-  saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
-
+ 
 
   // INTEGRATE STEP BY STEP
   cout << "** Integrate DMP step-by-step." << endl;
@@ -154,6 +144,17 @@ int main(int n_args, char** args)
       //cout << x.transpose() << " | " << xd.transpose() << endl;
     }
   } 
+
+  // WRITE THINGS TO FILE
+  cout << "** Writing output to directory '" << save_directory << "'"<< endl;
+  trajectory.saveToFile(save_directory,"demonstration_traj.txt",overwrite);
+  traj_reproduced.saveToFile(save_directory,"reproduced_traj.txt",overwrite);
+    
+  MatrixXd output_ana(ts.size(),1+xs_ana.cols()+xds_ana.cols());
+  output_ana << ts, xs_ana, xds_ana;
+  saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
+  saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms_ana,overwrite);
+  saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output_ana,overwrite);
 
   MatrixXd output_step(ts.size(),1+xs_ana.cols()+xds_ana.cols());
   output_step << ts, xs_step, xds_step;
