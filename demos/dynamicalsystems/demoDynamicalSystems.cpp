@@ -114,7 +114,7 @@ int main(int n_args, char** args)
   available_test_labels.push_back("attractor");
   available_test_labels.push_back("perturb");
   
-  if (n_args<2)
+  if (n_args<=2)
   {
     cout << "Usage:    " << args[0] << " <directory> [test label 1]  [test label 2]" << endl;
     cout <<      "                 available test labels = ";
