@@ -39,6 +39,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <boost/filesystem.hpp>
 
 
 using namespace std;
@@ -47,7 +48,8 @@ using namespace DmpBbo;
 
 void help(char* binary_name)
 {
-  cout << "Usage: " << binary_name << " [input trajectory (txt)] [output dmp (xml)] " << endl;
+  cout << "Usage: " << binary_name << " <input trajectory (txt)> <output directory> [output dmp (xml)] " << endl;
+  cout << "Default for dmp: 'dmp.xml' " << endl;
 }
 
 /** Main function
@@ -57,22 +59,26 @@ void help(char* binary_name)
  */
 int main(int n_args, char** args)
 {
-  string input_txt_file("trajectory.txt");
-  string output_xml_file("/tmp/dmp.xml");
-  if (n_args>1)
+  
+  string input_txt_file;
+  string directory;
+  string output_xml_file("dmp.xml");
+  if (n_args<3)
   {
-    if (string(args[1]).compare("--help")==0)
-    {
-      help(args[0]);
-      return 0;
-    }
-    else
-    {
-      input_txt_file = string(args[1]);
-    }
+    help(args[0]);
+    return -1;
   }
-  if (n_args>2)
-    output_xml_file = string(args[2]);
+  
+  if (string(args[1]).compare("--help")==0)
+  {
+    help(args[0]);
+    return 0;
+  }
+
+  input_txt_file = string(args[1]);
+  directory = string(args[2]);
+  if (n_args>3)
+    output_xml_file = string(args[3]);
     
   
   cout << "Reading trajectory from TXT file: " << input_txt_file << endl;
@@ -106,12 +112,24 @@ int main(int n_args, char** args)
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
   cout << "Training Dmp..." << endl;
-  dmp->train(trajectory);
+  bool overwrite = true;
+  dmp->train(trajectory,directory+"/train",overwrite);
 
 #ifndef NDEBUG
   // boost serialization currently only works in debug mode; I have no clue why...
-  cout << "Writing trained Dmp to XML file: " << output_xml_file << endl;
-  std::ofstream ofs(output_xml_file);
+  cout << "Writing trained Dmp to XML file: " << directory << "/" << output_xml_file << endl;
+  // Make directory if it doesn't already exist
+  if (!boost::filesystem::exists(directory))
+  {
+    if (!boost::filesystem::create_directories(directory))
+    {
+      cerr << __FILE__ << ":" << __LINE__ << ":";
+      cerr << "Couldn't make directory file '" << directory << "'." << endl;
+      return false;
+    }
+  }
+  
+  std::ofstream ofs(directory+"/"+output_xml_file);
   boost::archive::xml_oarchive oa(ofs);
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();

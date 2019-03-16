@@ -36,5 +36,7 @@ if __name__=='__main__':
     # Call the executable with the directory to which results should be written
     executable = "./demoDmpTrainFromTrajectoryFile"
     input_txt_file = "trajectory.txt"
-    output_xml_file = "/tmp/dmp.xml"
-    executeBinary(executable, input_txt_file+" "+output_xml_file,True)
+    output_directory = "demoDmpTrainFromTrajectoryFileDataTmp"
+    output_xml_file = "dmp.xml"
+    arguments = input_txt_file+" "+output_directory+" "+output_xml_file 
+    executeBinary(executable, arguments,True)
