@@ -76,7 +76,7 @@ if __name__=='__main__':
         
         # Call the executable with the directory to which results should be written
         print("Call executable to run optimization with "+str(n_dofs)+"D viapoint.")
-        executable = "../../bin/demoOptimizationDmpArm2D"
+        executable = "./demoOptimizationDmpArm2D"
         print(executeBinary(executable, str(n_dofs)+" "+directory))
         
         print("  Plotting")

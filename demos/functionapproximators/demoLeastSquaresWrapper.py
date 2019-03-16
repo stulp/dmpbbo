@@ -67,7 +67,7 @@ def runLeastSquaresDemo(n_dims, use_offset, regularization, directory, figure_nu
     arguments = " {:.8f}".format(regularization)
     arguments += " "+str(int(use_offset))
     arguments += " "+directory
-    executeBinary("../../bin/demoLeastSquares",arguments)
+    executeBinary("./demoLeastSquares",arguments)
     
     # Results from file
     beta = np.loadtxt(directory+"/beta.txt")

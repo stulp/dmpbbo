@@ -49,7 +49,7 @@ if __name__=='__main__':
     task.saveToFile(directory,"viapoint_task.txt")
     
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoOptimizationDmpParallel"
+    executable = "./demoOptimizationDmpParallel"
     executeBinary(executable, directory)
       
     fig = plt.figure(1,figsize=(12, 4))

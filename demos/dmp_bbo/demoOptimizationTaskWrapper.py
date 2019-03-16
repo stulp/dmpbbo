@@ -45,7 +45,7 @@ if __name__=='__main__':
     figure_number = 1;
     for covar_update in covar_updates:
       # Call the executable with the directory to which results should be written
-      executable = "../../bin/demoOptimizationTask"
+      executable = "./demoOptimizationTask"
       directory = "/tmp/demoOptimizationTask/"+covar_update
       arguments = directory+" "+covar_update
       executeBinary(executable,arguments,True)

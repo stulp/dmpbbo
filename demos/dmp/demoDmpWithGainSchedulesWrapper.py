@@ -40,7 +40,7 @@ from dmp.dmp_plotting import *
 if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoDmpWithGainSchedules"
+    executable = "./demoDmpWithGainSchedules"
     directory = "/tmp/demoDmpWithGainSchedules"
     executeBinary(executable, directory)
     

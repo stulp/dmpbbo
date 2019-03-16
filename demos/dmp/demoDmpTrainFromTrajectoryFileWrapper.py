@@ -34,7 +34,7 @@ from executeBinary import executeBinary
 if __name__=='__main__':
 
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoDmpTrainFromTrajectoryFile"
+    executable = "./demoDmpTrainFromTrajectoryFile"
     input_txt_file = "trajectory.txt"
     output_xml_file = "/tmp/dmp.xml"
     executeBinary(executable, input_txt_file+" "+output_xml_file,True)

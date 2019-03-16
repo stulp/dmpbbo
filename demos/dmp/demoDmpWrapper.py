@@ -38,7 +38,7 @@ from dmp.dmp_plotting import *
 
 if __name__=='__main__':
     # Call the executable with the directory to which results should be written
-    executable = "../../bin/demoDmp"
+    executable = "./demoDmp"
     directory = "/tmp/demoDmp"
     executeBinary(executable, directory,True)
     

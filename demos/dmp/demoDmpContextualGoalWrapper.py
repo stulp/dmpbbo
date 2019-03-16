@@ -45,7 +45,7 @@ if __name__=='__main__':
         print("Demo for "+str(n_dmp_contextual_step)+"-step contextual Dmp")
         
         # Call the executable with the directory to which results should be written
-        executable = "../../bin/demoDmpContextualGoal"
+        executable = "./demoDmpContextualGoal"
         main_directory = "/tmp/demoDmpContextualGoal"
         directory = main_directory + "/Step"+str(n_dmp_contextual_step)
         arguments = directory+" "+str(n_dmp_contextual_step)

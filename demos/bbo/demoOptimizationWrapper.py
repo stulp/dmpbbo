@@ -44,7 +44,7 @@ if __name__=='__main__':
         print("Run C++ optimization with covar update '"+covar_update+"'")
         
         # Call the executable with the directory to which results should be written
-        executable = "../../bin/demoOptimization"
+        executable = "./demoOptimization"
         directory = "/tmp/demoOptimization/"+covar_update
         executeBinary(executable,directory+" "+covar_update)
       

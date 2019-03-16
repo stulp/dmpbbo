@@ -46,7 +46,7 @@ if __name__=='__main__':
     """Run some training sessions and plot results."""
 
     fig_number = 1;     
-    executable = "../../bin/demoFunctionApproximatorTraining"
+    executable = "./demoFunctionApproximatorTraining"
     directory = "/tmp/demoFunctionApproximatorTraining/"
     
     fa_names = ["RBFN","GPR","RRRFF","LWR", "LWPR", "GMR"] 
