@@ -36,12 +36,14 @@ Please make sure you have installed all the required packages before trying to c
 We assume that you use a compiler that is compatible with the C++11 standard.
 
 To compile, do:
- `mkdir -p build_dir; cd build_dir; cmake .. -DCMAKE_BUILD_TYPE=Release; make; make Docs`
 
-When running the code on a real robot, you want to do an optimized build without asserts, i.e. `-DCMAKE_BUILD_TYPE=Release`
+`mkdir -p build_dir; cd build_dir; cmake .. -DCMAKE_BUILD_TYPE=Release; make; make Docs`
+
+Remove `make Docs` in case you do not have doxygen installed, or do not want to generate the doxygen documentation.
 
 To install libs in `/usr/local/lib`, headers in `/usr/local/include` and binaries in `dmpbbo/bin`:
- `sudo make install`
+
+`sudo make install`
 
 ### Static vs. shared libraries
 
@@ -67,17 +69,19 @@ Note that the crash happens towards the very end of the program, just before ret
 
 ## Building dmpbbo (advanced build options for debugging purposes)
 
-# Including debugging symbols and tests
+### Including debugging symbols and tests
 
 To compile a version that has debugging symbols included, and compiles some tests also:
+
 `mkdir -p build_dir_debug; cd build_dir_debug; cmake .. -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1`
 
-# Debugging real-time code
+### Debugging real-time code
 
 Various function approximators have been optimized so that no dynamic allocations are made in real-time critical functions. The Eigen matrix library has functionality for checking whether dynamic allocations are made in certain blocks of code. 
 
 To compile a version that has real-time checks built in:
-  `mkdir -p build_dir_realtime; cd build_dir_realtime; cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1`
+
+`mkdir -p build_dir_realtime; cd build_dir_realtime; cmake .. -DREALTIME_CHECKS=1 -DCMAKE_BUILD_TYPE=Debug; make VERBOSE=1`
 
 Note that it doesn't make sense to set `-DREALTIME_CHECKS=1` without `-DCMAKE_BUILD_TYPE=Debug`, as asserts are only done in debug mode. 
   
