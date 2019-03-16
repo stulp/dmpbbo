@@ -82,7 +82,7 @@ To compile a version that has real-time checks built in:
 Note that it doesn't make sense to set `-DREALTIME_CHECKS=1` without `-DCMAKE_BUILD_TYPE=Debug`, as asserts are only done in debug mode. 
   
 <a name="manual_installation"></a>
-## Manual installation of required/optional packages)
+## Manual installation of required/optional packages
 
 ### cmake (required)
  http://www.cmake.org/cmake/resources/software.html	
