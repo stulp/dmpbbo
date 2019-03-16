@@ -23,10 +23,9 @@ Each of the pages linked to above contains two sections:
 \li A tutorial that treats the concepts that are implemented 
 \li A description of how these concepts have been implemented, and why it has been done so in this fashion.
 
+A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-) The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
 
-Those parts of the code that are to be executed on a robot (those in functionapproximators/, dynamicalsystems/, and dmp/) have been implemented in C++. All other parts (bbo/ and dmpbbo/) have been implemented in C++ and Python. In many cases the Python version will be more convenient to use. For now the Python code has not been documented well, please see the C++ documentation instead (class/function names have been kept consistent).
-
-If you want a deeper understanding of the entire library, I recommend you to go through the pages in the order above. If you want to start coding immediately, I suggest to look at the \ref Demos to see how the functionality of the library may be used. The demos for each module are found in  cpp/MODULENAME/demos.
+If you want a deeper understanding of the entire library, I recommend you to go through the pages in the order above. If you want to start coding immediately, I suggest to look at the \ref Demos (located in the demos/ and demos_python/ directories) to see how the functionality of the library may be used.
 
 Some general considerations on the design of the library are here \ref page_design
 
@@ -101,6 +100,14 @@ See \ref page_serialization
 /** \defgroup Demos Demos
  */
  
+/** \page page_demos Demos
+ * 
+ * DmpBbo comes with several demos.
+ * 
+ * The C++ demos are located in the dmpbbo/demos/ directory. Many of the compiled executables are accompanied by a Python wrapper, which calls the executable, and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). For completeness, the pure Python demos are located in dmpbbo/demos_python.
+ *
+ Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmp/demos/ directory. 
+ */
 
 /** Namespace used for all classes in the project.
  */
