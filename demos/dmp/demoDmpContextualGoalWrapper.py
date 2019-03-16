@@ -46,7 +46,7 @@ if __name__=='__main__':
         
         # Call the executable with the directory to which results should be written
         executable = "./demoDmpContextualGoal"
-        main_directory = "/tmp/demoDmpContextualGoal"
+        main_directory = "./demoDmpContextualGoalDataTmp"
         directory = main_directory + "/Step"+str(n_dmp_contextual_step)
         arguments = directory+" "+str(n_dmp_contextual_step)
         executeBinary(executable, arguments)

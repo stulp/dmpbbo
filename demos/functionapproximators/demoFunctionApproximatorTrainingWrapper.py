@@ -47,7 +47,7 @@ if __name__=='__main__':
 
     fig_number = 1;     
     executable = "./demoFunctionApproximatorTraining"
-    directory = "/tmp/demoFunctionApproximatorTraining/"
+    directory = "./demoFunctionApproximatorTrainingDataTmp/"
     
     fa_names = ["RBFN","GPR","RRRFF","LWR", "LWPR", "GMR"] 
     for fa_name in fa_names:

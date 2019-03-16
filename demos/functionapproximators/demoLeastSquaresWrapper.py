@@ -106,7 +106,7 @@ if __name__=='__main__':
     parser.set_defaults(use_offset=False)
     parser.add_argument("n_dims", type=int, help="dimensionality of input data (1 or 2)")
     parser.add_argument("--use_offset", action='store_true', help="whether to use an offset in the linear model")
-    parser.add_argument("--directory", help="directory",default='/tmp/demoLeastSquares/')
+    parser.add_argument("--directory", help="directory",default='./demoLeastSquaresDataTmp/')
     parser.add_argument("--figure_number", type=int, help="figure number",default=1)
     parser.add_argument("--regularization", type=float, help="regularization term",default=0.0)
     args = parser.parse_args()

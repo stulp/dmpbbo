@@ -41,7 +41,7 @@ if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
     executable = "./demoDmpChangeGoal"
-    directory = "/tmp/demoDmpChangeGoal"
+    directory = "./demoDmpChangeGoalDataTmp"
     executeBinary(executable, directory)
     
     print("Plotting")

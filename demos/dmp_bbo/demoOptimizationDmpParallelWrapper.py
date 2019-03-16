@@ -45,7 +45,7 @@ if __name__=='__main__':
     viapoint_time = 0.2
     viapoint_radius = 0.0
     task = TaskViapoint(viapoint,viapoint_time, viapoint_radius)
-    directory = "/tmp/demoOptimizationDmpParallel/"+str(n_dims)+"D/"
+    directory = "./demoOptimizationDmpParallelDataTmp/"+str(n_dims)+"D/"
     task.saveToFile(directory,"viapoint_task.txt")
     
     # Call the executable with the directory to which results should be written

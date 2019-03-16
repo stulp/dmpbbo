@@ -46,7 +46,7 @@ if __name__=='__main__':
     for covar_update in covar_updates:
       # Call the executable with the directory to which results should be written
       executable = "./demoOptimizationTask"
-      directory = "/tmp/demoOptimizationTask/"+covar_update
+      directory = "./demoOptimizationTaskDataTmp/"+covar_update
       arguments = directory+" "+covar_update
       executeBinary(executable,arguments,True)
       

@@ -45,7 +45,7 @@ if __name__=='__main__':
         
         # Call the executable with the directory to which results should be written
         executable = "./demoOptimization"
-        directory = "/tmp/demoOptimization/"+covar_update
+        directory = "./demoOptimizationDataTmp/"+covar_update
         executeBinary(executable,directory+" "+covar_update)
       
         print("  Plotting results")

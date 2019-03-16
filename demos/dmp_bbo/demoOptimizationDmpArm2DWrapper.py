@@ -71,7 +71,7 @@ if __name__=='__main__':
         # Initialize a viapoint task and save it to file
         viapoint = 0.5*np.ones(2) # Always 2D!
         task = TaskViapoint(viapoint)
-        directory = "/tmp/demoOptimizationDmpArm2D/"+str(n_dofs)+"D/"
+        directory = "./demoOptimizationDmpArm2DDataTmp/"+str(n_dofs)+"D/"
         task.saveToFile(directory,"viapoint_task.txt")
         
         # Call the executable with the directory to which results should be written

@@ -60,7 +60,7 @@ if __name__=='__main__':
         
     
     # Call the executable with the directory to which results should be written
-    directory = "/tmp/demoDynamicalSystems"
+    directory = "./demoDynamicalSystemsDataTmp"
     arguments = directory
     for demo_label in demo_labels:
       arguments += " "+demo_label

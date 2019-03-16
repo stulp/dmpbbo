@@ -39,7 +39,7 @@ if __name__=='__main__':
     
     # Call the executable with the directory to which results should be written
     executable = "./demoExponentialSystem"
-    directory = "/tmp/demoExponentialSystem"
+    directory = "./demoExponentialSystemDataTmp"
     executeBinary(executable, directory)
     
     fig = plt.figure(1)

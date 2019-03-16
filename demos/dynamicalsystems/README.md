@@ -4,7 +4,7 @@
 
 Demonstrates how to initialize and integrate an exponential dynamical system. One (optional) argument is interpreted to be a directory to which to store the result. 
 
-The Python wrapper has the same interface, but uses a default directory in /tmp/
+The Python wrapper has the same interface, but uses a default directory.
 
 ## demoDynamicalSystems.cpp / demoDynamicalSystems.py  
 
@@ -21,4 +21,4 @@ The executable demoDynamicalSystems is called with a directory, and one or sever
 
 The results are stored in the directory that is passed as the first argument.
 
-The Python wrapper has the same interface, but uses a default directory in /tmp/
+The Python wrapper has the same interface, but uses a default directory.
