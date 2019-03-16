@@ -2,7 +2,7 @@
 
 This directory contains demos to show the functionality of DmpBbo. The cpp files are intented as a basis for your own tests/demos/projects.
 
-Many of the compiled executables are accompanied by a Python wrapper, which calls the executable, and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). 
+Many of the compiled executables are accompanied by a Python wrapper, which calls the executable, and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). The easiest way to run the demos is always to call the Python wrapper, rather than the executable.
 
 If you are not interested in C++, the pure Python demos are located in dmpbbo/demos_python/.
 
