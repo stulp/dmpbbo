@@ -1,6 +1,8 @@
 # Python version of dmpbbo
 
-## Installing required/optional packages for debian users (tested under Ubuntu 16.04) 
+## Installing required/optional packages for debian users 
+
+Tested under Ubuntu 16.04.
 
 dmpbbo requires python3 (mainly due to the way packages are imported), numpy (http://www.numpy.org/) and matplotlib (https://matplotlib.org/), plus some latex packages for the plotting.
 
@@ -8,7 +10,9 @@ dmpbbo requires python3 (mainly due to the way packages are imported), numpy (ht
 
 # C++ version of dmpbbo
 
-## Installing required/optional packages for debian users (tested under Ubuntu 16.04) 
+## Installing required/optional packages for debian users 
+
+Tested under Ubuntu 16.04
 
 ### Automatic installation
 
