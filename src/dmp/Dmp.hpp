@@ -451,183 +451,21 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::Dmp,boost::serialization::object_serializable
 #endif // _DMP_H_
 
 
+namespace DmpBbo {
+  
 /** \page page_dmp Dynamical Movement Primitives
 
-This page explains the background and implementation of dynamical movement primitives.
+This page provides and overview of the implementation of DMPs in the \c dmps/ module.
 
-\section sec_dmp_introduction Introduction
+It is assumed you have read about the theory behind DMPs in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorials/dmps.md">tutorials/dmps.md</a>. Note that in the tutorial, we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
 
-The core idea behind dynamical movement primitives (DMPs) is to represent movement primitives as a combination of dynamical systems (please read \ref page_dyn_sys, if you haven't already done so). The state variables of the main dynamical system \f$ [\mathbf{y \dot{y} \ddot{y}} ]\f$ then represent trajectories for controlling, for instance, the 7 joints of a robot arm, or its 3D end-effector position. The attractor state is the end-point or \em goal of the movement.
-
-The key advantage of DMPs is that they inherit the nice properties from linear dynamical systems (guaranteed convergence towards the attractor, robustness to perturbations, independence of time, etc) whilst allowing arbitrary (smooth) motions to be represented by adding a non-linear forcing term. This forcing term is often learned from demonstration, and subsequently improved through reinforcement learning.
-
-DMPs were introduced in \cite ijspeert02movement, but in this section we follow largely the notation and description in \cite ijspeert13dynamical, but at a slower pace.
-
-\em Historical \em remark. Recently, the term "dynamicAL movement primitives" is preferred over "dynamic movement primitives". The newer term makes the relation to dynamicAL systems more clear, and avoids confusion about whether the output of "dynamical movement primitives" is in kinematic or dynamic space (it is usually in kinematic space).
-
-\em Remark. This documentation and code focusses only on discrete movement primitives. For rythmic movement primitives, we refer to \cite ijspeert13dynamical.
-
-
-\section sec_core Basic Point-to-Point Movements: A Critically Damped Spring-Damper System
-
-At the heart of the DMP lies a spring-damper system, as described in \ref dyn_sys_spring_damper. In DMP papers, the notation of the spring-damper system is usually a bit different:
-\f{eqnarray*}{
-m\ddot{y}  =& -ky -c\dot{y} & \mbox{spring-damper system, ``traditional notation''} \\
-m\ddot{y}  =& c(-\frac{k}{c}y - \dot{y})\\
-\tau\ddot{y}  =& \alpha(-\beta y - \dot{y})      & \mbox{with } \alpha=c,~~\beta = \frac{k}{c},~~m=\tau\\
-\tau\ddot{y}  =& \alpha(-\beta (y-y^g) - \dot{y})& \mbox{with attractor } y^g\\
-\tau\ddot{y}  =& \alpha(\beta (y^g-y) - \dot{y})& \mbox{typical DMP notation for spring-damper system}\\
-\f}
-
-In the last two steps, we change the attractor state from 0 to \f$y^g\f$, where \f$y^g\f$ is the goal of the movement.
-
-To avoid overshooting or slow convergence towards \f$y^g\f$, we prefer to have a \em critically \em damped spring-damper system for the DMP. For such systems \f$c = 2\sqrt{mk}\f$ must hold, see \ref dyn_sys_critical_damping. In our notation this becomes \f$\alpha = 2\sqrt{\alpha\beta}\f$, which leads to \f$\beta = \alpha/4\f$. This determines the value of \f$\beta\f$ for a given value of \f$\alpha\f$ in DMPs. The influence of \f$\alpha\f$ is illustrated in the first figure in \ref sec_dyn_sys_intro.
-
-Rewriting the second order dynamical system as a first order system (see \ref dyn_sys_rewrite_second_first) with expanded state \f$ \mathbf{x}= [z~y]\f$ yields:
-
-\f{eqnarray*}{
-\mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}))/\tau \\ {z}/\tau  \end{array} \right]  \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0  \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \end{array} \right]
-\f}
-
-Please note that in the implementation, the state is implemented as  \f$ [y~z]\f$. The order is inconsequential, but we use the notation above (\f$[z~y]\f$) throughout the rest of this tutorial section, for consistency with the DMP literature.
-
-
-\section sec_forcing Arbitrary Smooth Movements: the Forcing Term
-
-The representation described in the previous section has some nice properties in terms of 
-\ref sec_dyn_sys_convergence
-, \ref sec_dyn_sys_perturbations
-, and \ref sec_dyn_sys_autonomy, but it can only represent very simple movements. To achieve more complex movements, we add a time-dependent forcing term to the spring-damper system. The spring-damper systems and forcing term are together known as a \em transformation \em system.
-
-\f{eqnarray*}{
-\mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}) + f(t))/\tau \\ {z}/\tau  \end{array} \right]   \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0  \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {?} \\ {y}^g \end{array} \right]
-\f}
-
-The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function \f$ f(t)\f$ is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see \ref page_func_approx. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
-
-\image html dmp_forcing_terms-svg.png "A non-linear forcing term enable more complex trajectories to be generated (these DMPs use a goal system and an exponential gating term)."
-\image latex dmp_forcing_terms-svg.pdf "A non-linear forcing term enable more complex trajectories to be generated (these DMPs use a goal system and an exponential gating term)." height=4cm
-
-\subsection sec_forcing_convergence Ensuring Convergence to 0 of the Forcing Term: the Gating System
-
-Since we add a forcing term to the dynamical system, we can no longer guarantee that the part of the system repesenting \f$ y \f$ will converge towards \f$ y^g \f$; perhaps the forcing term continually pushes it away \f$ y^g \f$ (perhaps it doesn't, but the point is that we cannot \em guarantee that it \em always doesn't). That is why there is a question mark in the attractor state in the equation above.
-
-To guarantee that the movement will always converge towards the attractor \f$ y^g \f$, we need to ensure that the forcing term decreases to 0 towards the end of the movement. To do so, a gating term is added, which is 1 at the beginning of the movement, and 0 at the end. This gating term itself is determined by, of course, a dynamical system. In \cite ijspeert02movement, it was suggested to use an exponential system. We add this extra system to our dynamical system by expanding the state as follows:
-
-\f{eqnarray*}{
-\mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({y}^{g}-{y})-{z}) + v\cdot f(t))/\tau \\ {z}/\tau \\ -\alpha_v v/\tau  \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \\ 0 \end{array} \right]
-\f}
-
-\subsection sec_forcing_autonomy Ensuring Autonomy of the Forcing Term: the Phase System
-
-By introducing the dependence of the forcing term \f$ f(t)\f$ on time \f$ t \f$ the overall system is no longer autonomous. To achieve independence of time, we therefore let \f$ f \f$ be a function of the state of an (autonomous) dynamical system rather than of \f$ t \f$. This system represents the \em phase of the movement. \cite ijspeert02movement suggested to use the same dynamical system for the gating and phase, and use the term \em canonical \em system to refer this joint gating/phase system. Thus the phase of the movement starts at 1, and converges to 0 towards the end of the movement, just like the gating system. The new formulation now is (the only difference is \f$ f(x)\f$ instead of \f$ f(t)\f$):
-
-\f{eqnarray*}{
-\mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({y}^{g}-{y})-{z}) + v\cdot f(v))/\tau \\ {z}/\tau \\ -\alpha_v v/\tau  \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {0} \\ {y}^g \\ 0 \end{array} \right]
-\f}
-
-Note that in most papers, the symbol for the state of the canonical system is \f$ x \f$. Since this symbol is already reserved for the state of the complete DMP, we rather use \f$ v\f$
-
-\todo Discuss goal-dependent scaling, i.e. \f$ f(t)v(y^g-y_0) \f$?
-
-
-\subsection sec_multidim_dmp Multi-dimensional Dynamic Movement Primitives
-
-Since DMPs usually have multi-dimensional states (e.g. one output \f$ {\mathbf{y}}_{d=1\dots D}\f$ for each of the \f$ D \f$ joints), it is more accurate to use bold fonts for the state variables (except the gating/phase system, because it is always 1D) so that they represent vectors:
-
-\f{eqnarray*}{
-\mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + v\cdot \mathbf{f}(v))/\tau \\ \mathbf{z}/\tau \\ -\alpha_v v/\tau  \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ 0 \end{array} \right]
-\f}
-
-So far, the graphs have shown 1-dimensional systems. To generate D-dimensional trajectories for, for instance, the 7 joints of an arm or the 3D position of its end-effector, we simply use D transformation systems. A key principle in DMPs is to use one and the same phase system for all of the transformation systems, to ensure that the output of the transformation systems are synchronized in time. The image below show the evolution of all the dynamical systems involved in integrating a multi-dimensional DMP.
-
-\image html dmpplot_ijspeert2002movement-svg.png "The various dynamical systems and forcing terms in multi-dimensional DMPs."
-\image latex dmpplot_ijspeert2002movement-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=8cm
-
-<em>
-
-\subsection sec_implementation_dmp Implementation
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).
 
-Please note that in this tutorial we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
 
 \em Remark. Dmp inherits the function DynamicalSystem::integrateStep() from the DynamicalSystem class. DynamicalSystem::integrateStep() uses either Euler integration, or 4-th order Runge-Kutta.  The latter is more accurate, but requires 4 calls of DynamicalSystem::differentialEquation() instead of 1). Which one is used can be set with DynamicalSystem::set_integration_method(). To numerically integrate a dynamical system, one must carefully choose the integration time dt. Choosing it too low leads to inaccurate integration, and the numerical integration will diverge from the 'true' solution acquired through analytical solution. See http://en.wikipedia.org/wiki/Euler%27s_method for examples. Choosing dt depends entirely on the time-scale (seconds vs. years) and parameters of the dynamical system (time constant, decay parameters). For DMPs, which are expected to take between 0.5-10 seconds, dt is usually chosen to be in the range 0.01-0.001.
-</em>
 
-
-\section sec_dmp_alternative Alternative Systems for Gating, Phase and Goals 
-
-The DMP formulation presented so far follows \cite ijspeert02movement. Since then, several variations have been proposed, which have several advantages in practice. We now describe some of these variations.
-
-\subsection sec_dmp_sigmoid_gating Gating: Sigmoid System
-
-A disadvantage of using an exponential system as a gating term is that the gating decreases very quickly in the beginning. Thus, the output of the function approximator \f$ f(x) \f$ needs to be very high towards the end of the movement if it is to have any effect at all. This leads to scaling issues when training the function approximator.
-
-Therefore, sigmoid systems have more recently been proposed \cite kulvicius12joining as a gating system. This leads to the following DMP formulation (since the gating and phase system are no longer shared, we introduce a new state variable \f$ s \f$ for the phase term):
-
-\f{eqnarray*}{
-\left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{s}}  \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + v\cdot f(s))/\tau \\ \mathbf{z}/\tau \\ -\alpha_s s/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 1 \\ 1 \end{array} \right]
-\mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ 0 \\ 0 \end{array} \right]
-\f}
-
-where the term \f$ v_{\mbox{\scriptsize max}}\f$ is determined by \f$\tau \f$
-
-\subsection sec_dmp_phase Phase: Constant Velocity System
-
-In practice, using an exponential phase system may complicate imitation learning of the function approximator \f$ f \f$, because samples are not equidistantly spaced in time. Therefore, we introduce a dynamical system that mimics the properties of the phase system described in \cite kulvicius12joining, whilst allowing for a more natural integration in the DMP formulation, and thus our code base. This system starts at 0, and has a constant velocity of \f$1/\tau\f$, which means the system reaches 1 when \f$t=\tau\f$. When this point is reached, the velocity is set to 0. 
-
-\f{eqnarray*}{
-\dot{s} =& 1/\tau \mbox{~if~} s < 1   & \\
-         & 0 \mbox{~if~} s>1 \\
-\f}
-
-This, in all honesty, is a bit of a hack, because it leads to a non-smooth acceleration profile. However, its properties as an input to the function approximator are so advantageous that we have designed it in this way (the implementation of this system is in the TimeSystem class).
-
-
-\image html phase_systems-svg.png "Exponential and constant velocity dynamical systems as the 1D phase for a dynamical movement primitive."
-\image latex phase_systems-svg.pdf "Exponential and constant velocity dynamical systems as the 1D phase for a dynamical movement primitive." height=4cm
-
-With the constant velocity dynamical system the DMP formulation becomes:
-
-\f{eqnarray*}{
-\left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{s}}  \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + v\cdot f(s))/\tau \\ \mathbf{z}/\tau \\ 1/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 0 \\ 1 \end{array} \right]
-\mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ 1 \\ 0 \end{array} \right]
-\f}
-
-\subsection sec_delayed_goal Zero Initial Accelerations: the Delayed Goal System
-
-Since the spring-damper system leads to high initial accelerations (see the graph to the right below), which is usually not desirable for robots, it was suggested to move the attractor of the system from the initial state \f$ y_0 \f$ to the goal state \f$ y^g \f$  \em during the movement \cite kulvicius12joining. This delayed goal attractor \f$ y^{g_d} \f$ itself is represented as an exponential dynamical system that starts at \f$ y_0 \f$, and converges to \f$ y^g \f$ (in early versions of DMPs, there was no delayed goal system, and \f$ y^{g_d} \f$ was simply equal to \f$ y^g \f$ throughout the movement). The combination of these two systems, listed below, leads to a movement that starts and ends with 0 velocities and accelerations, and approximately has a bell-shaped velocity profile. This representation is thus well suited to generating human-like point-to-point movements, which have similar properties.
-
-\f{eqnarray*}{
-\left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{\mathbf{y}}^{g_d}} \\ {\dot{s}}  \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g_d}-\mathbf{y})-\mathbf{z}) + v\cdot f(s))/\tau \\ \mathbf{z}/\tau \\ -\alpha_g({\mathbf{y}^g-\mathbf{y}^{g_d}}) \\ 1/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ \mathbf{y}_0 \\ 0 \\ 1 \end{array} \right]
-\mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ \mathbf{y}^g \\ 1 \\ 0 \end{array} \right]
-\f}
-
-
-\image html dmp_and_goal_system-svg.png "A first dynamical movement primitive, with and without a delayed goal system (left: state variable, center: velocities, right: accelerations."
-\image latex dmp_and_goal_system-svg.pdf "A first dynamical movement primitive, with and without a delayed goal system (left: state variable, center: velocities, right: accelerations." height=4cm
-
-
-In my experience, this DMP formulation is the best for learning human-like point-to-point movements (bell-shaped velocity profile, approximately zero velocities and accelerations at beginning and start of the movement), and generates nice normalized data for the function approximator without scaling issues. The image below shows the interactions between the spring-damper system, delayed goal system, phase system and gating system.
-
-
-\image html dmpplot_kulvicius2012joining-svg.png "The various dynamical systems and forcing terms in multi-dimensional DMPs."
-\image latex dmpplot_kulvicius2012joining-svg.pdf "The various dynamical systems and forcing terms in multi-dimensional DMPs." height=7cm
-
-
-\section sec_dmp_issues Known Issues
-
-\todo Known Issues
-
-\li Scaling towards novel goals
-
-\section sec_dmp_summary Summary
-
-The core idea in dynamical movement primitives is to combine dynamical systems, which have nice properties in terms of convergence towards the goal, robustness to perturbations, and independence of time, with function approximators, which allow for the generation of arbitrary (smooth) trajectories. The key enabler to this approach is to gate the output of the function approximator with a gating system, which is 1 at the beginning of the movement, and 0 towards the end.
-
-Further enhancements can be made by making the system autonomous (by using the output of a phase system rather than time as an input to the function approximator), or having initial velocities and accelerations of 0 (by using a delayed goal system).
-
-Multi-dimensional DMPs are achieved by using multi-dimensional dynamical systems, and learning one function approximator for each dimension. Synchronization of the different dimensions is ensure by coupling them with only \em one phase system.
 
 */
+
+}

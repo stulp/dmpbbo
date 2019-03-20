@@ -39,6 +39,8 @@ namespace DmpBbo {
 
 /** \brief Interface for implementing dynamical systems. Other dynamical systems should inherit from this class.
  *
+ * See also the \ref page_dyn_sys page
+ *
  * Two pure virtual functions that each DynamicalSystem subclass should implement are
  * \li differentialEquation() : The differential equation that defines the system
  * \li analyticalSolution() : The analytical solution to the system at given times
@@ -411,42 +413,19 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::DynamicalSystem,boost::serialization::object_
 
 #endif // _DYNAMICALSYSTEM_H_
 
-
+namespace DmpBbo {
 
 /** \page page_dyn_sys Dynamical Systems
 
-This page explains dynamical systems, and their implementation in DmpBbo
+This page provides and overview of the implementation of dynamical systems in the \c dynamicalsystems/ module.
 
-\section sec_dyn_sys_intro Introduction
+It is assumed you have read about the theory behind dynamical systems in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorials/dynamicalsystems.md">tutorials/dynamicalsystems.md</a>.
 
-Let a \em state be a vector of real numbers. A dynamical system consists of such a state and a rule that describes how this state will change over time; it describes what future state follows from the current state. A typical example is radioactive decay, where the state \f$x\f$ is the number of atoms, and the rate of decay is \f$\frac{dx}{dt}\f$  proportional to \f$x\f$: \f$ \frac{dx}{dt} = -\alpha x\f$. Here, \f$\alpha\f$ is the `decay constant' and \f$\dot{x}\f$ is a shorthand for \f$\frac{dx}{dt}\f$. Such an evolution rule describes an implicit relation between the current state \f$ x(t) \f$ and the state a short time in the future \f$x(t+dt)\f$.
+\section sec_dyn_sys_analytical_solution Analytical solution of a dynamical system
 
-If we know the initial state of a dynamical system, e.g. \f$x_0\equiv x(0)=4\f$, we may compute the evolution of the state over time through \em numerical \em integration. This means we take the initial state \f$ x_0\f$, and iteratively compute subsequent states \f$x(t+dt)\f$ by computing the rate of change \f$\dot{x}\f$, and integrating this over the small time interval \f$dt\f$. A pseudo-code example is shown below for  \f$x_0\equiv x(0)=4\f$, \f$dt=0.01s\f$ and  \f$\alpha=6\f$.
-
-\code
-alpha=6; // Decay constant
-dt=0.01; // Duration of one integration step
-x=4.0;   // Initial state
-t=0.0;   // Initial time
-while (t<1.5) {
-  dx = -alpha*x;  // Dynamical system rule
-  x = x + dx*dt;  // Project x into the future for a small time step dt (Euler integration)
-  t = t + dt;     // The future is now!
-}
-\endcode
-
-This procedure is called ``integrating the system'', and leads the trajectory plotted below (shown for both \f$\alpha=6\f$ and \f$\alpha=3\f$.
-
-\image html exponential_decay-svg.png "Evolution of the exponential dynamical system."
-\image latex exponential_decay-svg.pdf "Evolution of the exponential dynamical system." height=4cm
-
-The evolution of many dynamical systems can also be determined analytically, by explicitly solving the differential equation. For instance, \f$N(t) = x_0e^{-\alpha t}\f$ is the solution
-to \f$\dot{x} = -\alpha x\f$. Why? Let's plug \f$x(t) = x_0e^{-\alpha t}\f$ into \f$\frac{dx}{dt} = -\alpha x\f$, which leads to \f$\frac{d}{dt}(x_0e^{-\alpha t}) = -\alpha (x_0e^{-\alpha t})\f$. Then derive the left side of the equations, which yields \f$-\alpha(x_0e^{-\alpha t}) = -\alpha (x_0e^{-\alpha t})\f$. QED. Note that the solution works for arbitrary \f$x_0\f$. It should, because the solution should not depend on the initial state.
-
-\subsection dynsys_implementation1 Implementation
-
-<em>
 In the object-oriented implementation of this module, all dynamical systems inherit from the abstract DynamicalSystem class. The analytical solution of a dynamical system is computed with DynamicalSystem::analyticalSolution, which takes the times \c ts at which the solution should be computed, and returns the evolution of the system as \c xs and \c xds.
+
+\section sec_dyn_sys_numeric_integration Numeric integration of a dynamical system
 
 A system's differential equation is implement in the function DynamicalSystem::differentialEquation, which takes the current state \c x, and computes the rates of change \c xd. The functions DynamicalSystem::integrateStart() and DynamicalSystem::integrateStep() are then used to numerically integrate the system as follows (using the example plotted above):
 
@@ -471,109 +450,18 @@ delete dyn_sys;
 
 \em Remark. Both analyticalSolution and differentialEquation functions above are const, i.e. they do not change the DynamicalSystem itself.
 
-\em Remark. DynamicalSystem::integrateStep uses either Euler integration, or 4-th order Runge-Kutta.  The latter is more accurate, but requires 4 calls of DynamicalSystem::differentialEquation() instead of 1). Which one is used can be set with DynamicalSystem::set_integration_method(). To numerically integrate a dynamical system, one must carefully choose the integration time dt. Choosing it too low leads to inaccurate integration, and the numerical integration will diverge from the 'true' solution acquired through analytical solution. See http://en.wikipedia.org/wiki/Euler%27s_method for examples. Choosing dt depends entirely on the time-scale (seconds vs. years) and parameters of the dynamical system (time constant, decay parameters). 
+\em Remark. DynamicalSystem::integrateStep() uses either Euler integration, or 4-th order Runge-Kutta.  Runge-Kutta is much more accurate, but requires 4 calls of DynamicalSystem::differentialEquation() instead of only 1 for Euler integration. Which one is used can be set with DynamicalSystem::set_integration_method(). To numerically integrate a dynamical system, one must carefully choose the integration time dt. Choosing it too low leads to inaccurate integration, and the numerical integration will diverge from the "true" solution acquired through analytical solution. See http://en.wikipedia.org/wiki/Euler%27s_method for examples. Choosing dt depends entirely on the time-scale (seconds vs. years) and parameters of the dynamical system (time constant, decay parameters). 
 
 
-</em>
+\section dyn_sys_rewrite_second_first Rewriting one 2nd Order Systems as two 1st Order Systems
 
-\section sec_dyn_sys_properties Properties and Features of Linear Dynamical Systems
+For the theory, behind this see 
+<a href="../../../tutorial/dynamicalsystems.md#dyn_sys_second_order_systems">tutorial/dynamicalsystems.md</a>.
 
-\subsection sec_dyn_sys_convergence Convergence towards the Attractor
+The constructor DynamicalSystem::DynamicalSystem() immediately converts second order systems, such as SpringDamperSystem, into first order systems with an expanded state.
 
-In the limit of time, the dynamical system for exponential decay will converge to 0 (i.e. \f$x(\infty) = x_0e^{-\alpha\infty}  = 0\f$). The value 0 is known as the \em attractor of the system.
-For simple dynamical systems, it is possible to \em proove that they will converge towards the attractor.
-
-Suppose that the attractor state in our running example is not 0, but 1. In that case, we change the attractor state of the exponential decay to \f$x^g\f$ (\f$g\f$=goal) and define the following differential equation:
-\f{eqnarray*}{
-\dot{x}  =& -\alpha(x-x^g)                & \mbox{~with attractor } x^g
-\f}
-
-This system will now converge to the attractor state \f$x^g\f$, rather than 0.
-
-\image html change_tau_attr-svg.png "Changing the attractor state or time constant."
-\image latex change_tau_attr-svg.pdf "Changing the attractor state or time constant." height=4cm
-
-\subsection sec_dyn_sys_perturbations Robustness to Perturbations
-
-Another nice feature of dynamical systems is their robustness to perturbations, which means that they will converge towards the attractor even if they are perturbed. The figure below shows how the perturbed system (cyan) converges towards the attractor state just as the unperturbed system (blue) does.
-
-\image html perturb-svg.png "Perturbing the dynamical system."
-\image latex perturb-svg.pdf "Perturbing the dynamical system." height=4cm
-
-
-\subsection sec_dyn_sys_time_constant Changing the speed of convergence: The time constant
-
-The rates of change computed by the differential equation can be increased or decreased (leading to a faster or slower convergence) with a \em time \em constant, which is usually written as follows:
-
-\f{eqnarray*}{
-\tau\dot{x}  =& -\alpha(x-x^g)\\
-\dot{x}  =& (-\alpha(x-x^g))/\tau
-\f}
-
-\em Remark. For an exponential system, decreasing the time constant \f$\tau\f$ has the same effect as increasing  \f$\alpha\f$. For more complex dynamical systems with several parameters, it is useful to have a separate parameter that changes only the speed of convergence, whilst leaving the other parameters the same.
-
-\subsection sec_dyn_sys_multi Multi-dimensional states
-
-The state \f$x\f$ need not be a scalar, but may be a vector. This then represents a multi-dimensional state, i.e. \f$\tau\dot{\mathbf{x}}  = -\alpha(\mathbf{x}-\mathbf{x}^g)\f$. In the code, the size of the state vector \f$dim(\mathbf{x})\equiv dim(\dot{\mathbf{x}})\f$ of a dynamical system is returned by the function DynamicalSystem::dim()
-
-\subsection sec_dyn_sys_autonomy Autonomy
-
-Dynamical system that do not depend on time are called \em autonomous. For instance, the formula \f$ \dot{x}  = -\alpha x\f$ does not depend on time, which means the exponential system is autonomous.
-
-
-\subsection sec_implementation_dyn_sys_1 Implementation
-<em>
-The attractor state and time constant of a dynamical system are usually passed to the constructor. They can be changed afterwards with with DynamicalSystem::set_attractor_state and DynamicalSystem::set_tau. Before integration starts, the initial state can be set with  DynamicalSystem::set_initial_state. This influences the output of DynamicalSystem::integrateStart, but not DynamicalSystem::integrateStep.
-
-Further (first order) linear dynamical systems that are implemented in this module is a SigmoidSystem (see
- http://en.wikipedia.org/wiki/Exponential_decay and http://en.wikipedia.org/wiki/Sigmoid_function), as well as a dynamical system that has a constant velocity (TimeSystem), so as to mimic the passing of time (time moves at a constant rate per time ;-)
- 
-\f{eqnarray*}{
-\dot{x}  =& -\alpha (x-x^g)    & \mbox{exponential decay/growth} \label{equ_}\\
-\dot{x}  =& \alpha x (\beta-x) & \mbox{sigmoid} \label{equ_}\\
-\dot{x}  =& 1/\tau             & \mbox{constant velocity (mimics the passage of time)} \label{equ_}\\
-\f}
-
-\image html sigmoid-svg.png "Exponential (blue) and sigmoid (purple) dynamical systems."
-\image latex sigmoid-svg.pdf "Exponential (blue) and sigmoid (purple) dynamical systems." height=4cm
-
-</em>
-
-\section dyn_sys_second_order_systems Second-Order Systems 
-
-The \b order of a dynamical system is the order of the highest derivative in the differential equation. For instance, \f$\dot{x} = -\alpha x\f$ is of order 1, because the derivative with the highest order (\f$\dot{x}\f$) has order 1. Such a system is known as a first-order system. All systems considered so far have been first-order systems, because the derivative with the highest order, i.e. \f$ \dot{x} \f$, has always been of order 1. 
-
-\subsection dyn_sys_spring_damper Spring-Damper Systems 
-
-An example of a second order system (which also has terms \f$ \ddot{x} \f$) is a spring-damper system (see http://en.wikipedia.org/wiki/Damped_spring-mass_system), where \f$k\f$ is the spring constant, \f$c\f$ is the damping coefficient, and \f$m\f$ is the mass:
-
-\f{eqnarray*}{
-m\ddot{x}=& -kx -c\dot{x}      & \mbox{spring-damper  (2nd order system)} \label{equ_}\\
-\ddot{x}=& (-kx -c\dot{x})/m   &
-\f}
-
-\subsection dyn_sys_critical_damping Critical Damping 
-
-A spring-damper system is called critically damped when it converges to the attractor as quickly as possible without overshooting, as the red plot in http://en.wikipedia.org/wiki/File:Damping_1.svg. This happens when \f$c = 2\sqrt{mk}\f$.
-
-
-\subsection dyn_sys_rewrite_second_first Rewriting one 2nd Order Systems as two 1st Order Systems
-
-For implementation purposes, it is more convenient to work only with 1st order systems. Fortunately, we can expand the state \f$ x \f$ into two components \f$ x = [y~z]^T\f$ with \f$ z = \dot{y}\f$, and rewrite the differential equation as follows:
-
-\f$
-\left[ \begin{array}{l} \dot{y} \\ \dot{z} \end{array} \right] = \left[ \begin{array}{l} z \\ (-ky -cz)/m \end{array} \right]
-\f$
-
-With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state:
-
-\subsection sec_implementation_dyn_sys_2 Implementation
-<em>
-The constructor DynamicalSystem::DynamicalSystem immediately converts second order systems into first order systems with an expanded state.
-
-The function DynamicalSystem::dim() returns the size of the entire state vector \f$ x = [y~z]\f$, the function DynamicalSystem::dim_orig() return the size of only the \f$ y \f$ component. The attractor and initial state must always have the size returned by DynamicalSystem::dim_orig().
-</em>
+The function DynamicalSystem::dim() returns the size of the entire state vector \f$ \mathbf{x} = [y~z]\f$, the function DynamicalSystem::dim_orig() return the size of only the \f$ y \f$ component. The attractor and initial stateof the dynamical system must always have the size returned by DynamicalSystem::dim_orig().
 
 */
 
-
+}

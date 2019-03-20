@@ -360,13 +360,18 @@ BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximator,boost::serialization::ob
 
 #endif // _FUNCTIONAPPROXIMATOR_H_
 
+
+namespace DmpBbo {
+
 /** \page page_func_approx Function Approximation
 
-This page explains function approximators, and their implementation in DmpBbo
+This page provides and overview of the implementation of function approximators in the \c dynamicalsystems/ module.
+
+It is assumed you have read about the theory behind function approximators in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorials/functionapproximators.md">tutorials/functionapproximators.md</a>.
 
 \section sec_fa Function Approximation
 
-This module implements a set of function approximators, i.e. supervised learning algorithms that are trained with demonstration pairs input/target, after which they make predictions for new inputs. For simplicity, this module implements only batch learning (not incremental).
+This module implements a set of function approximators, i.e. supervised learning algorithms that are <b>trained</b> with demonstration pairs input/target, after which they <b>predict</b> output values for new inputs. For simplicity, DmpBbo focusses on batch learning (not incremental), as the main use cases in the context of dmpbbo is imitation learning.
 
 The two main functions are FunctionApproximator::train, which takes a set of inputs and corresponding targets, and FunctionApproximator::predict, which makes predictions for novel inputs. 
 
@@ -423,3 +428,5 @@ The reason why caching is implemented in ModelParameters, and not in FunctionApp
 
 
  */
+ 
+}
