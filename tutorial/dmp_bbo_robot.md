@@ -26,28 +26,28 @@ In practice, it is not convenient to run above two phases in a loop, but rather 
 
 * demo_optimization_one_by_one.bash, which alternatively calls the two scripts above.
 
+```bash
+#!/bin/bash
 
-   .
+DIREC="/tmp/demo_optimization_one_by_one"
+
+# Yes, I know there are for loops in bash ;-)
+# But this makes it really explicit how to call the scripts
     
-    DIREC="/tmp/demo_optimization_one_by_one"
+python demo_one_update.py $DIREC/
+python demo_perform_rollouts.py $DIREC/update00001 # Replace this with your robot
     
-    \# Yes, I know there are for loops in bash ;-)
+python demo_one_update.py $DIREC/
+python demo_perform_rollouts.py $DIREC/update00002 # Replace this with your robot
     
-    \# But this makes it really explicit how to call the scripts
+python demo_one_update.py $DIREC/
+python demo_perform_rollouts.py $DIREC/update00003 # Replace this with your robot
     
-    python demo_one_update.py $DIREC/
-    python demo_perform_rollouts.py $DIREC/update00001 # Replace this with your robot
+python demo_one_update.py $DIREC/
+python demo_perform_rollouts.py $DIREC/update00004 # Replace this with your robot
     
-    python demo_one_update.py $DIREC/
-    python demo_perform_rollouts.py $DIREC/update00002 # Replace this with your robot
-    
-    python demo_one_update.py $DIREC/
-    python demo_perform_rollouts.py $DIREC/update00003 # Replace this with your robot
-    
-    python demo_one_update.py $DIREC/
-    python demo_perform_rollouts.py $DIREC/update00004 # Replace this with your robot
-    
-    python demo_one_update.py $DIREC/ plotresults
+python demo_one_update.py $DIREC/ plotresults
+```
 
 <a name="sec_practical_howto"></a>
 ### Practical howto
