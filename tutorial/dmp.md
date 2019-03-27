@@ -4,7 +4,7 @@ Dynamical Movement Primitives
 *It is assumed that you have already read the tutorials on <a href="dynamicalsystems.md">Dynamical Systems</a> and <a href="functionapproximators.md">Function Approximation</a>.*
 
 
-The core idea behind dynamical movement primitives (DMPs) is to represent movement primitives as a combination of dynamical systems (please read <a class="el" href="page_dyn_sys.html">Dynamical Systems</a>, if you haven't already done so). The state variables of the main dynamical system ![alt text](formulae/form_0.png "$ [\mathbf{y~\dot{y}~\ddot{y}} ]$")  then represent trajectories for controlling, for instance, the 7 joints of a robot arm, or its 3D end-effector position. The attractor state is the end-point or *goal* of the movement.
+The core idea behind dynamical movement primitives (DMPs) is to represent movement primitives as a combination of dynamical systems, if you haven't already done so). The state variables of the main dynamical system ![alt text](formulae/form_0.png "$ [\mathbf{y~\dot{y}~\ddot{y}} ]$")  then represent trajectories for controlling, for instance, the 7 joints of a robot arm, or its 3D end-effector position. The attractor state is the end-point or *goal* of the movement.
 
 The key advantage of DMPs is that they inherit the nice properties from linear dynamical systems (guaranteed convergence towards the attractor, robustness to perturbations, independence of time, etc) whilst allowing arbitrary (smooth) motions to be represented by adding a non-linear forcing term. This forcing term is often learned from demonstration, and subsequently improved through reinforcement learning.
 
@@ -20,7 +20,7 @@ DMPs were introduced in <a class="el" href="citelist.html#CITEREF_ijspeert02move
 Basic Point-to-Point Movements: A Critically Damped Spring-Damper System
 ---------------
 
-At the heart of the DMP lies a spring-damper system, as described in <a href="page_dyn_sys.html#dyn_sys_spring_damper">Spring-Damper Systems</a>. In DMP papers, the notation of the spring-damper system is usually a bit different: 
+At the heart of the DMP lies a spring-damper system, as described in <a href="dynamicalsystems.md#dyn_sys_spring_damper">Spring-Damper Systems</a>. In DMP papers, the notation of the spring-damper system is usually a bit different: 
 
 
 ![alt text](formulae/form_1.png "\begin{eqnarray*} m\ddot{y} =&amp; -ky -c\dot{y} &amp; \mbox{spring-damper system, ``traditional notation''} \\ m\ddot{y} =&amp; c(-\frac{k}{c}y - \dot{y})\\ \tau\ddot{y} =&amp; \alpha(-\beta y - \dot{y}) &amp; \mbox{with } \alpha=c,~~\beta = \frac{k}{c},~~m=\tau\\ \tau\ddot{y} =&amp; \alpha(-\beta (y-y^g) - \dot{y})&amp; \mbox{with attractor } y^g\\ \tau\ddot{y} =&amp; \alpha(\beta (y^g-y) - \dot{y})&amp; \mbox{typical DMP notation for spring-damper system}\\ \end{eqnarray*}") 
@@ -28,9 +28,9 @@ At the heart of the DMP lies a spring-damper system, as described in <a href="pa
 
 In the last two steps, we change the attractor state from 0 to ![alt text](formulae/form_2.png "$y^g$") , where ![alt text](formulae/form_2.png "$y^g$")  is the goal of the movement.
 
-To avoid overshooting or slow convergence towards ![alt text](formulae/form_2.png "$y^g$") , we prefer to have a <em>critically</em> <em>damped</em> spring-damper system for the DMP. For such systems ![alt text](formulae/form_3.png "$c = 2\sqrt{mk}$")  must hold, see <a class="el" href="page_dyn_sys.html#dyn_sys_critical_damping">Critical Damping</a>. In our notation this becomes ![alt text](formulae/form_4.png "$\alpha = 2\sqrt{\alpha\beta}$") , which leads to ![alt text](formulae/form_5.png "$\beta = \alpha/4$") . This determines the value of ![alt text](formulae/form_6.png "$\beta$")  for a given value of ![alt text](formulae/form_7.png "$\alpha$")  in DMPs. The influence of ![alt text](formulae/form_7.png "$\alpha$")  is illustrated in the first figure <a class="el" href="page_dyn_sys.html">here</a>.
+To avoid overshooting or slow convergence towards ![alt text](formulae/form_2.png "$y^g$") , we prefer to have a <em>critically</em> <em>damped</em> spring-damper system for the DMP. For such systems ![alt text](formulae/form_3.png "$c = 2\sqrt{mk}$")  must hold, see <a class="el" href="dynamicalsystems.md#dyn_sys_critical_damping">Critical Damping</a>. In our notation this becomes ![alt text](formulae/form_4.png "$\alpha = 2\sqrt{\alpha\beta}$") , which leads to ![alt text](formulae/form_5.png "$\beta = \alpha/4$") . This determines the value of ![alt text](formulae/form_6.png "$\beta$")  for a given value of ![alt text](formulae/form_7.png "$\alpha$")  in DMPs. The influence of ![alt text](formulae/form_7.png "$\alpha$")  is illustrated in the first figure <a class="el" href="dynamicalsystems.md">here</a>.
 
-Rewriting the second order dynamical system as a first order system (see <a class="el" href="page_dyn_sys.html#dyn_sys_rewrite_second_first">Rewriting one 2nd Order Systems as two 1st Order Systems</a>) with expanded state ![alt text](formulae/form_107.png "$ \mathbf{x}= [z~y]$")  yields:
+Rewriting the second order dynamical system as a first order system (see <a class="el" href="dynamicalsystems.md#dyn_sys_rewrite_second_first">Rewriting one 2nd Order Systems as two 1st Order Systems</a>) with expanded state ![alt text](formulae/form_107.png "$ \mathbf{x}= [z~y]$")  yields:
 
 
 
@@ -45,14 +45,14 @@ Please note that in the implementation, the state is implemented as ![alt text](
 Arbitrary Smooth Movements: the Forcing Term
 ---------------
 
-The representation described in the previous section has some nice properties in terms of <a class="el" href="page_dyn_sys.html#sec_dyn_sys_convergence">Convergence towards the Attractor</a> , <a class="el" href="page_dyn_sys.html#sec_dyn_sys_perturbations">Robustness to Perturbations</a> , and <a class="el" href="page_dyn_sys.html#sec_dyn_sys_autonomy">Autonomy</a>, but it can only represent very simple movements. To achieve more complex movements, we add a time-dependent forcing term to the spring-damper system. The spring-damper systems and forcing term are together known as a <em>transformation</em> <em>system</em>.
+The representation described in the previous section has some nice properties in terms of <a class="el" href="dynamicalsystems.md#sec_dyn_sys_convergence">convergence towards the attractor</a> , <a class="el" href="dynamicalsystems.md#sec_dyn_sys_perturbations">robustness to perturbations</a> , and <a class="el" href="dynamicalsystems.md#sec_dyn_sys_autonomy">autonomy</a>, but it can only represent very simple movements. To achieve more complex movements, we add a time-dependent forcing term to the spring-damper system. The spring-damper systems and forcing term are together known as a <em>transformation</em> <em>system</em>.
 
 
 
 ![alt text](formulae/form_103.png "\begin{eqnarray*} \mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}) + f(t))/\tau \\ {z}/\tau \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {?} \\ {y}^g \end{array} \right] \end{eqnarray*}") 
 
 
-The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function ![alt text](formulae/form_13.png "$ f(t)$")  is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see <a class="el" href="page_func_approx.html">Function Approximation</a>. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
+The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function ![alt text](formulae/form_13.png "$ f(t)$")  is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see <a class="el" href="functionapproximators.md">Function Approximation</a>. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
 
 
 ![alt text](images/dmp_forcing_terms-svg.png  "A non-linear forcing term enable more complex trajectories to be generated (these DMPs use a goal system and an exponential gating term).")
