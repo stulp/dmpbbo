@@ -174,18 +174,3 @@ The core idea in dynamical movement primitives is to combine dynamical systems, 
 Further enhancements can be made by making the system autonomous (by using the output of a phase system rather than time as an input to the function approximator), or having initial velocities and accelerations of 0 (by using a delayed goal system).
 
 Multi-dimensional DMPs are achieved by using multi-dimensional dynamical systems, and learning one function approximator for each dimension. Synchronization of the different dimensions is ensure by coupling them with only <em>one</em> phase system. 
-
-
-
-<a name="sec_implementation_dmp"></a>
-
-Implementation
----------------
-
-<em> Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).</em>
-
-<em>Please note that in this tutorial we have used the notation ![alt text](formulae/form_11.png "$[z~y]$")  for consistency with the DMP literature. In the C++ implementation, the order is rather ![alt text](formulae/form_24.png "$[y~z]$") .</em>
-
-<em><em>Remark</em>. Dmp inherits the function DynamicalSystem::integrateStep() from the DynamicalSystem class. DynamicalSystem::integrateStep() uses either Euler integration, or 4-th order Runge-Kutta. The latter is more accurate, but requires 4 calls of DynamicalSystem::differentialEquation() instead of 1). Which one is used can be set with DynamicalSystem::set_integration_method(). To numerically integrate a dynamical system, one must carefully choose the integration time dt. Choosing it too low leads to inaccurate integration, and the numerical integration will diverge from the 'true' solution acquired through analytical solution. See <a href="http://en.wikipedia.org/wiki/Euler%27s_method">http://en.wikipedia.org/wiki/Euler%27s_method</a> for examples. Choosing dt depends entirely on the time-scale (seconds vs. years) and parameters of the dynamical system (time constant, decay parameters). For DMPs, which are expected to take between 0.5-10 seconds, dt is usually chosen to be in the range 0.01-0.001. </em>
-
-
