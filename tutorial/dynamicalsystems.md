@@ -112,7 +112,7 @@ An example of a second order system (which also has terms ![alt text](formulae/f
 
 
 <a name="dyn_sys_critical_damping"></a>
-### Critical Damping
+#### Critical Damping
 
 A spring-damper system is called critically damped when it converges to the attractor as quickly as possible without overshooting, as the red plot in [this graph]("http://en.wikipedia.org/wiki/File:Damping_1.svg">http://en.wikipedia.org/wiki/File:Damping_1.svg).
 
