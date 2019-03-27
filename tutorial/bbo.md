@@ -26,3 +26,12 @@ The basic algorithm is as follows:
 		x_mu = x_mu_new
 		x_covar = x_covar_new
 	}
+	
+Further reading
+---------------
+
+The next tutorials to go to would be:
+* <a href="dmp_bbo.md">Black-Box Optimizaton of Dynamical Movement Primitives</a> (if you already know about dynamical movement primitives)
+* <a href="dmp.md">Dynamical Movement Primitives</a> (if you don't)
+
+
