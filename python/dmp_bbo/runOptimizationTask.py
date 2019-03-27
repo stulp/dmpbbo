@@ -21,6 +21,7 @@ import math
 import os
 import sys
 import matplotlib.pyplot as plt
+from collections import OrderedDict
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
@@ -84,7 +85,6 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         learning_curve.append([cur_samples])
         learning_curve[-1].extend(cost_eval)
         
-        
         # Plot summary of this update
         if fig:
             highlight = (i_update==0)
@@ -105,6 +105,11 @@ def runOptimizationTask(task, task_solver, initial_distribution, updater, n_upda
         # Distribution is new distribution
         distribution = distribution_new
         
+    
+    # Remove duplicate entries in the legend.
+    handles, labels = ax_rollout.get_legend_handles_labels()
+    by_label = OrderedDict(zip(labels, handles))
+    ax_rollout.legend(by_label.values(), by_label.keys())
         
     # Plot learning curve
     cost_labels = task.costLabels()

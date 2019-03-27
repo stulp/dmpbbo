@@ -112,27 +112,31 @@ class TaskViapoint(Task):
         y = cost_vars[:,1:n_dims+1]
         if n_dims==1:
             line_handles = ax.plot(t,y,linewidth=0.5)
-            ax.plot(self.viapoint_time_,self.viapoint_,'o')
+            ax.plot(t[0], y[0], 'bo', label='start')                
+            ax.plot(t[-1], y[-1], 'go', label='end')                
+            ax.plot(self.viapoint_time_,self.viapoint_,'ok',label='viapoint')
             if (self.viapoint_radius_>0.0):
                 r = self.viapoint_radius_
                 t = self.viapoint_time_
                 v = self.viapoint_[0]
-                ax.plot([t,t],[v+r,v-r],'-r')
+                ax.plot([t,t],[v+r,v-r],'-k')
                 ax.set_xlabel('time (s)')
                 ax.set_ylabel('y')
                 
-                
         elif n_dims==2:
             line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
-            ax.plot(self.viapoint_[0],self.viapoint_[1],'ro')
+            ax.plot(y[0,0], y[0,1], 'bo', label='start')                
+            ax.plot(y[-1,0], y[-1,1], 'go', label='end')                
+            ax.plot(self.viapoint_[0],self.viapoint_[1],'ko',label='viapoint')
             if (self.viapoint_radius_>0.0):
-                circle = plt.Circle(self.viapoint_,self.viapoint_radius_, color='r', fill=False)
+                circle = plt.Circle(self.viapoint_,self.viapoint_radius_, color='k', fill=False)
                 ax.add_artist(circle)
             ax.axis('equal')
             ax.set_xlabel('y_1')
             ax.set_ylabel('y_2')
         else:
             line_handles = []
+            
         return line_handles
         
     def saveToFile(self,directory,filename):
