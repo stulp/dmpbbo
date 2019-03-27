@@ -36,34 +36,53 @@ sys.path.append(lib_path)
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
 
+def usage(available_demo_labels):
+  print('\nUsage: '+sys.argv[0]+' <test1> [test2]\n')
+  print('Available test labels are:')
+  for label, explanation in available_demo_labels.items():    
+    print('   '+label+' - '+explanation)
+  print('')
+  print('If you call with two tests, the results of the two are compared in one plot.\n')
+    
+
+def process_labels(labels,available_demo_labels):
+    if not labels:
+        usage(available_demo_labels)
+        sys.exit()
+        
+    demo_labels = []
+    for label in labels:
+      if label in available_demo_labels:
+        demo_labels.append(str(label))
+      else:
+        print('WARNING: "'+label+'" is an unknown test label, not adding.')
+        
+        
+    if not demo_labels:
+        print('ERROR: No valid test labels provided."')
+        usage(available_demo_labels)
+        sys.exit()
+    
+    return demo_labels
 
 if __name__=='__main__':
     executable = "./demoDynamicalSystems"
     
-    # See if input directory was passed
-    if (len(sys.argv)<2 or len(sys.argv)>3):
-        print('\nUsage: '+sys.argv[0]+' <test1> [test2]\n')
-        print('Available test labels are:')
-        print('   rungekutta - Use 4th-order Runge-Kutta numerical integration.')
-        print('   euler      - Use simple Euler numerical integration.')
-        print('   analytical - Compute analytical solution (rather than numerical integration)')
-        print('   tau        - Change the time constant "tau"')
-        print('   attractor  - Change the attractor state during the integration')
-        print('   perturb    - Perturb the system during the integration')
-        print('')
-        print('If you call with two tests, the results of the two are compared in one plot.\n')
-        sys.exit()
-        
-    demo_labels = [];
-    for arg in sys.argv[1:]:
-      demo_labels.append(str(arg))
-        
+    available_demo_labels = {
+        'rungekutta' :'Use 4th-order Runge-Kutta numerical integration.',
+        'euler'      :'Use simple Euler numerical integration.',
+        'analytical' :'Compute analytical solution (rather than numerical integration)',
+        'tau'        :'Change the time constant "tau"',
+        'attractor'  :'Change the attractor state during the integration',
+        'perturb'    :'Perturb the system during the integration',
+    }
+    
+    demo_labels = process_labels(sys.argv[1:],available_demo_labels)   
     
     # Call the executable with the directory to which results should be written
     directory = "./demoDynamicalSystemsDataTmp"
-    arguments = directory
-    for demo_label in demo_labels:
-      arguments += " "+demo_label
+    arguments = directory +" "+ " ".join(demo_labels)
+      
      
     print("____________________________________________________________________")
     executeBinary(executable, arguments, True)
