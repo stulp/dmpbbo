@@ -7,6 +7,9 @@ Black-box in this context means that no assumptions about the cost function can 
 
 The evolution strategies that are implemented are all based on reward-weighted averaging (aka probablity-weighted averaging), as explained in this paper/presentation: [http://icml.cc/discuss/2012/171.html](http://icml.cc/discuss/2012/171.html)
 
+Here is a 1-page description of the algorithm:
+http://www.pyoudeyer.com/stulpOudeyerDevelopmentalScience17.pdf#page=30
+
 The basic algorithm is as follows:
 
 	x_mu = ??; x_Sigma = ?? // Initialize multi-variate Gaussian distribution
