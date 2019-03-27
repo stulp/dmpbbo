@@ -8,11 +8,11 @@ The core idea behind dynamical movement primitives (DMPs) is to represent moveme
 
 The key advantage of DMPs is that they inherit the nice properties from linear dynamical systems (guaranteed convergence towards the attractor, robustness to perturbations, independence of time, etc) whilst allowing arbitrary (smooth) motions to be represented by adding a non-linear forcing term. This forcing term is often learned from demonstration, and subsequently improved through reinforcement learning.
 
-DMPs were introduced in <a class="el" href="citelist.html#CITEREF_ijspeert02movement">[3]</a>, but in this section we follow largely the notation and description in <a class="el" href="citelist.html#CITEREF_ijspeert13dynamical">[4]</a>, but at a slower pace.
+DMPs were introduced in <a href="citelist.html#CITEREF_ijspeert02movement">[3]</a>, but in this section we follow largely the notation and description in <a href="citelist.html#CITEREF_ijspeert13dynamical">[4]</a>, but at a slower pace.
 
 *Historical remark*. The term "dynamicAL movement primitives" is now preferred over "dynamic movement primitives". The newer term makes the relation to dynamicAL systems more clear, and avoids confusion about whether the output of "dynamical movement primitives" is in kinematic or dynamic space (it is usually in kinematic space).
 
-*Remark*. This documentation and code focusses only on discrete movement primitives. For rythmic movement primitives, we refer to <a class="el" href="citelist.html#CITEREF_ijspeert13dynamical">[4]</a>.
+*Remark*. This documentation and code focusses only on discrete movement primitives. For rythmic movement primitives, we refer to <a href="citelist.html#CITEREF_ijspeert13dynamical">[4]</a>.
 
 
 <a name="sec_core"></a>
@@ -28,9 +28,9 @@ At the heart of the DMP lies a spring-damper system, as described in <a href="dy
 
 In the last two steps, we change the attractor state from 0 to ![alt text](formulae/form_2.png "$y^g$") , where ![alt text](formulae/form_2.png "$y^g$")  is the goal of the movement.
 
-To avoid overshooting or slow convergence towards ![alt text](formulae/form_2.png "$y^g$") , we prefer to have a <em>critically</em> <em>damped</em> spring-damper system for the DMP. For such systems ![alt text](formulae/form_3.png "$c = 2\sqrt{mk}$")  must hold, see <a class="el" href="dynamicalsystems.md#dyn_sys_critical_damping">Critical Damping</a>. In our notation this becomes ![alt text](formulae/form_4.png "$\alpha = 2\sqrt{\alpha\beta}$") , which leads to ![alt text](formulae/form_5.png "$\beta = \alpha/4$") . This determines the value of ![alt text](formulae/form_6.png "$\beta$")  for a given value of ![alt text](formulae/form_7.png "$\alpha$")  in DMPs. The influence of ![alt text](formulae/form_7.png "$\alpha$")  is illustrated in the first figure <a class="el" href="dynamicalsystems.md">here</a>.
+To avoid overshooting or slow convergence towards ![alt text](formulae/form_2.png "$y^g$") , we prefer to have a <em>critically</em> <em>damped</em> spring-damper system for the DMP. For such systems ![alt text](formulae/form_3.png "$c = 2\sqrt{mk}$")  must hold, see <a href="dynamicalsystems.md#dyn_sys_critical_damping">Critical Damping</a>. In our notation this becomes ![alt text](formulae/form_4.png "$\alpha = 2\sqrt{\alpha\beta}$") , which leads to ![alt text](formulae/form_5.png "$\beta = \alpha/4$") . This determines the value of ![alt text](formulae/form_6.png "$\beta$")  for a given value of ![alt text](formulae/form_7.png "$\alpha$")  in DMPs. The influence of ![alt text](formulae/form_7.png "$\alpha$")  is illustrated in the first figure <a href="dynamicalsystems.md">here</a>.
 
-Rewriting the second order dynamical system as a first order system (see <a class="el" href="dynamicalsystems.md#dyn_sys_rewrite_second_first">Rewriting one 2nd Order Systems as two 1st Order Systems</a>) with expanded state ![alt text](formulae/form_107.png "$ \mathbf{x}= [z~y]$")  yields:
+Rewriting the second order dynamical system as a first order system (see <a href="dynamicalsystems.md#dyn_sys_rewrite_second_first">Rewriting one 2nd Order Systems as two 1st Order Systems</a>) with expanded state ![alt text](formulae/form_107.png "$ \mathbf{x}= [z~y]$")  yields:
 
 
 
@@ -45,14 +45,14 @@ Please note that in the implementation, the state is implemented as ![alt text](
 Arbitrary Smooth Movements: the Forcing Term
 ---------------
 
-The representation described in the previous section has some nice properties in terms of <a class="el" href="dynamicalsystems.md#sec_dyn_sys_convergence">convergence towards the attractor</a> , <a class="el" href="dynamicalsystems.md#sec_dyn_sys_perturbations">robustness to perturbations</a> , and <a class="el" href="dynamicalsystems.md#sec_dyn_sys_autonomy">autonomy</a>, but it can only represent very simple movements. To achieve more complex movements, we add a time-dependent forcing term to the spring-damper system. The spring-damper systems and forcing term are together known as a <em>transformation</em> <em>system</em>.
+The representation described in the previous section has some nice properties in terms of <a href="dynamicalsystems.md#sec_dyn_sys_convergence">convergence towards the attractor</a> , <a href="dynamicalsystems.md#sec_dyn_sys_perturbations">robustness to perturbations</a> , and <a href="dynamicalsystems.md#sec_dyn_sys_autonomy">autonomy</a>, but it can only represent very simple movements. To achieve more complex movements, we add a time-dependent forcing term to the spring-damper system. The spring-damper systems and forcing term are together known as a <em>transformation</em> <em>system</em>.
 
 
 
 ![alt text](formulae/form_103.png "\begin{eqnarray*} \mathbf{\dot{x}} = \left[ \begin{array}{l} {\dot{z}} \\ {\dot{y}} \end{array} \right] = \left[ \begin{array}{l} (\alpha (\beta({y}^{g}-{y})-{z}) + f(t))/\tau \\ {z}/\tau \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} 0 \\ y_0 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} {?} \\ {y}^g \end{array} \right] \end{eqnarray*}") 
 
 
-The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function ![alt text](formulae/form_13.png "$ f(t)$")  is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see <a class="el" href="functionapproximators.md">Function Approximation</a>. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
+The forcing term is an open loop controller, i.e. it depends only on time. By modifying the acceleration profile of the movement with a forcing term, arbitrary smooth movements can be achieved. The function ![alt text](formulae/form_13.png "$ f(t)$")  is usually a function approximator, such as locally weighted regression (LWR) or locally weighted projection regression (LWPR), see <a href="functionapproximators.md">Function Approximation</a>. The graph below shows an example of a forcing term implemented with LWR with random weights for the basis functions.
 
 
 ![alt text](images/dmp_forcing_terms-svg.png  "A non-linear forcing term enable more complex trajectories to be generated (these DMPs use a goal system and an exponential gating term).")
@@ -65,7 +65,7 @@ Ensuring Convergence to 0 of the Forcing Term: the Gating System
 
 Since we add a forcing term to the dynamical system, we can no longer guarantee that the part of the system repesenting ![alt text](formulae/form_79.png "$ y $")  will converge towards ![alt text](formulae/form_35.png "$ y^g $") ; perhaps the forcing term continually pushes it away ![alt text](formulae/form_35.png "$ y^g $")  (perhaps it doesn't, but the point is that we cannot <em>guarantee</em> that it <em>always</em> doesn't). That is why there is a question mark in the attractor state in the equation above.
 
-To guarantee that the movement will always converge towards the attractor ![alt text](formulae/form_35.png "$ y^g $") , we need to ensure that the forcing term decreases to 0 towards the end of the movement. To do so, a gating term is added, which is 1 at the beginning of the movement, and 0 at the end. This gating term itself is determined by, of course, a dynamical system. In <a class="el" href="citelist.html#CITEREF_ijspeert02movement">[3]</a>, it was suggested to use an exponential system. We add this extra system to our dynamical system by expanding the state as follows:
+To guarantee that the movement will always converge towards the attractor ![alt text](formulae/form_35.png "$ y^g $") , we need to ensure that the forcing term decreases to 0 towards the end of the movement. To do so, a gating term is added, which is 1 at the beginning of the movement, and 0 at the end. This gating term itself is determined by, of course, a dynamical system. In <a href="citelist.html#CITEREF_ijspeert02movement">[3]</a>, it was suggested to use an exponential system. We add this extra system to our dynamical system by expanding the state as follows:
 
 
 
@@ -78,7 +78,7 @@ To guarantee that the movement will always converge towards the attractor ![alt 
 Ensuring Autonomy of the Forcing Term: the Phase System
 ---------------
 
-By introducing the dependence of the forcing term ![alt text](formulae/form_13.png "$ f(t)$")  on time ![alt text](formulae/form_16.png "$ t $")  the overall system is no longer autonomous. To achieve independence of time, we therefore let ![alt text](formulae/form_17.png "$ f $")  be a function of the state of an (autonomous) dynamical system rather than of ![alt text](formulae/form_16.png "$ t $") . This system represents the <em>phase</em> of the movement. <a class="el" href="citelist.html#CITEREF_ijspeert02movement">[3]</a> suggested to use the same dynamical system for the gating and phase, and use the term <em>canonical</em> <em>system</em> to refer this joint gating/phase system. Thus the phase of the movement starts at 1, and converges to 0 towards the end of the movement, just like the gating system. The new formulation now is (the only difference is ![alt text](formulae/form_18.png "$ f(x)$")  instead of ![alt text](formulae/form_13.png "$ f(t)$") ):
+By introducing the dependence of the forcing term ![alt text](formulae/form_13.png "$ f(t)$")  on time ![alt text](formulae/form_16.png "$ t $")  the overall system is no longer autonomous. To achieve independence of time, we therefore let ![alt text](formulae/form_17.png "$ f $")  be a function of the state of an (autonomous) dynamical system rather than of ![alt text](formulae/form_16.png "$ t $") . This system represents the <em>phase</em> of the movement. <a href="citelist.html#CITEREF_ijspeert02movement">[3]</a> suggested to use the same dynamical system for the gating and phase, and use the term <em>canonical</em> <em>system</em> to refer this joint gating/phase system. Thus the phase of the movement starts at 1, and converges to 0 towards the end of the movement, just like the gating system. The new formulation now is (the only difference is ![alt text](formulae/form_18.png "$ f(x)$")  instead of ![alt text](formulae/form_13.png "$ f(t)$") ):
 
 
 
@@ -114,7 +114,7 @@ So far, the graphs have shown 1-dimensional systems. To generate D-dimensional t
 Alternative Systems for Gating, Phase and Goals
 ---------------
 
-The DMP formulation presented so far follows <a class="el" href="citelist.html#CITEREF_ijspeert02movement">[3]</a>. Since then, several variations have been proposed, which have several advantages in practice. We now describe some of these variations.
+The DMP formulation presented so far follows <a href="citelist.html#CITEREF_ijspeert02movement">[3]</a>. Since then, several variations have been proposed, which have several advantages in practice. We now describe some of these variations.
 
 
 <a name="sec_dmp_sigmoid_gating"></a>
@@ -122,7 +122,7 @@ The DMP formulation presented so far follows <a class="el" href="citelist.html#C
 
 A disadvantage of using an exponential system as a gating term is that the gating decreases very quickly in the beginning. Thus, the output of the function approximator ![alt text](formulae/form_25.png "$ f(x) $")  needs to be very high towards the end of the movement if it is to have any effect at all. This leads to scaling issues when training the function approximator.
 
-Therefore, sigmoid systems have more recently been proposed <a class="el" href="citelist.html#CITEREF_kulvicius12joining">[6]</a> as a gating system. This leads to the following DMP formulation (since the gating and phase system are no longer shared, we introduce a new state variable ![alt text](formulae/form_113.png "$ s $")  for the phase term):
+Therefore, sigmoid systems have more recently been proposed <a href="citelist.html#CITEREF_kulvicius12joining">[6]</a> as a gating system. This leads to the following DMP formulation (since the gating and phase system are no longer shared, we introduce a new state variable ![alt text](formulae/form_113.png "$ s $")  for the phase term):
 
 
 ![alt text](formulae/form_115.png "\begin{eqnarray*} \left[ \begin{array}{l} {\dot{\mathbf{z}}} \\ {\dot{\mathbf{y}}} \\ {\dot{s}} \\ {\dot{v}} \end{array} \right] = \left[ \begin{array}{l} (\alpha_y (\beta_y({\mathbf{y}}^{g}-\mathbf{y})-\mathbf{z}) + v\cdot f(s))/\tau \\ \mathbf{z}/\tau \\ -\alpha_s s/\tau \\ -\alpha_v v (1-v/v_{\mbox{\scriptsize max}}) \end{array} \right] \mbox{~~~~with init. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}_0 \\ 1 \\ 1 \end{array} \right] \mbox{~and attr. state~} \left[ \begin{array}{l} \mathbf{0} \\ \mathbf{y}^g \\ 0 \\ 0 \end{array} \right] \end{eqnarray*}") 
@@ -134,7 +134,7 @@ where the term ![alt text](formulae/form_28.png "$ v_{\mbox{\scriptsize max}}$")
 <a name="sec_dmp_phase"></a>
 ### Phase: Constant Velocity System
 
-In practice, using an exponential phase system may complicate imitation learning of the function approximator ![alt text](formulae/form_17.png "$ f $") , because samples are not equidistantly spaced in time. Therefore, we introduce a dynamical system that mimics the properties of the phase system described in <a class="el" href="citelist.html#CITEREF_kulvicius12joining">[6]</a>, whilst allowing for a more natural integration in the DMP formulation, and thus our code base. This system starts at 0, and has a constant velocity of ![alt text](formulae/form_30.png "$1/\tau$") , which means the system reaches 1 when ![alt text](formulae/form_31.png "$t=\tau$") . When this point is reached, the velocity is set to 0.
+In practice, using an exponential phase system may complicate imitation learning of the function approximator ![alt text](formulae/form_17.png "$ f $") , because samples are not equidistantly spaced in time. Therefore, we introduce a dynamical system that mimics the properties of the phase system described in <a href="citelist.html#CITEREF_kulvicius12joining">[6]</a>, whilst allowing for a more natural integration in the DMP formulation, and thus our code base. This system starts at 0, and has a constant velocity of ![alt text](formulae/form_30.png "$1/\tau$") , which means the system reaches 1 when ![alt text](formulae/form_31.png "$t=\tau$") . When this point is reached, the velocity is set to 0.
 
 
 
@@ -155,7 +155,7 @@ With the constant velocity dynamical system the DMP formulation becomes:
 <a name="sec_delayed_goal"></a>
 ### Zero Initial Accelerations: the Delayed Goal System
 
-Since the spring-damper system leads to high initial accelerations (see the graph to the right below), which is usually not desirable for robots, it was suggested to move the attractor of the system from the initial state ![alt text](formulae/form_34.png "$ y_0 $")  to the goal state ![alt text](formulae/form_35.png "$ y^g $")  <em>during</em> the movement <a class="el" href="citelist.html#CITEREF_kulvicius12joining">[6]</a>. This delayed goal attractor ![alt text](formulae/form_36.png "$ y^{g_d} $")  itself is represented as an exponential dynamical system that starts at ![alt text](formulae/form_34.png "$ y_0 $") , and converges to ![alt text](formulae/form_35.png "$ y^g $")  (in early versions of DMPs, there was no delayed goal system, and ![alt text](formulae/form_36.png "$ y^{g_d} $")  was simply equal to ![alt text](formulae/form_35.png "$ y^g $")  throughout the movement). The combination of these two systems, listed below, leads to a movement that starts and ends with 0 velocities and accelerations, and approximately has a bell-shaped velocity profile. This representation is thus well suited to generating human-like point-to-point movements, which have similar properties.
+Since the spring-damper system leads to high initial accelerations (see the graph to the right below), which is usually not desirable for robots, it was suggested to move the attractor of the system from the initial state ![alt text](formulae/form_34.png "$ y_0 $")  to the goal state ![alt text](formulae/form_35.png "$ y^g $")  <em>during</em> the movement <a href="citelist.html#CITEREF_kulvicius12joining">[6]</a>. This delayed goal attractor ![alt text](formulae/form_36.png "$ y^{g_d} $")  itself is represented as an exponential dynamical system that starts at ![alt text](formulae/form_34.png "$ y_0 $") , and converges to ![alt text](formulae/form_35.png "$ y^g $")  (in early versions of DMPs, there was no delayed goal system, and ![alt text](formulae/form_36.png "$ y^{g_d} $")  was simply equal to ![alt text](formulae/form_35.png "$ y^g $")  throughout the movement). The combination of these two systems, listed below, leads to a movement that starts and ends with 0 velocities and accelerations, and approximately has a bell-shaped velocity profile. This representation is thus well suited to generating human-like point-to-point movements, which have similar properties.
 
 
 
