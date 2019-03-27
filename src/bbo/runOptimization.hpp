@@ -92,13 +92,15 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 /** \defgroup BBO Black Box Optimization Module
  */
 
+namespace DmpBbo {
+  
 /** \page page_bbo Black Box Optimization
 
-This page explains the implementation of <A HREF="http://en.wikipedia.org/wiki/Evolution_strategy">evolution strategies</A> for the <A HREF="http://en.wikipedia.org/wiki/Optimization_%28mathematics%29">optimization</A> of black-box <A HREF="http://en.wikipedia.org/wiki/Loss_function">cost functions</A>. Black-box in this context means that no assumptions about the cost function can be made, for example, we do not have access to its derivative, and we do not even know if it is continuous or not.
+This page provides and overview of the implementation of the evolutionary strategies in the \c bbo/ module.
 
-The evolution strategies that are implemented are all based on reward-weighted averaging (aka probablity-weighted averaging), as explained in this paper/presentation: http://icml.cc/discuss/2012/171.html
+It is assumed you have read about the theory behind evolutionary strategies in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/bbo.md">tutorial/bbo.md</a>.
 
-The basic algorithm is as follows:
+The basic algorithm from the tutorial is as follows:
 \code
 x_mu = ??; x_Sigma = ?? // Initialize multi-variate Gaussian distribution
 while (!halt_condition) {
@@ -119,10 +121,9 @@ while (!halt_condition) {
 }
 \endcode
 
-\section sec_bbo_implementation Implementation
+The corresponding implementation is in  
+runOptimization():
 
-The algorithm above has been implemented as follows (see 
-runOptimization() and demoOptimization.cpp):
 \code
 
 int n_dim = 2; // Optimize 2D problem
@@ -157,6 +158,6 @@ for (int i_update=1; i_update<=n_updates; i_update++)
 }
 \endcode
 
-
  */
+}
 

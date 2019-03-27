@@ -6,23 +6,26 @@ function approximators,
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
-A PDF tutorial on these topics (generated with Doxygen) is available at https://github.com/stulp/dmpbbo/blob/master/docs/tutorial.pdf
-
-A snapshot of the complete HTML doxygen documentation is here: http://freekstulp.net/dmpbbo/html/
 
 # For whom?
 
 This library may be useful for you if you
 
-+ are new to dynamical movement primitives and want to learn about them (see the 
-    tutorial in the doxygen documentation).
++ are interested in the theory behind dynamical movement primitives and their optimization. Then the <a href="https://github.com/stulp/dmpbbo/tutorials"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives, but would rather use existing,
-    tested code than brew it yourself.
++ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="https://github.com/stulp/dmpbbo/demos"><b>demos</b></a> are a good starting point, as they provide examples of how to use the code.
+
++ want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
+
   
-+ want to do reinforcement learning/optimization of dynamical movement primitives.
-  
-  
+ 
+# How?
+
+How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
+
+
+# Code structure
+
 Most submodules of this project are independent of all others, so if you don't care 
 about dynamical movement primitives, the following submodules can still easily be 
 integrated in other code to perform some (hopefully) useful function:
@@ -36,37 +39,14 @@ integrated in other code to perform some (hopefully) useful function:
 
 + `bbo/` : implementation of some (rather simple) algorithms for the stochastic 
   optimization of black-box cost functions
+
   
-If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
+## Why Python and C++?
 
-    @MISC{stulp_dmpbbo,
-        author = {Freek Stulp},
-        title  = {{\tt DmpBbo} -- A C++ library for black-box optimization of 
-                                                    dynamical movement primitives.},
-        year   = {2014},
-        url    = {https://github.com/stulp/dmpbbo.git}
-    }
+A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-)  The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
 
-# How?
 
-How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
-
-To learn how to use the code, the first thing to do is look at the
-documentation and tutorial here:
-
-+ `build_dir/docs/html/index.html` This documentation must first be generated with doxygen, see INSTALL.txt 
-
-+ `docs/tutorial.pdf` This is a snapshot of the PDF in docs/tutorial/
-
-To delve into the code a bit deeper, each module has a set of demos, e.g.
-
-+ `demos/dynamicalsystems/`
-  The demos do not show all the functionality, but are well
-  documented and a good place to understand how the code can be 
-  used. There are python scripts that call the right executables, and
-  do some plotting.
-
-# Why?
+# Why dmpbbo?
 
 For our own use, the aims of coding this were the following:
 
@@ -83,13 +63,37 @@ For our own use, the aims of coding this were the following:
     
 + Running dynamical movement primitives on real robots.
 
+##  Research background
 
-# Why Python and C++?
+In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
 
-A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-)  The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
+* Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters [@matsubara11learning], [@silva12learning],  [@stulp13learning].
 
-### Build Status
+* Representing and optimizing gain schedules and force profiles as part of a DMP [@buchli11learning], [@kalakrishnan11learning]
+
+
+*  Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP [@stulp13robot], [@stulp12policy_hal]
+
+* Demonstrating the advantages of using covariance matrix adaptation for the policy improvement [@stulp12path],[@stulp12adaptive],[@stulp14simultaneous]
+
+* Using the same unified model for the model parameters of different function approximators [@stulp15many]. In fact, coding this library lead to this article, rather than vice versa.
+
+If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
+
+    @MISC{stulp_dmpbbo,
+        author = {Freek Stulp},
+        title  = {{\tt DmpBbo} -- A C++ library for black-box optimization of 
+                                                    dynamical movement primitives.},
+        year   = {2014},
+        url    = {https://github.com/stulp/dmpbbo.git}
+    }
+
+
+
+# Build Status
 
 [![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
+
+
 
 

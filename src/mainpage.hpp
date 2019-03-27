@@ -6,7 +6,14 @@
 
 /** \mainpage 
 
+\section sec_cui_bono What the doxygen documentation is for
+
+This is the doxygen documentation of the DmpBbo library. Its main aim is to document the API, describe the implemenation, and provide rationale management for developers. If you are more interested in the theory behind dynamical movement primitives and their optimization, the <a href="https://github.com/stulp/dmpbbo/tutorials">tutorials</a> is the place to go for you. If you want to get started quickly, the <a href="https://github.com/stulp/dmpbbo/demos">demos</a> would be the right place.
+
+\section sec_overview_modules Overview of the modules/libraries
+
 This library contains several modules for training dynamical movement primitives (DMPs), and optimizing their parameters through black-box optimization. Each module has its own dedicated page.
+
 
 \li  \ref page_dyn_sys (in dynamicalsystems/) This module provides implementations of several basic dynamical systems. DMPs are combinations of such systems. This module is completely independent of all other modules.
 
@@ -18,33 +25,12 @@ This library contains several modules for training dynamical movement primitives
 
 \li \ref page_dmp_bbo (in dmp_bbo/) This module applies black-box optimization to the parameters of a DMP. It depends on all the other modules.
 
-Each of the pages linked to above contains two sections: 
+\section sec_pytho_cpp A mixed C++/Python library
 
-\li A tutorial that treats the concepts that are implemented 
-\li A description of how these concepts have been implemented, and why it has been done so in this fashion.
 
 A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-) The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
 
-If you want a deeper understanding of the entire library, I recommend you to go through the pages in the order above. If you want to start coding immediately, I suggest to look at the \ref Demos (located in the demos/ and demos_python/ directories) to see how the functionality of the library may be used.
-
 Some general considerations on the design of the library are here \ref page_design
-
-\section sec_research_background Research background
-
-In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
-
-\li Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters \cite matsubara11learning \cite silva12learning \cite stulp13learning.
-
-\li Representing and optimizing gain schedules and force profiles as part of a DMP \cite buchli11learning \cite kalakrishnan11learning,
-
-
-\li Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP \cite stulp13robot, \cite stulp12policy_hal,
-
-\li Demonstrating the advantages of using covariance matrix adaptation for the policy improvement \cite stulp12path \cite stulp12adaptive \cite stulp14simultaneous 
-
-\li Using the same unified model for the model parameters of different function approximators \cite stulp15many. In fact, coding this library lead to this article, rather than vice versa.
-
-
 
 */
 
