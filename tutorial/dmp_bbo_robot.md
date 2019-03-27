@@ -58,7 +58,7 @@ Here's what you need to do to make it all work.
 <a name="sec_specify_task"></a>
 ### Specify the task
 
-Copy demo_one_update.py to, for instance, one_update_my_task.py. In it, replace the Task with whatever your task is. The most important function is evaluateRollout(self, cost_vars), which takes the cost-relevant variables, and returns its cost. See the sections on <a href="page_dmp_bbo.html#sec_cost_vars">Cost-relevant variables</a> and <a href="page_dmp_bbo.html#sec_cost_components">Cost components</a> for what these should contain.
+Copy demo_one_update.py to, for instance, one_update_my_task.py. In it, replace the Task with whatever your task is. The most important function is evaluateRollout(self, cost_vars), which takes the cost-relevant variables, and returns its cost. See the sections on <a href="dmp_bbo.md#sec_cost_vars">cost-relevant variables</a> and <a href="dmp_bbo.md#sec_cost_components">cost components</a> for what these should contain.
 
 If you want functionality for plotting a rollout, you can also implement the function plotRollout(self,cost_vars,ax), which takes costs_vars and visualizes the rollout they represent on the axis 'ax'.
 <a name="sec_specify_settings"></a>
