@@ -419,7 +419,7 @@ namespace DmpBbo {
 
 This page provides and overview of the implementation of dynamical systems in the \c dynamicalsystems/ module.
 
-It is assumed you have read about the theory behind dynamical systems in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorials/dynamicalsystems.md">tutorials/dynamicalsystems.md</a>.
+It is assumed you have read about the theory behind dynamical systems in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/dynamicalsystems.md">tutorial/dynamicalsystems.md</a>.
 
 \section sec_dyn_sys_analytical_solution Analytical solution of a dynamical system
 
