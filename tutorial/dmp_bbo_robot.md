@@ -1,6 +1,8 @@
 Running things on a real robot
 ===============
 
+*It is assumed that you have already read the tutorials on <a href="dmp_bbo.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
+
 
 <a name="sec_bbo_one_update"></a>
 ## One update at a time with Task/TaskSolver
