@@ -1,7 +1,9 @@
 Black Box Optimization of Dynamical Movement Primitives
 ===============
 
-This page assumes you have read the page on <a class="el" href="page_bbo.html">Black Box Optimization</a> and <a class="el" href="page_dmp.html">Dynamical Movement Primitives</a>. When applying BBO to policy improvement (e.g. optimizing a DMP on a robot), the concept of a "rollout" becomes important. A rollout is the result of executing a policy (e.g. a DMP) with a certain set of policy parameters (e.g. the parameter of the DMP). Although the search space for optimization is in the space of the policy parameters, the costs are rather determined from the rollout.
+This page assumes you have read the tutorials on <a href="bbo.md">Black Box Optimization</a> and <a href="dmp.md">Dynamical Movement Primitives</a>. 
+
+When applying BBO to policy improvement (e.g. optimizing a DMP on a robot), the concept of a "rollout" becomes important. A rollout is the result of executing a policy (e.g. a DMP) with a certain set of policy parameters (e.g. the parameter of the DMP). Although the search space for optimization is in the space of the policy parameters, the costs are rather determined from the rollout.
 
 From an implementation point of view, applying BBO to policy improvement (which may execute DMPs) requires several extensions:
 
