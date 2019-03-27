@@ -31,8 +31,9 @@ In practice, it is not convenient to run above two phases in a loop, but rather 
     
     DIREC="/tmp/demo_optimization_one_by_one"
     
-    # Yes, I know there are for loops in bash ;-)
-    # But this makes it really explicit how to call the scripts
+    \# Yes, I know there are for loops in bash ;-)
+    
+    \# But this makes it really explicit how to call the scripts
     
     python demo_one_update.py $DIREC/
     python demo_perform_rollouts.py $DIREC/update00001 # Replace this with your robot
