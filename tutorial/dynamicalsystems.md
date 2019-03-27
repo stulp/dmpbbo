@@ -126,4 +126,13 @@ For implementation purposes, it is more convenient to work only with 1st order s
 
 ![alt text](formulae/form_77.png "$ \left[ \begin{array}{l} \dot{y} \\ \dot{z} \end{array} \right] = \left[ \begin{array}{l} z \\ (-ky -cz)/m \end{array} \right] $") 
 
-With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state:
+With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state.
+
+
+# Up Next
+
+The next tutorials to go to would be:
+* <a href="dmp.md">Dynamical Movement Primitives</a> (if you already know about function approximation)
+* <a href="functionapproximators.md">Function Approximation</a> (if you don't)
+
+
