@@ -129,7 +129,7 @@ For implementation purposes, it is more convenient to work only with 1st order s
 With this rewrite, the left term contains only first order derivatives, and the right term does not contain any derivatives. This is thus a first order system. Integrating such an expanded system is done just as one would integrate a dynamical system with a multi-dimensional state.
 
 
-# Up Next
+## Further reading
 
 The next tutorials to go to would be:
 * <a href="dmp.md">Dynamical Movement Primitives</a> (if you already know about function approximation)
