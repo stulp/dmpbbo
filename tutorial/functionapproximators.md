@@ -28,3 +28,10 @@ The unified model is a unified representation for the different model parameters
 
 Whilst coding this library and numerous discussion with Olivier Sigaud, it became apparent that the latent function representations of all the function approximators in this library all use the same generic model. Each specific model (i.e. as used in GPR, GMR, LWR, etc.) is a special case of the Unified Model. We discuss this in the paper titled: "Many Regression Algorithms, One Unified Model - A Review, Freek Stulp and Olivier Sigaud", which you should be able to find in an on-line search. 
 
+Further reading
+---------------
+
+The next tutorials to go to would be:
+* <a href="dmp.md">Dynamical Movement Primitives</a> (if you already know about dynamical systems)
+* <a href="dynamicalsystems.md">Dynamical Systems</a> (if you don't)
+
