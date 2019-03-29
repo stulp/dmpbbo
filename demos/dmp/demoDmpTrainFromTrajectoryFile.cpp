@@ -115,8 +115,6 @@ int main(int n_args, char** args)
   bool overwrite = true;
   dmp->train(trajectory,directory+"/train",overwrite);
 
-#ifndef NDEBUG
-  // boost serialization currently only works in debug mode; I have no clue why...
   cout << "Writing trained Dmp to XML file: " << directory << "/" << output_xml_file << endl;
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
@@ -133,7 +131,6 @@ int main(int n_args, char** args)
   boost::archive::xml_oarchive oa(ofs);
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();
-#endif
     
   delete meta_parameters;
   delete fa_lwr;
