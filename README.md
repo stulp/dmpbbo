@@ -89,6 +89,12 @@ If you use this library in the context of experiments for a scientific paper, we
     }
 
 
+# Contributing
+
+Contributions in the form of feedback, code, and bug reports are very welcome:
+
+* If you have found an issue or a bug, please open a GitHub issue.
+* If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.
 
 # Build Status
 
