@@ -1,0 +1,20 @@
+________________________________________________________________________________
+myPerformRollouts.cpp
+  reads dmp.xml
+  reads current parameters
+
+________________________________________________________________________________
+tuneExploration.cpp
+visualizeExplorationRollouts.py
+
+________________________________________________________________________________
+specify the cost function in MyTask.py
+
+________________________________________________________________________________
+step by step version in 
+  with separate plot function
+  
+
+________________________________________________________________________________
+monitor entire optimization
+

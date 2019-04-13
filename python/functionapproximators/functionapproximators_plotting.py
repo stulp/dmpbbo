@@ -476,4 +476,13 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax):
 #    plotLocallyWeightedLinesFromDirectory(directory,ax)
 #    plt.show()
 
+def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
+    """Load data related to function approximator training from a directory and plot it."""
+    if ax2 != None:
+        plotLocallyWeightedLinesFromDirectory(directory,ax2)
+    else:
+        plotLocallyWeightedLinesFromDirectory(directory,ax)
+        
+    plotDataFromDirectory(directory,ax)
+
 

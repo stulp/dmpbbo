@@ -28,18 +28,6 @@ from executeBinary import executeBinary
 lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 from functionapproximators.functionapproximators_plotting import *
-
-
-def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
-    """Load data related to function approximator training from a directory and plot it."""
-    if ax2 != None:
-        plotLocallyWeightedLinesFromDirectory(directory,ax2)
-    else:
-        plotLocallyWeightedLinesFromDirectory(directory,ax)
-        
-    plotDataFromDirectory(directory,ax)
-    
-        
     
 
 if __name__=='__main__':
