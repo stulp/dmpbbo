@@ -1,9 +1,13 @@
 add_executable(testDynamicalSystemSerialization testDynamicalSystemSerialization.cpp getDynamicalSystemsVector.cpp)
 target_link_libraries(testDynamicalSystemSerialization dynamicalsystems ${Boost_LIBRARIES})
-#install(TARGETS testDynamicalSystemSerialization DESTINATION bin_test)
+
+add_executable(testDynamicalSystemSerializationLoad testDynamicalSystemSerializationLoad.cpp getDynamicalSystemsVector.cpp)
+target_link_libraries(testDynamicalSystemSerializationLoad dynamicalsystems ${Boost_LIBRARIES})
 
 add_executable(testDynamicalSystemCloning testDynamicalSystemCloning.cpp getDynamicalSystemsVector.cpp)
 target_link_libraries(testDynamicalSystemCloning dynamicalsystems ${Boost_LIBRARIES})
-#install(TARGETS testDynamicalSystemCloning DESTINATION bin_test)
+
+add_executable(testSer testSer.cpp getDynamicalSystemsVector.cpp)
+target_link_libraries(testSer dynamicalsystems ${Boost_LIBRARIES})
 
 
