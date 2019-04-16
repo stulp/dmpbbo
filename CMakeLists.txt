@@ -53,7 +53,11 @@ ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 # See if LWPR is installed. 
 find_package(LWPR)
 if(LWPR_FOUND)
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_LWPR")
+  if (BUILD_SHARED_LIBS) # LWPR doesn't work with shared libs
+    message(WARNING  "LWPR cannot be used with .so libraries.")
+  else()
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_LWPR")
+  endif()
 endif()
 
 ###############################################################################

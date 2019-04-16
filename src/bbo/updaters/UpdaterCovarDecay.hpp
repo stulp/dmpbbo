@@ -48,40 +48,8 @@ public:
   
   void updateDistribution(const DistributionGaussian& distribution, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, Eigen::VectorXd& weights, DistributionGaussian& distribution_new) const;
   
-private:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
-   */
-  UpdaterCovarDecay(void) {};
-  
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(UpdaterMean);
-    
-    ar & BOOST_SERIALIZATION_NVP(covar_decay_factor_);
-  }
-
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::UpdaterCovarDecay, "UpdaterCovarDecay")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdaterCovarDecay,boost::serialization::object_serializable)
 
 #endif

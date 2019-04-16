@@ -26,6 +26,9 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 #include <iosfwd>
 
 
@@ -96,21 +99,17 @@ private:
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive
    * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
+    ar & BOOST_SERIALIZATION_NVP(alpha_);
+  }
 
 };
 
 }
 
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ExponentialSystem, "ExponentialSystem")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ExponentialSystem,boost::serialization::object_serializable);
-
-#endif // _Exponential_SYSTEM_H_
+#endif // _EXPONENTIAL_SYSTEM_H_
 

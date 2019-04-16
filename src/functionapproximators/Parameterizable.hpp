@@ -26,13 +26,14 @@
 
 #include "eigen_realtime/eigen_realtime_check.hpp" // Include this before Eigen header files
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <set>
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-
-
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
 
@@ -293,14 +294,5 @@ private:
 };
 
 }
-
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Tell boost serialization that this class has pure virtual functions. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::Parameterizable);
- 
-#include <boost/serialization/export.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Parameterizable,boost::serialization::object_serializable);
 
 #endif

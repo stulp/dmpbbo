@@ -21,24 +21,13 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "dynamicalsystems/ExponentialSystem.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ExponentialSystem);
-
-#include <boost/serialization/base_object.hpp>
 
 #include <cmath>
 #include <vector>
 #include <iostream>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 
@@ -107,15 +96,6 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, Mat
     xs.transposeInPlace();
     xds.transposeInPlace();
   }
-}
-
-template<class Archive>
-void ExponentialSystem::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-
-  ar & BOOST_SERIALIZATION_NVP(alpha_);
 }
 
 string ExponentialSystem::toString(void) const

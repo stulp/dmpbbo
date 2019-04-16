@@ -26,6 +26,7 @@
 
 #include <iosfwd>
 
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
@@ -115,15 +116,6 @@ private:
 };
 
 }
-
-
-/** Tell boost serialization that this class has pure virtual functions. */
-#include <boost/serialization/assume_abstract.hpp>
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::MetaParameters);
- 
-/** Don't add version information to archives. */
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::MetaParameters,boost::serialization::object_serializable);
 
 #endif //  #ifndef METAPARAMETERS_H
 

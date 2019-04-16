@@ -36,14 +36,13 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-  
 Rollout::Rollout(const Eigen::MatrixXd& policy_parameters):
   policy_parameters_(policy_parameters),
   cost_vars_(MatrixXd(0,0)),
   cost_(VectorXd(0,0))
 {
 }
-  
+
 Rollout::Rollout(const Eigen::MatrixXd& policy_parameters, const Eigen::MatrixXd& cost_vars):
   policy_parameters_(policy_parameters),
   cost_vars_(cost_vars),

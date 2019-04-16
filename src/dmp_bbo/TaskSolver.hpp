@@ -26,8 +26,6 @@
 
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-
 namespace DmpBbo {
 
 /** Interface for classes that can perform rollouts.
@@ -36,16 +34,13 @@ namespace DmpBbo {
 class TaskSolver
 {
 public:
+  
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
    * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
    * \param[in] sample The samples
    * \param[out] cost_vars The variables relevant to computing the cost.
    */
-  inline void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
-  {
-    Eigen::VectorXd task_parameters;
-    performRollout(sample,task_parameters,cost_vars);
-  };
+  void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const;
     
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
    * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
@@ -74,32 +69,9 @@ public:
     return output;
   }
   
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // No members to serialize.
-  }
-  
 };
 
 } // namespace DmpBbo
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::TaskSolver);
- 
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolver,boost::serialization::object_serializable);
 
 #endif
 

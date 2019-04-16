@@ -21,6 +21,7 @@
  */
 
 #include "dmp/Dmp.hpp"
+#include "dmp/serialization.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
@@ -40,6 +41,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+
+
 
 using namespace std;
 using namespace Eigen;

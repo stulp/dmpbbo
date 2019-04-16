@@ -21,24 +21,13 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/ModelParametersRRRFF.hpp"
-
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersRRRFF);
-
-#include <iostream>
-
 #include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include <iostream>
 
 using namespace Eigen;
 using namespace std;
@@ -102,19 +91,6 @@ int ModelParametersRRRFF::getExpectedInputDim(void) const
 {
   return nb_in_dim_;
 };
-
-template<class Archive>
-void ModelParametersRRRFF::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
-
-  ar & BOOST_SERIALIZATION_NVP(weights_);
-  ar & BOOST_SERIALIZATION_NVP(cosines_periodes_);
-  ar & BOOST_SERIALIZATION_NVP(cosines_phase_);
-  ar & BOOST_SERIALIZATION_NVP(nb_in_dim_);
-  ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-}
 
 string ModelParametersRRRFF::toString(void) const 
 {

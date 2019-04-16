@@ -23,25 +23,11 @@
 
 #include "TaskSolverDmpArm2D.hpp"
 
-
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskSolverDmpArm2D);
-
-#include <boost/serialization/base_object.hpp>
-
 #include <iostream>
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
 
@@ -141,7 +127,7 @@ void TaskSolverDmpArm2D::anglesToLinkPositions(const MatrixXd& angles, MatrixXd&
 
 string TaskSolverDmpArm2D::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskSolverDmpArm2D");
+  return string("TaskSolverDmpArm2D");
 }
 
 }

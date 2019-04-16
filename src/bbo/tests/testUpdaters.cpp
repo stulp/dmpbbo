@@ -29,11 +29,6 @@
 #include <iomanip> 
 #include <fstream> 
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
 using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
@@ -97,6 +92,10 @@ int main()
     cout << "  distribution = " << distribution << endl;
     
     
+    /*
+    
+    SERIALIZATION NO LONGER SUPPORTED FOR THIS MODULE
+    
     // create and open a character archive for output
     std::string filename("/tmp/updater_");
     filename += to_string(i_updater)+".xml";
@@ -113,8 +112,9 @@ int main()
     
     cout << "___________________________________________" << endl;
     cout << filename << endl;
-    //cout << *(updaters[i_updater]) << endl;
-    //cout << *updater_out << endl;
+    cout << *(updaters[i_updater]) << endl;
+    cout << *updater_out << endl;
+    */
     
   }
   

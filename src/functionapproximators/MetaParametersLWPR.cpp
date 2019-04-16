@@ -21,23 +21,10 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/MetaParametersLWPR.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersLWPR);
-
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/vector.hpp>
 
 #include <iostream>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace Eigen;
@@ -77,25 +64,6 @@ string MetaParametersLWPR::toString(void) const {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersLWPR");
 }
 
-
-template<class Archive>
-void MetaParametersLWPR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
-
-  ar & BOOST_SERIALIZATION_NVP(init_D_);
-  ar & BOOST_SERIALIZATION_NVP(w_gen_);
-  ar & BOOST_SERIALIZATION_NVP(w_prune_);
-  ar & BOOST_SERIALIZATION_NVP(update_D_);
-  ar & BOOST_SERIALIZATION_NVP(init_alpha_);
-  ar & BOOST_SERIALIZATION_NVP(penalty_);
-  ar & BOOST_SERIALIZATION_NVP(diag_only_);
-  ar & BOOST_SERIALIZATION_NVP(use_meta_);
-  ar & BOOST_SERIALIZATION_NVP(meta_rate_);
-  ar & BOOST_SERIALIZATION_NVP(kernel_name_);
-
-}
 
 }
 

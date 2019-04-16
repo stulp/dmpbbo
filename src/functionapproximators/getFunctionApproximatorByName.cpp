@@ -47,11 +47,13 @@ namespace DmpBbo {
 
 FunctionApproximator* getFunctionApproximatorByName(std::string name, int n_input_dims)
 {
-  int n_args = 1;
+  int n_args = 3;
   
-  char** args = new char * [1];
-  args[0] = new char [name.length()+1];
-  std::strcpy(args[0], name.c_str());  
+  char** args = new char * [3];
+  args[1] = new char [2+1];
+  std::strcpy(args[1], "fa");  
+  args[2] = new char [name.length()+1];
+  std::strcpy(args[2], name.c_str());  
   
   return getFunctionApproximatorFromArgs(n_args, args, n_input_dims);
 }
@@ -60,9 +62,9 @@ FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], 
 {
   string fa_name = "LWR";
   for (int aa=1; aa<n_args; aa++)
-    if (string(args[aa]).compare("fa")==0)                 
+    if (string(args[aa]).compare("fa")==0)
       fa_name = string(args[++aa]);
-
+    
   if (fa_name.compare("LWR")==0)
   {
     //___________________________________________________________________________

@@ -26,7 +26,10 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-namespace DmpBbo {
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
+namespace DmpBbo {           
 
 /** \brief Dynamical System modelling the evolution of a sigmoidal system \f$\dot{x} = -\alpha x(1-x/K)\f$.
  *
@@ -85,20 +88,19 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    // serialize base class information
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
+  
+    ar & BOOST_SERIALIZATION_NVP(max_rate_);
+    ar & BOOST_SERIALIZATION_NVP(inflection_point_time_);
+    ar & BOOST_SERIALIZATION_NVP(Ks_);
+  }
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::SigmoidSystem, "SigmoidSystem")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::SigmoidSystem,boost::serialization::object_serializable)
-
 
 #endif // _Sigmoid_SYSTEM_H_
 

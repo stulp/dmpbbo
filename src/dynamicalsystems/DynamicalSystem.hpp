@@ -30,6 +30,9 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 namespace DmpBbo {
@@ -383,7 +386,6 @@ private:
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive
    * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
@@ -402,14 +404,6 @@ private:
 };
 
 }
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::DynamicalSystem);
- 
-#include <boost/serialization/export.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::DynamicalSystem,boost::serialization::object_serializable);
 
 #endif // _DYNAMICALSYSTEM_H_
 

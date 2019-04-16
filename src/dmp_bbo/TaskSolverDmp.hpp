@@ -24,13 +24,12 @@
 #ifndef TaskSolverDmp_H
 #define TaskSolverDmp_H
 
+#include "dmp_bbo/TaskSolver.hpp"
+
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmp_bbo/TaskSolver.hpp"
-
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 namespace DmpBbo {
   
@@ -76,45 +75,8 @@ public:
    */
   void set_perturbation(double perturbation_standard_deviation);
 
-protected:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  TaskSolverDmp(void) {};
-
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolver);
-    
-    ar & BOOST_SERIALIZATION_NVP(dmp_);
-    ar & BOOST_SERIALIZATION_NVP(n_time_steps_);    
-    ar & BOOST_SERIALIZATION_NVP(integrate_time_);
-    ar & BOOST_SERIALIZATION_NVP(use_normalized_parameter_);
-  }
-
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskSolverDmp, "TaskSolverDmp")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolverDmp,boost::serialization::object_serializable);
 
 #endif

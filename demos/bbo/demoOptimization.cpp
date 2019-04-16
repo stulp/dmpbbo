@@ -27,8 +27,6 @@
 #include <iomanip> 
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 #include "bbo/CostFunction.hpp"
 #include "bbo/runOptimization.hpp"
 #include "bbo/DistributionGaussian.hpp"

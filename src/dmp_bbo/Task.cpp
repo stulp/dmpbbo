@@ -1,6 +1,6 @@
 /**
- * @file   MetaParameters.cpp
- * @brief  MetaParameters class source file.
+ * @file   Task.cpp
+ * @brief  Task class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -20,29 +20,30 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#include <iostream>
-#include <assert.h>
 
-#include "functionapproximators/MetaParameters.hpp"
+#include "dmp_bbo/Task.hpp"
+
+#include "dmpbbo_io/EigenFileIO.hpp"
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <boost/filesystem.hpp>
+#include <eigen3/Eigen/Core>
 
 using namespace std;
+using namespace Eigen;
 
 namespace DmpBbo {
 
-MetaParameters::MetaParameters(int expected_input_dim)
-: expected_input_dim_(expected_input_dim)
+void Task::evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, Eigen::VectorXd& costs) const 
 {
-  assert(expected_input_dim_>0);
-}
-                                                                          
-MetaParameters::~MetaParameters(void) 
-{
-}
+  int n_task_pars = 0;
+  Eigen::VectorXd task_parameters(n_task_pars);
+  evaluateRollout(cost_vars,sample,task_parameters,costs);
+};
 
-ostream& operator<<(std::ostream& output, const MetaParameters& meta_parameters) {
-  output << meta_parameters.toString();
-  return output;
-}
+
+
 
 }

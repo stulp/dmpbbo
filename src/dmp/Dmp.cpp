@@ -21,22 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "dmp/Dmp.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::Dmp);
-
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <eigen3/Eigen/Core>
 
 #include "dmp/Trajectory.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
@@ -45,8 +30,13 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::Dmp);
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
+
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <eigen3/Eigen/Core>
 
 
 using namespace std;
@@ -893,26 +883,6 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
 string Dmp::toString(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("Dmp");
-}
-
-
-template<class Archive>
-void Dmp::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
-  
-  ar & BOOST_SERIALIZATION_NVP(goal_system_);
-  ar & BOOST_SERIALIZATION_NVP(spring_system_);
-  ar & BOOST_SERIALIZATION_NVP(phase_system_);
-  ar & BOOST_SERIALIZATION_NVP(gating_system_);
-  ar & BOOST_SERIALIZATION_NVP(function_approximators_);
-  
-  ar & BOOST_SERIALIZATION_NVP(forcing_term_scaling_);
-  ar & BOOST_SERIALIZATION_NVP(trajectory_amplitudes_);
-  
-  ar & BOOST_SERIALIZATION_NVP(perturbation_standard_deviation_);
 }
 
 }

@@ -24,11 +24,6 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <string>
-#include <set>
-#include <boost/filesystem.hpp>
-#include <eigen3/Eigen/Core>
-
 #include "dmp_bbo/runOptimizationTask.hpp"
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
@@ -40,6 +35,12 @@
 #include "bbo/DistributionGaussian.hpp"
 #include "bbo/Updater.hpp"
 #include "bbo/updaters/UpdaterCovarDecay.hpp"
+
+#include <string>
+#include <set>
+#include <boost/filesystem.hpp>
+#include <eigen3/Eigen/Core>
+
 
 using namespace std;
 using namespace Eigen;

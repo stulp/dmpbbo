@@ -21,23 +21,12 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/ModelParametersGPR.hpp"
-#include "functionapproximators/FunctionApproximatorGPR.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGPR);
-
 #include "functionapproximators/UnifiedModel.hpp"
 
 #include "functionapproximators/BasisFunction.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -107,19 +96,6 @@ void ModelParametersGPR::kernelActivations(const Eigen::Ref<const Eigen::MatrixX
   BasisFunction::Gaussian::activations(centers,widths,inputs,kernel_activations,normalize_activations,asymmetric_kernels);
   
   kernel_activations *= maximum_covariance_;
-}
-
-template<class Archive>
-void ModelParametersGPR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
-
-  ar & BOOST_SERIALIZATION_NVP(train_inputs_);
-  ar & BOOST_SERIALIZATION_NVP(gram_inv_targets_);
-  ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);            
-  ar & BOOST_SERIALIZATION_NVP(sigmas_);     
-                                    
 }
 
 string ModelParametersGPR::toString(void) const

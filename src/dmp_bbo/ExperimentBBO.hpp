@@ -27,9 +27,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 namespace DmpBbo {
 
 class Task;
@@ -42,6 +39,7 @@ class ExperimentBBO
 {
 
 public:
+  
   /** Constructor.
    * \param[in] task_arg The Task to optimize
    * \param[in] task_solver_arg The TaskSolver that will solve the task
@@ -57,15 +55,7 @@ public:
     Updater* updater_arg,
     int n_updates_arg,
     int n_samples_per_update_arg
-  )
-  :
-    task(task_arg),
-    task_solver(task_solver_arg),
-    initial_distribution(initial_distribution_arg),
-    updater(updater_arg),
-    n_updates(n_updates_arg),
-    n_samples_per_update(n_samples_per_update_arg)
-  {}
+  );
   
   /** Task to be used during evaluation.
    */
@@ -76,40 +66,20 @@ public:
   const TaskSolver* task_solver;
   
   /** The initial parameter distribution for the search. */
-  const DistributionGaussian* const initial_distribution; 
+  const DistributionGaussian*  initial_distribution; 
 
   /** The updater used to update the parameters of the distribution. */
   const Updater* updater;
 
   /** The number of updates to perform. */
-  int n_updates;
+  const int n_updates;
   
   /** The number of samples per update. */
-  int n_samples_per_update;
-
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_NVP(task);
-    ar & BOOST_SERIALIZATION_NVP(task_solver);
-    ar & BOOST_SERIALIZATION_NVP(initial_distribution);
-    ar & BOOST_SERIALIZATION_NVP(updater);
-    ar & BOOST_SERIALIZATION_NVP(n_updates);
-    ar & BOOST_SERIALIZATION_NVP(n_samples_per_update);
-  }
+  const int n_samples_per_update;
 
 };
 
 }
-
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ExperimentBBO,boost::serialization::object_serializable);
 
 /*
 class ExperimentBBOResults

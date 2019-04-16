@@ -22,21 +22,23 @@
  */
  
 
+ /*
 #include <boost/serialization/export.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
+*/
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SpringDamperSystem);
+//BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::SpringDamperSystem);
 
 #include <cmath>
 #include <iostream>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
+//#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
