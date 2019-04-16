@@ -24,9 +24,15 @@
 #ifndef TASKVIAPOINT_H
 #define TASKVIAPOINT_H
 
-#include <eigen3/Eigen/Core>
 
 #include "dmp_bbo/TaskWithTrajectoryDemonstrator.hpp"
+
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
+#include <eigen3/Eigen/Core>
+
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/access.hpp>
 
 namespace DmpBbo {
 
@@ -46,7 +52,6 @@ namespace DmpBbo {
  */
 class TaskViapoint : public TaskWithTrajectoryDemonstrator
 {
-  friend class TaskViapointArm;
   
 public:
   /** If the viapoint_time is set to MINIMUM_DIST, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
@@ -79,7 +84,7 @@ public:
    */
   TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal, double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight);
 
-  virtual ~TaskViapoint(void) {}
+  virtual ~TaskViapoint(void);
   
   virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
@@ -156,7 +161,7 @@ protected:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  TaskViapoint(void) {};
+  TaskViapoint(void);
   
 
 private:
@@ -187,13 +192,5 @@ private:
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskViapoint, "TaskViapoint")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskViapoint,boost::serialization::object_serializable);
-
 #endif
 

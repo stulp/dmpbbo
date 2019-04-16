@@ -23,8 +23,6 @@
 
 #include "bbo/DistributionGaussian.hpp"
 
-#include "bbo/serialization.hpp"
-
 // If the SAVE_XML flag is defined, an xml is saved and loaded. If is is not, it is only loaded.
 //#define SAVE_XML 
 
@@ -35,6 +33,9 @@
 #include <iostream>
 #include <fstream>
 #include <eigen3/Eigen/Core>
+
+#include "bbo/serialization.hpp"
+
 
 using namespace std;
 using namespace Eigen;

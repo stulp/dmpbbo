@@ -24,14 +24,17 @@
 #ifndef TaskSolverDmpArm2D_H
 #define TaskSolverDmpArm2D_H
 
+#include "dmp_bbo/TaskSolverDmp.hpp"
+
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmp_bbo/TaskSolverDmp.hpp"
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/access.hpp>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-                                   
 namespace DmpBbo {
   
 // Forward definitions
@@ -52,6 +55,8 @@ public:
    */
   TaskSolverDmpArm2D(Dmp* dmp, const Eigen::VectorXd& link_lengths, std::set<std::string> optimize_parameters, double dt=0.01, double integrate_dmp_beyond_tau_factor=1.0, bool use_normalized_parameter=false);
     
+  ~TaskSolverDmpArm2D(void);
+  
   virtual void performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const;
   
   /** Get the positions of the links given the joint angles by using forward kinematics.
@@ -87,7 +92,7 @@ private:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  TaskSolverDmpArm2D(void) {};
+  TaskSolverDmpArm2D(void);
 
   /** Give boost serialization access to private members. */  
   friend class boost::serialization::access;
@@ -109,12 +114,5 @@ private:
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskSolverDmpArm2D, "TaskSolverDmpArm2D")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolverDmpArm2D,boost::serialization::object_serializable);
 
 #endif

@@ -1,6 +1,10 @@
 #ifndef _SERIALIZATION_DMPS_H_
 #define _SERIALIZATION_DMPS_H_
 
+#include "functionapproximators/serialization.hpp"
+#include "dynamicalsystems/serialization.hpp"
+
+
 #include <boost/serialization/export.hpp>
 
 #include "dmp/DmpContextual.hpp"

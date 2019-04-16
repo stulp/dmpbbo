@@ -23,30 +23,12 @@
 
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
-
-
-
-
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-#include "dmp_bbo/TaskSolverDmp.hpp"
-
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskSolverDmp);
-
-#include <boost/serialization/base_object.hpp>
-
 #include <iostream>
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
@@ -55,6 +37,11 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
+
+TaskSolverDmp::TaskSolverDmp(void)
+{
+}
+
   
 TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)

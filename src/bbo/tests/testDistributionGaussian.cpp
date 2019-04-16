@@ -30,6 +30,8 @@
 
 #include <eigen3/Eigen/Core>
 
+#include "bbo/serialization.hpp"
+
 
 using namespace std;
 using namespace Eigen;

@@ -36,16 +36,16 @@ namespace DmpBbo {
 class TaskSolver
 {
 public:
+  TaskSolver(void);
+  
+  virtual ~TaskSolver(void);
+  
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
    * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
    * \param[in] sample The samples
    * \param[out] cost_vars The variables relevant to computing the cost.
    */
-  inline void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
-  {
-    Eigen::VectorXd task_parameters;
-    performRollout(sample,task_parameters,cost_vars);
-  };
+  void performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const;
     
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
    * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
@@ -92,14 +92,6 @@ private:
 };
 
 } // namespace DmpBbo
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::TaskSolver);
- 
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolver,boost::serialization::object_serializable);
 
 #endif
 

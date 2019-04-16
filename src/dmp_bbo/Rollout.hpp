@@ -28,6 +28,7 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
@@ -37,11 +38,15 @@ class Rollout {
   
 public:
   
+  /** Default constructor, needed for serialization.
+   */
+  Rollout(void);
+
   /** Constructor.
    * \param[in] policy_parameters The parameters of the policy for this rollout
    */
   Rollout(const Eigen::MatrixXd& policy_parameters);
-  
+
   /** Constructor.
    * \param[in] policy_parameters The parameters of the policy for this rollout
    * \param[in] cost_vars The cost-relevant variables that arose from executing the policy (e.g. DMP) with the policy parameters.
@@ -116,7 +121,7 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, DmpBbo::Rollout& rollout, const unsigned int version)
+  void serialize(Archive & ar, const unsigned int version)
   {
     ar & BOOST_SERIALIZATION_NVP(policy_parameters_);
     ar & BOOST_SERIALIZATION_NVP(cost_vars_);
@@ -130,9 +135,6 @@ private:
 
 }
   
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Rollout,boost::serialization::object_serializable);
 
 #endif
 

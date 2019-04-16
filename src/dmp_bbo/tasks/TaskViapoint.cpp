@@ -21,17 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapoint);
-
-#include <boost/serialization/base_object.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -39,13 +29,20 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapoint);
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
+
+TaskViapoint::TaskViapoint(void)
+{
+}
+
+TaskViapoint::~TaskViapoint(void)
+{
+}
 
 TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius), 

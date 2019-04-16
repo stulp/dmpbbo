@@ -32,6 +32,7 @@
 #include <eigen3/Eigen/Core>
 
 #include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
   
@@ -41,6 +42,11 @@ namespace DmpBbo {
 class TaskWithTrajectoryDemonstrator : public Task
 {
 public:
+  
+  TaskWithTrajectoryDemonstrator(void);
+
+  virtual ~TaskWithTrajectoryDemonstrator(void);
+
   /** Generate one (optimal) demonstration for this task.
    * \param[in] task_parameters The task parameters for which to generate a demonstration. A matrix of size T X D, where T is the number of time steps, and D is the number of task parameters. If T=1, the task parameters are assumed to be constant over time.
    * \param[in] ts The times at which to sample the trajectory
@@ -53,18 +59,7 @@ public:
    * \param[in] ts The times at which to sample the trajectory
    * \param[out] demonstrations The demonstrations (a vector of trajectories)
    */
-  void generateDemonstrations(const std::vector<Eigen::MatrixXd>& task_parameters, const std::vector<Eigen::VectorXd>& ts, std::vector<Trajectory>& demonstrations) const
-  {
-    unsigned int n_demos = task_parameters.size();
-    assert(n_demos==ts.size());
-    
-    demonstrations = std::vector<Trajectory>(n_demos);
-    for (unsigned int i_demo=0; i_demo<n_demos; i_demo++)
-    {
-      generateDemonstration(task_parameters[i_demo], ts[i_demo], demonstrations[i_demo]); 
-    }
-    
-  }
+  void generateDemonstrations(const std::vector<Eigen::MatrixXd>& task_parameters, const std::vector<Eigen::VectorXd>& ts, std::vector<Trajectory>& demonstrations) const;
   
   /** Generate a set of demonstrations for this task.
    * \param[in] task_parameter_distribution The distribution from which to sample task parameters
@@ -72,18 +67,7 @@ public:
    * \param[in] ts The times at which to sample the trajectory
    * \param[out] demonstrations The demonstrations (a vector of trajectories)
    */
-  void generateDemonstrations(DistributionGaussian* task_parameter_distribution, int n_demos, const Eigen::VectorXd& ts, std::vector<Trajectory>& demonstrations) const
-  {
-    Eigen::MatrixXd task_parameters;
-    
-    demonstrations = std::vector<Trajectory>(n_demos);
-    for (int i_demo=0; i_demo<n_demos; i_demo++)
-    {
-      task_parameter_distribution->generateSamples(n_demos,task_parameters);
-      generateDemonstration(task_parameters, ts, demonstrations[i_demo]); 
-    }
-    
-  }
+  void generateDemonstrations(DistributionGaussian* task_parameter_distribution, int n_demos, const Eigen::VectorXd& ts, std::vector<Trajectory>& demonstrations) const;
 
   /*
   Matlab code:
@@ -140,14 +124,6 @@ private:
 };
   
 } // namespace DmpBbo
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::TaskWithTrajectoryDemonstrator);
- 
-#include <boost/serialization/export.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskWithTrajectoryDemonstrator,boost::serialization::object_serializable);
 
 #endif
 

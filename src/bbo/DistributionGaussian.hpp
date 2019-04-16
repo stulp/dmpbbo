@@ -34,6 +34,9 @@
 
 #include <boost/random.hpp>
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 namespace DmpBbo {
 
 /** \brief A class for representing a Gaussian distribution.

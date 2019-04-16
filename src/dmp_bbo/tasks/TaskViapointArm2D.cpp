@@ -21,32 +21,25 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
 #include "dmp_bbo/tasks/TaskViapointArm2D.hpp"
 
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapointArm2D);
-
-#include <boost/serialization/base_object.hpp>
+#include "dmpbbo_io/EigenFileIO.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
+
+TaskViapointArm2D::TaskViapointArm2D(void) 
+{
+}
 
 TaskViapointArm2D::TaskViapointArm2D(int n_dofs, const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : TaskViapoint(viapoint, viapoint_time,viapoint_radius), n_dofs_(n_dofs)
@@ -77,15 +70,6 @@ void TaskViapointArm2D::evaluateRollout(const MatrixXd& cost_vars, const Eigen::
   // Joint accelerations
   MatrixXd add = cost_vars.block(0,1+2*n_dofs_,n_time_steps,n_dofs_);
   computeCosts(ts,y,add,costs);         
-}
-
-template<class Archive>
-void TaskViapointArm2D::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskViapoint);
-  
-  ar & BOOST_SERIALIZATION_NVP(n_dofs_);
 }
 
 

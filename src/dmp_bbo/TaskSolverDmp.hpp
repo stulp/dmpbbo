@@ -24,13 +24,20 @@
 #ifndef TaskSolverDmp_H
 #define TaskSolverDmp_H
 
+#include "dmp_bbo/TaskSolver.hpp"
+
+#include "dmp/serialization.hpp"
+
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmp_bbo/TaskSolver.hpp"
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 
 namespace DmpBbo {
   
@@ -83,7 +90,7 @@ protected:
    * constructor should not be called by other classes, it is private (boost::serialization is a
    * friend)
    */
-  TaskSolverDmp(void) {};
+  TaskSolverDmp(void);
 
 private:
   /** Give boost serialization access to private members. */  
@@ -109,12 +116,5 @@ private:
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskSolverDmp, "TaskSolverDmp")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskSolverDmp,boost::serialization::object_serializable);
 
 #endif
