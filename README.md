@@ -11,9 +11,9 @@ of dynamical movement primitives.
 
 This library may be useful for you if you
 
-+ are interested in the theory behind dynamical movement primitives and their optimization. Then the <a href="https://github.com/stulp/dmpbbo/tutorials"><b>tutorials</b></a> are the best place to start.
++ are interested in the theory behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="https://github.com/stulp/dmpbbo/demos"><b>demos</b></a> are a good starting point, as they provide examples of how to use the code.
++ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="demos/"><b>demos</b></a> are a good starting point, as they provide examples of how to use the code.
 
 + want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
@@ -89,6 +89,12 @@ If you use this library in the context of experiments for a scientific paper, we
     }
 
 
+# Contributing
+
+Contributions in the form of feedback, code, and bug reports are very welcome:
+
+* If you have found an issue or a bug, please open a GitHub issue.
+* If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.
 
 # Build Status
 
