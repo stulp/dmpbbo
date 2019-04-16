@@ -34,8 +34,6 @@
 #include "functionapproximators/ModelParametersLWR.hpp"
 
 #include "dmp/serialization.hpp"
-#include "dynamicalsystems/serialization.hpp"
-#include "functionapproximators/serialization.hpp"
 
 // If the SAVE_XML flag is defined, an xml is saved and loaded. If is is not, it is only loaded.
 #define SAVE_XML 
