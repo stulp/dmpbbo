@@ -59,23 +59,23 @@ public:
   
   /** Task to be used during evaluation.
    */
-   Task* task;
+  const Task* task;
 
   /** Task solver to be used for a rollout.
    */
-   TaskSolver* task_solver;
+  const TaskSolver* task_solver;
   
   /** The initial parameter distribution for the search. */
-   DistributionGaussian*  initial_distribution; 
+  const DistributionGaussian*  initial_distribution; 
 
   /** The updater used to update the parameters of the distribution. */
-   Updater* updater;
+  const Updater* updater;
 
   /** The number of updates to perform. */
-  int n_updates;
+  const int n_updates;
   
   /** The number of samples per update. */
-  int n_samples_per_update;
+  const int n_samples_per_update;
 
 };
 
