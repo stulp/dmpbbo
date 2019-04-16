@@ -3,10 +3,10 @@
 
 #include <boost/serialization/export.hpp>
 
-#include "dmp/DistributionGaussian.hpp"
-#include "dmp/UpdaterMean.hpp"
-#include "dmp/UpdaterCovarDecay.hpp"
-#include "dmp/UpdaterCovarAdaptation.hpp"
+#include "bbo/DistributionGaussian.hpp"
+#include "bbo/updaters/UpdaterMean.hpp"
+#include "bbo/updaters/UpdaterCovarDecay.hpp"
+#include "bbo/updaters/UpdaterCovarAdaptation.hpp"
 
 BOOST_CLASS_EXPORT(DmpBbo::DistributionGaussian);
 BOOST_CLASS_EXPORT(DmpBbo::UpdaterMean);

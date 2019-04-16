@@ -21,18 +21,12 @@
  */
  
 
-#include "dynamicalsystems/DynamicalSystem.hpp"
+#include "bbo/DistributionGaussian.hpp"
 
-#include "dynamicalsystems/serialization.hpp"
+#include "bbo/serialization.hpp"
 
 // If the SAVE_XML flag is defined, an xml is saved and loaded. If is is not, it is only loaded.
-#define SAVE_XML 
-
-#ifdef SAVE_XML
-// No need to include this header if we read the objects from file. 
-#include "getDynamicalSystemsVector.hpp"
-#endif // SAVE_XML
-
+//#define SAVE_XML 
 
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
@@ -48,20 +42,69 @@ using namespace DmpBbo;
 
 int main(int n_args, char** args)
 {
-  unsigned int n_systems;
+  std::string filename("/tmp/distribution.xml");
+
+#ifdef SAVE_XML
+    // Save to xml file (if SAVE_XML flag is defined)
+    int dim = 2;
+    VectorXd mean(dim);
+    mean << 0.0, 1.0;
+    MatrixXd covar(dim,dim);
+    covar << 3.0, 0.5, 0.5, 1.0;
+    MatrixXd covar_diag(dim,dim);
+    covar_diag << 3.0, 0.0, 0.0, 1.0;
+    
+    DistributionGaussian* obj_save = new DistributionGaussian(mean, covar); 
+    cout << "Saving DistributionGaussian to " << filename << endl;
+    std::ofstream ofs(filename);
+    boost::archive::xml_oarchive oa(ofs);
+    oa << BOOST_SERIALIZATION_NVP(obj_save);
+    ofs.close();
+#else
+    cout << "(NOT saving object to " << filename << ")" << endl;
+#endif // SAVE_XML
+
+
+    // Load file from xml file
+    cout << "Loading from " << filename << endl;
+    std::ifstream ifs(filename);
+    boost::archive::xml_iarchive ia(ifs);
+    DistributionGaussian* obj_load;
+    ia >> BOOST_SERIALIZATION_NVP(obj_load);
+    ifs.close();
+
+    
+    // Output toString and xml output
+    //cout << obj_load->toString() << endl;
+    boost::archive::xml_oarchive oa2(std::cout);
+    oa2 << BOOST_SERIALIZATION_NVP(obj_load);
+
+    /*
+  
+  
+  Updater* updaters[3];
   
 #ifdef SAVE_XML
-  // When saving to xml, initialize some objects to save
-  vector<DynamicalSystem*> dyn_systems;
-  getDynamicalSystemsVector(dyn_systems);
-  n_systems = dyn_systems.size();
-#else
-  // Hack; we know "dyn_systems" contains 5 objects 
-  n_systems = 5; 
+
+
+  double eliteness = 10;
+  string weighting_method = "PI-BB";
+  updaters[0] = new UpdaterMean(eliteness,weighting_method);
+
+  double covar_decay_factor = 0.9;
+  updaters[1] = new UpdaterCovarDecay(eliteness,covar_decay_factor,weighting_method);
+  
+  VectorXd base_level = VectorXd::Constant(n_dims,0.01);
+  bool diag_only = true;
+  double learning_rate = 1.0;
+  updaters[2] = new UpdaterCovarAdaptation(eliteness,weighting_method,base_level,diag_only,learning_rate);  
+
+
 #endif // SAVE_XML
   
-
-  for (unsigned int dd=0; dd<n_systems; dd++)
+  
+  
+  for (unsigned int dd=0; dd<3; dd++)
   {
     // Prepare filename
     std::string filename("/tmp/dyn_sys");
@@ -98,5 +141,6 @@ int main(int n_args, char** args)
     oa2 << BOOST_SERIALIZATION_NVP(obj_load);
     
   }
+  */
 }
 

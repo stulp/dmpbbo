@@ -48,6 +48,12 @@ boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >
         boost::normal_distribution<>(0, 1)
      );
 
+DistributionGaussian::DistributionGaussian(unsigned int n_dims)
+{
+  mean_ = VectorXd::Zero(n_dims);
+  covar_ = MatrixXd::Ones(n_dims,n_dims);
+}
+
 
 DistributionGaussian::DistributionGaussian(const VectorXd& mean, const MatrixXd& covar) 
 {

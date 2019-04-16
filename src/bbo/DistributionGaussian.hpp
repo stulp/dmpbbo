@@ -44,6 +44,11 @@ namespace DmpBbo {
 class DistributionGaussian
 {
 public:
+  /** Construct the Gaussian distribution with zero mean and unit covariance matrix.
+   *  \param[in] n_dims Dimensionality of the multi-variate distribution
+   */
+  DistributionGaussian(unsigned int n_dims=1);
+  
   /** Construct the Gaussian distribution with a mean and covariance matrix.
    *  \param[in] mean Mean of the distribution
    *  \param[in] covar Covariance matrix of the distribution
