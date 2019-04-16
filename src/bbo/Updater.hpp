@@ -98,12 +98,5 @@ private:
 
 } // namespace DmpBbo
 
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::Updater);
- 
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Updater,boost::serialization::object_serializable);
 
 #endif

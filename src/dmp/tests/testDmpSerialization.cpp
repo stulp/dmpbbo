@@ -33,6 +33,13 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
+#include "dmp/serialization.hpp"
+#include "dynamicalsystems/serialization.hpp"
+#include "functionapproximators/serialization.hpp"
+
+// If the SAVE_XML flag is defined, an xml is saved and loaded. If is is not, it is only loaded.
+#define SAVE_XML 
+
 #include <iostream>
 #include <fstream>
 
@@ -44,6 +51,7 @@ using namespace DmpBbo;
 int main(int n_args, char** args)
 {
 
+#ifdef SAVE_XML 
   // Generate a trajectory 
   double tau = 0.5;
   int n_time_steps = 51;
@@ -89,51 +97,52 @@ int main(int n_args, char** args)
   // Initialize the DMP
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
+#endif // SAVE_XML  
+
   for (int trained=0; trained<=1; trained++)
   {
     cout << "______________________________________________" << endl;
+    std::string filename("/tmp/dmp_");
+    filename += to_string(trained)+".xml";
+    
+#ifdef SAVE_XML 
     if (trained==1)
     {
       cout << "Training Dmp..." << endl;
       dmp->train(trajectory);
     }
-    // create and open a character archive for output
-    std::string filename("/tmp/dmp_");
-    filename += to_string(trained)+".xml";
-    
     
     std::ofstream ofs(filename);
     boost::archive::xml_oarchive oa(ofs);
     oa << boost::serialization::make_nvp("dmp",dmp);
     ofs.close();
+#endif // SAVE_XML  
   
     std::ifstream ifs(filename);
     boost::archive::xml_iarchive ia(ifs);
-    Dmp* dmp_out;
-    ia >> BOOST_SERIALIZATION_NVP(dmp_out);
+    Dmp* dmp_load;
+    ia >> BOOST_SERIALIZATION_NVP(dmp_load);
     ifs.close();
     
     
-    cout << "___________________________________________" << endl;
     cout << "  filename=" << filename << endl;
-    cout << *dmp << endl;
-    cout << *dmp_out << endl;
+    cout << *dmp_load << endl;
     
     int n_time_steps = 51;
     VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau); // Time steps
     MatrixXd xs_ana;
     MatrixXd xds_ana;
     MatrixXd forcing_terms_ana, fa_output_ana;
-    //cout << dmp->get_perturbation_analytical_solution() << endl;
     dmp->analyticalSolution(ts,xs_ana,xds_ana,forcing_terms_ana,fa_output_ana);
-    //cout << xs_ana << endl;
     
-    delete dmp_out;
+    delete dmp_load;
   }
 
+#ifdef SAVE_XML 
   delete meta_parameters;
   delete fa_lwr;
   delete dmp;
+#endif // SAVE_XML 
 
   return 0;
 }

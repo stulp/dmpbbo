@@ -86,12 +86,4 @@ private:
 
 }
 
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::UpdaterCovarAdaptation, "UpdaterCovarAdaptation")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdaterCovarAdaptation,boost::serialization::object_serializable)
-
 #endif

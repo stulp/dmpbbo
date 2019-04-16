@@ -76,12 +76,4 @@ private:
 
 }
 
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::UpdaterCovarDecay, "UpdaterCovarDecay")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdaterCovarDecay,boost::serialization::object_serializable)
-
 #endif

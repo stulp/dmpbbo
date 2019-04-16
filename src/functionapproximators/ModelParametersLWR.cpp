@@ -21,24 +21,11 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-#include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersLWR);
-
-
 #include "functionapproximators/BasisFunction.hpp"
 
-//#include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -288,22 +275,6 @@ void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, con
 }
 */
 
-template<class Archive>
-void ModelParametersLWR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
-
-  ar & BOOST_SERIALIZATION_NVP(centers_);
-  ar & BOOST_SERIALIZATION_NVP(widths_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_);
-  ar & BOOST_SERIALIZATION_NVP(offsets_);
-  ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
-  ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-  ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-  ar & BOOST_SERIALIZATION_NVP(caching_);
-}
 
 string ModelParametersLWR::toString(void) const
 {

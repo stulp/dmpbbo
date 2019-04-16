@@ -21,28 +21,12 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/MetaParametersGPR.hpp"
 
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::MetaParametersGPR);
-
-
 #include "dmpbbo_io/BoostSerializationToString.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <unordered_map>
-
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/vector.hpp>
-
-
 
 using namespace Eigen;
 using namespace std;
@@ -72,16 +56,6 @@ MetaParametersGPR::MetaParametersGPR(int expected_input_dim, double maximum_cova
 MetaParametersGPR* MetaParametersGPR::clone(void) const
 {
   return new MetaParametersGPR(getExpectedInputDim(),maximum_covariance_,sigmas_);
-}
-
-template<class Archive>
-void MetaParametersGPR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
-
-  ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);
-  ar & BOOST_SERIALIZATION_NVP(sigmas_);
 }
 
 string MetaParametersGPR::toString(void) const

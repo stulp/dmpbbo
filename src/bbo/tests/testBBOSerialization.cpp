@@ -1,5 +1,5 @@
 /**
- * @file testDynamicalSystemSerialization.cpp
+ * @file testBBOSerialization.cpp
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 

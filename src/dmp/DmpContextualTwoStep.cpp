@@ -242,14 +242,4 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
   
 }
 
-template<class Archive>
-void DmpContextualTwoStep::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DmpContextual);
-  
-  ar & BOOST_SERIALIZATION_NVP(policy_parameter_function_);
-
-}
-
 }

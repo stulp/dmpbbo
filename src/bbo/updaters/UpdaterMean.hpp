@@ -99,12 +99,4 @@ private:
 
 }
 
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::UpdaterMean, "UpdaterMean")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UpdaterMean,boost::serialization::object_serializable)
-
 #endif

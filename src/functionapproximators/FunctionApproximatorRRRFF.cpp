@@ -21,22 +21,13 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/FunctionApproximatorRRRFF.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorRRRFF);
-
-#include "functionapproximators/leastSquares.hpp"
-#include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/MetaParametersRRRFF.hpp"
 #include "functionapproximators/ModelParametersRRRFF.hpp"
+#include "functionapproximators/leastSquares.hpp"
+#include "functionapproximators/BasisFunction.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
+#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <eigen3/Eigen/LU>
@@ -169,11 +160,5 @@ bool FunctionApproximatorRRRFF::saveGridData(const VectorXd& min, const VectorXd
   
 }
 
-template<class Archive>
-void FunctionApproximatorRRRFF::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
-}
 
 }

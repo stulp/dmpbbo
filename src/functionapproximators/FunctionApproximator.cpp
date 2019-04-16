@@ -28,7 +28,6 @@
 #include "functionapproximators/UnifiedModel.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>

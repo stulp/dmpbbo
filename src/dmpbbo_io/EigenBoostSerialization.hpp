@@ -143,6 +143,9 @@ The RETURN_STRING_FROM_BOOST_SERIALIZATION_XML macro does all the work for writi
 
 I decided to go for string toString(void) instead of ostream& toStream(ostream&), because toString allows you to easily use both the output stream operator  (output << obj.toString()) and printf (printf("%s",obj.toString()), whereas toStream would be much more messy to use in combination with printf (not everyone likes to use the outputstream operator). 
 
+\todo Mention that implemented as here:
+https://github.com/pantonante/boost-serialization-examples/tree/master/polymorphism
+
 \section sec_boost_serialization_ugliness Boost serialization issues
 
 With boost::serialization, it is possible to serialize classes without a default constuctor with 

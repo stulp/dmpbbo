@@ -26,8 +26,13 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <iosfwd>
 #include <vector>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
 
@@ -222,18 +227,23 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
+    ar & BOOST_SERIALIZATION_NVP(priors_);
+    ar & BOOST_SERIALIZATION_NVP(means_x_);
+    ar & BOOST_SERIALIZATION_NVP(means_y_);
+    ar & BOOST_SERIALIZATION_NVP(covars_x_);
+    ar & BOOST_SERIALIZATION_NVP(covars_y_);
+    ar & BOOST_SERIALIZATION_NVP(covars_y_x_);
+    ar & BOOST_SERIALIZATION_NVP(covars_x_inv_);
+    ar & BOOST_SERIALIZATION_NVP(mvgd_scale_);
+  }
+    
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersGMR, "ModelParametersGMR")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersGMR,boost::serialization::object_serializable);
 
 #endif        //  #ifndef MODELPARAMETERSGMR_H
 

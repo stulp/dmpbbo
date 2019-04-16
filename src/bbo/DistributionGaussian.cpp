@@ -32,9 +32,6 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Eigenvalues>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
-
 using namespace std;
 using namespace Eigen;
 

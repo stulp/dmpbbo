@@ -21,15 +21,17 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/*
 #include <boost/serialization/export.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/xml_iarchive.hpp>
 #include <boost/archive/xml_oarchive.hpp>
+*/
 #include "dynamicalsystems/TimeSystem.hpp"
 
 /** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TimeSystem);
+//BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TimeSystem);
 
 #include <cmath>
 #include <vector>
@@ -135,15 +137,6 @@ void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& 
     xs.transposeInPlace();
     xds.transposeInPlace();
   }
-}
-
-template<class Archive>
-void TimeSystem::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-  
-  ar & BOOST_SERIALIZATION_NVP(count_down_);
 }
 
 string TimeSystem::toString(void) const

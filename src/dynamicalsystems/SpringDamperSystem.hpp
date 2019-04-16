@@ -26,6 +26,9 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 namespace DmpBbo {
 
 /** Value indicating that the spring constant should be set such that the
@@ -144,9 +147,7 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // serialize base class information
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-    
     ar & BOOST_SERIALIZATION_NVP(damping_coefficient_);
     ar & BOOST_SERIALIZATION_NVP(spring_constant_);
     ar & BOOST_SERIALIZATION_NVP(mass_);
@@ -155,13 +156,6 @@ private:
 
 }
 
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::SpringDamperSystem, "SpringDamperSystem")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::SpringDamperSystem,boost::serialization::object_serializable)
 
 #endif // _SPRING_DAMPER_SYSTEM_H_
 
