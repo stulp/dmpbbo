@@ -8,6 +8,7 @@ compiler:
 branches:
   only:
     - master
+    - serialize_tmp
 
 env:
   - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=ON
