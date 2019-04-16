@@ -124,11 +124,12 @@ void DistributionGaussian::generateSamples(int n_samples, MatrixXd& samples) con
     samples.row(i_sample) = mean_ + covar_decomposed_*z;
   }  
 }
-
+                                                                   
 
 std::ostream& operator<<(std::ostream& output, const DistributionGaussian& distribution)
 {
-  output << "N([" << toString(distribution.mean_) << "], ["<< toString(distribution.covar_) << "])";
+  Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
+  output << "N(" << distribution.mean_.format(my_format) << ", "<< distribution.covar_.format(my_format) << "])";
   return output;
 }
 

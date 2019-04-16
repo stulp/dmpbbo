@@ -25,13 +25,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-
 #include <eigen3/Eigen/Core>
-
-#include "bbo/serialization.hpp"
-
 
 using namespace std;
 using namespace Eigen;
@@ -60,9 +54,12 @@ int main(int n_args, char* args[])
   int n_samples = 3;
   MatrixXd samples(n_samples,dim);
   distribution1.generateSamples(n_samples, samples);
-  cout << "________________\nsamples distribution 1 =\n" << samples << endl;
-  distribution2.generateSamples(n_samples, samples);
-  cout << "________________\nsamples distribution 2 =\n" << samples << endl;
+  cout << "________________" << endl;
+  cout << distribution1 << endl;
+  cout << "samples distribution 1 =" << endl << samples << endl;
+  cout << "________________" << endl;
+  cout << distribution2 << endl;
+  cout << "samples distribution 2 =" << endl << samples << endl;
   
   
   if (directory.empty())
@@ -89,6 +86,7 @@ int main(int n_args, char* args[])
     }
   }
 
+  /*
   DistributionGaussian distribution_out(2*mean, 2*covar); 
 
   // create and open a character archive for output
@@ -103,12 +101,12 @@ int main(int n_args, char* args[])
   ia >> BOOST_SERIALIZATION_NVP(distribution_out);
   ifs.close();
   
-  
   cout << "___________________________________________" << endl;
   cout << distribution1 << endl;
   cout << distribution_out << endl;
   distribution_out.generateSamples(10, samples);
   cout << samples << endl;
+  */  
 }
 
 
