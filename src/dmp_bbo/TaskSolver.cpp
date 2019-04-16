@@ -35,14 +35,7 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-  
-TaskSolver::TaskSolver(void)
-{
-}
 
-TaskSolver::~TaskSolver(void)
-{
-}
 
 void TaskSolver::performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
 {

@@ -27,9 +27,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 namespace DmpBbo {
 
 /** Interface for cost functions, which define a task.
@@ -39,10 +36,6 @@ class Task
 {
 public:
   
-  Task(void);
-  
-  virtual ~Task(void);
-
   /** The cost function which defines the task.
    * See also \ref sec_cost_components and \ref sec_bbo_task_and_task_solver
    *
@@ -93,21 +86,6 @@ public:
   {
     output << task.toString();
     return output;
-  }
-  
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // No members to serialize.
   }
   
 };

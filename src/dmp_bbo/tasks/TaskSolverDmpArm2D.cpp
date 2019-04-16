@@ -28,7 +28,6 @@
 #include <set>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
 
@@ -36,15 +35,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-  
-TaskSolverDmpArm2D::TaskSolverDmpArm2D(void)
-{
-}
-
-TaskSolverDmpArm2D::~TaskSolverDmpArm2D(void)
-{
-}
-
   
 TaskSolverDmpArm2D::TaskSolverDmpArm2D(Dmp* dmp, const Eigen::VectorXd& link_lengths, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : TaskSolverDmp(dmp,optimize_parameters,dt,integrate_dmp_beyond_tau_factor,use_normalized_parameter), link_lengths_(link_lengths)
@@ -137,7 +127,7 @@ void TaskSolverDmpArm2D::anglesToLinkPositions(const MatrixXd& angles, MatrixXd&
 
 string TaskSolverDmpArm2D::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskSolverDmpArm2D");
+  return string("TaskSolverDmpArm2D");
 }
 
 }

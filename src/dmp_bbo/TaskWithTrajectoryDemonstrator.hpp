@@ -31,9 +31,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 namespace DmpBbo {
   
 /** Interface for tasks that are able to provide demonstrations that solve the task (optimally).
@@ -43,10 +40,6 @@ class TaskWithTrajectoryDemonstrator : public Task
 {
 public:
   
-  TaskWithTrajectoryDemonstrator(void);
-
-  virtual ~TaskWithTrajectoryDemonstrator(void);
-
   /** Generate one (optimal) demonstration for this task.
    * \param[in] task_parameters The task parameters for which to generate a demonstration. A matrix of size T X D, where T is the number of time steps, and D is the number of task parameters. If T=1, the task parameters are assumed to be constant over time.
    * \param[in] ts The times at which to sample the trajectory
@@ -105,21 +98,6 @@ public:
   end
   */
   
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Task);
-  }
   
 };
   

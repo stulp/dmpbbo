@@ -26,14 +26,9 @@
 
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 #include <string>
 #include <set>
 #include <eigen3/Eigen/Core>
-
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/access.hpp>
 
 namespace DmpBbo {
   
@@ -85,32 +80,7 @@ public:
 
 private:
   Eigen::VectorXd link_lengths_;
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  TaskSolverDmpArm2D(void);
 
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskSolverDmp);
-    
-    ar & BOOST_SERIALIZATION_NVP(link_lengths_); 
-  }
-                                         
 };
 
 }

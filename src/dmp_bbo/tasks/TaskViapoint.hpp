@@ -27,12 +27,7 @@
 
 #include "dmp_bbo/TaskWithTrajectoryDemonstrator.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 #include <eigen3/Eigen/Core>
-
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/access.hpp>
 
 namespace DmpBbo {
 
@@ -84,8 +79,6 @@ public:
    */
   TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal, double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight);
 
-  virtual ~TaskViapoint(void);
-  
   virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   unsigned int getNumberOfCostComponents(void) const;
@@ -154,40 +147,6 @@ protected:
   double   acceleration_weight_;
   /** Weight for the cost of not being at the goal at the end of the movement. */
   double   goal_weight_;
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  TaskViapoint(void);
-  
-
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version) 
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskWithTrajectoryDemonstrator);
-    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
-    ar & BOOST_SERIALIZATION_NVP(goal_);
-    ar & BOOST_SERIALIZATION_NVP(goal_time_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
-    ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
-    ar & BOOST_SERIALIZATION_NVP(goal_weight_);
-  }
   
 };
 

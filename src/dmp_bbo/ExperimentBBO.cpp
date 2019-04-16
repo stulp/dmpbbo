@@ -51,16 +51,5 @@ n_updates(n_updates_arg),
 n_samples_per_update(n_samples_per_update_arg)
 {}
 
-ExperimentBBO::ExperimentBBO(void)
-:
-  task(NULL),
-  task_solver(NULL),
-  initial_distribution(NULL),
-  updater(NULL),
-  n_updates(0),
-  n_samples_per_update(0)
-{}
-
-
 
 }

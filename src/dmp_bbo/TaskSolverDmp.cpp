@@ -29,7 +29,6 @@
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
 
@@ -37,11 +36,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-
-TaskSolverDmp::TaskSolverDmp(void)
-{
-}
-
   
 TaskSolverDmp::TaskSolverDmp(Dmp* dmp, std::set<std::string> optimize_parameters, double dt, double integrate_dmp_beyond_tau_factor, bool use_normalized_parameter)
 : dmp_(dmp)
@@ -75,7 +69,7 @@ void TaskSolverDmp::performRollout(const Eigen::VectorXd& sample, const Eigen::V
 
 string TaskSolverDmp::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskSolverDmp");
+  return string("TaskSolverDmp");
 }
 
 }

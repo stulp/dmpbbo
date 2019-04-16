@@ -36,15 +36,6 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-Task::Task(void)
-{
-}
-
-
-Task::~Task(void)
-{
-}
-
 void Task::evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, Eigen::VectorXd& costs) const 
 {
   int n_task_pars = 0;

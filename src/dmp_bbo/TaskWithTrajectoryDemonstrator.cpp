@@ -36,14 +36,6 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TaskWithTrajectoryDemonstrator::TaskWithTrajectoryDemonstrator(void)
-{
-}
-
-
-TaskWithTrajectoryDemonstrator::~TaskWithTrajectoryDemonstrator(void)
-{
-}
 
 void TaskWithTrajectoryDemonstrator::generateDemonstrations(const vector<MatrixXd>& task_parameters, const vector<VectorXd>& ts, vector<Trajectory>& demonstrations) const
 {

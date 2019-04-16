@@ -24,7 +24,6 @@
 #include "dmp_bbo/tasks/TaskViapointArm2D.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -36,10 +35,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-
-TaskViapointArm2D::TaskViapointArm2D(void) 
-{
-}
 
 TaskViapointArm2D::TaskViapointArm2D(int n_dofs, const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : TaskViapoint(viapoint, viapoint_time,viapoint_radius), n_dofs_(n_dofs)
@@ -74,7 +69,7 @@ void TaskViapointArm2D::evaluateRollout(const MatrixXd& cost_vars, const Eigen::
 
 
 string TaskViapointArm2D::toString(void) const {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapointArm2D");
+  return string("TaskViapointArm2D");
 }
 
 

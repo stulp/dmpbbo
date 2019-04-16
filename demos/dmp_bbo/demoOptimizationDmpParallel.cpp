@@ -28,11 +28,6 @@
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
 #include "dmp_bbo/TaskSolverDmp.hpp"
 
-
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include "dmp_bbo/serialization.hpp"
-
 #include "dmp/Dmp.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"

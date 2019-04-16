@@ -27,9 +27,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 namespace DmpBbo {
 
 class Task;
@@ -79,32 +76,6 @@ public:
   
   /** The number of samples per update. */
   int n_samples_per_update;
-
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_NVP(task);
-    ar & BOOST_SERIALIZATION_NVP(task_solver);
-    ar & BOOST_SERIALIZATION_NVP(initial_distribution);
-    ar & BOOST_SERIALIZATION_NVP(updater);
-    ar & BOOST_SERIALIZATION_NVP(n_updates);
-    ar & BOOST_SERIALIZATION_NVP(n_samples_per_update);
-  }
-  
-protected:
-  /** Default constructor. 
-   * Required for boost serialization.
-   */
-  ExperimentBBO(void);
-
 
 };
 

@@ -131,6 +131,8 @@ int main(int n_args, char* args[])
     cout << "clf; for dd=0:"<<n_demos-1<<", data = load(sprintf('"<<directory<<"demonstration%02d.txt',dd)); tp = load(sprintf('"<<directory<<"task_parameters%02d.txt',dd)); viapoint_time = load(sprintf('"<<directory<<"viapoint_time%02d.txt',dd)); for ss=1:3, subplot(1,3,ss); plot(data(:,1),data(:,ss+1)'); hold on; if (ss==1), plot(viapoint_time,tp,'ro'); end; axis square; axis tight; end; end" << endl;
   }
   
+  /*
+  SERIALIZATION DISABLED IN DMP_BBO MODULE
     // create and open a character archive for output
     std::string filename_xml("/tmp/task_viapoint.xml");
   
@@ -149,7 +151,7 @@ int main(int n_args, char* args[])
     cout << "  filename_xml=" << filename_xml << endl;
     cout << task << endl;
     cout << task_out << endl;
-
+*/
 
     
 }

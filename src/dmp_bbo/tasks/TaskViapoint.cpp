@@ -29,20 +29,11 @@
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-
-TaskViapoint::TaskViapoint(void)
-{
-}
-
-TaskViapoint::~TaskViapoint(void)
-{
-}
 
 TaskViapoint::TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius)
 : viapoint_(viapoint), viapoint_time_(viapoint_time), viapoint_radius_(viapoint_radius), 
@@ -185,7 +176,7 @@ void TaskViapoint::generateDemonstration(const MatrixXd& task_parameters, const 
 
 
 string TaskViapoint::toString(void) const {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapoint");
+  return string("TaskViapoint");
 }
 
 TaskViapoint TaskViapoint::readFromFile(std::string filename)

@@ -26,8 +26,6 @@
 
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-
 namespace DmpBbo {
 
 /** Interface for classes that can perform rollouts.
@@ -36,9 +34,6 @@ namespace DmpBbo {
 class TaskSolver
 {
 public:
-  TaskSolver(void);
-  
-  virtual ~TaskSolver(void);
   
   /** Perform a rollout, i.e. given a sample, determine all the variables that are relevant to evaluating the cost function. 
    * See also \ref sec_cost_vars and \ref sec_bbo_task_and_task_solver
@@ -72,21 +67,6 @@ public:
   friend std::ostream& operator<<(std::ostream& output, const TaskSolver& task_solver) {
     output << task_solver.toString();
     return output;
-  }
-  
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // No members to serialize.
   }
   
 };
