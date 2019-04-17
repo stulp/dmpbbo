@@ -887,6 +887,9 @@ string Dmp::toString(void) const
   
   stream << "Dmp(";
   stream << "name=" << name() << ", ";
+  stream << "dim_orig=" << dim_orig() << ", ";
+  stream << "dim=" << dim() << ", ";
+  stream << "tau=" << tau() << ", ";
   stream << "y_init=" << initial_state().format(my_format) << ", ";
   stream << "y_attr=" << attractor_state().format(my_format);
   stream << ")";

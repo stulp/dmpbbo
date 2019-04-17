@@ -35,57 +35,74 @@ from dmp.dmp_plotting import plotTrajectory
 
 if __name__=="__main__":
 
-    directory = None
-    if (len(sys.argv)==1):
-        print('\nUsage: '+sys.argv[0]+' <directory> [covar_scale] [n_samples]\n')
+
+    input_dmp_file = None
+    input_parameters_file = None
+    output_directory = None
+    
+    if (len(sys.argv)<4):
+        print('\nUsage: '+sys.argv[0]+' <input dmp file> <input policy parameters file> <output directory> [covar_scale] [n_samples]\n')
         sys.exit()
+        
     if (len(sys.argv)>1):
-        directory = sys.argv[1]
+        input_dmp_file = sys.argv[1]
+    if (len(sys.argv)>2):
+        input_parameters_file = sys.argv[2]
+    if (len(sys.argv)>3):
+        output_directory = sys.argv[3]
     
     covar_scale = 1.0
-    if (len(sys.argv)>2):
-        covar_scale = float(sys.argv[2])
+    if (len(sys.argv)>4):
+        covar_scale = float(sys.argv[4])
         
     n_samples = 10    
-    if (len(sys.argv)>2):
-        n_samples = int(sys.argv[3])
+    if (len(sys.argv)>5):
+        n_samples = int(sys.argv[5])
         
-    print('  * Loading mean from "'+directory+'/parameter_vector_initial.txt"')
-    parameter_vector = np.loadtxt(directory+"/parameter_vector_initial.txt")
+    print("Python | calling "+" ".join(sys.argv))
+    
+    print('Python |     Loading mean from "'+input_parameters_file+'"')
+    parameter_vector = np.loadtxt(input_parameters_file)
+    
+    
+    print('Python |     Generating '+str(n_samples)+' samples with covar='+str(covar_scale))
     covar_init =  covar_scale*np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
-    
-    
-    print('  * Generating '+str(n_samples)+' samples with covar='+str(covar_scale))
     samples = distribution.generateSamples(n_samples)
-    #cur_dir = '%s/tune_exploration/rollout%03d' % (directory, i_sample+1)
-    
-    output_directory = directory+"/tune_exploration/" 
-    filename = output_directory + 'samples.txt'  
-    print('  * Saving '+str(n_samples)+' samples to '+filename)
-    if not os.path.exists(output_directory):
-        os.makedirs(output_directory)
-    np.savetxt(filename,samples)
 
-    # DMP SAMPLE OUTPUTDIR zzz
-    executeBinary("./performDmpRollouts", "results/dmp.xml results/tune_exploration/", True)
+    print('Python |     Saving samples to '+output_directory)
+    for i_sample in range(n_samples):
+        
+        rollout_directory = '%s/rollout%03d/' % (output_directory, i_sample+1)
+        sample_filename = rollout_directory+'policy_parameters.txt'
+        
+        print('Python |         Saving sample '+str(i_sample)+' to '+sample_filename)
+        if not os.path.exists(rollout_directory):
+            os.makedirs(rollout_directory)
+        np.savetxt(sample_filename,samples[i_sample,:])
+    
+        print('Python |         Caling executeBinary ',end="")
+        arguments = [input_dmp_file,rollout_directory+"trajectory.txt",sample_filename]
+        arguments.append(rollout_directory+"dmp.xml")
+        executeBinary("./executeDmp"," ".join(arguments), True)
 
     fig = plt.figure(1)
     axs = [ fig.add_subplot(1,2,1), fig.add_subplot(1,3,2), fig.add_subplot(1,3,3)]
 
     
+    print("Python |     Plotting")
     for i_sample in range(n_samples):                       
-        filename = '%s/traj_sample%05d.txt' % (output_directory, i_sample+1)
-        print(filename)
-        data = np.loadtxt(filename)
+        rollout_directory = '%s/rollout%03d' % (output_directory, i_sample+1)
+        traj_filename = rollout_directory+'/trajectory.txt'
+        data = np.loadtxt(traj_filename)
         lines = plotTrajectory(data,axs)
-        plt.setp(lines,linestyle='-', linewidth=1, color=(0.2,0.7,0.2), label='perturbed')
+        plt.setp(lines,linestyle='-', linewidth=1, color=(0.2,0.2,0.2), label='perturbed')
         
-    filename = output_directory+"/traj_unperturbed.txt"
-    print(filename)
-    data = np.loadtxt(filename)
-    lines = plotTrajectory(data,axs)
-    plt.setp(lines,linestyle='-', linewidth=3, color=(0.2,0.2,0.2), label='perturbed')
+    #filename = output_directory+"/traj_unperturbed.txt"
+    #print(filename)
+    #data = np.loadtxt(filename)
+    #lines = plotTrajectory(data,axs)
+    #plt.setp(lines,linestyle='-', linewidth=3, color=(0.2,0.2,0.2), #label='perturbed')
     #plt.legend()
         
 

@@ -56,8 +56,7 @@ using namespace DmpBbo;
 
 void help(char* binary_name)
 {
-  cout << "Usage: " << binary_name << " <input trajectory (txt)> <output directory> [output dmp (xml)] [n_basis_functions]" << endl;
-  cout << "Default for dmp: 'dmp.xml' " << endl;
+  cout << "Usage: " << binary_name << " <input trajectory (txt)> <output dmp (xml)> [output policy parameters.txt] [output training directory] [n_basis_functions]" << endl;
   cout << "Default for n_basis_functions: 5 " << endl;
 }
 
@@ -69,9 +68,10 @@ void help(char* binary_name)
 int main(int n_args, char** args)
 {
   
-  string input_txt_file;
-  string directory;
-  string output_xml_file("dmp.xml");
+  string input_trajectory_file;
+  string output_dmp_file;
+  string output_train_directory("");
+  string output_parameters_file("");
   int n_basis_functions = 5;
   
   if (n_args<3)
@@ -86,19 +86,24 @@ int main(int n_args, char** args)
     return 0;
   }
 
-  input_txt_file = string(args[1]);
-  directory = string(args[2]);
+  input_trajectory_file = string(args[1]);
+  output_dmp_file = string(args[2]);
   if (n_args>3)
-    output_xml_file = string(args[3]);
+    output_parameters_file = string(args[3]);
   if (n_args>4)
-    n_basis_functions = atoi(args[4]);
+    output_train_directory = string(args[4]);
+  if (n_args>5)
+    n_basis_functions = atoi(args[5]);
     
+  cout << "C++    | Executing "; 
+  for (int ii=0; ii<n_args; ii++) cout << " " << args[ii]; 
+  cout << endl;
   
-  cout << "Reading trajectory from TXT file: " << input_txt_file << endl;
-  Trajectory trajectory = Trajectory::readFromFile(input_txt_file);
+  cout << "C++    |     Reading trajectory from file: " << input_trajectory_file << endl;
+  Trajectory trajectory = Trajectory::readFromFile(input_trajectory_file);
   if (trajectory.length()==0)
   {
-    cerr << "The TXT file " << input_txt_file << " could not be found. Aborting." << endl << endl;
+    cerr << "ERROR: The file " << input_trajectory_file << " could not be found. Aborting." << endl << endl;
     help(args[0]);
     return -1;
   }
@@ -128,26 +133,15 @@ int main(int n_args, char** args)
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
   dmp->set_name("trained");
 
-  cout << "Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
+  cout << "C++    |     Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
-  dmp->train(trajectory,directory+"/train",overwrite);
+  dmp->train(trajectory,output_train_directory,overwrite);
 
   // Set which parameters to optimize
   dmp->setSelectedParameters(parameters_to_optimize);
   
-  // Make directory if it doesn't already exist
-  if (!boost::filesystem::exists(directory))
-  {
-    if (!boost::filesystem::create_directories(directory))
-    {
-      cerr << __FILE__ << ":" << __LINE__ << ":";
-      cerr << "Couldn't make directory file '" << directory << "'." << endl;
-      return false;
-    }
-  }
-
-  cout << "Writing trained Dmp to XML file: " << directory << "/" << output_xml_file << endl;
-  std::ofstream ofs(directory+"/"+output_xml_file);
+  cout << "C++    |     Writing trained Dmp to XML file: " << output_dmp_file << endl;
+  std::ofstream ofs(output_dmp_file);
   boost::archive::xml_oarchive oa(ofs);
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();
@@ -156,8 +150,8 @@ int main(int n_args, char** args)
   Eigen::VectorXd parameter_vector;
   dmp->getParameterVectorSelected(parameter_vector);
   overwrite = true;
-  cout << "Writing initial parameter vector to file : " << directory << "/parameter_vector_initial.txt" << endl;
-  saveMatrix(directory,"parameter_vector_initial.txt",parameter_vector,overwrite);
+  cout << "C++    |     Writing initial parameter vector to file : " << output_parameters_file << endl;
+  saveMatrix(output_parameters_file,parameter_vector,overwrite);
   
     
   delete meta_parameters;

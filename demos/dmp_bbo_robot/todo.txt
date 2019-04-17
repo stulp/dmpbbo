@@ -1,3 +1,8 @@
+executeDmp.cpp
+  reads xml file
+  executes it
+  writes output trajectory to txt file
+
 ________________________________________________________________________________
 myPerformRollouts.cpp
   reads dmp.xml

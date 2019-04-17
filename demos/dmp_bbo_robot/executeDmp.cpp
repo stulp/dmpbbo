@@ -56,7 +56,7 @@ using namespace DmpBbo;
 
 void help(char* binary_name)
 {
-  cout << "Usage: " << binary_name << " <dmp filename.xml> <input/output directory> " << endl;
+  cout << "Usage: " << binary_name << " <dmp filename.xml> <output trajectory filename.txt> [sample.txt] [output dmp filename.xml]" << endl;
 }
 
 /** Main function
@@ -67,7 +67,7 @@ void help(char* binary_name)
 int main(int n_args, char** args)
 {
   
-  if (n_args!=3)
+  if (n_args<3 || n_args>5)
   {
     help(args[0]);
     return -1;
@@ -80,82 +80,68 @@ int main(int n_args, char** args)
   }
 
   string dmp_filename = string(args[1]);
-  string directory = string(args[2]);
+  string traj_filename = string(args[2]);
+  string sample_filename = "";
+  if (n_args>3)
+    sample_filename = string(args[3]);
+  string dmp_output_filename = "";
+  if (n_args>4)
+    dmp_output_filename = string(args[4]);
+
+  cout << "C++    | Executing "; 
+  for (int ii=0; ii<n_args; ii++) cout << " " << args[ii]; 
+  cout << endl;
   
-  cout << directory << endl;
-  MatrixXd samples;
-  if (!loadMatrix(directory+"samples.txt", samples)) return -1;
-  cout << "  samples=" << samples << endl;
-  
+  // Read dmp from xml file
+  cout << "C++    |     Reading dmp from file '" << dmp_filename << "'"  << endl;
   std::ifstream ifs(dmp_filename);
   boost::archive::xml_iarchive ia(ifs);
   Dmp* dmp;
   ia >> BOOST_SERIALIZATION_NVP(dmp);
   ifs.close();
-  
-  cout << *dmp << endl;
+  cout << "C++    |         " << *dmp << endl;
+
+  // Read sample file, if necessary
+  if (!sample_filename.empty())
+  {
+    cout << "C++    |     Reading sample from file '" << sample_filename << "'"  << endl;
+    VectorXd sample;
+    if (!loadMatrix(sample_filename, sample)) 
+    {
+      cerr << "C++    | WARNING: Could not read sample file. Executing default DMP instead." << endl;
+    }
+    else
+    {
+      dmp->setParameterVectorSelected(sample);      
+    }
+  }
 
   // Integrate DMP longer than the tau with which it was trained
   double integration_time = 1.5*dmp->tau();
   double frequency_Hz = 100.0;
+  cout << "C++    |     Integrating dmp for " << integration_time << "s at " << (int)frequency_Hz << "Hz" << endl;
   int n_time_steps = floor(frequency_Hz*integration_time);
   VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,integration_time); // Time steps
   
-  // Save trajectory without perturbation
-  Trajectory traj;
-  dmp->analyticalSolution(ts,traj);
+  // Save trajectory 
+  cout << "C++    |     Saving trajectory to file '" << traj_filename << "'"  << endl;
+  Trajectory trajectory;
+  dmp->analyticalSolution(ts,trajectory);
   bool overwrite = true;
-  traj.saveToFile(directory, "traj_unperturbed.txt", overwrite);
+  trajectory.saveToFile(traj_filename, overwrite);
 
-  // Save trajectories with perturbed samples 
-  VectorXd cur_sample;
-  for (int i_sample=0; i_sample<samples.rows(); i_sample++)
+  // Read sample file, if necessary
+  if (!dmp_output_filename.empty())
   {
-    cur_sample = samples.row(i_sample);
-    dmp->setParameterVectorSelected(cur_sample);
-    dmp->analyticalSolution(ts,traj);
-    
-    stringstream stream;
-    stream << "traj_sample" << setw(5) << setfill('0') << i_sample+1 << ".txt";
-    traj.saveToFile(directory, stream.str(), overwrite);
-    
+    cout << "C++    |     Saving dmp to file '" << dmp_output_filename << "'"  << endl;
+    std::ofstream ofs(dmp_output_filename);
+    boost::archive::xml_oarchive oa(ofs);
+    oa << boost::serialization::make_nvp("dmp",dmp);
+    ofs.close();
   }
   
-  /*
-
-  cout << "Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
-  bool overwrite = true;
-  dmp->train(trajectory,directory+"/train",overwrite);
-
-  // Make directory if it doesn't already exist
-  if (!boost::filesystem::exists(directory))
-  {
-    if (!boost::filesystem::create_directories(directory))
-    {
-      cerr << __FILE__ << ":" << __LINE__ << ":";
-      cerr << "Couldn't make directory file '" << directory << "'." << endl;
-      return false;
-    }
-  }
-
-  cout << "Writing trained Dmp to XML file: " << directory << "/" << output_xml_file << endl;
-  std::ofstream ofs(directory+"/"+output_xml_file);
-  boost::archive::xml_oarchive oa(ofs);
-  oa << boost::serialization::make_nvp("dmp",dmp);
-  ofs.close();
   
-  // Set which parameters to optimize, and save the initial vector to file
-  dmp->setSelectedParameters(parameters_to_optimize);
-  Eigen::VectorXd parameter_vector;
-  dmp->getParameterVectorSelected(parameter_vector);
-  overwrite = true;
-  cout << "Writing initial parameter vector to file : " << directory << "/parameter_vector_initial.txt" << endl;
-  saveMatrix(directory,"parameter_vector_initial.txt",parameter_vector,overwrite);
-  
-    
-  delete meta_parameters;
-  delete fa_lwr;
-  */
   delete dmp;
+  
   return 0;
 }

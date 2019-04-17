@@ -159,6 +159,13 @@ public:
    */
   bool saveToFile(std::string directory, std::string filename, bool overwrite=false) const;
 
+  /** Save a trajectory to a file
+   * \param[in] filename Filename
+   * \param[in] overwrite Whether to overwrite existing files (true=overwrite, false=give warning)
+   * \return true if writing was successful, false otherwise.
+   */
+  bool saveToFile(std::string filename, bool overwrite=false) const;
+
   //friend std::istream& operator>>(std::istream& input, Trajectory& trajectory);
   
   /** Read a trajectory from a file.

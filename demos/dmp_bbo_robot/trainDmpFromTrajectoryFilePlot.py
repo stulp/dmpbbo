@@ -40,7 +40,7 @@ if __name__=='__main__':
     parser.add_argument("directory", help="directory to read data from")
     args = parser.parse_args()
     
-    directory = args.directory+"/train/"
+    directory = args.directory
     
     print("Plotting")
     
