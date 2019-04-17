@@ -30,8 +30,6 @@
 
 #include "bbo/DistributionGaussian.hpp"
 
-#include <boost/serialization/access.hpp>
-
 namespace DmpBbo {
 
 /** Interface for the distribution update step in evolution strategies.
@@ -51,13 +49,10 @@ for (int i_update=1; i_update<=n_updates; i_update++)
  *
  * The last step (updating the distribution) is implemented by classes inheriting from this Updater
  * interface.
- *
- * \todo Implement << and virtual toString with boost serialization
  */
 class Updater
 {
 public:
-  
 
   /** Update a distribution given the samples and costs of an epoch.
    * \param[in] distribution Current distribution
@@ -79,31 +74,9 @@ public:
    */
   virtual void updateDistribution(const DistributionGaussian& distribution, const Eigen::MatrixXd& samples, const Eigen::VectorXd& costs, Eigen::VectorXd& weights, DistributionGaussian& distribution_new) const = 0;
   
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // No members to serialize.
-  }
-  
 };
 
 } // namespace DmpBbo
 
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::Updater);
- 
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Updater,boost::serialization::object_serializable);
 
 #endif

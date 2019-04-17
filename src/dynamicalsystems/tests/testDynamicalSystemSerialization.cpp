@@ -20,9 +20,23 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include "getDynamicalSystemsVector.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
+
+#include "dynamicalsystems/serialization.hpp"
+
+// If the SAVE_XML flag is defined, an xml is saved and loaded. If is is not, it is only loaded.
+#define SAVE_XML 
+
+#ifdef SAVE_XML
+// No need to include this header if we read the objects from file. 
+#include "getDynamicalSystemsVector.hpp"
+#endif // SAVE_XML
+
+
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
+
 
 #include <iostream>
 #include <fstream>
@@ -34,35 +48,54 @@ using namespace DmpBbo;
 
 int main(int n_args, char** args)
 {
+  unsigned int n_systems;
   
+#ifdef SAVE_XML
+  // When saving to xml, initialize some objects to save
   vector<DynamicalSystem*> dyn_systems;
   getDynamicalSystemsVector(dyn_systems);
+  n_systems = dyn_systems.size();
+#else
+  // Hack; we know "dyn_systems" contains 5 objects 
+  n_systems = 5; 
+#endif // SAVE_XML
   
-  for (unsigned int dd=0; dd<dyn_systems.size(); dd++)
+
+  for (unsigned int dd=0; dd<n_systems; dd++)
   {
-    DynamicalSystem* cur_dyn_system = dyn_systems[dd]; 
-    
-    // create and open a character archive for output
+    // Prepare filename
     std::string filename("/tmp/dyn_sys");
     filename += to_string(dd)+".xml";
+
+    cout << "___________________________________________" << endl;
     
     
+#ifdef SAVE_XML
+    // Save to xml file (if SAVE_XML flag is defined)
+    DynamicalSystem* obj_save = dyn_systems[dd]; 
+    cout << "Saving " << obj_save->toString() << " to " << filename << endl;
     std::ofstream ofs(filename);
     boost::archive::xml_oarchive oa(ofs);
-    //oa << BOOST_SERIALIZATION_NVP(dyn_sys);
-    oa << boost::serialization::make_nvp("dyn_sys",cur_dyn_system);
+    oa << BOOST_SERIALIZATION_NVP(obj_save);
     ofs.close();
-  
+#else
+    cout << "(NOT saving object to " << filename << ")" << endl;
+#endif // SAVE_XML
+
+
+    // Load file from xml file
+    cout << "Loading from " << filename << endl;
     std::ifstream ifs(filename);
     boost::archive::xml_iarchive ia(ifs);
-    DynamicalSystem* dyn_sys_out;
-    ia >> BOOST_SERIALIZATION_NVP(dyn_sys_out);
+    DynamicalSystem* obj_load;
+    ia >> BOOST_SERIALIZATION_NVP(obj_load);
     ifs.close();
+
     
-    cout << "___________________________________________" << endl;
-    cout << "  filename=" << filename << endl;
-    cout << *cur_dyn_system << endl;
-    cout << *dyn_sys_out << endl;
+    // Output toString and xml output
+    cout << obj_load->toString() << endl;
+    boost::archive::xml_oarchive oa2(std::cout);
+    oa2 << BOOST_SERIALIZATION_NVP(obj_load);
     
   }
 }

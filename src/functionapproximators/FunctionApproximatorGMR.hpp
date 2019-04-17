@@ -26,6 +26,11 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 
 /** @defgroup GMR Gaussian Mixture Regression (GMR)
  *  @ingroup FunctionApproximators
@@ -185,7 +190,10 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
+  }
   
   void preallocateMatrices(int n_gaussians, int n_input_dims, int n_output_dims);
   /** This is a cached variable whose memory is allocated once during construction. */
@@ -203,12 +211,5 @@ private:
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::FunctionApproximatorGMR, "FunctionApproximatorGMR")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximatorGMR,boost::serialization::object_serializable);
 
 #endif // !_FUNCTION_APPROXIMATOR_GMR_H_

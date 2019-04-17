@@ -21,27 +21,15 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
 #include "dmp_bbo/tasks/TaskViapointArm2D.hpp"
 
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::TaskViapointArm2D);
-
-#include <boost/serialization/base_object.hpp>
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
 #include <fstream>
 #include <iomanip>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -79,18 +67,9 @@ void TaskViapointArm2D::evaluateRollout(const MatrixXd& cost_vars, const Eigen::
   computeCosts(ts,y,add,costs);         
 }
 
-template<class Archive>
-void TaskViapointArm2D::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskViapoint);
-  
-  ar & BOOST_SERIALIZATION_NVP(n_dofs_);
-}
-
 
 string TaskViapointArm2D::toString(void) const {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TaskViapointArm2D");
+  return string("TaskViapointArm2D");
 }
 
 

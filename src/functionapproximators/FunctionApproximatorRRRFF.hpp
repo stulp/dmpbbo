@@ -91,17 +91,13 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
+  }
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::FunctionApproximatorRRRFF, "FunctionApproximatorRRRFF")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximatorRRRFF,boost::serialization::object_serializable);
 
 #endif // !_FUNCTION_APPROXIMATOR_RRRFF_H_

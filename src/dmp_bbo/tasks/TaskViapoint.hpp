@@ -24,9 +24,10 @@
 #ifndef TASKVIAPOINT_H
 #define TASKVIAPOINT_H
 
-#include <eigen3/Eigen/Core>
 
 #include "dmp_bbo/TaskWithTrajectoryDemonstrator.hpp"
+
+#include <eigen3/Eigen/Core>
 
 namespace DmpBbo {
 
@@ -46,7 +47,6 @@ namespace DmpBbo {
  */
 class TaskViapoint : public TaskWithTrajectoryDemonstrator
 {
-  friend class TaskViapointArm;
   
 public:
   /** If the viapoint_time is set to MINIMUM_DIST, we do not compute the distance between the trajectory and the viapoint at "viapoint_time", but use the minimum distance instead. */
@@ -79,8 +79,6 @@ public:
    */
   TaskViapoint(const Eigen::VectorXd& viapoint, double  viapoint_time, double viapoint_radius, const Eigen::VectorXd& goal, double goal_time, double viapoint_weight, double acceleration_weight, double goal_weight);
 
-  virtual ~TaskViapoint(void) {}
-  
   virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::VectorXd& cost) const;
   
   unsigned int getNumberOfCostComponents(void) const;
@@ -150,50 +148,8 @@ protected:
   /** Weight for the cost of not being at the goal at the end of the movement. */
   double   goal_weight_;
   
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  TaskViapoint(void) {};
-  
-
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version) 
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(TaskWithTrajectoryDemonstrator);
-    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_time_);    
-    ar & BOOST_SERIALIZATION_NVP(viapoint_radius_);    
-    ar & BOOST_SERIALIZATION_NVP(goal_);
-    ar & BOOST_SERIALIZATION_NVP(goal_time_);
-    ar & BOOST_SERIALIZATION_NVP(viapoint_weight_);    
-    ar & BOOST_SERIALIZATION_NVP(acceleration_weight_);
-    ar & BOOST_SERIALIZATION_NVP(goal_weight_);
-  }
-  
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskViapoint, "TaskViapoint")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskViapoint,boost::serialization::object_serializable);
-
 #endif
 

@@ -21,21 +21,10 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/ModelParametersGMR.hpp"
-#include "functionapproximators/FunctionApproximator.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::ModelParametersGMR);
 
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
@@ -215,23 +204,6 @@ ModelParameters* ModelParametersGMR::clone(void) const
 
   return new ModelParametersGMR(n_observations, priors, means_x, means_y, covars_x, covars_y, covars_y_x);
 }
-
-template<class Archive>
-void ModelParametersGMR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
-  
-  ar & BOOST_SERIALIZATION_NVP(priors_);
-  ar & BOOST_SERIALIZATION_NVP(means_x_);
-  ar & BOOST_SERIALIZATION_NVP(means_y_);
-  ar & BOOST_SERIALIZATION_NVP(covars_x_);
-  ar & BOOST_SERIALIZATION_NVP(covars_y_);
-  ar & BOOST_SERIALIZATION_NVP(covars_y_x_);
-  ar & BOOST_SERIALIZATION_NVP(covars_x_inv_);
-  ar & BOOST_SERIALIZATION_NVP(mvgd_scale_);
-}
-
 
 string ModelParametersGMR::toString(void) const 
 {

@@ -28,8 +28,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/nvp.hpp>
-
 namespace DmpBbo {
   
 /** Class for storing the information in a rollout, the result of executing a policy once. */
@@ -41,7 +39,7 @@ public:
    * \param[in] policy_parameters The parameters of the policy for this rollout
    */
   Rollout(const Eigen::MatrixXd& policy_parameters);
-  
+
   /** Constructor.
    * \param[in] policy_parameters The parameters of the policy for this rollout
    * \param[in] cost_vars The cost-relevant variables that arose from executing the policy (e.g. DMP) with the policy parameters.
@@ -107,22 +105,6 @@ private:
   /** The cost of this rollout. */
   Eigen::VectorXd cost_;  
   
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-   
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, DmpBbo::Rollout& rollout, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_NVP(policy_parameters_);
-    ar & BOOST_SERIALIZATION_NVP(cost_vars_);
-    ar & BOOST_SERIALIZATION_NVP(cost_);
-  }
-  
 };
 
 
@@ -130,9 +112,6 @@ private:
 
 }
   
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Rollout,boost::serialization::object_serializable);
 
 #endif
 

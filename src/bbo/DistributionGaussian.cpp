@@ -32,9 +32,6 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/Eigenvalues>
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
-
 using namespace std;
 using namespace Eigen;
 
@@ -50,6 +47,12 @@ boost::variate_generator<boost::mt19937&, boost::normal_distribution<> >
         rng, 
         boost::normal_distribution<>(0, 1)
      );
+
+DistributionGaussian::DistributionGaussian(unsigned int n_dims)
+{
+  mean_ = VectorXd::Zero(n_dims);
+  covar_ = MatrixXd::Ones(n_dims,n_dims);
+}
 
 
 DistributionGaussian::DistributionGaussian(const VectorXd& mean, const MatrixXd& covar) 
@@ -121,11 +124,12 @@ void DistributionGaussian::generateSamples(int n_samples, MatrixXd& samples) con
     samples.row(i_sample) = mean_ + covar_decomposed_*z;
   }  
 }
-
+                                                                   
 
 std::ostream& operator<<(std::ostream& output, const DistributionGaussian& distribution)
 {
-  output << "N([" << toString(distribution.mean_) << "], ["<< toString(distribution.covar_) << "])";
+  Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
+  output << "N(" << distribution.mean_.format(my_format) << ", "<< distribution.covar_.format(my_format) << "])";
   return output;
 }
 

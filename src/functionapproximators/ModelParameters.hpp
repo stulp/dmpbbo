@@ -30,6 +30,7 @@
 #include <set>
 #include <string>
 
+#include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
@@ -102,22 +103,12 @@ public:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // serialize base class information
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
   }
 
 };
 
 }
-
-
-/** Tell boost serialization that this class has pure virtual functions. */
-#include <boost/serialization/assume_abstract.hpp>
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::ModelParameters);
- 
-/** Don't add version information to archives. */
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParameters,boost::serialization::object_serializable);
 
 #endif //  #ifndef MODELPARAMETERS_H
 

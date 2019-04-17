@@ -26,10 +26,14 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <iosfwd>
 #include <vector>
-
 #include <eigen3/Eigen/Core>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
 
@@ -139,18 +143,18 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
+    ar & BOOST_SERIALIZATION_NVP(train_inputs_);
+    ar & BOOST_SERIALIZATION_NVP(gram_inv_targets_);
+    ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);            
+    ar & BOOST_SERIALIZATION_NVP(sigmas_);     
+  }
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::ModelParametersGPR, "ModelParametersGPR")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::ModelParametersGPR,boost::serialization::object_serializable);
 
 #endif        //  #ifndef MODELPARAMETERSGPR_H
 

@@ -1,6 +1,6 @@
 /**
- * @file   MetaParameters.cpp
- * @brief  MetaParameters class source file.
+ * @file   TaskSolver.cpp
+ * @brief  TaskSolver class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -20,29 +20,28 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
-#include <iostream>
-#include <assert.h>
 
-#include "functionapproximators/MetaParameters.hpp"
+#include "dmp_bbo/TaskSolver.hpp"
+
+#include "dmpbbo_io/EigenFileIO.hpp"
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include <boost/filesystem.hpp>
+#include <eigen3/Eigen/Core>
 
 using namespace std;
+using namespace Eigen;
 
 namespace DmpBbo {
 
-MetaParameters::MetaParameters(int expected_input_dim)
-: expected_input_dim_(expected_input_dim)
-{
-  assert(expected_input_dim_>0);
-}
-                                                                          
-MetaParameters::~MetaParameters(void) 
-{
-}
 
-ostream& operator<<(std::ostream& output, const MetaParameters& meta_parameters) {
-  output << meta_parameters.toString();
-  return output;
-}
+void TaskSolver::performRollout(const Eigen::VectorXd& sample, Eigen::MatrixXd& cost_vars) const
+{
+  Eigen::VectorXd task_parameters;
+  performRollout(sample,task_parameters,cost_vars);
+};
+
 
 }

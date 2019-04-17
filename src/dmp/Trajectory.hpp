@@ -24,11 +24,13 @@
 #ifndef _TRAJECTORY_H_
 #define _TRAJECTORY_H_
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <iosfwd>
 #include <eigen3/Eigen/Core>
 
+#include <boost/serialization/nvp.hpp>
 #include <boost/serialization/access.hpp>
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 
 namespace DmpBbo {
@@ -221,7 +223,7 @@ private:
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive
    * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
+   * \see page_serialization
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
@@ -236,10 +238,6 @@ private:
 };
 
 }
-
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Trajectory,boost::serialization::object_serializable);
 
 #endif
 

@@ -29,11 +29,16 @@
 
 #include "Parameterizable.hpp"
 
-#include <boost/serialization/nvp.hpp>
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
+
 
 namespace DmpBbo {
   
@@ -338,9 +343,7 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // serialize base class information
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
-    
     ar & BOOST_SERIALIZATION_NVP(meta_parameters_);
     ar & BOOST_SERIALIZATION_NVP(model_parameters_);
   }
@@ -348,15 +351,6 @@ private:
 };
 
 }
-
-
-/** Tell boost serialization that this class has pure virtual functions. */
-#include <boost/serialization/assume_abstract.hpp>
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::FunctionApproximator);
- 
-/** Don't add version information to archives. */
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximator,boost::serialization::object_serializable);
 
 #endif // _FUNCTIONAPPROXIMATOR_H_
 

@@ -26,6 +26,9 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 namespace DmpBbo {
 
 /** \brief Dynamical System modelling the evolution of a time: \f$\dot{x} = 1/\tau\f$.
@@ -89,18 +92,16 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
+    ar & BOOST_SERIALIZATION_NVP(count_down_);
+  }
+
 };
 
 }
 
-#include <boost/serialization/export.hpp>
-
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TimeSystem, "TimeSystem");
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TimeSystem,boost::serialization::object_serializable);
 
 #endif // _Time_SYSTEM_H_
 
