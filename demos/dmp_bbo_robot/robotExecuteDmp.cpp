@@ -112,7 +112,17 @@ int main(int n_args, char** args)
     }
     else
     {
-      dmp->setParameterVectorSelected(sample);      
+      // Set DMP parameters to sample
+      dmp->setParameterVectorSelected(sample);
+      // Save dmp whose parameters have been perturbed, if necessary
+      if (!dmp_output_filename.empty())
+      {
+        cout << "C++    |     Saving dmp to file '" << dmp_output_filename << "'"  << endl;
+        std::ofstream ofs(dmp_output_filename);
+        boost::archive::xml_oarchive oa(ofs);
+        oa << boost::serialization::make_nvp("dmp",dmp);
+        ofs.close();
+      }
     }
   }
 
@@ -129,17 +139,6 @@ int main(int n_args, char** args)
   dmp->analyticalSolution(ts,trajectory);
   bool overwrite = true;
   trajectory.saveToFile(traj_filename, overwrite);
-
-  // Read sample file, if necessary
-  if (!dmp_output_filename.empty())
-  {
-    cout << "C++    |     Saving dmp to file '" << dmp_output_filename << "'"  << endl;
-    std::ofstream ofs(dmp_output_filename);
-    boost::archive::xml_oarchive oa(ofs);
-    oa << boost::serialization::make_nvp("dmp",dmp);
-    ofs.close();
-  }
-  
   
   delete dmp;
   

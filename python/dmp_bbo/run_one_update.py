@@ -148,6 +148,13 @@ def runOptimizationTaskOneUpdate(directory,task, initial_distribution, updater, 
     samples = distribution_new.generateSamples(n_samples_per_update)
     print('  * Save samples to "'+update_dir+'/samples.txt"')
     np.savetxt(update_dir+"/samples.txt",samples)
+    for i_sample in range(n_samples_per_update):
+        rollout_dir = '%s/rollout%03d' % (update_dir, i_sample+1)
+        sample_filename = rollout_dir+"/sample.txt"
+        print('  * Save sample to "'+sample_filename+'"')
+        if not os.path.isdir(rollout_dir):
+            os.makedirs(rollout_dir)
+        np.savetxt(sample_filename,samples[i_sample,:])
     
     print('ROLLOUTS NOW REQUIRED')
     print('  * Info: '+str(n_samples_per_update)+' samples have been save in "'+update_dir+'/samples.txt".')

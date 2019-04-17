@@ -21,42 +21,36 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add relative path, in case PYTHONPATH is not set
-lib_path = os.path.abspath('../')
-sys.path.append(lib_path)
-from executeBinary import executeBinary
-
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.DistributionGaussian import DistributionGaussian
-from dmp.dmp_plotting import plotTrajectory
 
 
 if __name__=="__main__":
 
-
-    input_dmp_file = None
     input_parameters_file = None
+    output_covar_file = None
     output_directory = None
     
-    if (len(sys.argv)<4):
-        print('\nUsage: '+sys.argv[0]+' <input dmp file> <input policy parameters file> <output directory> [covar_scale] [n_samples]\n')
+    if (len(sys.argv)<3):
+        print('Usage: '+sys.argv[0]+' <input policy parameters file> <output covar file> <output directory> [covar_scale] [n_samples]')
+        print('Example: python3 '+sys.argv[0]+' results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration/ 10.0 12')
         sys.exit()
         
     if (len(sys.argv)>1):
-        input_dmp_file = sys.argv[1]
+        input_parameters_file = sys.argv[1]
     if (len(sys.argv)>2):
-        input_parameters_file = sys.argv[2]
+        output_covar_file = sys.argv[2]
     if (len(sys.argv)>3):
         output_directory = sys.argv[3]
     
     covar_scale = 1.0
-    if (len(sys.argv)>4):
+    if (len(sys.argv)>3):
         covar_scale = float(sys.argv[4])
         
     n_samples = 10    
-    if (len(sys.argv)>5):
+    if (len(sys.argv)>4):
         n_samples = int(sys.argv[5])
         
     print("Python | calling "+" ".join(sys.argv))
@@ -70,40 +64,17 @@ if __name__=="__main__":
     distribution = DistributionGaussian(parameter_vector, covar_init)
     samples = distribution.generateSamples(n_samples)
 
+    print('Python |     Saving covar to "'+output_covar_file+'"')
+    np.savetxt(output_covar_file,covar_init)
+    
     print('Python |     Saving samples to '+output_directory)
     for i_sample in range(n_samples):
         
         rollout_directory = '%s/rollout%03d/' % (output_directory, i_sample+1)
-        sample_filename = rollout_directory+'policy_parameters.txt'
+        sample_filename = rollout_directory+'sample.txt'
         
         print('Python |         Saving sample '+str(i_sample)+' to '+sample_filename)
         if not os.path.exists(rollout_directory):
             os.makedirs(rollout_directory)
         np.savetxt(sample_filename,samples[i_sample,:])
-    
-        print('Python |         Caling executeBinary ',end="")
-        arguments = [input_dmp_file,rollout_directory+"trajectory.txt",sample_filename]
-        arguments.append(rollout_directory+"dmp.xml")
-        executeBinary("./executeDmp"," ".join(arguments), True)
 
-    fig = plt.figure(1)
-    axs = [ fig.add_subplot(1,2,1), fig.add_subplot(1,3,2), fig.add_subplot(1,3,3)]
-
-    
-    print("Python |     Plotting")
-    for i_sample in range(n_samples):                       
-        rollout_directory = '%s/rollout%03d' % (output_directory, i_sample+1)
-        traj_filename = rollout_directory+'/trajectory.txt'
-        data = np.loadtxt(traj_filename)
-        lines = plotTrajectory(data,axs)
-        plt.setp(lines,linestyle='-', linewidth=1, color=(0.2,0.2,0.2), label='perturbed')
-        
-    #filename = output_directory+"/traj_unperturbed.txt"
-    #print(filename)
-    #data = np.loadtxt(filename)
-    #lines = plotTrajectory(data,axs)
-    #plt.setp(lines,linestyle='-', linewidth=3, color=(0.2,0.2,0.2), #label='perturbed')
-    #plt.legend()
-        
-
-    plt.show()        

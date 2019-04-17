@@ -1,17 +1,3 @@
-executeDmp.cpp
-  reads xml file
-  executes it
-  writes output trajectory to txt file
-
-________________________________________________________________________________
-myPerformRollouts.cpp
-  reads dmp.xml
-  reads current parameters
-
-________________________________________________________________________________
-tuneExploration.cpp
-visualizeExplorationRollouts.py
-
 ________________________________________________________________________________
 specify the cost function in MyTask.py
 
