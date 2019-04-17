@@ -22,10 +22,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Add relative path, in case PYTHONPATH is not set
+lib_path = os.path.abspath('../')
+sys.path.append(lib_path)
+from executeBinary import executeBinary
+
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.DistributionGaussian import DistributionGaussian
+from dmp.dmp_plotting import plotTrajectory
 
 
 if __name__=="__main__":
@@ -61,6 +66,27 @@ if __name__=="__main__":
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
     np.savetxt(filename,samples)
+
+    # DMP SAMPLE OUTPUTDIR zzz
+    executeBinary("./performDmpRollouts", "results/dmp.xml results/tune_exploration/", True)
+
+    fig = plt.figure(1)
+    axs = [ fig.add_subplot(1,2,1), fig.add_subplot(1,3,2), fig.add_subplot(1,3,3)]
+
+    
+    for i_sample in range(n_samples):                       
+        filename = '%s/traj_sample%05d.txt' % (output_directory, i_sample+1)
+        print(filename)
+        data = np.loadtxt(filename)
+        lines = plotTrajectory(data,axs)
+        plt.setp(lines,linestyle='-', linewidth=1, color=(0.2,0.7,0.2), label='perturbed')
         
+    filename = output_directory+"/traj_unperturbed.txt"
+    print(filename)
+    data = np.loadtxt(filename)
+    lines = plotTrajectory(data,axs)
+    plt.setp(lines,linestyle='-', linewidth=3, color=(0.2,0.2,0.2), label='perturbed')
+    #plt.legend()
         
-        
+
+    plt.show()        

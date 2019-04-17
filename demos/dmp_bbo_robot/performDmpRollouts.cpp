@@ -26,6 +26,7 @@
 
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
+#include "dmp/serialization.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
@@ -46,6 +47,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -91,40 +94,34 @@ int main(int n_args, char** args)
   ifs.close();
   
   cout << *dmp << endl;
+
+  // Integrate DMP longer than the tau with which it was trained
+  double integration_time = 1.5*dmp->tau();
+  double frequency_Hz = 100.0;
+  int n_time_steps = floor(frequency_Hz*integration_time);
+  VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,integration_time); // Time steps
+  
+  // Save trajectory without perturbation
+  Trajectory traj;
+  dmp->analyticalSolution(ts,traj);
+  bool overwrite = true;
+  traj.saveToFile(directory, "traj_unperturbed.txt", overwrite);
+
+  // Save trajectories with perturbed samples 
+  VectorXd cur_sample;
+  for (int i_sample=0; i_sample<samples.rows(); i_sample++)
+  {
+    cur_sample = samples.row(i_sample);
+    dmp->setParameterVectorSelected(cur_sample);
+    dmp->analyticalSolution(ts,traj);
+    
+    stringstream stream;
+    stream << "traj_sample" << setw(5) << setfill('0') << i_sample+1 << ".txt";
+    traj.saveToFile(directory, stream.str(), overwrite);
+    
+  }
   
   /*
-  cout << "Reading trajectory from TXT file: " << input_txt_file << endl;
-  Trajectory trajectory = Trajectory::readFromFile(input_txt_file);
-  if (trajectory.length()==0)
-  {
-    cerr << "The TXT file " << input_txt_file << " could not be found. Aborting." << endl << endl;
-    help(args[0]);
-    return -1;
-  }
-
-  //double tau = trajectory.duration();
-  //int n_time_steps = trajectory.length();
-  VectorXd ts = trajectory.ts(); // Time steps
-  int n_dims = trajectory.dim();
-
-  
-  // Initialize some meta parameters for training RBFN function approximator
-  int input_dim = 1;
-  double intersection = 0.7;
-  MetaParametersRBFN* meta_parameters = new MetaParametersRBFN(input_dim,n_basis_functions,intersection);      
-  FunctionApproximatorRBFN* fa_lwr = new FunctionApproximatorRBFN(meta_parameters);  
-  
-  // Set the parameters to optimize
-  set<string> parameters_to_optimize;
-  parameters_to_optimize.insert("weights");
-  
-  // Clone the function approximator for each dimension of the DMP
-  vector<FunctionApproximator*> function_approximators(n_dims);    
-  for (int dd=0; dd<n_dims; dd++)
-    function_approximators[dd] = fa_lwr->clone();
-  
-  // Initialize the DMP
-  Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
 
   cout << "Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
@@ -158,7 +155,7 @@ int main(int n_args, char** args)
     
   delete meta_parameters;
   delete fa_lwr;
-  delete dmp;
   */
+  delete dmp;
   return 0;
 }

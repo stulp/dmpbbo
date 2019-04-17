@@ -30,11 +30,10 @@
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
-
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <eigen3/Eigen/Core>
 
@@ -882,7 +881,17 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
 
 string Dmp::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("Dmp");
+  Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
+
+  stringstream stream;
+  
+  stream << "Dmp(";
+  stream << "name=" << name() << ", ";
+  stream << "y_init=" << initial_state().format(my_format) << ", ";
+  stream << "y_attr=" << attractor_state().format(my_format);
+  stream << ")";
+  
+  return stream.str();
 }
 
 }

@@ -18,3 +18,11 @@ step by step version in
 ________________________________________________________________________________
 monitor entire optimization
 
+
+
+________________________________________________________________________________
+move 
+
+Remove "#install(TARGETS testUpdaters DESTINATION bin_test)"
+
+EigenToString.tpp from EigenBoostSerialization? Or move into EigenFileIO

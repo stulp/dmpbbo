@@ -26,6 +26,7 @@
 
 #include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
+#include "dmp/serialization.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
@@ -46,6 +47,8 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 
+#include <boost/archive/xml_iarchive.hpp>
+#include <boost/archive/xml_oarchive.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -123,11 +126,15 @@ int main(int n_args, char** args)
   
   // Initialize the DMP
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
+  dmp->set_name("trained");
 
   cout << "Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
   dmp->train(trajectory,directory+"/train",overwrite);
 
+  // Set which parameters to optimize
+  dmp->setSelectedParameters(parameters_to_optimize);
+  
   // Make directory if it doesn't already exist
   if (!boost::filesystem::exists(directory))
   {
@@ -145,8 +152,7 @@ int main(int n_args, char** args)
   oa << boost::serialization::make_nvp("dmp",dmp);
   ofs.close();
   
-  // Set which parameters to optimize, and save the initial vector to file
-  dmp->setSelectedParameters(parameters_to_optimize);
+  // Save the initial parameter vector to file
   Eigen::VectorXd parameter_vector;
   dmp->getParameterVectorSelected(parameter_vector);
   overwrite = true;
