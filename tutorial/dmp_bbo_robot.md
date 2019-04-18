@@ -1,47 +1,48 @@
-Step-by-step howto for training and optimizing DMPs on a real robot
+Step-by-step howto for training and optimizing a DMP on a real robot
 ===============
 
 *It is assumed that you have already read the tutorials on <a href="dmp_bbo.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
 
-This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory cp -uva dmp_bbo_robot my_own_optimization, and adapt the cpp and py files to your robot and task.
+This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva dmp_bbo_robot my_own_optimization`, and adapt the cpp and py files to your robot and task.
 
 ## Step 1: Train the DMP with a demonstration
 
 It is common practice to initialize the DMP with a demonstrated trajectory, so that the optimization does not have to start from scratch. Given that the optimization algorithms are local, such an initialization is essential to avoid local minima that do not solve the task.
 
-This initialization is done with the following command (the binary is compiled from step1A_trainDmpFromTrajectoryFile.cpp):
+This initialization is done with the following command (the binary is compiled from `step1A_trainDmpFromTrajectoryFile.cpp`):
 
     ./step1A_trainDmpFromTrajectoryFile trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 6
 
-This reads a trajectory from a file (for the format see the Trajectory class), trains a DMP, and saves it to an xml file with boost::serialization. The policy parameters of this DMP, which are to be optimized in the subsequent optimization step, are also stored in policy_parameters.txt. To analyze the fitting process and tune training meta-parameters, the intermediate fitting results are written to results/train/. These can be plotted with:
+This reads a trajectory from a file (for the format see the Trajectory class), trains a DMP, and saves it to an xml file with boost::serialization. The policy parameters of this DMP, which are to be optimized in the subsequent optimization step, are also stored in `policy_parameters.txt`. To analyze the fitting process and tune training meta-parameters, the intermediate fitting results are written to `results/train/`. These can be plotted with:
 
      python3 step1B_trainDmpFromTrajectoryFilePlot.py results/train/
 
-The "6" in the call to step1A_trainDmpFromTrajectoryFile is a meta-parameter, in this example the number of basis functions. You can try different values and plot the results until a good fit is achieved.
+The "6" in the call to `step1A_trainDmpFromTrajectoryFile` is a meta-parameter, in this example the number of basis functions. You can try different values and plot the results until a good fit is achieved.
 
 ## Step 2: Define the task (i.e. cost function) and implement executing rollouts on the robot
 
-Defining the task requires you to make a class that inherits from dmp_bbo.Task, and implements the following functions:
-* evaluateRollout(cost_vars,...). This is the cost function, which takes the cost-relevant variables (cost_vars) as an input, and returns the cost associated with the rollout. cost_vars thus defines the variables the robot needs to record when performing a rollout, as these variables are required to compute the cost.
-* plotRollout(cost_vars,...). This function visualizes one rollout.
+Defining the task requires you to make a class that inherits from `dmp_bbo.Task`, and implements the following functions:
+
+* `evaluateRollout(cost_vars,...)`. This is the cost function, which takes the cost-relevant variables (cost_vars) as an input, and returns the cost associated with the rollout. cost_vars thus defines the variables the robot needs to record when performing a rollout, as these variables are required to compute the cost.
+* `plotRollout(cost_vars,...)`. This function visualizes one rollout.
 
 An example is Python script is available, which writes the defined task to a directory.
 
     python3 step1_defineTask.py results/
 
-The task converts cost-relevant variables into a cost. The robot, who is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the used must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In the dmp_bbo_robot examples, this interface is the executable robotPerformRollout (compiled from robotPerformRollout.cpp). 
+The task converts cost-relevant variables into a cost. The robot, who is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the used must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In the dmp_bbo_robot examples, this interface is the executable `robotPerformRollout` (compiled from `robotPerformRollout.cpp`). 
 
     ./robotPerformRollout results/dmp.xml results/cost_vars_demonstrated.txt
 
 The results of performing a rollout can be visualized as follows:
     
-    python3 plotRollout.py results/cost_vars_demonstrated.txt results/task.p    
+    python3 plotRollout.py results/cost_vars_demonstrated.txt results/task.p
     
-This uses the plotRollouts(cost_vars,...) function in the Task to plot the rollout.
+This uses the `plotRollouts(cost_vars,...)` function in the `Task` to plot the rollout.
     
 ## Step 3: Tune the exploration noise for the optimization
 
-During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution (which parameters these are is set through the Parameterizable class from which Dmp inherits. See the "set<string> parameters_to_optimize" code in step1A_trainDmpFromTrajectoryFile.cpp for an example). The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning. 
+During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution (which parameters these are is set through the `Parameterizable` class from which `Dmp` inherits. See the "`set<string> parameters_to_optimize`" code in `step1A_trainDmpFromTrajectoryFile.cpp` for an example). The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning. 
 
 The covariance matrix of this distributions determines the magnitude of exploration. It should not be too low, otherwise the stochasticity of the exploration may be smaller than that of the robot movement itself, and no learning can take place. It should also not be too high for safety reasons; your robot may reach acceleration limits, joint limits, or unexpectedly bump into the environment. 
 
@@ -63,36 +64,36 @@ You can tune this parameter by calling the following three scripts for different
 
 ## Step 4: Run the optimization (step by step)
 
-Now we have trained a dmp (stored in dmp.xml), specified the task (stored in task.p), and tuned the exploration (stored in distribution_initial_covar.txt). Now it's time to run the optimization. This is an iterative process with two main steps (and an optional step of plotting intermediate results). Each iteration is called "an update", as it involves one update of the policy parameters.
+Now we have trained a dmp (stored in `dmp.xml`), specified the task (stored in `task.p`), and tuned the exploration (stored in `distribution_initial_covar.txt`). Now it's time to run the optimization! This is an iterative process with two main steps (and an optional step of plotting intermediate results). Each iteration is called an "update", as it involves one update of the policy parameters.
 
-### Step 4A: Read previous rollouts, update parameters, and generate new samples (off-line, in Python)
+### Step 4A: Update parameters 
 
 This is a highly automized process, which is called as follows
 
-  python3 step4A_oneOptimizationUpdate.py  results/
+    python3 step4A_oneOptimizationUpdate.py  results/
 
-This will automatically find the most recent update (e.g. results/update0083/) and read all cost_vars in the rollouts in this update directory (which are stored in update0083/rollout001/cost_vars.txt, update0083/rollout002/cost_vars.txt, etc.). It then computes the costs from each cost_vars (with task.evaluateRollout), and updates the policy parameters. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. update0084/rollout001/policy_parameters.txt, update0084/rollout002/policy_parameters.txt, etc.)
+This will automatically find the most recent update (e.g. `results/update0083/`) and read all cost_vars in the rollouts in this update directory (which are stored in `update0083/rollout001/cost_vars.txt`, `update0083/rollout002/cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluateRollout(...)`), and updates the policy parameters. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update0084/rollout001/policy_parameters.txt`, `update0084/rollout002/policy_parameters.txt`, etc.)
 
 Note: on the first call this script only writes the samples, but does not read the rollouts, as there are none yet.
 
-### Step 4B: Perform rollouts: read samples, execute policy, store resulting cost_vars (on robots, e.g. with C++ implementation of a Dmp)
+### Step 4B: Perform rollouts
 
-Performing the rollouts on the robot is done with the same "./robotPerformRollout" executable as above. There is a convenience bash script
+Performing the rollouts on the robot is done with the same `./robotPerformRollout` executable as above. There is a convenience bash script
 
-  robotPerformRollouts.bash results/dmp.xml results/update00084/
+    robotPerformRollouts.bash results/dmp.xml results/update00084/
 
-which loops over all rolloutNNNN/ directories and calls ./robotPerformRollout on each. Finally, the step4B_performRollouts.bash determines the current update (e.g. update0084/), calls robotPerformRollouts.bash with this directory
+which loops over all `rolloutNNNN/` directories and calls `./robotPerformRollout` on each. Finally, the `step4B_performRollouts.bash` determines the current update (e.g. `update0084/`), calls `robotPerformRollouts.bash` with this directory
 
-  ./step4B_performRollouts.bash results/
+    ./step4B_performRollouts.bash results/
 
-Note that all of the scripts/programs in Step 4B will be very specific to your robot. For instance, you may have a Simulink model that implements the policy, and instead of robotPerformRollouts.bash you may have a python script or some ROS-based solution. As long as it sticks to the conventions in the directory structure with updates in "update00084/" directories, rollouts in "rollout001/", policy parameters read from policy_parameters.txt and cost-relevant variables written to cost_vars.txt in these directories, all is good.
+Note that all of the scripts/programs in Step 4B will be very specific to your robot. For instance, you may have a Simulink model that implements the policy, and instead of robotPerformRollouts.bash you may have a python script or some ROS-based solution. As long as it sticks to the conventions in the directory structure with updates in `update00084/` directories, rollouts in `rollout001/`, policy parameters read from `policy_parameters.txt` and cost-relevant variables written to `cost_vars.txt` in these directories, all is good.
 
 ### Step 4C: Plotting intermediate results
 
 Iteratively executing the two steps above iteratively leads to (you'll probably have this scripted somehow)
 
     python3 step4A_oneOptimizationUpdate.py results/ 
-    ./step4B_performRollouts.bash results/           
+    ./step4B_performRollouts.bash results/
     python3 step4A_oneOptimizationUpdate.py results/
     ./step4B_performRollouts.bash results/
     python3 step4A_oneOptimizationUpdate.py results/
@@ -100,7 +101,7 @@ Iteratively executing the two steps above iteratively leads to (you'll probably 
 
 If you are curious about intermediate results, you can visualize them with
 
-    step4C_plotOptimization.py results/
+    python3 step4C_plotOptimization.py results/
 
 This will automatically determine what the last update directory is.
 
@@ -111,74 +112,4 @@ Sockets vs txt files. Keep it simple!
 Approach not optimized for running millions of rollouts on a CPU cluster, but for running 10s/100s of rollouts on a real robot. 
 
 Overhead of using txt files in terms of execution time neglible. But very nice to have a format that is human readable. Easy to adapt to different robots (whatever robot, operating system and programming language you use, they should be able to read ASCII files)
-
-<a name="sec_bbo_one_update"></a>
-## One update at a time with Task/TaskSolver
-
-**Note.** this is currently only implemented in python/dmp_bbo/, with a demo in demos/dmp_bbo_robot
-
-When running an optimization on a real robot, it is convenient to seperate it in two alternating steps:1
-
-* compute the costs from the rollouts, update the parameter distribution from the costs, and generate samples from the new distribution. The input to this step are the rollouts, which should contain all the variables relevant to computing the costs. The output is the new samples. 
-
-* perform the roll-outs, given the samples in parameter space. Save all the cost-relevant variables to file.
-
-
-The first part has been implemented in Python (run_one_update.py), and the second part is specific to your robot, and can be implemented however you want.
-
-In practice, it is not convenient to run above two phases in a loop, but rather perform them step by step. That means the optimization can be stopped at any time, which is useful if you are running long optimization (and want to go to lunch or something). An example of this update-by-update optimization is given in python/dmp_bbo/demos, where:
-
-* demo_one_update.py performs the actual optimization
-
-* demo_perform_rollouts.py executes the rollouts (you'll have to implement something similar on your robot)
-
-* demo_optimization_one_by_one.bash, which alternatively calls the two scripts above.
-
-```bash
-#!/bin/bash
-
-DIREC="/tmp/demo_optimization_one_by_one"
-
-# Yes, I know there are for loops in bash ;-)
-# But this makes it really explicit how to call the scripts
-    
-python demo_one_update.py $DIREC/
-python demo_perform_rollouts.py $DIREC/update00001 # Replace this with your robot
-    
-python demo_one_update.py $DIREC/
-python demo_perform_rollouts.py $DIREC/update00002 # Replace this with your robot
-    
-python demo_one_update.py $DIREC/
-python demo_perform_rollouts.py $DIREC/update00003 # Replace this with your robot
-    
-python demo_one_update.py $DIREC/
-python demo_perform_rollouts.py $DIREC/update00004 # Replace this with your robot
-    
-python demo_one_update.py $DIREC/ plotresults
-```
-
-<a name="sec_practical_howto"></a>
-### Practical howto
-
-**Todo** Update this with DMP example
-
-Here's what you need to do to make it all work.
-<a name="sec_specify_task"></a>
-### Specify the task
-
-Copy demo_one_update.py to, for instance, one_update_my_task.py. In it, replace the Task with whatever your task is. The most important function is evaluateRollout(self, cost_vars), which takes the cost-relevant variables, and returns its cost. See the sections on <a href="dmp_bbo.md#sec_cost_vars">cost-relevant variables</a> and <a href="dmp_bbo.md#sec_cost_components">cost components</a> for what these should contain.
-
-If you want functionality for plotting a rollout, you can also implement the function plotRollout(self,cost_vars,ax), which takes costs_vars and visualizes the rollout they represent on the axis 'ax'.
-<a name="sec_specify_settings"></a>
-### Specify the settings of the optimization
-
-This includes the initial distribution, the method for updating the covariance matrix and the number of samples per update. This is all set in one_update_my_task.py (your copy of demo_one_update.py).
-<a name="sec_specify_robot"></a>
-### Enable your robot to perform rollouts
-
-Implement a script "performRollouts" for your robot (in whatever language you want). It should take a directory as an input. From this trajectory, it should read the file "policy_parameters.txt" and execute whatever movement it makes with these policy parameters (e.g. the parameters of the DMP, which can be set with the function setParameterVectorSelected, which it inheritst from Parameterizable)
-
-It should write the resulting rollout to a file called cost_vars.txt (in the same directory from which policy_parameters.txt was read). This should be a vector or a matrix. What it contains depends entirely on your task. So what your robot writes to cost_vars.txt should be compatible with Task.evaluateRollout(self,cost_vars).
-
-The "communication protocol" between run_one_update.py and the robot is very simple (conciously made so!). Only .txt files containing matrices are exchanged. An example script (in Python) can be found in demo_perform_rollouts.py. Again, this script can be anything you want (Python, bash script, Matlab, real robot), as long as it respects the format of cost_vars.txt that Task.evaluateRollout() expects. 
 
