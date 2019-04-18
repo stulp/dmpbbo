@@ -26,8 +26,8 @@ import inspect
 lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
-from dmp_bbo.Task import Task
-from dmp_bbo.tasks.TaskViapoint import TaskViapoint
+from TaskThrowBall import TaskThrowBall
+
 
 if __name__=="__main__":
     
@@ -41,10 +41,11 @@ if __name__=="__main__":
     if (len(sys.argv)>1):
         output_task_file = sys.argv[1]
 
-    n_dims = 2
-    viapoint = np.linspace(0.2,0.7,n_dims)
-    viapoint_time = 0.25
-    task = TaskViapoint(viapoint, viapoint_time)
+    x_goal = -0.70
+    x_margin = 0.1
+    y_floor = -0.3
+    acceleration_weight = 0.00001
+    task = TaskThrowBall(x_goal,x_margin,y_floor,acceleration_weight)
     
     # Save the task instance itself
     print('  * Saving task to file "'+output_task_file+"'")

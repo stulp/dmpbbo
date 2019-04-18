@@ -1,12 +1,4 @@
-renamem robotExecuteDmp to robotPerformRollout
-_______________________________________________________________________________
-throw_ball_task
-  define cost_vars
-  implement "simulation" of ball in in robotExecuteDmp.cpp
-  generate example trajectory in step0_robotKinestheticTeaching
-  fine tune all the other steps (exploration etc.)
-
-Include images in tutorial/dmp_bbo_robot.md
+Fine tune plotting and include images in tutorial/dmp_bbo_robot.md
 
 Mode dmp_bbo_robot up  one directory
   

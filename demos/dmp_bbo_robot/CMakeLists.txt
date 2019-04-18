@@ -2,6 +2,6 @@ add_executable(step1A_trainDmpFromTrajectoryFile step1A_trainDmpFromTrajectoryFi
 target_link_libraries(step1A_trainDmpFromTrajectoryFile dmp functionapproximators dynamicalsystems ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS step1A_trainDmpFromTrajectoryFile DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(robotExecuteDmp robotExecuteDmp.cpp)
-target_link_libraries(robotExecuteDmp dmp functionapproximators dynamicalsystems ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-install(TARGETS robotExecuteDmp DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(robotPerformRollout robotPerformRollout.cpp)
+target_link_libraries(robotPerformRollout dmp functionapproximators dynamicalsystems ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+install(TARGETS robotPerformRollout DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
