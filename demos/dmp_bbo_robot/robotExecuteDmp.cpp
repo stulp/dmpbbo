@@ -56,7 +56,7 @@ using namespace DmpBbo;
 
 void help(char* binary_name)
 {
-  cout << "Usage: " << binary_name << " <dmp filename.xml> <output trajectory filename.txt> [sample.txt] [output dmp filename.xml]" << endl;
+  cout << "Usage: " << binary_name << " <dmp filename.xml> <output trajectory filename.txt> [dmp parameters.txt] [output dmp filename.xml]" << endl;
 }
 
 /** Main function

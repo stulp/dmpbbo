@@ -71,7 +71,7 @@ if __name__=="__main__":
     for i_sample in range(n_samples):
         
         rollout_directory = '%s/rollout%03d/' % (output_directory, i_sample+1)
-        sample_filename = rollout_directory+'sample.txt'
+        sample_filename = rollout_directory+'policy_parameters.txt'
         
         print('Python |         Saving sample '+str(i_sample)+' to '+sample_filename)
         if not os.path.exists(rollout_directory):

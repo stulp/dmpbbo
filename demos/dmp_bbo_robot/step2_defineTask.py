@@ -30,25 +30,25 @@ from dmp_bbo.Task import Task
 from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 
 if __name__=="__main__":
-    directory = None
+    
+    output_task_file = None
     
     if (len(sys.argv)<2):
-        print('Usage: '+sys.argv[0]+' <directory>')
-        print('Example: python3 '+sys.argv[0]+' results/')
+        print('Usage: '+sys.argv[0]+' <task file.p>')
+        print('Example: python3 '+sys.argv[0]+' results/task.p')
         sys.exit()
         
     if (len(sys.argv)>1):
-        directory = sys.argv[1]
+        output_task_file = sys.argv[1]
 
     n_dims = 2
-    viapoint = np.linspace(0.0,1.0,n_dims)
+    viapoint = np.linspace(0.2,0.7,n_dims)
     viapoint_time = 0.25
     task = TaskViapoint(viapoint, viapoint_time)
     
     # Save the task instance itself
-    output_file = directory+'/task.p';
-    print('  * Saving task to file "'+output_file+"'")
-    pickle.dump(task, open(output_file, "wb" ))
+    print('  * Saving task to file "'+output_task_file+"'")
+    pickle.dump(task, open(output_task_file, "wb" ))
 
     # Save the source code of the task for future reference
     #src_task = inspect.getsourcelines(task.__class__)

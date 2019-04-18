@@ -9,7 +9,6 @@ From an implementation point of view, applying BBO to policy improvement (which 
 
 * Running multiple optimizations in parallel, one for each DOF of the DMP
 * Using rollouts with a Task/TaskSolver instead of a CostFunction
-* Allowing the optimization to be run one update at a time, instead of in a loop
 
 
 <a name="sec_parallel_optimization"></a>

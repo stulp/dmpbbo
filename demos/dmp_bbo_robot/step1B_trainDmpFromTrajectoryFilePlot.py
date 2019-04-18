@@ -59,7 +59,6 @@ if __name__=='__main__':
     
     fig = plt.figure(2,figsize=(n_dims*5,5))
     for i_dim in range(n_dims):
-        print(i_dim)
         ax = fig.add_subplot(1, n_dims, i_dim+1)
         plotFunctionApproximatorTrainingFromDirectory(directory+"dim"+str(i_dim),ax)
        

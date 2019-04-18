@@ -13,6 +13,6 @@ echo "bash   | Rollout directories are ${ROLLOUT_DIRS}"
 # Call execute dmp for each rollout
 for CUR_DIR in $ROLLOUT_DIRS
 do
-  echo "bash   | Calling ./robotExecuteDmp $INPUT_DMP $CUR_DIR/cost_vars.txt $CUR_DIR/sample.txt $CUR_DIR/dmp.xml"
-  ./robotExecuteDmp $INPUT_DMP $CUR_DIR/cost_vars.txt $CUR_DIR/sample.txt $CUR_DIR/dmp.xml
+  echo "bash   | Calling ./robotExecuteDmp $INPUT_DMP $CUR_DIR/cost_vars.txt $CUR_DIR/policy_parameters.txt $CUR_DIR/dmp.xml"
+  ./robotExecuteDmp $INPUT_DMP $CUR_DIR/cost_vars.txt $CUR_DIR/policy_parameters.txt $CUR_DIR/dmp.xml
 done

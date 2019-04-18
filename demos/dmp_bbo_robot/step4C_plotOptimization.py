@@ -18,33 +18,29 @@
 
 import os
 import sys
+import pickle
 import numpy as np
+import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath('../../python/')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
-
-from demo_perform_rollouts import performRolloutsFakeRobot
-from demo_one_update import oneUpdate
-
-
+from dmp_bbo.Task import Task
+from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 
 if __name__=="__main__":
+
+    # See if input directory was passed
+    if (len(sys.argv)>=2):
+        directory = str(sys.argv[1])
+    else:
+        print('\nUsage: '+sys.argv[0]+' <directory>\n')
+        sys.exit()
+
+    # Load the task
+    task = pickle.load(open(directory+'/task.p', "rb" ))
     
-    directory="/tmp/demo_optimization_one_by_one_python"
-
-    oneUpdate(directory)
-    performRolloutsFakeRobot(directory+'/update00000')
-
-    oneUpdate(directory)
-    performRolloutsFakeRobot(directory+'/update00001')
-
-    plot_results = True
-    oneUpdate(directory,plot_results)
-    performRolloutsFakeRobot(directory+'/update00002')
-
-    oneUpdate(directory)
-    performRolloutsFakeRobot(directory+'/update00003')
-
-    oneUpdate(directory,plot_results)
-
+    # Plot the optimization results (from the files saved to disk)
+    fig = plt.figure(1,figsize=(15, 5))
+    plotOptimizationRollouts(directory,fig,task.plotRollout)
+    plt.show()

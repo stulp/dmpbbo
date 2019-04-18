@@ -30,7 +30,6 @@ from bbo.DistributionGaussian import DistributionGaussian
 
 from dmp_bbo.Task import Task
 from dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
-from dmp_bbo.dmp_bbo_plotting import plotOptimizationRollouts
 
 if __name__=="__main__":
 
@@ -38,13 +37,8 @@ if __name__=="__main__":
     if (len(sys.argv)>=2):
         directory = str(sys.argv[1])
     else:
-        print('\nUsage: '+sys.argv[0]+' <directory> [plot_results]\n')
+        print('\nUsage: '+sys.argv[0]+' <directory>\n')
         sys.exit()
-
-    plot_results = False
-    if (len(sys.argv)>=3):
-        plot_results = True
-        
 
     ############################################################
     # TUNE OPTIMIZATION ALGORITHM PARAMETERS HERE
@@ -71,11 +65,5 @@ if __name__=="__main__":
     
     # Execute one update
     i_update = runOptimizationTaskOneUpdate(directory, task, initial_distribution, updater, n_samples_per_update)
-
-    # Plot the update, if necessary
-    i_update -= 1
-    if plot_results and i_update>1:
-        # Plot the optimization results (from the files saved to disk)
-        fig = plt.figure(1,figsize=(15, 5))
-        plotOptimizationRollouts(directory,fig,task.plotRollout)
-        plt.show()
+    
+    #print("./robotPerformRollouts.bash $DIRECTORY/dmp.xml ${UPDATE_DIR}")

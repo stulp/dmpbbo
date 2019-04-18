@@ -1,18 +1,24 @@
-________________________________________________________________________________
-specify the cost function in MyTask.py
+renamem robotExecuteDmp to robotPerformRollout
+_______________________________________________________________________________
+throw_ball_task
+  define cost_vars
+  implement "simulation" of ball in in robotExecuteDmp.cpp
+  generate example trajectory in step0_robotKinestheticTeaching
+  fine tune all the other steps (exploration etc.)
 
-________________________________________________________________________________
-step by step version in 
-  with separate plot function
+Include images in tutorial/dmp_bbo_robot.md
+
+Mode dmp_bbo_robot up  one directory
   
+Make Python scripts robust against missing data, e.g. cost_vars
+
+update Python/C++ comparison
+
+Check if true: An example is given in TaskViapoint, which implements a Task in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by TaskSolverDmp, which is able to generate such trajectories.
+
 
 ________________________________________________________________________________
-monitor entire optimization
-
-
-
-________________________________________________________________________________
-move 
+Other things:
 
 Remove "#install(TARGETS testUpdaters DESTINATION bin_test)"
 
