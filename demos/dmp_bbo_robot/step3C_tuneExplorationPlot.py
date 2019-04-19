@@ -55,13 +55,14 @@ if __name__=="__main__":
         task = pickle.load(open(input_task_file, "rb" ))
     
     fig = plt.figure(1)
-    axs = [ fig.add_subplot(1,4,ii+1) for ii in range(4) ]
+    n_subplots = 1
+    axs = [ fig.add_subplot(1,n_subplots,ii+1) for ii in range(n_subplots) ]
         
     dirs = sorted(glob.glob(directory+"/rollout*"))
     for cur_dir in dirs:
-        plotTrajectoryFromFile(cur_dir+"/cost_vars.txt",axs[0:3])
+        #plotTrajectoryFromFile(cur_dir+"/cost_vars.txt",axs[1:4])
         if task:
             cost_vars = np.loadtxt(cur_dir+"/cost_vars.txt")
-            task.plotRollout(cost_vars,axs[-1])
+            task.plotRollout(cost_vars,axs[0])
 
     plt.show()        

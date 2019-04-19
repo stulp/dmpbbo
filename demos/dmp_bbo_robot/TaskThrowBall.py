@@ -52,16 +52,19 @@ class TaskThrowBall(Task):
         ball = cost_vars[:,-2:]
         
         line_handles = ax.plot(y[:,0],y[:,1],linewidth=0.5)
-        line_handles_ball = ax.plot(ball[:,0],ball[:,1],'-')
-        line_handles_ball = ax.plot(ball[::10,0],ball[::10,1],'o')
-        x_range = [self.x_goal_-self.x_margin_,self.x_goal_+self.x_margin_]
-        ax.plot(x_range,[self.y_floor_, self.y_floor_],'-k',linewidth=1)
-        #ax.plot(y[0,0], y[0,1], 'bo', label='start')   
-        #ax.plot(y[-1,0], y[-1,1], 'go', label='end')
+        line_handles_ball_traj = ax.plot(ball[:,0],ball[:,1],'-')
+        line_handles_ball = ax.plot(ball[::5,0],ball[::5,1],'ok')
+        plt.setp(line_handles_ball,'MarkerFaceColor','none')
+
+        line_handles.extend(line_handles_ball_traj)
+
+        # Plot the floor
+        x_floor = [-1.0, self.x_goal_-self.x_margin_,self.x_goal_, self.x_goal_+self.x_margin_ ,0.4]
+        y_floor = [self.y_floor_,self.y_floor_,self.y_floor_-0.05,self.y_floor_,self.y_floor_]
+        ax.plot(x_floor,y_floor,'-k',linewidth=1)
+        ax.plot(self.x_goal_,self.y_floor_-0.05,'og')
         ax.axis('equal')
         ax.set_xlabel('y_1')
         ax.set_ylabel('y_2')
-        
-        self.evaluateRollout(cost_vars,None)
             
         return line_handles

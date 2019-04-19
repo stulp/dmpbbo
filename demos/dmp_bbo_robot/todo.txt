@@ -1,6 +1,6 @@
 Fine tune plotting and include images in tutorial/dmp_bbo_robot.md
 
-Mode dmp_bbo_robot up  one directory
+Move dmp_bbo_robot up  one directory
   
 Make Python scripts robust against missing data, e.g. cost_vars
 
