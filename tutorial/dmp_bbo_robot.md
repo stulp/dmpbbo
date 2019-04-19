@@ -5,19 +5,43 @@ Step-by-step howto for training and optimizing a DMP on a real robot
 
 This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva dmp_bbo_robot my_own_optimization`, and adapt the cpp and py files to your robot and task.
 
+In the task considered in this tutorial, the robot has to throw a ball into a certain area, as illustrated below. The "robot" makes an elliptical movement with its end-effector (blue trajectory), releases the ball (black circles) after 0.6 seconds, so that the ball flies through the air (green trajectory) until it hits the ground. The aim is to throw the ball to a particular position (the green marker on the "floor"). There is a margin of error, illustrated by the dent in the floor.
+
+![alt text](images/task_throw_ball.png  "Illustration of the ball throwing task.")
+
+
 ## Step 1: Train the DMP with a demonstration
 
 It is common practice to initialize the DMP with a demonstrated trajectory, so that the optimization does not have to start from scratch. Given that the optimization algorithms are local, such an initialization is essential to avoid local minima that do not solve the task.
 
 This initialization is done with the following command (the binary is compiled from `step1A_trainDmpFromTrajectoryFile.cpp`):
 
-    ./step1A_trainDmpFromTrajectoryFile trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 6
+    ./step1A_trainDmpFromTrajectoryFile trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 5
 
 This reads a trajectory from a file (for the format see the Trajectory class), trains a DMP, and saves it to an xml file with boost::serialization. The policy parameters of this DMP, which are to be optimized in the subsequent optimization step, are also stored in `policy_parameters.txt`. To analyze the fitting process and tune training meta-parameters, the intermediate fitting results are written to `results/train/`. These can be plotted with:
 
      python3 step1B_trainDmpFromTrajectoryFilePlot.py results/train/
 
-The "6" in the call to `step1A_trainDmpFromTrajectoryFile` is a meta-parameter, in this example the number of basis functions. You can try different values and plot the results until a good fit is achieved.
+The "5" in the call to `step1A_trainDmpFromTrajectoryFile` is a meta-parameter, in this example the number of basis functions. The first plot shows the results of the function approximation inside each DMP dimension, where the black dots are the input data, the blue line is the approximation, and the vertical red lines is the difference between them (the "residuals"). The x and y-axis are annotated with the vague "input" and "output". This is because the function approximator inside the DMP has not clue what it is fitting. 
+
+![alt text](images/step1_function_approximation_5.png  "Results of function approximation with 5 basis functions.")
+
+The third plot shows the demonstrated trajectory and the reproduced trajectory (the second plot shows more detailed results of integrating the trained DMP). The demonstrated trajectory is the eliptical movement illustrated in the figure above.
+
+![alt text](images/step1_trajectory_comparison_5.png  "Reproduced trajectory with 5 basis functions.")
+
+In the results above, the fitting is not very good, i.e. there is a large difference between the input data and the fitted function. We therefore also see that the reproduced trajectory does not fit the demonstrated trajectory well. This is because 5 basis function do not suffice to fit the data accurately. So let's increase the number of basis functions to 10
+
+    ./step1A_trainDmpFromTrajectoryFile trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 10
+     python3 step1B_trainDmpFromTrajectoryFilePlot.py results/train/
+
+Which yields the following result:
+
+![alt text](images/step1_function_approximation_10.png  "Results of function approximation with 10 basis functions.")
+
+![alt text](images/step1_trajectory_comparison_10.png  "Reproduced trajectory with 10 basis functions.")
+     
+This fit is quite good, so let's go with 10 basis functions. Note that with 20 basis functions, the fit is even better. But more basis functions means a higher-dimensional search space for the subsequent optimization, and therefore slower convergence to the (local) optimum. This is the trade-off that needs to be anticipated when choosing the number of basis functions.
 
 ## Step 2: Define the task (i.e. cost function) and implement executing rollouts on the robot
 
@@ -29,7 +53,7 @@ Defining the task requires you to make a class that inherits from `dmp_bbo.Task`
 An example is Python script is available, which writes the defined task to a directory.
 
     python3 step1_defineTask.py results/
-
+    
 The task converts cost-relevant variables into a cost. The robot, who is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the used must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In the dmp_bbo_robot examples, this interface is the executable `robotPerformRollout` (compiled from `robotPerformRollout.cpp`). 
 
     ./robotPerformRollout results/dmp.xml results/cost_vars_demonstrated.txt
@@ -38,8 +62,14 @@ The results of performing a rollout can be visualized as follows:
     
     python3 plotRollout.py results/cost_vars_demonstrated.txt results/task.p
     
-This uses the `plotRollouts(cost_vars,...)` function in the `Task` to plot the rollout.
-    
+This uses the `plotRollouts(cost_vars,...)` function in the `Task` to plot the rollout. An example of its output is plotted below.
+   
+![alt text](images/task_throw_ball.png  "Illustration of the ball throwing task.")
+
+For the cost function of this task, the only relevant variables are the landing position of the ball, and the accelerations at each time step (accelerations are also penalized). In practice however, I usually store more information in cost_vars for visualization purposes, e.g. the end-effector trajectory and the ball trajectory. These are not needed to compute the cost with `evaluateRollout(cost_vars,...)`, but certainly help to provide sensible plots with `plotRollouts(cost_vars,...)`
+
+Gathering the information for cost-vars can be non-trivial in practice. For instance, for the ball-in-cup experiments on the Meka robot, the end-effector position was recorded by the robot, and stored at each time step. The ball trajectory was recorded with an external camera, passed to the robot, which stored it inside the cost_vars matrix alongside the end-effector positions.
+
 ## Step 3: Tune the exploration noise for the optimization
 
 During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution (which parameters these are is set through the `Parameterizable` class from which `Dmp` inherits. See the "`set<string> parameters_to_optimize`" code in `step1A_trainDmpFromTrajectoryFile.cpp` for an example). The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning. 
@@ -49,7 +79,7 @@ The covariance matrix of this distributions determines the magnitude of explorat
 You can tune this parameter by calling the following three scripts for different exploration magnitudes:
 
     MAG=0.1      # Exploration magnitude to try (start low!)
-    N_SAMPLES=12 # Number of samples to generate
+    N_SAMPLES=10 # Number of samples to generate
     # Generate samples with this magnitude
     # This will save samples to directories 
     #     results/tune_exploration_0.1/rollout001/policy_parameters.txt
@@ -60,6 +90,10 @@ You can tune this parameter by calling the following three scripts for different
     ./step3B_performExplorationRollouts.bash results/dmp.xml results/tune_exploration_${MAG}/
     # Plot the rollouts to see the variance in the movements
     python3 step3C_tuneExplorationPlot.py results/tune_exploration_${MAG}/ results/task.p
+
+Below the results of exploring with magnitudes 0.1, 1.0, 10.0, and 100.0. The value 0.1 is probably too low, because there is hardly any variation in the end-effector movement. 100.0 is definitely too high! If you execute this on your robot you are a braver person than I (Quote from the license: "This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY". If your bravery breaks your robot, don't blame me!). Given these results, I'd be comfortable with a value between 1.0 and 10.0. We'll continue with 10.0 in this tutorial, as we can't break any robots in simulation.
+
+![alt text](images/exploration_rollouts-svg.png  "Resulting rollouts with different exploration magnitudes.")
 
 
 ## Step 4: Run the optimization (step by step)
