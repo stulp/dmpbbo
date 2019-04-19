@@ -42,7 +42,7 @@ if __name__=="__main__":
         output_task_file = sys.argv[1]
 
     x_goal = -0.70
-    x_margin = 0.1
+    x_margin = 0.01
     y_floor = -0.3
     acceleration_weight = 0.00001
     task = TaskThrowBall(x_goal,x_margin,y_floor,acceleration_weight)
