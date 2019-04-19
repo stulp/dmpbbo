@@ -42,17 +42,23 @@ if __name__=="__main__":
 
     ############################################################
     # TUNE OPTIMIZATION ALGORITHM PARAMETERS HERE
-    
+
+
     eliteness = 10
     weighting_method = 'PI-BB'
-    covar_decay_factor = 0.8
-    updater = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
+    updater_mean = UpdaterMean(eliteness,weighting_method)
     
-    base_level_diagonal = None
-    diag_only=False
+    covar_decay_factor = 0.8
+    updater_decay = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
+    
+    min_level = 0.1
+    max_level = 10.0
+    diag_only = True
     learning_rate=0.5
     #updater = UpdaterCovarAdaptation(eliteness, weighting_method)
-    updater = UpdaterCovarAdaptation(eliteness, weighting_method,base_level_diagonal,diag_only,learning_rate)
+    updater_adaptation = UpdaterCovarAdaptation(eliteness, weighting_method,max_level,min_level,diag_only,learning_rate)
+    
+    updater = updater_adaptation
     
     n_samples_per_update = 10
     

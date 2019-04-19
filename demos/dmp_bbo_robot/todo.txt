@@ -1,8 +1,6 @@
-Improve UpdateCovarAdaptation
-  allow base_level to be a scale
-  add a member max_level (scalar or vector)
+Check code: set variance or standard deviation?
 
-Fine tune plotting and include images in tutorial/dmp_bbo_robot.md
+Include optimization images in tutorial/dmp_bbo_robot.md
 
 Move dmp_bbo_robot up  one directory
   
