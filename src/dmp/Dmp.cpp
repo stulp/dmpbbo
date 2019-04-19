@@ -37,6 +37,8 @@
 #include <string>
 #include <eigen3/Eigen/Core>
 
+#include "dmpbbo_io/EigenFileIO.hpp"
+
 
 using namespace std;
 using namespace Eigen;
@@ -683,12 +685,26 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
   
   if (!save_directory.empty())
   {
-    int n_time_steps = 101;
-    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau());
-    Trajectory traj_reproduced;
-    analyticalSolution(ts,traj_reproduced);
+    // Integrate the DMP to get the resulting trajectory, and save it for debugging purposes
+    int n_time_steps = 151;
+    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,1.5*tau());
+    VectorXd tau_vec(1);
+    tau_vec[0] = tau();
+    saveMatrix(save_directory,"tau.txt",tau_vec,overwrite);
     
+    
+    MatrixXd xs, xds, forcing_terms, fa_output;
+    analyticalSolution(ts,xs,xds,forcing_terms,fa_output);
+    Trajectory traj_reproduced;
+    statesAsTrajectory(ts, xs, xds, traj_reproduced);
+
     trajectory.saveToFile(save_directory,"traj_demonstration.txt",overwrite);
+    MatrixXd output_ana(ts.size(),1+xs.cols()+xds.cols());
+    output_ana << ts, xs, xds;
+    saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
+    saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms,overwrite);
+    saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output,overwrite);
+    
     traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt",overwrite);
   }
   
