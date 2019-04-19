@@ -64,7 +64,9 @@ class TaskThrowBall(Task):
         ax.plot(x_floor,y_floor,'-k',linewidth=1)
         ax.plot(self.x_goal_,self.y_floor_-0.05,'og')
         ax.axis('equal')
-        ax.set_xlabel('y_1')
-        ax.set_ylabel('y_2')
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_xlim([-0.9, 0.3])
+        ax.set_ylim([-0.4, 0.3])
             
         return line_handles
