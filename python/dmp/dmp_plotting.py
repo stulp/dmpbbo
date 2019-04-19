@@ -26,7 +26,7 @@ sys.path.append(lib_path)
 from dynamicalsystems.dynamicalsystems_plotting import * 
 
 
-def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[]):
+def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[],tau=None):
 
     ts  = data[:,0] # First column is time
     data = data[:,1:] # Remove first column
@@ -126,6 +126,13 @@ def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[]):
         ax.set_xlabel(r'time ($s$)');
         ax.set_ylabel(r'unknown');
 
+    if tau:
+        x_lim = [min(ts),max(ts)]
+        for ax in plt.gcf().get_axes():
+            ax.plot([tau,tau],ax.get_ylim(),'-k')
+            ax.set_xlim(x_lim[0],x_lim[1])
+            
+
 
 if __name__=='__main__':
     
@@ -171,6 +178,11 @@ def plotTrajectory(trajectory,axs,n_misc=0):
       lines[len(lines):] = axs[3].plot(trajectory[:,time_index],trajectory[:,3*n_dims+1:], '-')
       axs[3].set_xlabel('time (s)');
       axs[3].set_ylabel('misc');
+      
+    x_lim = [min(trajectory[:,time_index]),max(trajectory[:,time_index])]
+    for ax in axs:
+        ax.set_xlim(x_lim[0],x_lim[1])
+        
         
       
     return lines
