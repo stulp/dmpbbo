@@ -57,7 +57,7 @@ using namespace DmpBbo;
 void help(char* binary_name)
 {
   cout << "Usage:   " << binary_name << " <input trajectory (txt)> <output dmp (xml)> [output policy parameters.txt] [output training directory] [n_basis_functions]" << endl;
-  cout << "Example: " << binary_name << " trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 6" << endl;
+  cout << "Example: " << binary_name << " trajectory.txt results/dmp.xml results/policy_parameters.txt results/train/ 10" << endl;
   cout << "Default for n_basis_functions: 5 " << endl;
 }
 
