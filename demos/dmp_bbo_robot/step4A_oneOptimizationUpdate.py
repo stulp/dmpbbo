@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
-from bbo.updaters import UpdaterCovarDecay
+from bbo.updaters import *
 from bbo.DistributionGaussian import DistributionGaussian
 
 from dmp_bbo.Task import Task
@@ -47,6 +47,12 @@ if __name__=="__main__":
     weighting_method = 'PI-BB'
     covar_decay_factor = 0.8
     updater = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
+    
+    base_level_diagonal = None
+    diag_only=False
+    learning_rate=0.5
+    #updater = UpdaterCovarAdaptation(eliteness, weighting_method)
+    updater = UpdaterCovarAdaptation(eliteness, weighting_method,base_level_diagonal,diag_only,learning_rate)
     
     n_samples_per_update = 10
     

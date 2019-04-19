@@ -1,3 +1,7 @@
+Improve UpdateCovarAdaptation
+  allow base_level to be a scale
+  add a member max_level (scalar or vector)
+
 Fine tune plotting and include images in tutorial/dmp_bbo_robot.md
 
 Move dmp_bbo_robot up  one directory
@@ -10,7 +14,7 @@ Check if true: An example is given in TaskViapoint, which implements a Task in w
 
 
 ________________________________________________________________________________
-Other things:
+Once merged to master
 
 Remove "#install(TARGETS testUpdaters DESTINATION bin_test)"
 
