@@ -40,11 +40,11 @@ TARGET_PDF_PDF := $(addprefix ${BIN_DIR}/,${TARGET_PDF_PDF})
 ################################################################################
 # TARGETS
 
-all: ${TARGET_SVG_PDF}  ${TARGET_SVG_PNG} #${TARGET_PNG_PNG} ${TARGET_PDF_PDF} 
+all: ${TARGET_SVG_PNG} #${TARGET_PNG_PNG} ${TARGET_SVG_PDF}  ${TARGET_PDF_PDF} 
 	@echo "__________________________________________________\nBuilding images"
 
 clean:
-	rm ${TARGET_SVG_PDF} ${TARGET_SVG_PNG} #${TARGET_PNG_PNG} ${TARGET_PDF_PDF}
+	rm  ${TARGET_SVG_PNG} #${TARGET_PNG_PNG} ${TARGET_SVG_PDF} ${TARGET_PDF_PDF}
 
 ${BIN_DIR}:
 	mkdir ${BIN_DIR}
