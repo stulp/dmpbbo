@@ -66,3 +66,4 @@ if __name__=="__main__":
             task.plotRollout(cost_vars,axs[0])
 
     plt.show()        
+    fig.savefig(directory+'/exploration_rollouts.png')
