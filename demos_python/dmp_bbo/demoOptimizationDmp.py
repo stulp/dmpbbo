@@ -86,7 +86,7 @@ if __name__=="__main__":
     
         n_search =  dmp.getParameterVectorSelectedSize()
     
-        covar_update = 'decay'
+        covar_update = 'cma'
         mean_init  =  np.full(n_search,0.0)
         covar_init =  1000.0*np.eye(n_search)
         distribution = DistributionGaussian(mean_init, covar_init)
@@ -99,10 +99,11 @@ if __name__=="__main__":
             covar_decay_factor = 0.9
             updater = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
         else:
-            base_level = np.full(n_dims,0.000001);
-            diag_only = False;
-            learning_rate = 0.75;
-            updater = UpdaterCovarAdaptation(eliteness,weighting_method,base_level,diag_only,learning_rate);  
+            min_level = 0.000001
+            max_level = None
+            diag_only = False
+            learning_rate = 0.5
+            updater = UpdaterCovarAdaptation(eliteness,weighting_method,max_level,min_level,diag_only,learning_rate);  
       
         n_samples_per_update = 10
         n_updates = 40
