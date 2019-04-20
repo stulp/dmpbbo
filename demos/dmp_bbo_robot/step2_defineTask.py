@@ -44,7 +44,7 @@ if __name__=="__main__":
     x_goal = -0.70
     x_margin = 0.01
     y_floor = -0.3
-    acceleration_weight = 0.00001
+    acceleration_weight = 0.001
     task = TaskThrowBall(x_goal,x_margin,y_floor,acceleration_weight)
     
     # Save the task instance itself
