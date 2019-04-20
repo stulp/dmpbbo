@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import pickle
 import inspect
 
-lib_path = os.path.abspath('../../python')
+lib_path = os.path.abspath('../python')
 sys.path.append(lib_path)
 
 from TaskThrowBall import TaskThrowBall

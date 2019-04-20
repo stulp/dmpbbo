@@ -21,7 +21,7 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath('../../python/')
+lib_path = os.path.abspath('../python/')
 sys.path.append(lib_path)
 
 from bbo.DistributionGaussian import DistributionGaussian
@@ -35,7 +35,7 @@ if __name__=="__main__":
     
     if (len(sys.argv)<3):
         print('Usage: '+sys.argv[0]+' <input policy parameters file> <output covar file> <output directory> [sigma] [n_samples]')
-        print('Example: python3 '+sys.argv[0]+' results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration/ 10.0 12')
+        print('Example: python3 '+sys.argv[0]+' results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration/ 3.0 12')
         sys.exit()
         
     if (len(sys.argv)>1):

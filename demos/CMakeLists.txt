@@ -3,6 +3,3 @@ add_subdirectory(dynamicalsystems)
 add_subdirectory(dmp)
 add_subdirectory(bbo)
 add_subdirectory(dmp_bbo)
-add_subdirectory(dmp_bbo_robot)
-
-

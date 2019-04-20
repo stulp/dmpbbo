@@ -23,12 +23,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add relative path, in case PYTHONPATH is not set
-lib_path = os.path.abspath('../')
-sys.path.append(lib_path)
-from executeBinary import executeBinary
-
-lib_path = os.path.abspath('../../python/')
+lib_path = os.path.abspath('../python/')
 sys.path.append(lib_path)
 
 from dmp_bbo.dmp_bbo_plotting import *
@@ -37,16 +32,16 @@ from dmp.dmp_plotting import *
 
 if __name__=="__main__":
 
-    input_parameters_file = None
+    input_cost_vars_file = None
     input_task_file = None
     
-    if (len(sys.argv)<2):
-        print('Usage: '+sys.argv[0]+' <rollouts directory> [task pickle file]')
-        print('Example: python3 '+sys.argv[0]+' results/tune_exploration/ results/task.p')
+    if len(sys.argv)<3:
+        print('Usage: '+sys.argv[0]+' <cost vars file> <task pickle file>')
+        print('Example: python3 '+sys.argv[0]+' results/cost_vars_demonstrated.txt results/task.p')
         sys.exit()
         
     if (len(sys.argv)>1):
-        directory = sys.argv[1]
+        input_cost_vars_file = sys.argv[1]
     if (len(sys.argv)>2):
         input_task_file = sys.argv[2]
         
@@ -58,12 +53,7 @@ if __name__=="__main__":
     n_subplots = 1
     axs = [ fig.add_subplot(1,n_subplots,ii+1) for ii in range(n_subplots) ]
         
-    dirs = sorted(glob.glob(directory+"/rollout*"))
-    for cur_dir in dirs:
-        #plotTrajectoryFromFile(cur_dir+"/cost_vars.txt",axs[1:4])
-        if task:
-            cost_vars = np.loadtxt(cur_dir+"/cost_vars.txt")
-            task.plotRollout(cost_vars,axs[0])
+    cost_vars = np.loadtxt(input_cost_vars_file)
+    task.plotRollout(cost_vars,axs[0])
 
-    plt.show()        
-    fig.savefig(directory+'/exploration_rollouts.png')
+    plt.show()
