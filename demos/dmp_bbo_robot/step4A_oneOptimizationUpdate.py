@@ -48,19 +48,19 @@ if __name__=="__main__":
     weighting_method = 'PI-BB'
     updater_mean = UpdaterMean(eliteness,weighting_method)
     
-    covar_decay_factor = 0.8
+    covar_decay_factor = 0.9
     updater_decay = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
     
-    min_level = 0.1
-    max_level = 10.0
-    diag_only = True
+    min_level = 0.3
+    max_level = 3.0
+    diag_only = False
     learning_rate=0.5
     #updater = UpdaterCovarAdaptation(eliteness, weighting_method)
     updater_adaptation = UpdaterCovarAdaptation(eliteness, weighting_method,max_level,min_level,diag_only,learning_rate)
     
-    updater = updater_adaptation
+    updater = updater_decay
     
-    n_samples_per_update = 10
+    n_samples_per_update = 5
     
     ############################################################
 
