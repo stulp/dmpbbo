@@ -74,27 +74,28 @@ Gathering the information for cost-vars can be non-trivial in practice. For inst
 
 During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution (which parameters these are is set through the `Parameterizable` class from which `Dmp` inherits. See the "`set<string> parameters_to_optimize`" code in `step1A_trainDmpFromTrajectoryFile.cpp` for an example). The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning. 
 
-The covariance matrix of this distributions determines the magnitude of exploration. It should not be too low, otherwise the stochasticity of the exploration may be smaller than that of the robot movement itself, and no learning can take place. It should also not be too high for safety reasons; your robot may reach acceleration limits, joint limits, or unexpectedly bump into the environment. 
+The covariance matrix of this distributions determines the magnitude of exploration. This magnitude is defined in terms of sigma, where the diagonal of the covariance matrix is initialized with sigma^2. Sigma should not be too low, otherwise the stochasticity of the exploration may be smaller than that of the robot movement itself, and no learning can take place. It should also not be too high for safety reasons; your robot may reach acceleration limits, joint limits, or unexpectedly bump into the environment. 
 
 You can tune this parameter by calling the following three scripts for different exploration magnitudes:
 
-    MAG=0.1      # Exploration magnitude to try (start low!)
+    SIGMA=0.1      # Exploration magnitude to try (start low!)
     N_SAMPLES=10 # Number of samples to generate
     # Generate samples with this magnitude
     # This will save samples to directories 
     #     results/tune_exploration_0.1/rollout001/policy_parameters.txt
     #     results/tune_exploration_0.1/rollout002/policy_parameters.txt
     #     etc
-    python3 step3A_tuneExploration.py results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration_${MAG}/ ${MAG} ${N_SAMPLES}
+    python3 step3A_tuneExploration.py results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration_${SIGMA}/ ${SIGMA} ${N_SAMPLES}
     # Execute the Dmps with sampled parameters on the robot
-    ./step3B_performExplorationRollouts.bash results/dmp.xml results/tune_exploration_${MAG}/
+    ./step3B_performExplorationRollouts.bash results/dmp.xml results/tune_exploration_${SIGMA}/
     # Plot the rollouts to see the variance in the movements
-    python3 step3C_tuneExplorationPlot.py results/tune_exploration_${MAG}/ results/task.p
+    python3 step3C_tuneExplorationPlot.py results/tune_exploration_${SIGMA}/ results/task.p
 
-Below the results of exploring with magnitudes 0.1, 1.0, 10.0, and 100.0. The value 0.1 is probably too low, because there is hardly any variation in the end-effector movement. 100.0 is definitely too high! If you execute this on your robot you are a braver person than I (Quote from the license: "This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY". If your bravery breaks your robot, don't blame me!). Given these results, I'd be comfortable with a value between 1.0 and 10.0. We'll continue with 10.0 in this tutorial, as we can't break any robots in simulation.
+Below the results of exploring with sigma 0.1, 1.0, 3.0, and 10.0. The value 0.1 is probably too low, because there is hardly any variation in the end-effector movement. 10.0 is definitely too high! If you execute this on your robot you are a braver person than I (Quote from the license: "This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY". If your bravery breaks your robot, don't blame me!). Given these results, I'd be comfortable with a value between 1.0 and 3.0. We'll continue with 3.0 in this tutorial, as we can't break any robots in simulation.
 
 ![alt text](images/exploration_rollouts-svg.png  "Resulting rollouts with different exploration magnitudes.")
 
+If you are performing the optimization with covariance matrix adapation (CMA), i.e. with the UpdaterCovarAdaptation, I would set the initial sigma to 3.0, max_level to 3.0 (so that the exploration is not adapted to more than 3.0) and min_level 0.3 (to avoid premature convergence along one of the dimensions). These parameters are set in `step4A_oneOptimizationUpdate.py`, which we turn to next.
 
 ## Step 4: Run the optimization (step by step)
 
@@ -137,13 +138,8 @@ If you are curious about intermediate results, you can visualize them with
 
     python3 step4C_plotOptimization.py results/
 
-This will automatically determine what the last update directory is.
+This will automatically determine what the last update directory is, and plot the optimization process so far, as shown below. The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.9, which is specified in `step4A_oneOptimizationUpdate.py`. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
 
-## Design rationale
+![alt text](images/step4_optimization_decay.png  "Optimization results after 40 rollouts/8 updates.")
 
-Sockets vs txt files. Keep it simple!
-
-Approach not optimized for running millions of rollouts on a CPU cluster, but for running 10s/100s of rollouts on a real robot. 
-
-Overhead of using txt files in terms of execution time neglible. But very nice to have a format that is human readable. Easy to adapt to different robots (whatever robot, operating system and programming language you use, they should be able to read ASCII files)
-
+We see that after 15 rollouts, the "robot" has learned to throw the ball in the specified area. The accelerations have increased slightly because the movement to do this requires slightly higher velocities than those in the demonstration.
