@@ -34,7 +34,7 @@ if __name__=="__main__":
     output_directory = None
     
     if (len(sys.argv)<3):
-        print('Usage: '+sys.argv[0]+' <input policy parameters file> <output covar file> <output directory> [covar_scale] [n_samples]')
+        print('Usage: '+sys.argv[0]+' <input policy parameters file> <output covar file> <output directory> [sigma] [n_samples]')
         print('Example: python3 '+sys.argv[0]+' results/policy_parameters.txt results/distribution_initial_covar.txt results/tune_exploration/ 10.0 12')
         sys.exit()
         
@@ -45,9 +45,9 @@ if __name__=="__main__":
     if (len(sys.argv)>3):
         output_directory = sys.argv[3]
     
-    covar_scale = 1.0
+    sigma = 1.0
     if (len(sys.argv)>3):
-        covar_scale = float(sys.argv[4])
+        sigma = float(sys.argv[4])
         
     n_samples = 10    
     if (len(sys.argv)>4):
@@ -59,8 +59,8 @@ if __name__=="__main__":
     parameter_vector = np.loadtxt(input_parameters_file)
     
     
-    print('Python |     Generating '+str(n_samples)+' samples with covar='+str(covar_scale))
-    covar_init =  covar_scale*np.eye(parameter_vector.size)
+    print('Python |     Generating '+str(n_samples)+' samples with sigma='+str(sigma))
+    covar_init =  sigma*sigma*np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
     samples = distribution.generateSamples(n_samples)
 
