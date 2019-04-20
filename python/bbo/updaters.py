@@ -172,10 +172,10 @@ class UpdaterCovarAdaptation(Updater):
         if (self.diagonal_max is not None):
             is_scalar_max = np.isscalar(self.diagonal_max)
             if is_scalar_max:
-                level_max = self.diagonal_max
+                level_max = pow(self.diagonal_max,2)
             for ii in range(n_dims):
                 if not is_scalar_max:
-                    level_max = self.diagonal_max[ii]
+                    level_max = pow(self.diagonal_max[ii],2)
                 if covar_new[ii,ii]>level_max:
                     covar_new[ii,ii]=level_max
                     
@@ -183,10 +183,10 @@ class UpdaterCovarAdaptation(Updater):
         if (self.diagonal_min is not None):
             is_scalar_min = np.isscalar(self.diagonal_min)
             if is_scalar_min:
-                level_min = self.diagonal_min
+                level_min = pow(self.diagonal_min,2)
             for ii in range(n_dims):
                 if not is_scalar_min:
-                    level_min = self.diagonal_min[ii]
+                    level_min = pow(self.diagonal_min[ii],2)
                 if covar_new[ii,ii]<level_min:
                     covar_new[ii,ii]=level_min
                     
