@@ -76,7 +76,7 @@ void runOptimizationTask(
 /** Run several parallel evolutionary optimization processes.
  * \param[in] task The task to optimize
  * \param[in] task_solver The solver of the task
- * \param[in] distributions The initial parameter distribution (one for each parallel optimization)
+ * \param[in] initial_distributions The initial parameter distribution (one for each parallel optimization)
  * \param[in] updater The Updater used to update the parameters
  * \param[in] n_updates The number of updates to perform
  * \param[in] n_samples_per_update The number of samples per update
@@ -85,12 +85,34 @@ void runOptimizationTask(
  * \param[in] only_learning_curve Save only the learning curve (default: false)
  * \todo This function will be removed. It can be implemented much simpler. Only UpdateCovarAdapation is affected by this, and one can enforce block-diagonal-covars there (e.g. with a function setSubCovars(VectorXi). Update the docu accordingly when this is done. )
  */
-void runOptimizationParallelDeprecated(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
+void runOptimizationParallelDeprecated(Task* task, TaskSolver* task_solver, std::vector<DistributionGaussian*> initial_distributions, Updater* updater, int n_updates, int n_samples_per_update, std::string save_directory=std::string(""),bool overwrite=false,
 bool only_learning_curve=false);
 
+/** Save the results of one update to a directory
+ * \param[in] directory Directory to save to
+ * \param[in] i_update Current update number. E.g. if i_update=9, results are stored to directory/update00009/
+ * \param[in] distribution Gaussian distribution before updating
+ * \param[in] rollout_eval Evaluation rollout, i.e. without exploration noise
+ * \param[in] rollouts Exploration rollouts in this update
+ * \param[in] weights Weights resulting from the costs of the rollouts
+ * \param[in] distribution_new Gaussian distribution after updating
+ * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \return true is saving was successful, false otherwise.
+ */
 bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite=false);
 
-bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distribution_new, bool overwrite=false);
+/** Save the results of one update to a directory
+ * \param[in] directory Directory to save to
+ * \param[in] i_update Current update number. E.g. if i_update=9, results are stored to directory/update00009/
+ * \param[in] distributions Gaussian distributions before updating
+ * \param[in] rollout_eval Evaluation rollout, i.e. without exploration noise
+ * \param[in] rollouts Exploration rollouts in this update
+ * \param[in] weights Weights resulting from the costs of the rollouts
+ * \param[in] distributions_new Gaussian distributions after updating
+ * \param[in] overwrite Overwrite existing files in the directory above (default: false)
+ * \return true is saving was successful, false otherwise.
+ */
+bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distributions, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distributions_new, bool overwrite=false);
 
 }
 
