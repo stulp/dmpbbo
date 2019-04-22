@@ -121,13 +121,6 @@ bool saveToDirectory(std::string directory, int i_update, const std::vector<Dist
 /** \defgroup DMP_BBO Black Box Optimization of Dynamical Movement Primitives Module
  */
 
-/** \page page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
-
-The documentation for this module is in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/dmp_bbo.md">tutorial/dmp_bbo.md</a>.
-
- */
-
-
  /**
 \verbatim
 For standard optimization, n_parallel = 1 and n_time_steps = 1 so that

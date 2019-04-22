@@ -108,13 +108,43 @@ See \ref page_serialization
  * 
  * DmpBbo comes with several demos.
  * 
- * The C++ demos are located in the dmpbbo/demos/ directory. Please see the README.md files located there.
+ * The C++ demos are located in the dmpbbo/demos_cpp/ directory. Please see the README.md files located there.
  *
  * Many of the compiled executables are accompanied by a Python wrapper, which calls the executable,  and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). For completeness, the pure Python demos are located in dmpbbo/demos_python.
  *
- Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmp/demos/ directory. 
+ Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmpbbo/demos_cpp/ directory. 
  */
 
+/** \page page_moved Pages that have moved to the on-line tutorial (Markdown)
+
+\section page_unified_model Unified Model for Function Approximators
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md#unified-model-for-function-approximators" target="_blank">tutorial/functionapproximators.md</a>
+
+\section page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
+
+The documentation for the dmp_bbo module is in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md" target="_blank">tutorial/dmp_bbo.md</a>.
+
+\section sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#costfunction-vs-tasktasksolver" target="_blank">tutorial/dmp_bbo.md</a>
+
+
+\section sec_cost_components Cost components
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#cost-components" target="_blank">tutorial/dmp_bbo.md</a>
+
+\section sec_cost_vars Cost-relevant variables
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#cost-relevant-variables" target="_blank">tutorial/dmp_bbo.md</a>
+
+
+
+
+
+
+ */
+ 
 /** Namespace used for all classes in the project.
  */
 namespace DmpBBO 
