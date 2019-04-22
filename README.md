@@ -13,7 +13,9 @@ This library may be useful for you if you
 
 + are interested in the theory behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="demos/"><b>demos</b></a> are a good starting point, as they provide examples of how to use the code.
++ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="demos/"><b>demos</b></a> and <a href="demos_python/"><b>demos_python</b></a> are a good starting point, as they provide examples of how to use the code.
+
++ run the optimization of DMPs on a real robot. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a> and <a href="tutorial/dmp_bbo_robot.md/"><b>dmp_bbo_robot.md</b></a>
 
 + want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
@@ -43,8 +45,11 @@ integrated in other code to perform some (hopefully) useful function:
   
 ## Why Python and C++?
 
-A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-)  The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
+When optimizing DMPs on a real robot, it's best to have the DMPs running in your real-time control loop. Hence, DMPs need to be implemented in C++. For the optimization algorithms itself, real-time concerns are not an issue. However, on-the-fly visualization to monitor the optimization process is important, and for this Python is a better choice.
 
+For completeness, basic DMP functionality has been implemented in Python as well. And the optimization algorithms have been implemented in C++ also. However, the main use case is C++ for DMPs, and Python for optimization. How to do this is implemented in `demo_robot/`, and documented in `tutorial/dmp_bbo_robot.md`
+
+Note that for now the Python code has not been documented well, please Doxygen navigate the C++ documentation instead (class/function names have been kept consistent).
 
 # Why dmpbbo?
 
