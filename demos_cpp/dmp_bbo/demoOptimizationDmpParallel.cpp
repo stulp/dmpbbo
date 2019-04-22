@@ -73,7 +73,7 @@ int main(int n_args, char* args[])
   {
     cerr << "Directory '" << directory << "' does not exist." << endl;
     cerr << "HINT: The preferred way to run this demo is by calling ";
-    cerr << "python demos/dmp_bbo/" << (args[0]+2) <<"Wrapper.py, "; // +2 removes leading "./" 
+    cerr << "python3 " << args[0] <<"Wrapper.py, "; 
     cerr << "rather than this binary." << endl; 
     cerr << "Abort." << endl;
     return -1;
