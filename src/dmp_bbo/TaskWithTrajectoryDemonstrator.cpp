@@ -37,7 +37,7 @@ using namespace Eigen;
 namespace DmpBbo {
 
 
-void TaskWithTrajectoryDemonstrator::generateDemonstrations(const vector<MatrixXd>& task_parameters, const vector<VectorXd>& ts, vector<Trajectory>& demonstrations) const
+void TaskWithTrajectoryDemonstrator::generateDemonstrations(const std::vector<Eigen::MatrixXd>& task_parameters, const std::vector<Eigen::VectorXd>& ts, std::vector<Trajectory>& demonstrations) const
 {
   unsigned int n_demos = task_parameters.size();
   assert(n_demos==ts.size());
@@ -51,7 +51,7 @@ void TaskWithTrajectoryDemonstrator::generateDemonstrations(const vector<MatrixX
 }
 
 
-void TaskWithTrajectoryDemonstrator::generateDemonstrations(DistributionGaussian* task_parameter_distribution, int n_demos, const VectorXd& ts, vector<Trajectory>& demonstrations) const
+void TaskWithTrajectoryDemonstrator::generateDemonstrations(DistributionGaussian* task_parameter_distribution, int n_demos, const Eigen::VectorXd& ts, std::vector<Trajectory>& demonstrations) const
 {
   MatrixXd task_parameters;
   

@@ -53,6 +53,8 @@ use jacobiSvd or another on from the least squares page of Eigen 3.3
 
 \todo Look for "but Eigen is not good with splicing" and see if splicing can be done more easily
 */
+
+
 Eigen::MatrixXd weightedLeastSquares(
   const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   const Eigen::Ref<const Eigen::MatrixXd>& targets,

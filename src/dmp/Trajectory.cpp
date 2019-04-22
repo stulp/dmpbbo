@@ -256,21 +256,21 @@ ostream& operator<<(std::ostream& output, const Trajectory& trajectory) {
   return output;
 }
 
-bool Trajectory::saveToFile(string directory, string filename, bool overwrite) const
+bool Trajectory::saveToFile(std::string directory, std::string filename, bool overwrite) const
 {
   MatrixXd traj_matrix;
   asMatrix(traj_matrix);
   return saveMatrix(directory, filename, traj_matrix, overwrite);  
 }
 
-bool Trajectory::saveToFile(string filename, bool overwrite) const
+bool Trajectory::saveToFile(std::string filename, bool overwrite) const
 {
   MatrixXd traj_matrix;
   asMatrix(traj_matrix);
   return saveMatrix(filename, traj_matrix, overwrite);  
 }
 
-Trajectory Trajectory::readFromFile(string filename, int n_dims_misc)
+Trajectory Trajectory::readFromFile(std::string filename, int n_dims_misc)
 {
   MatrixXd traj_matrix;
   if (!loadMatrix(filename,traj_matrix))

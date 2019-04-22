@@ -55,7 +55,7 @@ DistributionGaussian::DistributionGaussian(unsigned int n_dims)
 }
 
 
-DistributionGaussian::DistributionGaussian(const VectorXd& mean, const MatrixXd& covar) 
+DistributionGaussian::DistributionGaussian(const Eigen::VectorXd& mean, const Eigen::MatrixXd& covar) 
 {
   mean_ = mean;
   set_covar(covar);
