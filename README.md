@@ -15,7 +15,7 @@ This library may be useful for you if you
 
 + already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, <a href="demos_cpp/"><b>demos_cpp/</b></a> and <a href="demos_python/"><b>demos_python/</b></a> are a good starting point, as they provide examples of how to use the code.
 
-+ run the optimization of DMPs on a real robot. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a> and <a href="tutorial/dmp_bbo_robot.md/"><b>dmp_bbo_robot.md</b></a>
++ run the optimization of DMPs on a real robot. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a>.
 
 + want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
