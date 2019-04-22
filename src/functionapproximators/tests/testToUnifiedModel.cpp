@@ -39,7 +39,7 @@
 
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 #include "getFunctionApproximatorsVector.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"

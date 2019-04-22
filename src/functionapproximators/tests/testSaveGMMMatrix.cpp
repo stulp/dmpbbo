@@ -25,7 +25,7 @@
 //#include "functionapproximators/FunctionApproximatorLWR.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 
 #include <iostream>
 #include <sstream>
@@ -50,7 +50,7 @@ using namespace DmpBbo;
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/FunctionApproximatorGMR.hpp"
 
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;

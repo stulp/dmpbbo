@@ -13,7 +13,7 @@ This library may be useful for you if you
 
 + are interested in the theory behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, the <a href="demos/"><b>demos</b></a> and <a href="demos_python/"><b>demos_python</b></a> are a good starting point, as they provide examples of how to use the code.
++ already know about dynamical movement primitives and reinforcement learning, but would rather use existing, tested code than brew it yourself. In this case, <a href="demos_cpp/"><b>demos_cpp/</b></a> and <a href="demos_python/"><b>demos_python/</b></a> are a good starting point, as they provide examples of how to use the code.
 
 + run the optimization of DMPs on a real robot. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a> and <a href="tutorial/dmp_bbo_robot.md/"><b>dmp_bbo_robot.md</b></a>
 
