@@ -1,7 +1,7 @@
 Step-by-step howto for training and optimizing a DMP on a real robot
 ===============
 
-*It is assumed that you have already read the tutorials on <a href="dmp_bbo.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
+*It is assumed that you have already read the tutorials on <a href="../tutorial/dmp_bbo.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
 
 This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva dmp_bbo_robot my_own_optimization`, and adapt the cpp and py files to your robot and task.
 
