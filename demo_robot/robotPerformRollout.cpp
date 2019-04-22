@@ -1,5 +1,5 @@
 /**
- * \file trainDmpTrainFromTrajectoryFile.cpp
+ * \file trainPerformRollout.cpp
  * \author Freek Stulp
  * \brief  Demonstrates how to train a Dmp with a trajectory in a txt file.
  *
@@ -175,8 +175,8 @@ int main(int n_args, char** args)
         {
           // Ball hits the floor (floor is at -0.3)
           y_ball(ii,1) = -0.3;
-          yd_ball.row(ii).array() = 0.0;
-          ydd_ball.row(ii).array() = 0.0;
+          yd_ball.row(ii) = VectorXd::Zero(2);
+          ydd_ball.row(ii) = VectorXd::Zero(2);
           
         }
     }
