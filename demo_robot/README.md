@@ -5,6 +5,8 @@ Step-by-step howto for training and optimizing a DMP on a real robot
 
 This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva dmp_bbo_robot my_own_optimization`, and adapt the cpp and py files to your robot and task.
 
+You can run all the steps below automatically by calling the `demo_robot.bash` script in this directory.
+
 In the task considered in this tutorial, the robot has to throw a ball into a certain area, as illustrated below. The "robot" makes an elliptical movement with its end-effector (blue trajectory), releases the ball (black circles) after 0.6 seconds, so that the ball flies through the air (green trajectory) until it hits the ground. The aim is to throw the ball to a particular position (the green marker on the "floor"). There is a margin of error, illustrated by the dent in the floor.
 
 ![alt text](images/task_throw_ball.png  "Illustration of the ball throwing task.")
