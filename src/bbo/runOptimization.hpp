@@ -96,7 +96,7 @@ namespace DmpBbo {
   
 /** \page page_bbo Black Box Optimization
 
-This page provides and overview of the implementation of the evolutionary strategies in the \c bbo/ module.
+This page provides an  overview of the implementation of the evolutionary strategies in the \c bbo/ module.
 
 It is assumed you have read about the theory behind evolutionary strategies in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/bbo.md">tutorial/bbo.md</a>.
 

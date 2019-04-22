@@ -465,7 +465,7 @@ namespace DmpBbo {
   
 /** \page page_dmp Dynamical Movement Primitives
 
-This page provides and overview of the implementation of DMPs in the \c dmps/ module.
+This page provides an  overview of the implementation of DMPs in the \c dmps/ module.
 
 It is assumed you have read about the theory behind DMPs in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/dmps.md">tutorial/dmps.md</a>. Note that in the tutorial, we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
 

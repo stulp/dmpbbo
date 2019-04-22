@@ -72,8 +72,6 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
-\todo Move dmp_bbo_robot explanation from doxygen to README.md file.
-
 \todo Explain why C++ implementation of bbo and dmp_bbo have only limited use.
 
 \todo Documentation: Write a related pages with a table on which functionality is implemented in Python/Cpp
@@ -98,6 +96,19 @@ See \ref page_serialization
 
 \todo Table showing which functionality is available in Python/C++
 
+\todo Consistent interfaces and helps for demos (e.g. with argparse)
+
+\todo Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmpbbo/demos_cpp/ directory.  => Are there md files everywhere?
+
+\todo What exactly goes in tutorial and what in implementation?
+
+\todo Include design rationale for txt files (in design_rationale.md) in dmp_bbo_bbo.md
+
+\todo Make Python scripts robust against missing data, e.g. cost_vars
+
+\todo Check if true: "An example is given in TaskViapoint, which implements a Task in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by TaskSolverDmp, which is able to generate such trajectories."
+
+\todo EigenToString.tpp from EigenBoostSerialization? Or move into EigenFileIO?
 
  */ 
 

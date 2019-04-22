@@ -411,7 +411,7 @@ namespace DmpBbo {
 
 /** \page page_dyn_sys Dynamical Systems
 
-This page provides and overview of the implementation of dynamical systems in the \c dynamicalsystems/ module.
+This page provides an  overview of the implementation of dynamical systems in the \c dynamicalsystems/ module.
 
 It is assumed you have read about the theory behind dynamical systems in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/dynamicalsystems.md">tutorial/dynamicalsystems.md</a>.
 
