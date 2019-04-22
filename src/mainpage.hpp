@@ -8,7 +8,7 @@
 
 \section sec_cui_bono What the doxygen documentation is for
 
-This is the doxygen documentation of the DmpBbo library. Its main aim is to document the API, describe the implemenation, and provide rationale management for developers. If you are more interested in the theory behind dynamical movement primitives and their optimization, the <a href="https://github.com/stulp/dmpbbo/tutorials">tutorials</a> is the place to go for you. If you want to get started quickly, the <a href="https://github.com/stulp/dmpbbo/demos">demos</a> would be the right place.
+This is the doxygen documentation of the DmpBbo library. Its main aim is to document the API, describe the implemenation, and provide rationale management for developers. If you are more interested in the theory behind dynamical movement primitives and their optimization, the <a href="https://github.com/stulp/dmpbbo/blob/master/tutorials">tutorials</a> is the place to go for you. If you want to get started quickly, the <a href="https://github.com/stulp/dmpbbo/demos">demos</a> would be the right place.
 
 \section sec_overview_modules Overview of the modules/libraries
 

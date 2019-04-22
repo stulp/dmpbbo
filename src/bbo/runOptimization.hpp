@@ -98,7 +98,7 @@ namespace DmpBbo {
 
 This page provides an  overview of the implementation of the evolutionary strategies in the \c bbo/ module.
 
-It is assumed you have read about the theory behind evolutionary strategies in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/bbo.md">tutorial/bbo.md</a>.
+It is assumed you have read about the theory behind evolutionary strategies in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/bbo.md">tutorial/bbo.md</a>.
 
 The basic algorithm from the tutorial is as follows:
 \code

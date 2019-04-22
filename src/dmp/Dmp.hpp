@@ -467,7 +467,7 @@ namespace DmpBbo {
 
 This page provides an  overview of the implementation of DMPs in the \c dmps/ module.
 
-It is assumed you have read about the theory behind DMPs in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/dmps.md">tutorial/dmps.md</a>. Note that in the tutorial, we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
+It is assumed you have read about the theory behind DMPs in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp.md">tutorial/dmp.md</a>. Note that in the tutorial, we have used the notation \f$[z~y]\f$ for consistency with the DMP literature. In the C++ implementation, the order is rather \f$[y~z]\f$.
 
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class derives from the DynamicalSystem class. It overrides the virtual function DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep() function. It also implements the pure virtual function DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved analytically (we cannot write it in closed form due to the arbitrary forcing term), calling Dmp::analyticalSolution() in fact performs a numerical Euler integration (although the linear subsystems (phase, gating, etc.) are analytically solved because this is faster computationally).

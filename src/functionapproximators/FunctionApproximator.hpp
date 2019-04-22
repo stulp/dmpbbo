@@ -361,7 +361,7 @@ namespace DmpBbo {
 
 This page provides an  overview of the implementation of function approximators in the \c dynamicalsystems/ module.
 
-It is assumed you have read about the theory behind function approximators in the tutorial <a href="https://github.com/stulp/dmpbbo/tutorial/functionapproximators.md">tutorial/functionapproximators.md</a>.
+It is assumed you have read about the theory behind function approximators in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md">tutorial/functionapproximators.md</a>.
 
 \section sec_fa Function Approximation
 
