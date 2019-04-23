@@ -4,7 +4,7 @@ Dynamical Movement Primitives
 *It is assumed that you have already read the tutorials on <a href="dynamicalsystems.md">Dynamical Systems</a> and <a href="functionapproximators.md">Function Approximation</a>.*
 
 
-The core idea behind dynamical movement primitives (DMPs) is to represent movement primitives as a combination of dynamical systems, if you haven't already done so). The state variables of the main dynamical system ![alt text](formulae/form_0.png "$ [\mathbf{y~\dot{y}~\ddot{y}} ]$")  then represent trajectories for controlling, for instance, the 7 joints of a robot arm, or its 3D end-effector position. The attractor state is the end-point or *goal* of the movement.
+The core idea behind dynamical movement primitives (DMPs) is to represent movement primitives as a combination of dynamical systems. The state variables of the main dynamical system ![alt text](formulae/form_0.png "$ [\mathbf{y~\dot{y}~\ddot{y}} ]$")  then represent trajectories for controlling, for instance, the 7 joints of a robot arm, or its 3D end-effector position. The attractor state is the end-point or *goal* of the movement.
 
 The key advantage of DMPs is that they inherit the nice properties from linear dynamical systems (guaranteed convergence towards the attractor, robustness to perturbations, independence of time, etc) whilst allowing arbitrary (smooth) motions to be represented by adding a non-linear forcing term. This forcing term is often learned from demonstration, and subsequently improved through reinforcement learning.
 
