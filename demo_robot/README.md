@@ -54,7 +54,7 @@ Defining the task requires you to make a class that inherits from `dmp_bbo.Task`
 
 An example is Python script is available, which writes the defined task to a directory.
 
-    python3 step1_defineTask.py results/
+    python3 step2_defineTask.py results/
     
 The task converts cost-relevant variables into a cost. The robot, who is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the used must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In the dmp_bbo_robot examples, this interface is the executable `robotPerformRollout` (compiled from `robotPerformRollout.cpp`). 
 
