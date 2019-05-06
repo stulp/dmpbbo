@@ -7,17 +7,15 @@ tags:
 authors:
  - name: Freek Stulp
    orcid: 0000-0001-9555-9517
-   affiliation: 1, 2
+   affiliation: 1
  - name: Gennaro Raiola
    orcid: 0000-0003-1481-1106
-   affiliation: 1, 3
+   affiliation: 1, 2
 affiliations:
  - name: ENSTA-ParisTech (at the time of this work)
    index: 1
- - name: Institute of Robotics and Mechatronics, DLR
-   index: 2
  - name: Department of Advanced Robotics, Istituto Italiano di Tecnologia (IIT)
-   index: 3
+   index: 2
 date: 16 January 2018
 bibliography: paper.bib
 ---
