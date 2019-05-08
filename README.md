@@ -1,3 +1,7 @@
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01225/status.svg)](https://doi.org/10.21105/joss.01225)
+
+[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
+
 # What?
 
 This repository provides an implementation of dynamical systems, 
@@ -101,9 +105,6 @@ Contributions in the form of feedback, code, and bug reports are very welcome:
 * If you have found an issue or a bug, please open a GitHub issue.
 * If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.
 
-# Build Status
-
-[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
 
 
 
