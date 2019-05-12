@@ -28,6 +28,9 @@
 
 #include <set>
 
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
 namespace DmpBbo {
 
 class FunctionApproximator;
@@ -196,7 +199,7 @@ private:
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive
    * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
+   * \see page_serialization
    */
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
@@ -211,13 +214,5 @@ private:
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::DmpContextual);
- 
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::DmpContextual,boost::serialization::object_serializable);
 
 #endif

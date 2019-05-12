@@ -21,7 +21,7 @@ bibliography: paper.bib
 ---
 # General overview
 
-Dynamical movement primitives (DMPs) [@ijspeert02movement,@ijspeert13dynamical] are one of the most popular representations for goal-directed motion primitives in robotics. They are also often used as the policy representation for policy improvement in robotics, a particular form of reinforcement learning. `dmpbbo` provides five software modules for the representation and optimization of dynamical movement primitives. These five modules are:
+Dynamical movement primitives (DMPs) [@ijspeert02movement, @ijspeert13dynamical] are one of the most popular representations for goal-directed motion primitives in robotics. They are also often used as the policy representation for policy improvement in robotics, a particular form of reinforcement learning. `dmpbbo` provides five software modules for the representation and optimization of dynamical movement primitives. These five modules are:
 
 * `dynamicalsystems/`,  various dynamical systems representing for instance exponential decay or spring-damper systems (standalone module).
 * `functionapproximators/`, various function approximators such as Gaussian process regression, radial basis function networks, and Gaussian mixture regression (standalone module).
@@ -48,7 +48,7 @@ Several more advanced features implemented in dmpbbo are:
 
 ## Applications
 
-This library and its predecessors were used in the following scientific publications [@stulp12adaptive,@stulp13learning,stulp14simultaneous,@stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
+This library and its predecessors were used in the following scientific publications [@stulp12adaptive, @stulp13learning, @stulp14simultaneous, @stulp15many]. The images below are snapshots of robotic applications where `dmpbbo' was used. And here a list of videos:
 
 * https://www.youtube.com/watch?v=R7LWkh1UMII
 * https://www.youtube.com/watch?v=MAiw3Ke7bh8

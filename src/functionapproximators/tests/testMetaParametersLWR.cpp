@@ -25,7 +25,7 @@
 //#include "functionapproximators/FunctionApproximatorLWR.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 
 #include <iostream>
 #include <sstream>

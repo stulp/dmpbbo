@@ -30,7 +30,9 @@
 #include "dmp/Dmp.hpp"
 
 #include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include <boost/serialization/assume_abstract.hpp>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
 
 /*
 //Implement: extra states with an attractor. 
@@ -69,28 +71,53 @@ class Trajectory;
 /**
 Implementation of DMPs which contain extra dimensions to represent variable gain schedules, as described in \cite buchli11learning.
 
-These dimensions can also used to represent force profiles \cite kalakrishnan11learning, or any other variables relevant to the Dmp, but which are not part of the dynamical system.
+These dimensions can also used to represent force profiles \cite kalakrishnan11learning, or any other variables relevant to the DMP, but which are not part of the dynamical system.
  */
 class DmpWithGainSchedules : public Dmp
 {
 public:
   
- DmpWithGainSchedules(
-   Dmp* dmp,
-   std::vector<FunctionApproximator*> function_approximators_gain_schedules
-   );
+  /** Constructor.
+   * \param[in] dmp The Dmp part of the DmpWithGainSchedules
+   * \param[in] function_approximators_gain_schedules Function approximators that will represent the gain schedules.
+   */
+  DmpWithGainSchedules(
+    Dmp* dmp,
+    std::vector<FunctionApproximator*> function_approximators_gain_schedules
+  );
    
   
   /** Destructor. */
   ~DmpWithGainSchedules(void);
   
   /** Return a deep copy of this object 
-   * \return A deep copy of this object
+   * \return A deep copy of this object    
    */
   DmpWithGainSchedules* clone(void) const;
   
+  /** Start integrating the system
+   *
+   * \param[out] x     - The first vector of state variables
+   * \param[out] xd    - The first vector of rates of change of the state variables
+   * \param[out] gains - The gains of the gain schedules
+   *
+   * \remarks x, xd, and gains should be of size dim() X 1. This forces you to pre-allocate 
+   * memory, which speeds things up (and also makes Eigen's Ref functionality easier to deal with).
+   */
   void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd, Eigen::Ref<Eigen::VectorXd> gains) const;
 
+  /**
+   * Integrate the system one time step.
+   *
+   * \param[in]  dt         Duration of the time step
+   * \param[in]  x          Current state
+   * \param[out] x_updated  Updated state, dt time later.
+   * \param[out] xd_updated Updated rates of change of state, dt time later.
+   * \param[out] gains      The gains of the gain schedules
+   *
+   * \remarks x should be of size dim() X 1. This forces you to pre-allocate memory, which
+   * speeds things up (and also makes Eigen's Ref functionality easier to deal with).
+   */
   void integrateStep(double dt, const Eigen::Ref<const Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> x_updated, Eigen::Ref<Eigen::VectorXd> xd_updated, Eigen::Ref<Eigen::VectorXd> gains) const;
   
   /**
@@ -132,6 +159,10 @@ public:
    */
   void train(const Trajectory& trajectory, std::string save_directory, bool overwrite=false);
   
+  /** 
+   * Return the dimensionality of the vector with gains.
+   * \return The dimensionality of the vector with gains
+   */
   int dim_gains(void) const
   {
     return function_approximators_gains_.size();
@@ -198,22 +229,18 @@ private:
   /** Serialize class data members to boost archive. 
    * \param[in] ar Boost archive
    * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
+   * \see page_serialization
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Dmp);
+    ar & BOOST_SERIALIZATION_NVP(function_approximators_gains_);
+  }
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::DmpWithGainSchedules);
  
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::DmpWithGainSchedules,boost::serialization::object_serializable);
-
 #endif // _DMP_WITH_GAIN_SCHEDULES_H_
 

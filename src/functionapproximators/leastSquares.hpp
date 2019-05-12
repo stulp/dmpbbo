@@ -33,7 +33,15 @@
 namespace DmpBbo {
   
  
-/** (Regularized) weighted least squares with bias */
+/** (Regularized) weighted least squares with bias 
+ * \param[in] inputs Input values. Size n_samples X n_input_dims
+ * \param[in] targets Target values. Size n_samples X n_ouput_dims
+ * \param[in] weights Weights, one for each sample. Size n_samples X 1
+ * \param[in] use_offset Use linear model "y = a*x + offset" instead of "y = a*x". Default: true.
+ * \param[in] regularization Regularization term for regularized least squares. Default: 0.0.
+ * \param[in] min_weight Minimum weight taken into account for least squares. Samples with a lower weight are not included in the least squares regression. May lead to significant speed-up. See documentation in cpp file for more details. Default: 0.0.
+ * \return Parameters of the linear model
+ */
 Eigen::MatrixXd weightedLeastSquares(
   const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   const Eigen::Ref<const Eigen::MatrixXd>& targets,
@@ -43,7 +51,13 @@ Eigen::MatrixXd weightedLeastSquares(
   double min_weight=0.0
   );
 
-/** (Regularized) least squares with bias */
+/** (Regularized) least squares with bias 
+ * \param[in] inputs Input values. Size n_samples X n_input_dims
+ * \param[in] targets Target values. Size n_samples X n_ouput_dims
+ * \param[in] use_offset Use linear model "y = a*x + offset" instead of "y = a*x". Default: true.
+ * \param[in] regularization Regularization term for regularized least squares. Default: 0.0.
+ * \return Parameters of the linear model
+ */
 Eigen::MatrixXd leastSquares(
   const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   const Eigen::Ref<const Eigen::MatrixXd>& targets,
@@ -51,7 +65,11 @@ Eigen::MatrixXd leastSquares(
   double regularization=0.0
   );
 
-/** Linear prediction */
+/** (Regularized) least squares with bias 
+ * \param[in] inputs Input values. Size n_samples X n_input_dims
+ * \param[in] beta Parameters of the linear model, i.e. y = beta[0]*x + beta[1]
+ * \param[out] outputs Predicted output values. Size n_samples X n_ouput_dims
+ */
 void linearPrediction(
   const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
   const Eigen::Ref<const Eigen::VectorXd>& beta,

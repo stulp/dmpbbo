@@ -24,9 +24,9 @@
 #ifndef TaskViapointArm2D_H
 #define TaskViapointArm2D_H
 
-#include <eigen3/Eigen/Core>
-
 #include "dmp_bbo/tasks/TaskViapoint.hpp"
+
+#include <eigen3/Eigen/Core>
 
 namespace DmpBbo {
 
@@ -62,36 +62,9 @@ private:
    */
   int n_dofs_;
   
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  TaskViapointArm2D(void) {};
-  
-
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
-  
 };                              
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::TaskViapointArm2D, "TaskViapointArm2D")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::TaskViapointArm2D,boost::serialization::object_serializable);
 
 #endif
 

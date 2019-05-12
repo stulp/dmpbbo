@@ -26,19 +26,17 @@
 
 #include "functionapproximators/Parameterizable.hpp"
 
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
+
 #include <iosfwd>
 #include <vector>
-
 #include <eigen3/Eigen/Core>
 
-namespace DmpBbo {
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+#include <boost/serialization/vector.hpp>
 
-/** \page page_unified_model Unified Model for Function Approximators
- * The unified model is a unified representation for the different model parameters used by the different function approximators.
- 
-Whilst coding this library and numerous discussion with Olivier Sigaud, it became apparent that the latent function representations of all the function approximators in this library all use the same generic model. Each specific model (i.e. as used in GPR, GMR, LWR, etc.) is a special case of the Unified Model. We discuss this in the paper titled: "Many Regression Algorithms, One Unified Model - A Review, Freek Stulp and Olivier Sigaud", which you should be able to find in an on-line search.
- *
- */
+namespace DmpBbo {
 
 /** \brief The unified model, which can be used to represent the model of all other function approximators.
  *
@@ -230,18 +228,24 @@ private:
    * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
    */
   template<class Archive>
-  void serialize(Archive & ar, const unsigned int version);
+  void serialize(Archive & ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
+    ar & BOOST_SERIALIZATION_NVP(centers_);
+    ar & BOOST_SERIALIZATION_NVP(covars_);
+    ar & BOOST_SERIALIZATION_NVP(slopes_);
+    ar & BOOST_SERIALIZATION_NVP(offsets_);
+    ar & BOOST_SERIALIZATION_NVP(priors_);
+    ar & BOOST_SERIALIZATION_NVP(normalized_basis_functions_);
+    ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
+    ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
+    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
+    ar & BOOST_SERIALIZATION_NVP(caching_);
+  }
 
 };
 
 }
-
-#include <boost/serialization/export.hpp>
-/** Register this derived class. */
-BOOST_CLASS_EXPORT_KEY2(DmpBbo::UnifiedModel, "UnifiedModel")
-
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::UnifiedModel,boost::serialization::object_serializable);
 
 #endif        //  #ifndef UNIFIEDMODEL_H
 

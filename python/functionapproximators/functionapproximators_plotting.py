@@ -65,7 +65,7 @@ def plotDataResiduals(inputs,targets,predictions,ax):
     else:
         print('Cannot plot input data with a dimensionality of '+str(n_dims)+'.')
 
-    plt.setp(list_of_lines, label='predictions', color='red', linewidth=2)
+    plt.setp(list_of_lines, label='predictions', color=[1,0.5,0.5], linewidth=0.5)
     return list_of_lines
 
 def plotGrid(inputs,outputs,ax,n_samples_per_dim):
@@ -89,7 +89,7 @@ def plotGridPredictions(inputs,predictions,ax,n_samples_per_dim):
     list_of_lines = plotGrid(inputs,predictions,ax,n_samples_per_dim)
     n_dims = len(numpy.atleast_1d(n_samples_per_dim))
     if (n_dims==1):
-        plt.setp(list_of_lines, label='latent function', color='#9999ff',linewidth=3)
+        plt.setp(list_of_lines, label='latent function', color='#5555ff',linewidth=3)
     else:
         plt.setp(list_of_lines, label='latent function', color='#5555ff',linewidth=1)
     return list_of_lines
@@ -130,6 +130,9 @@ def plotDataFromDirectory(directory,ax):
     except IOError:
         n_samples_per_dim = None
       
+    if len(predictions)>0:
+      plotDataResiduals(inputs,targets,predictions,ax)
+      
     # Plotting
     try:
       inputs_grid = numpy.loadtxt(directory+'/inputs_grid.txt')
@@ -146,8 +149,6 @@ def plotDataFromDirectory(directory,ax):
       predictions_grid = [];
       
       
-    if len(predictions)>0:
-      plotDataResiduals(inputs,targets,predictions,ax)
     plotDataTargets(inputs,targets,ax)
     #plotDataPredictions(inputs,predictions,ax)   
     
@@ -475,5 +476,14 @@ def plotLocallyWeightedLinesFromDirectory(directory,ax):
 #    plotDataFromDirectory(directory,ax)
 #    plotLocallyWeightedLinesFromDirectory(directory,ax)
 #    plt.show()
+
+def plotFunctionApproximatorTrainingFromDirectory(directory,ax,ax2=None):
+    """Load data related to function approximator training from a directory and plot it."""
+    if ax2 != None:
+        plotLocallyWeightedLinesFromDirectory(directory,ax2)
+    else:
+        plotLocallyWeightedLinesFromDirectory(directory,ax)
+        
+    plotDataFromDirectory(directory,ax)
 
 

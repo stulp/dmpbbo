@@ -48,7 +48,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
-bool saveToDirectory(string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
+bool saveToDirectory(std::string directory, int i_update, const DistributionGaussian& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const DistributionGaussian& distribution_new, bool overwrite)
 {
   vector<DistributionGaussian> distribution_vec;
   distribution_vec.push_back(distribution);
@@ -59,7 +59,7 @@ bool saveToDirectory(string directory, int i_update, const DistributionGaussian&
   return saveToDirectory(directory, i_update, distribution_vec, rollout_eval, rollouts, weights, distribution_new_vec, overwrite);
 }
 
-bool saveToDirectory(string directory, int i_update, const vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const vector<Rollout*>& rollouts, const VectorXd& weights, const vector<DistributionGaussian>& distribution_new, bool overwrite)
+bool saveToDirectory(std::string directory, int i_update, const std::vector<DistributionGaussian>& distribution, const Rollout* rollout_eval, const std::vector<Rollout*>& rollouts, const Eigen::VectorXd& weights, const std::vector<DistributionGaussian>& distribution_new, bool overwrite)
 {
   
   VectorXd cost_eval;
@@ -229,11 +229,11 @@ void runOptimizationTask(ExperimentBBO* experiment, std::string save_directory, 
 void runOptimizationParallelDeprecated(
   Task* task, 
   TaskSolver* task_solver, 
-  vector<DistributionGaussian*> initial_distributions, 
+  std::vector<DistributionGaussian*> initial_distributions, 
   Updater* updater, 
   int n_updates, 
   int n_samples_per_update, 
-  string save_directory, 
+  std::string save_directory, 
   bool overwrite, 
   bool only_learning_curve)
 {  

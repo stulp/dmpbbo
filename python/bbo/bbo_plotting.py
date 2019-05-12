@@ -96,6 +96,10 @@ def plotLearningCurve(learning_curve,ax,costs_all=[],cost_labels=[]):
     # Individual cost components
     if costs_eval.shape[1]>1:
         lines.extend(ax.plot(samples_eval,costs_eval[:,1:],'-',linewidth=1))
+        
+    #max_eval = 1.2*np.max(costs_eval)
+    #for sample_eval in samples_eval:
+    #    ax.plot([sample_eval,sample_eval],[0,max_eval],'-',color=[0.9,0.9,0.9],linewidth=1)
     
     # Annotation
     ax.set_xlabel('number of evaluations')
@@ -107,7 +111,11 @@ def plotLearningCurve(learning_curve,ax,costs_all=[],cost_labels=[]):
         plt.legend(lines, cost_labels)
 
     y_limits = [0,1.2*np.max(costs_eval)]
+    plotUpdateLines(samples_eval,ax,y_limits)
+        
     ax.set_ylim(y_limits)
+    
+    
     return lines
     
     
@@ -121,7 +129,13 @@ def plotExplorationCurve(exploration_curve,ax):
     \param[in] ax Axis to plot the learning curve on.
     """
     exploration_curve = np.array(exploration_curve)
-    line = ax.plot(exploration_curve[:,0],exploration_curve[:,1],'-',color='green',linewidth=2)
+    samples_eval = exploration_curve[:,0]
+    explo = exploration_curve[:,1]
+    
+    line = ax.plot(samples_eval,explo,'-',color='green',linewidth=2)
+    y_limits = [0,1.1*np.max(explo)]
+    plotUpdateLines(samples_eval,ax,y_limits)
+    ax.set_ylim(y_limits)
     ax.set_xlabel('number of evaluations')
     ax.set_ylabel('sqrt of max. eigval of covar')
     ax.set_title('Exploration magnitude')

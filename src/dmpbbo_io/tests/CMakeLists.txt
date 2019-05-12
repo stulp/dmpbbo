@@ -1,3 +1,2 @@
 add_executable(testEigenBoostSerialization testEigenBoostSerialization.cpp)
 target_link_libraries(testEigenBoostSerialization ${Boost_LIBRARIES})
-install(TARGETS testEigenBoostSerialization  DESTINATION bin_test)

@@ -1,3 +1,7 @@
+[![DOI](http://joss.theoj.org/papers/10.21105/joss.01225/status.svg)](https://doi.org/10.21105/joss.01225)
+
+[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
+
 # What?
 
 This repository provides an implementation of dynamical systems, 
@@ -6,23 +10,28 @@ function approximators,
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
-A PDF tutorial on these topics (generated with Doxygen) is available at https://github.com/stulp/dmpbbo/blob/master/docs/tutorial.pdf
-
-A snapshot of the complete HTML doxygen documentation is here: http://freekstulp.net/dmpbbo/html/
 
 # For whom?
 
 This library may be useful for you if you
 
-+ are new to dynamical movement primitives and want to learn about them (see the 
-    tutorial in the doxygen documentation).
++ are interested in the **theory** behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives, but would rather use existing,
-    tested code than brew it yourself.
++ already know about dynamical movement primitives and reinforcement learning, but would rather **use existing, tested code** than brew it yourself. In this case, <a href="demos_cpp/"><b>demos_cpp/</b></a> and <a href="demos_python/"><b>demos_python/</b></a> are a good starting point, as they provide examples of how to use the code.
+
++ run the optimization of DMPs **on a real robot**. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a>.
+
++ want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
+
   
-+ want to do reinforcement learning/optimization of dynamical movement primitives.
-  
-  
+ 
+# How?
+
+How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
+
+
+# Code structure
+
 Most submodules of this project are independent of all others, so if you don't care 
 about dynamical movement primitives, the following submodules can still easily be 
 integrated in other code to perform some (hopefully) useful function:
@@ -36,27 +45,16 @@ integrated in other code to perform some (hopefully) useful function:
 
 + `bbo/` : implementation of some (rather simple) algorithms for the stochastic 
   optimization of black-box cost functions
+  
+## Why Python and C++?
 
-# How?
+When optimizing DMPs on a real robot, it's best to have the DMPs running in your real-time control loop. Hence, DMPs need to be implemented in C++. For the optimization algorithms itself, real-time concerns are not an issue. However, on-the-fly visualization to monitor the optimization process is important, and for this Python is a better choice.
 
-How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
+For completeness, basic DMP functionality has been implemented in Python as well. And the optimization algorithms have been implemented in C++ also. However, the main use case is C++ for DMPs, and Python for optimization. How to do this is implemented in `demo_robot/`, and documented in `tutorial/dmp_bbo_robot.md`
 
-To learn how to use the code, the first thing to do is look at the
-documentation and tutorial here:
+Note that for now the Python code has not been documented well, please Doxygen navigate the C++ documentation instead (class/function names have been kept consistent).
 
-+ `build_dir/docs/html/index.html` This documentation must first be generated with doxygen, see INSTALL.txt 
-
-+ `docs/tutorial.pdf` This is a snapshot of the PDF in docs/tutorial/
-
-To delve into the code a bit deeper, each module has a set of demos, e.g.
-
-+ `demos/dynamicalsystems/`
-  The demos do not show all the functionality, but are well
-  documented and a good place to understand how the code can be 
-  used. There are python scripts that call the right executables, and
-  do some plotting.
-
-# Why?
+# Why dmpbbo?
 
 For our own use, the aims of coding this were the following:
 
@@ -73,12 +71,20 @@ For our own use, the aims of coding this were the following:
     
 + Running dynamical movement primitives on real robots.
 
+##  Research background
 
-# Why Python and C++?
+In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
 
-A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-)  The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment.
+* Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters [@matsubara11learning], [@silva12learning],  [@stulp13learning].
 
-# Publication
+* Representing and optimizing gain schedules and force profiles as part of a DMP [@buchli11learning], [@kalakrishnan11learning]
+
+
+*  Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP [@stulp13robot], [@stulp12policy_hal]
+
+* Demonstrating the advantages of using covariance matrix adaptation for the policy improvement [@stulp12path],[@stulp12adaptive],[@stulp14simultaneous]
+
+* Using the same unified model for the model parameters of different function approximators [@stulp15many]. In fact, coding this library lead to this article, rather than vice versa.
 
 If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
 
@@ -90,10 +96,10 @@ If you use this library in the context of experiments for a scientific paper, we
 	url    = {https://www.theoj.org/joss-papers/joss.01225/10.21105.joss.01225.pdf}
     }
 
-Link to the paper [PDF](https://www.theoj.org/joss-papers/joss.01225/10.21105.joss.01225.pdf).
 
-### Build Status
+# Contributing
 
-[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
+Contributions in the form of feedback, code, and bug reports are very welcome:
 
-
+* If you have found an issue or a bug, please open a GitHub issue.
+* If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.

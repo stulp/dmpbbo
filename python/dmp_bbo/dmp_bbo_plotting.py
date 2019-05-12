@@ -36,9 +36,9 @@ def containsNewDistribution(directory):
     return False
 
 def plotOptimizationRolloutsTask(directory,fig,task,plot_all_rollouts=False):
-    plotOptimizationRollouts(directory,fig,task.plotRollout,plot_all_rollouts)
+    plotOptimizationRollouts(directory,fig,task.plotRollout,plot_all_rollouts,task.costLabels())
 
-def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False):
+def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False,cost_labels=[]):
     
     if not fig:    
         fig = plt.figure(1,figsize=(9, 4))
@@ -106,12 +106,12 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
         # All the costs so far
         all_costs.extend(costs)
         # Update exploration curve
-        i_samples = i_samples + n_rollouts
         cur_exploration = np.sqrt(distribution.maxEigenValue())
         exploration_curve.append([i_samples,cur_exploration])
         # Update learning curve
         learning_curve.append([i_samples])
         learning_curve[-1].extend(np.atleast_1d(cost_eval))
+        i_samples = i_samples + n_rollouts
         
         n_subplots = 3
         i_subplot = 1
@@ -131,7 +131,7 @@ def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=Fa
         
     
     plotExplorationCurve(exploration_curve,fig.add_subplot(1,n_subplots,i_subplot))
-    plotLearningCurve(learning_curve,fig.add_subplot(1,n_subplots,i_subplot+1))
+    plotLearningCurve(learning_curve,fig.add_subplot(1,n_subplots,i_subplot+1),all_costs,cost_labels)
 
 #def plotOptimizations(directories,axs):
 #    n_updates = 10000000

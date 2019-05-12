@@ -21,20 +21,11 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::FunctionApproximatorLWPR);
-
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/ModelParametersLWPR.hpp"
+
+#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include "lwpr.hh"
 
@@ -173,13 +164,5 @@ void FunctionApproximatorLWPR::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
   }
   
 }
-
-template<class Archive>
-void FunctionApproximatorLWPR::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
-}
-
 
 }

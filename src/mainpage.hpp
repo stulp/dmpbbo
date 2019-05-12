@@ -6,7 +6,14 @@
 
 /** \mainpage 
 
+\section sec_cui_bono What the doxygen documentation is for
+
+This is the doxygen documentation of the DmpBbo library. Its main aim is to document the API, describe the implemenation, and provide rationale management for developers. If you are more interested in the theory behind dynamical movement primitives and their optimization, the <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial">tutorials</a> is the place to go for you. If you want to get started quickly, the <a href="https://github.com/stulp/dmpbbo/blob/master/demos_cpp">demos</a> would be the right place.
+
+\section sec_overview_modules Overview of the modules/libraries
+
 This library contains several modules for training dynamical movement primitives (DMPs), and optimizing their parameters through black-box optimization. Each module has its own dedicated page.
+
 
 \li  \ref page_dyn_sys (in dynamicalsystems/) This module provides implementations of several basic dynamical systems. DMPs are combinations of such systems. This module is completely independent of all other modules.
 
@@ -18,34 +25,12 @@ This library contains several modules for training dynamical movement primitives
 
 \li \ref page_dmp_bbo (in dmp_bbo/) This module applies black-box optimization to the parameters of a DMP. It depends on all the other modules.
 
-Each of the pages linked to above contains two sections: 
-
-\li A tutorial that treats the concepts that are implemented 
-\li A description of how these concepts have been implemented, and why it has been done so in this fashion.
+\section sec_pytho_cpp A mixed C++/Python library
 
 
-Those parts of the code that are to be executed on a robot (those in functionapproximators/, dynamicalsystems/, and dmp/) have been implemented in C++. All other parts (bbo/ and dmpbbo/) have been implemented in C++ and Python. In many cases the Python version will be more convenient to use. For now the Python code has not been documented well, please see the C++ documentation instead (class/function names have been kept consistent).
-
-If you want a deeper understanding of the entire library, I recommend you to go through the pages in the order above. If you want to start coding immediately, I suggest to look at the \ref Demos to see how the functionality of the library may be used. The demos for each module are found in  cpp/MODULENAME/demos.
+A part of the functionality of the C++ code has been mirrored in Python. The Python version is probably the better language for getting to know dmpbbo (especially if you do not know C++ ;-) The C++ code is the better choice if you want to run dmpbbo on a real robot in a real-time environment. For now the Python code has not been documented well, please navigate the C++ documentation instead (class/function names have been kept consistent).
 
 Some general considerations on the design of the library are here \ref page_design
-
-\section sec_research_background Research background
-
-In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
-
-\li Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters \cite matsubara11learning \cite silva12learning \cite stulp13learning.
-
-\li Representing and optimizing gain schedules and force profiles as part of a DMP \cite buchli11learning \cite kalakrishnan11learning,
-
-
-\li Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP \cite stulp13robot, \cite stulp12policy_hal,
-
-\li Demonstrating the advantages of using covariance matrix adaptation for the policy improvement \cite stulp12path \cite stulp12adaptive \cite stulp14simultaneous 
-
-\li Using the same unified model for the model parameters of different function approximators \cite stulp15many. In fact, coding this library lead to this article, rather than vice versa.
-
-
 
 */
 
@@ -87,6 +72,8 @@ See \ref page_serialization
 
 /** \page page_todo Todo
 
+\todo Explain why C++ implementation of bbo and dmp_bbo have only limited use.
+
 \todo Documentation: Write a related pages with a table on which functionality is implemented in Python/Cpp
 
 \todo Documentation: document Python classes/functions
@@ -95,13 +82,80 @@ See \ref page_serialization
 
 \todo Plotting: setColor on ellipses?
 
+\todo delay_cost in C++ not the same as in Python. Take the mean (as in Python) rather than the sum.
+
+\todo Check documentation of dmp_bbo_robot
+
+
+\todo demoOptimizationTaskWrapper.py: should there be a Task there also?
+\todo clean up demoImitationAndOptimization
+\todo clean up demoOptimizationDmpParallel: remove deprecated, only covar updates matter, make a flag
+\todo FunctionApproximator::saveGridData in Python also
+\todo further compare scripts
+\todo testTrainingCompareCppPython.py => move part of it into demos/python/functionapproximators
+
+\todo Table showing which functionality is available in Python/C++
+
+\todo Consistent interfaces and helps for demos (e.g. with argparse)
+
+\todo Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmpbbo/demos_cpp/ directory.  => Are there md files everywhere?
+
+\todo What exactly goes in tutorial and what in implementation?
+
+\todo Include design rationale for txt files (in design_rationale.md) in dmp_bbo_bbo.md
+
+\todo Make Python scripts robust against missing data, e.g. cost_vars
+
+\todo Check if true: "An example is given in TaskViapoint, which implements a Task in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by TaskSolverDmp, which is able to generate such trajectories."
+
+\todo EigenToString.tpp from EigenBoostSerialization? Or move into EigenFileIO?
 
  */ 
 
 /** \defgroup Demos Demos
  */
  
+/** \page page_demos Demos
+ * 
+ * DmpBbo comes with several demos.
+ * 
+ * The C++ demos are located in the dmpbbo/demos_cpp/ directory. Please see the README.md files located there.
+ *
+ * Many of the compiled executables are accompanied by a Python wrapper, which calls the executable,  and reads the files it writes, and then plots them (yes, I know about Python bindings; this approach allows better debugging of the format of the output files, which should always remain compatible between the C++ and Python versions of DmpBbo). For completeness, the pure Python demos are located in dmpbbo/demos_python.
+ *
+ Please note that this doxygen documentation only documents the C++ API of the libraries (in src/), not the demos. For explanations of the demos, please see the md files in the dmpbbo/demos_cpp/ directory. 
+ */
 
+/** \page page_moved Pages that have moved to the on-line tutorial (Markdown)
+
+\section page_unified_model Unified Model for Function Approximators
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md#unified-model-for-function-approximators" target="_blank">tutorial/functionapproximators.md</a>
+
+\section page_dmp_bbo Black Box Optimization of Dynamical Movement Primitives
+
+The documentation for the dmp_bbo module is in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md" target="_blank">tutorial/dmp_bbo.md</a>.
+
+\section sec_bbo_task_and_task_solver CostFunction vs Task/TaskSolver
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#costfunction-vs-tasktasksolver" target="_blank">tutorial/dmp_bbo.md</a>
+
+
+\section sec_cost_components Cost components
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#cost-components" target="_blank">tutorial/dmp_bbo.md</a>
+
+\section sec_cost_vars Cost-relevant variables
+
+This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#cost-relevant-variables" target="_blank">tutorial/dmp_bbo.md</a>
+
+
+
+
+
+
+ */
+ 
 /** Namespace used for all classes in the project.
  */
 namespace DmpBBO 

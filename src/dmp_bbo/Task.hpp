@@ -27,8 +27,6 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/access.hpp>
-
 namespace DmpBbo {
 
 /** Interface for cost functions, which define a task.
@@ -37,6 +35,7 @@ namespace DmpBbo {
 class Task
 {
 public:
+  
   /** The cost function which defines the task.
    * See also \ref sec_cost_components and \ref sec_bbo_task_and_task_solver
    *
@@ -44,12 +43,7 @@ public:
    * \param[in] sample The sample from which cost_vars was generated. Required for regularization.
    * \param[out] costs The cost for these cost_vars. The first element cost[0] should be the total cost. The others may be the individual cost components that consitute the total cost, e.g. cost[0] = cost[1] + cost[2] ...
    */
-  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, Eigen::VectorXd& costs) const 
-  {
-    int n_task_pars = 0;
-    Eigen::VectorXd task_parameters(n_task_pars);
-    evaluateRollout(cost_vars,sample,task_parameters,costs);
-  };
+  virtual void evaluateRollout(const Eigen::MatrixXd& cost_vars, const Eigen::VectorXd& sample, Eigen::VectorXd& costs) const;
   
   /** Get the number of individual cost components that constitute the final total cost.
    * \return The number of cost components.
@@ -88,37 +82,15 @@ public:
    *  \remark Calls virtual function Task::toString, which must be implemented by
    * subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */ 
-  friend std::ostream& operator<<(std::ostream& output, const Task& task) {
+  friend std::ostream& operator<<(std::ostream& output, const Task& task)
+  {
     output << task.toString();
     return output;
-  }
-  
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // No members to serialize.
   }
   
 };
 
 } // namespace DmpBbo
-
-#include <boost/serialization/assume_abstract.hpp>
-/** Don't add version information to archives. */
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::Task);
- 
-#include <boost/serialization/level.hpp>
-/** Don't add version information to archives. */
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::Task,boost::serialization::object_serializable);
 
 #endif
 

@@ -149,7 +149,7 @@ if __name__=='__main__':
             fig.suptitle("Analytical Solution")
         else:
             fig.suptitle("Numerical Integration")
-        axs1 = [ fig.add_subplot(231), fig.add_subplot(132), fig.add_subplot(133) ] 
+        axs1 = [ fig.add_subplot(231), fig.add_subplot(232), fig.add_subplot(233) ] 
         axs2 = [ fig.add_subplot(234), fig.add_subplot(235), fig.add_subplot(236) ] 
     
         trajectory = numpy.loadtxt(directory+"/demonstration_traj.txt")

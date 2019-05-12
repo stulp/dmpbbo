@@ -21,22 +21,7 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "dmp/Dmp.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::Dmp);
-
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <eigen3/Eigen/Core>
 
 #include "dmp/Trajectory.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
@@ -45,8 +30,14 @@ BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::Dmp);
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <eigen3/Eigen/Core>
+
+#include "dmpbbo_io/EigenFileIO.hpp"
 
 
 using namespace std;
@@ -166,7 +157,7 @@ void Dmp::initSubSystems(DmpType dmp_type)
   else if (dmp_type==KULVICIUS_2012_JOINING || dmp_type==COUNTDOWN_2013)
   {
     goal_system   = new ExponentialSystem(tau(),initial_state(),attractor_state(),15);
-    gating_system = new SigmoidSystem(tau(),one_1,-20,0.9*tau()); 
+    gating_system = new SigmoidSystem(tau(),one_1,-10,0.9*tau()); 
     bool count_down = (dmp_type==COUNTDOWN_2013);    
     phase_system  = new TimeSystem(tau(),count_down);
   }
@@ -694,12 +685,26 @@ void Dmp::train(const Trajectory& trajectory, std::string save_directory, bool o
   
   if (!save_directory.empty())
   {
-    int n_time_steps = 101;
-    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,tau());
-    Trajectory traj_reproduced;
-    analyticalSolution(ts,traj_reproduced);
+    // Integrate the DMP to get the resulting trajectory, and save it for debugging purposes
+    int n_time_steps = 151;
+    VectorXd ts = VectorXd::LinSpaced(n_time_steps,0,1.5*tau());
+    VectorXd tau_vec(1);
+    tau_vec[0] = tau();
+    saveMatrix(save_directory,"tau.txt",tau_vec,overwrite);
     
+    
+    MatrixXd xs, xds, forcing_terms, fa_output;
+    analyticalSolution(ts,xs,xds,forcing_terms,fa_output);
+    Trajectory traj_reproduced;
+    statesAsTrajectory(ts, xs, xds, traj_reproduced);
+
     trajectory.saveToFile(save_directory,"traj_demonstration.txt",overwrite);
+    MatrixXd output_ana(ts.size(),1+xs.cols()+xds.cols());
+    output_ana << ts, xs, xds;
+    saveMatrix(save_directory,"reproduced_ts_xs_xds.txt",output_ana,overwrite);
+    saveMatrix(save_directory,"reproduced_forcing_terms.txt",forcing_terms,overwrite);
+    saveMatrix(save_directory,"reproduced_fa_output.txt",fa_output,overwrite);
+    
     traj_reproduced.saveToFile(save_directory,"traj_reproduced.txt",overwrite);
   }
   
@@ -892,27 +897,20 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
 
 string Dmp::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("Dmp");
-}
+  Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
 
-
-template<class Archive>
-void Dmp::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
+  stringstream stream;
   
-  ar & BOOST_SERIALIZATION_NVP(goal_system_);
-  ar & BOOST_SERIALIZATION_NVP(spring_system_);
-  ar & BOOST_SERIALIZATION_NVP(phase_system_);
-  ar & BOOST_SERIALIZATION_NVP(gating_system_);
-  ar & BOOST_SERIALIZATION_NVP(function_approximators_);
+  stream << "Dmp(";
+  stream << "name=" << name() << ", ";
+  stream << "dim_orig=" << dim_orig() << ", ";
+  stream << "dim=" << dim() << ", ";
+  stream << "tau=" << tau() << ", ";
+  stream << "y_init=" << initial_state().format(my_format) << ", ";
+  stream << "y_attr=" << attractor_state().format(my_format);
+  stream << ")";
   
-  ar & BOOST_SERIALIZATION_NVP(forcing_term_scaling_);
-  ar & BOOST_SERIALIZATION_NVP(trajectory_amplitudes_);
-  
-  ar & BOOST_SERIALIZATION_NVP(perturbation_standard_deviation_);
+  return stream.str();
 }
 
 }

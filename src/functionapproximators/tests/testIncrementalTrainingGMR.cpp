@@ -31,7 +31,7 @@
 #include "functionapproximators/MetaParametersGMR.hpp"
 #include "functionapproximators/ModelParametersGMR.hpp"
 
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 
 using namespace DmpBbo;
 using namespace Eigen;

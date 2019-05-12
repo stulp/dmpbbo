@@ -18,6 +18,7 @@
 
 import numpy as np
 import sys
+import math
 import os
 
 lib_path = os.path.abspath('../../python/')
@@ -109,7 +110,7 @@ class UpdaterCovarDecay(Updater):
 class UpdaterCovarAdaptation(Updater):
     """ Updater that updates the mean of the distribution, and uses covariance matrix adaptation to update the covariance matrix of the distribution."""
             
-    def __init__(self,eliteness = 10, weighting_method = 'PI-BB',base_level_diagonal=None,diag_only=False,learning_rate=1.0):
+    def __init__(self,eliteness = 10, weighting_method = 'PI-BB',diagonal_max=None,diagonal_min=None,diag_only=False,learning_rate=1.0):
         """ Constructor
         \param[in] eliteness The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
         \param[in] weighting_method ('PI-BB' = PI^2 style weighting)
@@ -119,7 +120,8 @@ class UpdaterCovarAdaptation(Updater):
         """
         self.eliteness = eliteness
         self.weighting_method = weighting_method
-        self.base_level_diagonal = base_level_diagonal
+        self.diagonal_max = diagonal_max
+        self.diagonal_min = diagonal_min
         self.diag_only = diag_only
         if (learning_rate>1.0):
             learning_rate=1.0
@@ -166,12 +168,29 @@ class UpdaterCovarAdaptation(Updater):
             lr = self.learning_rate # For legibility
             covar_new = (1-lr)*covar_cur + lr*covar_new;
             
-        # Add a base_level to avoid pre-mature convergence
-        if (self.base_level_diagonal is not None):
+        # Set a maximum value for the diagonal to avoid too much exploration
+        if (self.diagonal_max is not None):
+            is_scalar_max = np.isscalar(self.diagonal_max)
+            if is_scalar_max:
+                level_max = pow(self.diagonal_max,2)
             for ii in range(n_dims):
-                if covar_new[ii,ii]<self.base_level_diagonal[ii]:
-                    covar_new[ii,ii]=self.base_level_diagonal[ii]
-
+                if not is_scalar_max:
+                    level_max = pow(self.diagonal_max[ii],2)
+                if covar_new[ii,ii]>level_max:
+                    covar_new[ii,ii]=level_max
+                    
+        # Set a minimum value for the diagonal to avoid pre-mature convergence
+        if (self.diagonal_min is not None):
+            is_scalar_min = np.isscalar(self.diagonal_min)
+            if is_scalar_min:
+                level_min = pow(self.diagonal_min,2)
+            for ii in range(n_dims):
+                if not is_scalar_min:
+                    level_min = pow(self.diagonal_min[ii],2)
+                if covar_new[ii,ii]<level_min:
+                    covar_new[ii,ii]=level_min
+                    
+                    
         # Update the covariance matrix
         distribution_new = DistributionGaussian(mean_new, covar_new)
     
@@ -233,3 +252,28 @@ def costsToWeights(costs, weighting_method, eliteness):
     weights = weights/sum(weights)
     
     return weights
+
+
+if __name__=="__main__":
+    eliteness = 10
+    weighting_method = 'PI-BB'
+    covar_decay_factor = 0.8
+    updater = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
+    
+    diagonal_min = 0.1
+    diagonal_max = 1.0
+    diag_only=False
+    learning_rate=1.0
+    updater = UpdaterCovarAdaptation(eliteness, weighting_method,diagonal_max,diagonal_min,diag_only,learning_rate)
+
+    mu  = np.array([2,4])
+    cov = np.array([[0.3,0.0],[0.0,0.5]])
+    distribution = DistributionGaussian(mu,cov)
+    
+    n_samples = 10
+    samples = distribution.generateSamples(n_samples)
+    costs = abs(samples[:,0]) + abs(samples[:,1]) # Manhattan distance
+    
+    (new_distribution, w) = updater.updateDistribution(distribution, samples, costs)
+    print(distribution.covar)
+    print(new_distribution.covar)

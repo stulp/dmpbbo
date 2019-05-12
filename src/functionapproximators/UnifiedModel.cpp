@@ -21,23 +21,12 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
  
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/vector.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
 #include "functionapproximators/UnifiedModel.hpp"
-
-/** For boost::serialization. See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/special.html#export */
-BOOST_CLASS_EXPORT_IMPLEMENT(DmpBbo::UnifiedModel);
-
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -387,23 +376,6 @@ void UnifiedModel::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& in
   
 }
 
-template<class Archive>
-void UnifiedModel::serialize(Archive & ar, const unsigned int version)
-{
-  // serialize base class information
-  ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
-
-  ar & BOOST_SERIALIZATION_NVP(centers_);
-  ar & BOOST_SERIALIZATION_NVP(covars_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_);
-  ar & BOOST_SERIALIZATION_NVP(offsets_);
-  ar & BOOST_SERIALIZATION_NVP(priors_);
-  ar & BOOST_SERIALIZATION_NVP(normalized_basis_functions_);
-  ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
-  ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-  ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-  ar & BOOST_SERIALIZATION_NVP(caching_);
-}
 
 string UnifiedModel::toString(void) const
 {

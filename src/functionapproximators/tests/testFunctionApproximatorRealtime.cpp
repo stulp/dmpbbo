@@ -30,7 +30,7 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 
 #include "getFunctionApproximatorsVector.hpp"
-#include "../../../demos/functionapproximators/targetFunction.hpp"
+#include "testTargetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;

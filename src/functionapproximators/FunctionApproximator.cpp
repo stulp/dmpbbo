@@ -28,7 +28,6 @@
 #include "functionapproximators/UnifiedModel.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
@@ -359,7 +358,7 @@ void FunctionApproximator::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs
     }
     outfile   << "import numpy                                                                  \n";
     outfile   << "import matplotlib.pyplot as plt                                               \n";
-    outfile   << "directory = '" << save_directory << "'                                        \n";
+    outfile   << "directory = '" << "./" << "'                                        \n";
     outfile   << "inputs   = numpy.loadtxt(directory+'/inputs.txt')                             \n";
     outfile   << "targets  = numpy.loadtxt(directory+'/targets.txt')                            \n";
     outfile   << "outputs  = numpy.loadtxt(directory+'/outputs.txt')                            \n";

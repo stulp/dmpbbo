@@ -29,11 +29,16 @@
 
 #include "Parameterizable.hpp"
 
-#include <boost/serialization/nvp.hpp>
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
+
+#include <boost/serialization/access.hpp>
+#include <boost/serialization/nvp.hpp>
+
+
 
 namespace DmpBbo {
   
@@ -338,9 +343,7 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    // serialize base class information
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
-    
     ar & BOOST_SERIALIZATION_NVP(meta_parameters_);
     ar & BOOST_SERIALIZATION_NVP(model_parameters_);
   }
@@ -349,24 +352,20 @@ private:
 
 }
 
-
-/** Tell boost serialization that this class has pure virtual functions. */
-#include <boost/serialization/assume_abstract.hpp>
-BOOST_SERIALIZATION_ASSUME_ABSTRACT(DmpBbo::FunctionApproximator);
- 
-/** Don't add version information to archives. */
-#include <boost/serialization/export.hpp>
-BOOST_CLASS_IMPLEMENTATION(DmpBbo::FunctionApproximator,boost::serialization::object_serializable);
-
 #endif // _FUNCTIONAPPROXIMATOR_H_
+
+
+namespace DmpBbo {
 
 /** \page page_func_approx Function Approximation
 
-This page explains function approximators, and their implementation in DmpBbo
+This page provides an  overview of the implementation of function approximators in the \c dynamicalsystems/ module.
+
+It is assumed you have read about the theory behind function approximators in the tutorial <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md">tutorial/functionapproximators.md</a>.
 
 \section sec_fa Function Approximation
 
-This module implements a set of function approximators, i.e. supervised learning algorithms that are trained with demonstration pairs input/target, after which they make predictions for new inputs. For simplicity, this module implements only batch learning (not incremental).
+This module implements a set of function approximators, i.e. supervised learning algorithms that are <b>trained</b> with demonstration pairs input/target, after which they <b>predict</b> output values for new inputs. For simplicity, DmpBbo focusses on batch learning (not incremental), as the main use cases in the context of dmpbbo is imitation learning.
 
 The two main functions are FunctionApproximator::train, which takes a set of inputs and corresponding targets, and FunctionApproximator::predict, which makes predictions for novel inputs. 
 
@@ -423,3 +422,5 @@ The reason why caching is implemented in ModelParameters, and not in FunctionApp
 
 
  */
+ 
+}

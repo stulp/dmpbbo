@@ -68,10 +68,11 @@ if __name__=="__main__":
             covar_decay_factor = 0.8
             updater = UpdaterCovarDecay(eliteness,weighting_method,covar_decay_factor)
         else:
-            base_level = np.full(n_dims,0.000001);
+            min_level = 0.000001
+            max_level = None
             diag_only = False;
             learning_rate = 0.75;
-            updater = UpdaterCovarAdaptation(eliteness,weighting_method,base_level,diag_only,learning_rate);  
+            updater = UpdaterCovarAdaptation(eliteness,weighting_method,max_level,min_level,diag_only,learning_rate);  
       
         n_samples_per_update = 20
         n_updates = 40
