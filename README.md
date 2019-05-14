@@ -45,7 +45,6 @@ integrated in other code to perform some (hopefully) useful function:
 
 + `bbo/` : implementation of some (rather simple) algorithms for the stochastic 
   optimization of black-box cost functions
-
   
 ## Why Python and C++?
 
@@ -90,11 +89,11 @@ In 2014, I decided to write one library that integrates the different research t
 If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
 
     @MISC{stulp_dmpbbo,
-        author = {Freek Stulp},
-        title  = {{\tt DmpBbo} -- A C++ library for black-box optimization of 
-                                                    dynamical movement primitives.},
-        year   = {2014},
-        url    = {https://github.com/stulp/dmpbbo.git}
+	author = {Freek Stulp, Gennaro},
+	title  = {DmpBbo: A versatile Python/C++ library for Function Approximation, Dynamical Movement Primitives, and Black-Box Optimization},
+	year   = {2019},
+	doi    = {10.21105/joss.01225},
+	url    = {https://www.theoj.org/joss-papers/joss.01225/10.21105.joss.01225.pdf}
     }
 
 
@@ -104,8 +103,3 @@ Contributions in the form of feedback, code, and bug reports are very welcome:
 
 * If you have found an issue or a bug, please open a GitHub issue.
 * If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.
-
-
-
-
-
