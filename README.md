@@ -88,8 +88,8 @@ In 2014, I decided to write one library that integrates the different research t
 
 If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
 
-    @MISC{stulp_dmpbbo,
-	author = {Freek Stulp, Gennaro},
+    @article{stulp2019dmpbbo,
+	author = {Freek Stulp and Gennaro Raiola},
 	title  = {DmpBbo: A versatile Python/C++ library for Function Approximation, Dynamical Movement Primitives, and Black-Box Optimization},
 	year   = {2019},
 	doi    = {10.21105/joss.01225},
