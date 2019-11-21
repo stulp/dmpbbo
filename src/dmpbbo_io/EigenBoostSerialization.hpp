@@ -156,6 +156,12 @@ But load_construct_data requires the creation of an object, which we cannot when
 
 For this reason abstract base classes that are to be serialized with boost must have a default constructor, and may not have const members. This is really a pain, because a serialization library should not enforce such design decisions... But this is the way it is in the code.
 
+\section sec_backwards_compatibility_xml_files Backwards Compatability of XML files
+
+In commit fb936a2e1ac of 2019-04-16, I moved the registering of classes from the hpp file where the class is declared into one hpp file per module. This is less elegant and less modular, but since then, serialization works more robustly, i.e. not causing as many run-time crashes.
+
+This commit seems to have changed the serialization behaviour. In order to read older XML files generated before commit fb936a2e1ac, you may have to add a "DmpBbo::" prefix in front of class names. Gokhan Solak has provided a Gist file to automate this: https://gist.github.com/gokhansolak/975c80cba7ed46419145582306fd90e5
+
 \section sec_eigen_boost_serialization Serializing boost matrices
 
 To avoid bloating the serialization of Eigen matrices with lots of XML tags, they are serialized in a special way. The following examples show how Eigen matrices are serialized in XML:
