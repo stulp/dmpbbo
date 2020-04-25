@@ -62,7 +62,7 @@ endif()
 
 ###############################################################################
 # Find boost packages
-find_package( Boost 1.34 COMPONENTS filesystem system serialization REQUIRED)
+find_package( Boost 1.65 COMPONENTS filesystem system serialization REQUIRED)
 link_directories ( ${Boost_LIBRARY_DIRS} )
 include_directories ( ${Boost_INCLUDE_DIRS} )
 
