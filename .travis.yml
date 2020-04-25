@@ -8,7 +8,6 @@ compiler:
 branches:
   only:
     - master
-    - boost_serialization_issue
 
 env:
   - DMP_BUILD_TYPE=Debug BUILD_SHARED_LIBS=ON
