@@ -149,7 +149,25 @@ This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tuto
 
 This page has moved to <a href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dmp_bbo.md#cost-relevant-variables" target="_blank">tutorial/dmp_bbo.md</a>
 
+\section bibliography Bibliography
 
+To ensure that all relevant entries are generated for the bibliography, here is a list.
+
+
+\cite buchli11learning
+\cite ijspeert02movement
+\cite ijspeert13dynamical
+\cite kalakrishnan11learning
+\cite kulvicius12joining
+\cite matsubara11learning
+\cite silva12learning
+\cite stulp12adaptive
+\cite stulp12path
+\cite stulp12policy_hal
+\cite stulp13learning
+\cite stulp13robot
+\cite stulp14simultaneous
+\cite stulp15many
 
 
 
