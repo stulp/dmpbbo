@@ -18,7 +18,7 @@ env:
 
 # Setup repos etc before installation
 before_install:
-  # g++4.8.1
+  # g++
   - if [ "$CXX" == "g++" ]; then sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; fi
 
   # clang 3.4
@@ -27,9 +27,9 @@ before_install:
 
 install:
 ## Install 2014 compiler (taken from http://stackoverflow.com/questions/22111549/travis-ci-with-clang-3-4-and-c11)
-  # g++4.8.1
-  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  # g++-5
+  - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-5; fi
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
 
   # clang 3.4
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
