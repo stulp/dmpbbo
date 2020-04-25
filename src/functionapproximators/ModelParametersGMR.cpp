@@ -108,9 +108,10 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
   covars_y_x_(covars_y_x)
 {
 
-  size_t n_gaussians = priors.size();
 
 #ifndef NDEBUG // Check for NDEBUG to avoid 'unused variable' warnings for n_dims_in and n_dims_out.
+  size_t n_gaussians = priors.size();
+  
   assert(n_gaussians>0);
   assert(means_x_.size() == n_gaussians);
   assert(means_y_.size() == n_gaussians);
@@ -320,15 +321,15 @@ void ModelParametersGMR::toMatrix(Eigen::MatrixXd& gmm_as_matrix) const
 ModelParametersGMR* ModelParametersGMR::fromMatrix(const MatrixXd& gmm_matrix)
 {
   int n_dims_gmm = gmm_matrix.cols();
-  int n_rows = gmm_matrix.rows();
+  //int n_rows = gmm_matrix.rows();
   assert(n_dims_gmm>1);
-  assert(n_rows>0);
+  assert(gmm_matrix.rows()>0);
   
   int n_gaussians = gmm_matrix(0,0);
   int n_dims_out = gmm_matrix(0,1); 
   int n_observations = gmm_matrix(1,0);
 
-  assert(n_rows == (2+ (n_gaussians*(1+1+n_dims_gmm))));
+  assert(gmm_matrix.rows() == (2+ (n_gaussians*(1+1+n_dims_gmm))));
   
   vector<double> priors(n_gaussians);
   vector<VectorXd> means(n_gaussians);

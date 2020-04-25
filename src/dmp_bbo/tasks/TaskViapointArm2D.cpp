@@ -46,7 +46,7 @@ TaskViapointArm2D::TaskViapointArm2D(int n_dofs, const Eigen::VectorXd& viapoint
 void TaskViapointArm2D::evaluateRollout(const MatrixXd& cost_vars, const Eigen::VectorXd& sample, const VectorXd& task_parameters, VectorXd& costs) const
 {
   int n_time_steps = cost_vars.rows();
-  int n_cost_vars = cost_vars.cols();
+  //int n_cost_vars = cost_vars.cols();
   
   // cost_vars is assumed to have following structure
   // time  joint angles (e.g. n_dofs = 3)     forcing term  link positions (e.g. 3+1) 
@@ -56,7 +56,7 @@ void TaskViapointArm2D::evaluateRollout(const MatrixXd& cost_vars, const Eigen::
   // 1     + 3*n_dofs                        + n_dofs +       2*(n_dofs+1))
   //
   // Thus, the following must be true: n_cost_vars =  1 + 3*n_dofs + n_dofs + 2*(n_dofs+1)
-  assert(n_cost_vars == 1 + 3*n_dofs_ + n_dofs_ + 2*(n_dofs_+1));
+  assert(cost_vars.cols() == 1 + 3*n_dofs_ + n_dofs_ + 2*(n_dofs_+1));
   
   // rollout is of size   n_time_steps x n_cost_vars
   VectorXd ts = cost_vars.col(0);

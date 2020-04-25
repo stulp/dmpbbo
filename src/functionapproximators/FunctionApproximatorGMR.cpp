@@ -108,7 +108,7 @@ void FunctionApproximatorGMR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   const ModelParametersGMR* model_parameters_GMR =
     static_cast<const ModelParametersGMR*>(getModelParameters());
 
-  int n_gaussians;
+  int n_gaussians=0;
   if(meta_parameters_GMR!=NULL)
       n_gaussians = meta_parameters_GMR->number_of_gaussians_;
   else if(model_parameters_GMR!=NULL)

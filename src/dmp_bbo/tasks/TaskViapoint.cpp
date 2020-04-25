@@ -135,8 +135,7 @@ void TaskViapoint::evaluateRollout(const MatrixXd& cost_vars, const Eigen::Vecto
   // t=T  y_1..y_D  yd_1..yd_D  ydd_1..ydd_D  forcing_1..forcing_D
   int n_dims = viapoint_.size();
   int n_time_steps = cost_vars.rows();
-  int n_cost_vars = cost_vars.cols();
-  assert(n_cost_vars==(1+4*n_dims));
+  assert(cost_vars.cols()==(1+4*n_dims));
   
   // rollout is of size   n_time_steps x n_cost_vars
   VectorXd ts = cost_vars.col(0);
