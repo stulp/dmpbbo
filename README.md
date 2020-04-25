@@ -97,6 +97,22 @@ If you use this library in the context of experiments for a scientific paper, we
 	url     = {https://www.theoj.org/joss-papers/joss.01225/10.21105.joss.01225.pdf}
     }
 
+## Bibliography
+
+* <a id="buchli11learning"></a><b>[buchli11learning]</b>  Jonas Buchli, Freek Stulp, Evangelos Theodorou, and Stefan Schaal. <a href="http://ijr.sagepub.com/content/early/2011/03/31/0278364911402527">Learning variable impedance control</a>. <em>International Journal of Robotics Research</em>, 30(7):820-833, 2011.
+* <a id="ijspeert02movement"></a><b>[ijspeert02movement]</b>  A. J. Ijspeert, J. Nakanishi, and S. Schaal. Movement imitation with nonlinear dynamical systems in humanoid robots. In <em>Proceedings of the IEEE International Conference on Robotics and Automation (ICRA)</em>, 2002.
+* <a id="ijspeert13dynamical"></a><b>[ijspeert13dynamical]</b>  A. Ijspeert, J. Nakanishi, P Pastor, H. Hoffmann, and S. Schaal. Dynamical Movement Primitives: Learning attractor models for motor behaviors. <em>Neural Computation</em>, 25(2):328-373, 2013.
+* <a id="kalakrishnan11learning"></a><b>[kalakrishnan11learning]</b>  M. Kalakrishnan, L. Righetti, P. Pastor, and S. Schaal. <a href="http://www-clmc.usc.edu/publications/K/kalakrishnan-IROS2011">Learning force control policies for compliant manipulation</a>. In <em>IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS 2011)</em>, 2011.
+* <a id="kulvicius12joining"></a><b>[kulvicius12joining]</b>  Tomas Kulvicius, KeJun Ning, Minija Tamosiunaite, and Florentin Wörgötter. Joining movement sequences: Modified dynamic movement primitives for robotics applications exemplified on handwriting. <em>IEEE Transactions on Robotics</em>, 28(1):145-157, 2012.
+* <a id="matsubara11learning"></a><b>[matsubara11learning]</b>  T Matsubara, S Hyon, and J Morimoto. Learning parametric dynamic movement primitives from multiple demonstrations. <em>Neural Networks</em>, 24(5):493-500, 2011.
+* <a id="silva12learning"></a><b>[silva12learning]</b>  Bruno da Silva, George Konidaris, and Andrew G. Barto. Learning parameterized skills. In John Langford and Joelle Pineau, editors, <em>Proceedings of the 29th International Conference on Machine Learning (ICML-12)</em>, ICML '12, pages 1679-1686, New York, NY, USA, July 2012. Omnipress.
+* <a id="stulp12adaptive"></a><b>[stulp12adaptive]</b>  Freek Stulp. Adaptive exploration for continual reinforcement learning. In <em>International Conference on Intelligent Robots and Systems (IROS)</em>, pages 1631-1636, 2012.
+* <a id="stulp12path"></a><b>[stulp12path]</b>  Freek Stulp and Olivier Sigaud. Path integral policy improvement with covariance matrix adaptation. In <em>Proceedings of the 29th International Conference on Machine Learning (ICML)</em>, 2012.
+* <a id="stulp12policy_hal"></a><b>[stulp12policy_hal]</b>  Freek Stulp and Olivier Sigaud. <a href="http://hal.archives-ouvertes.fr/hal-00738463">Policy improvement methods: Between black-box optimization and episodic reinforcement learning</a>. hal-00738463, 2012.
+* <a id="stulp13learning"></a><b>[stulp13learning]</b>  Freek Stulp, Gennaro Raiola, Antoine Hoarau, Serena Ivaldi, and Olivier Sigaud. Learning compact parameterized skills with a single regression. In <em>IEEE-RAS International Conference on Humanoid Robots</em>, 2013.
+* <a id="stulp13robot"></a><b>[stulp13robot]</b>  Freek Stulp and Olivier Sigaud. Robot skill learning: From reinforcement learning to evolution strategies. <em>Paladyn. Journal of Behavioral Robotics</em>, 4(1):49-61, September 2013.
+* <a id="stulp14simultaneous"></a><b>[stulp14simultaneous]</b>  Freek Stulp, Laura Herlant, Antoine Hoarau, and Gennaro Raiola. Simultaneous on-line discovery and improvement of robotic skill options. In <em>International Conference on Intelligent Robots and Systems (IROS)</em>, 2014.
+* <a id="stulp15many"></a><b>[stulp15many]</b>  Freek Stulp and Olivier Sigaud. <a href="http://www.sciencedirect.com/science/article/pii/S0893608015001185">Many regression algorithms, one unified model - a review</a>. <em>Neural Networks</em>, 2015.    
 
 # Contributing
 
