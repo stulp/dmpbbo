@@ -75,16 +75,16 @@ For our own use, the aims of coding this were the following:
 
 In 2014, I decided to write one library that integrates the different research threads on the acquisition and optimization that I had been pursuing since 2009. These threads are listed below. Also, I wanted to provide a tutorial on dynamical movement primitives for students, along with code to try DMPs out in practice.
 
-* Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters [@matsubara11learning], [@silva12learning],  [@stulp13learning].
+* Representation and training of parameterized skills, i.e. motion primitives that adapt their trajectory to task parameters [[matsubara11learning]](#matsubara11learning), [[silva12learning]](#silva12learning),  [[stulp13learning]](#stulp13learning).
 
-* Representing and optimizing gain schedules and force profiles as part of a DMP [@buchli11learning], [@kalakrishnan11learning]
+* Representing and optimizing gain schedules and force profiles as part of a DMP [[buchli11learning]](#buchli11learning), [[kalakrishnan11learning]](#kalakrishnan11learning)
 
 
-*  Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP [@stulp13robot], [@stulp12policy_hal]
+*  Showing that evolution strategies outperform reinforcement learning algorithms when optimizing the parameters of a DMP [[stulp13robot]](#stulp13robot), [[stulp12policy_hal]](#stulp12policy_hal)
 
-* Demonstrating the advantages of using covariance matrix adaptation for the policy improvement [@stulp12path],[@stulp12adaptive],[@stulp14simultaneous]
+* Demonstrating the advantages of using covariance matrix adaptation for the policy improvement [[stulp12path],[@stulp12adaptive],[@stulp14simultaneous]](#stulp12path],[@stulp12adaptive],[@stulp14simultaneous)
 
-* Using the same unified model for the model parameters of different function approximators [@stulp15many]. In fact, coding this library lead to this article, rather than vice versa.
+* Using the same unified model for the model parameters of different function approximators [[stulp15many]](#stulp15many). In fact, coding this library lead to this article, rather than vice versa.
 
 If you use this library in the context of experiments for a scientific paper, we would appreciate if you could cite this library in the paper as follows:
 
