@@ -372,3 +372,25 @@ class Dmp(DynamicalSystem,Parameterizable):
             if fa.isTrained():
                 size += fa.getParameterVectorSelectedSize()
         return size
+
+    def set_initial_state(self,initial_state):
+        assert(initial_state.size==self.dim_orig_)
+        super(Dmp,self).set_initial_state(initial_state);
+        
+        # Set value in all relevant subsystems also  
+        self.spring_system_.set_initial_state(initial_state);
+        if self.goal_system_:
+            self.goal_system_.set_initial_state(initial_state);
+        
+    def set_attractor_state(self,attractor_state):
+        assert(attractor_state.size==self.dim_orig_)
+        super(Dmp,self).set_attractor_state(attractor_state);
+  
+        # Set value in all relevant subsystems also  
+        if self.goal_system_:
+            self.goal_system_.set_attractor_state(attractor_state);
+        
+        # Do NOT do the following. The attractor state of the spring system is determined by the
+        # goal system
+        # self.spring_system_.set_attractor_state(attractor_state);
+    
