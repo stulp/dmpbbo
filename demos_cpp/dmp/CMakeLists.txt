@@ -8,6 +8,10 @@ add_executable(demoDmpChangeGoal demoDmpChangeGoal.cpp)
 target_link_libraries(demoDmpChangeGoal dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
 install(TARGETS demoDmpChangeGoal DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
+add_executable(demoDmpChangeInitial demoDmpChangeInitial.cpp)
+target_link_libraries(demoDmpChangeInitial dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+install(TARGETS demoDmpChangeInitial DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
+
 add_executable(demoDmpContextual demoDmpContextual.cpp)
 target_link_libraries(demoDmpContextual dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
 install(TARGETS demoDmpContextual DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
