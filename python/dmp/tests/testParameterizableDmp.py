@@ -27,6 +27,7 @@ sys.path.append(lib_path)
 from dmp.dmp_plotting import *
 from dmp.Dmp import *
 from dmp.Trajectory import *
+from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__=='__main__':
@@ -62,16 +63,16 @@ if __name__=='__main__':
     axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
     
     lines = plotTrajectory(traj.asMatrix(),axs)
-    plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
+    plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,1.0), label='demonstration')
     lines = plotTrajectory(traj_ana.asMatrix(),axs)
-    plt.setp(lines, linestyle='-',  linewidth=2, color=(0.6,0.6,0.6), label='reproduced')
+    plt.setp(lines, linestyle='-',  linewidth=2, color=(0.6,0.6,1.0), label='reproduced')
 
     values = dmp.getParameterVectorSelected()
     print(values)
     
     for ii in range(5):
-        # Generate random vector with values between 0.5-1.5
-        rand_vector = 0.5 + np.random.random_sample(values.shape)
+        # Generate random vector with values between 0.8-1.2
+        rand_vector = 0.8 + 0.4*np.random.random_sample(values.shape)
         dmp.setParameterVectorSelected(rand_vector*values)
         values = dmp.getParameterVectorSelected()
         print(values)
@@ -84,6 +85,7 @@ if __name__=='__main__':
         if ii==0:
             plt.setp(lines, label='perturbed')
     
+    plt.legend()
     plt.show()
 
 
