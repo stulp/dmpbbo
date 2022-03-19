@@ -67,7 +67,10 @@ if __name__=='__main__':
             if ax2 != None:
                 ax2.set_title(fa_name+" ("+str(dim)+"D basis functions)")
               
-          
+        #filename = fa_name+'.png'
+        #print('Writing to file: '+filename)
+        #plt.savefig(filename)
+
     plt.show()
 
 
