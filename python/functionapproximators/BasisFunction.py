@@ -19,9 +19,11 @@ import numpy as np
 import numpy.matlib
 
 class Gaussian:
+    
     def activations(centers, widths, inputs, normalized_basis_functions=False):
 
-        assert(centers.shape==widths.shape)
+        if centers.shape!=widths.shape:
+            raise ValueError(f'centers ({centers.shape}) and widths ({widths.shape}) should have same shape.')
 
         n_basis_functions = centers.size
         n_samples         = inputs.size

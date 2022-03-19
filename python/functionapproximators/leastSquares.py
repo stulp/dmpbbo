@@ -30,9 +30,6 @@ def weightedLeastSquares(inputs, targets, weights, use_offset=True, regularizati
     #    inputs = inputs.T
     #if targets.shape[0] != n_samples and targets.shape[1] == n_samples:
     #    targets = targets.T
-    #
-    #assert(n_samples == weights.shape[0])
-    #assert(n_samples == targets.shape[0])
     
     n_samples = weights.size
 
@@ -84,7 +81,8 @@ def linearPrediction(inputs,betas):
         outputs = np.dot(inputs,betas)
     else:
         # There is an offset (AKA bias or intercept)
-        assert(n_input_dims==(n_beta-1)) 
+        if  n_input_dims+1 != n_beta:
+            raise ValueError(f'betas is of the wrong size (is {n_beta}, should be {n_inputs_dims+1})')
         # Apparently, not everybody has python3.5 installed, so don't use @
         #outputs = inputs@betas[0:n_beta-1] + betas[-1]
         outputs = np.dot(inputs,betas[0:n_beta-1]) + betas[-1]

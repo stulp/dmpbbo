@@ -60,7 +60,8 @@ class FunctionApproximator(Parameterizable):
             
     def setParameterVectorSelected(self,values):
         if self.isTrained():
-            assert(len(values)==self.getParameterVectorSelectedSize())
+            if len(values)!=self.getParameterVectorSelectedSize():
+                raise ValueError(f'values ({len(values)}) should have same size as size of selected parameters vector ({self.getParameterVectorSelectedSize()})')
             offset = 0
             for label in self._selected_values_labels:
                 expected_shape = self._model_params[label].shape
