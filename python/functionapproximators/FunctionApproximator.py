@@ -40,10 +40,10 @@ class FunctionApproximator(Parameterizable):
         raise NotImplementedError('subclasses must override isTrained()!')
 
 
-    def setSelectedParameters(selected_values_labels):
+    def setSelectedParameters(self,selected_values_labels):
         self._selected_values_labels = []      
         for label in selected_values_labels:
-            if label in _model_params.keys():
+            if label in self._model_params.keys():
                 self._selected_values_labels.append(label)
             else:
                 print(label+" not in ["+', '.join(_model_params.keys())+']: Ignoring')
