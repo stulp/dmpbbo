@@ -17,6 +17,9 @@
 
 class Parameterizable:
     
+    def setSelectedParameters(selected_values_labels):
+        raise NotImplementedError('subclasses must override setSelectedParameters()!')
+  
     def getParameterVectorSelected(self):
         raise NotImplementedError('subclasses must override getParameterVectorSelected()!')
     

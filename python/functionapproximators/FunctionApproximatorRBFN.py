@@ -28,23 +28,26 @@ class FunctionApproximatorRBFN(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.7, regularization=0.0):
         
-        self.meta_n_basis_functions_per_dim_ = n_basis_functions_per_dim
-        self.meta_intersection_height_ = intersection_height
-        self.meta_regularization_ = regularization
+        self._meta_params = {
+            'n_basis_functions_per_dim': n_basis_functions_per_dim,
+            'intersection_height': intersection_height,
+            'regularization': regularization,
+        }
 
-        self.model_centers_ = None
-        self.model_widths_ = None
-        self.model_weights_ = None
-        self.is_trained_ = False
+        # Initialize model parameters with empty lists
+        labels = ['centers','widths','weights']
+        self._model_params = {label: [] for label in labels}
+        
+        self._selected_values_labels = ['weights']
         
     def train(self,inputs,targets):
 
         
         # Determine the centers and widths of the basis functions, given the range of the input data
-        min_vals = np.asscalar(inputs.min(axis=0))
-        max_vals = np.asscalar(inputs.max(axis=0))
+        min_vals = inputs.min(axis=0)
+        max_vals = inputs.max(axis=0)
 
-        n_centers = self.meta_n_basis_functions_per_dim_
+        n_centers = self._meta_params['n_basis_functions_per_dim']
         centers = np.linspace(min_vals,max_vals,n_centers)
         widths = np.ones(n_centers)
         if n_centers>1:
@@ -59,33 +62,30 @@ class FunctionApproximatorRBFN(FunctionApproximator):
             # intersection = exp(-0.125((c1-c0)^2/w^2))
             #            w = sqrt((c1-c0)^2/-8*ln(intersection))
             for cc in range(n_centers-1):
-                w = np.sqrt(np.square(centers[cc+1]-centers[cc])/(-8*np.log(self.meta_intersection_height_)))
+                w = np.sqrt(np.square(centers[cc+1]-centers[cc])/(-8*np.log(self._meta_params['intersection_height'])))
                 widths[cc] = w
                 
             widths[n_centers-1] = widths[n_centers-2]
        
         # Get the activations of the basis functions 
-        self.model_widths_ = widths
-        self.model_centers_ = centers
+        self._model_params['widths'] = widths
+        self._model_params['centers'] = centers
         activations = self.getActivations(inputs)
 
         
-        # Perform one weighted least squares regression for each kernel
+        # Perform one least squares regression
         use_offset = False
-        reg = self.meta_regularization_
-        self.model_weights_ = leastSquares(activations,targets,use_offset,reg)
+        reg = self._meta_params['regularization']
+        weights = leastSquares(activations,targets,use_offset,reg)
+        self._model_params['weights'] = np.atleast_2d(weights).T
     
-        self.is_trained_ = True
-        
 
     def getActivations(self,inputs):
         normalize_activations = False
-        activations = Gaussian.activations(self.model_centers_,self.model_widths_,inputs,normalize_activations)
+        activations = Gaussian.activations(self._model_params['centers'],self._model_params['widths'],inputs,normalize_activations)
         return activations
 
     def predict(self,inputs):
-        #print('====================\npredict')
-        #print(inputs.shape)
 
         if inputs.ndim==1:
             # Otherwise matrix multiplication below will not work
@@ -97,29 +97,11 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         
         outputs = activations
         for ii in range(n_basis_functions):
-            outputs[:,ii] = outputs[:,ii]*self.model_weights_[ii]
+            outputs[:,ii] = outputs[:,ii]*self._model_params['weights'][ii]
             
         outputs = outputs.sum(axis=1)
             
         return outputs
         
     def isTrained(self):
-        return self.is_trained_
-
-
-    def getParameterVectorSelected(self):
-        if self.is_trained_:
-            return self.model_weights_
-        else:
-            warning('FunctionApproximatorRBFN is not trained.')
-            return [];
-        
-    def setParameterVectorSelected(self,values):
-        if self.is_trained_:
-            assert(len(values)==self.getParameterVectorSelectedSize())
-            self.model_weights_ = values
-        else:
-            warning('FunctionApproximatorRBFN is not trained.')
-            
-    def getParameterVectorSelectedSize(self):
-        return len(self.model_weights_)
+        return len(self._model_params['weights'])>0
