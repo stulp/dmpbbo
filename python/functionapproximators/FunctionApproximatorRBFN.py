@@ -49,7 +49,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
 
         n_centers = self._meta_params['n_basis_functions_per_dim']
         centers = np.linspace(min_vals,max_vals,n_centers)
-        widths = np.ones(n_centers)
+        widths = np.ones((n_centers,1))
         if n_centers>1:
             # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
             # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
