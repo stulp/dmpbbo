@@ -74,12 +74,8 @@ public:
   
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return 0;
-  }
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const {};
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false) {};
   
   /** Get the normalized kernel activations for given inputs
    * \param[in] inputs The input data (size: n_samples X n_dims)
@@ -112,8 +108,6 @@ public:
    */
   const Eigen::MatrixXd& gram(void) const { return gram_; };
   
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
   Eigen::MatrixXd train_inputs_;

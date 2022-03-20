@@ -67,13 +67,8 @@ public:
   int getExpectedInputDim(void) const;
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  
-  inline int getParameterVectorAllSize(void) const
-  {
-    return  n_centers_ + n_widths_ + n_slopes_ + n_offsets_;
-  }
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const {};
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false) {};
   
   /** 
    * Convert these LWPR model parameters to unified model parameters.
@@ -83,9 +78,6 @@ public:
    */
   UnifiedModel* toUnifiedModel(void) const;
 
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
-  
 private:
   LWPR_Object* lwpr_object_;
   

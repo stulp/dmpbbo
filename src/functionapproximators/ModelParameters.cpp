@@ -26,9 +26,51 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 
+#include <eigen3/Eigen/Core>
+
 using namespace std;
 
 namespace DmpBbo {
+
+bool ModelParameters::isParameterSelected(std::string label) const {
+   return selected_param_labels_.find(label)!=selected_param_labels_.end();
+}
+
+void ModelParameters::setSelectedParameters(const std::set<std::string>& labels)
+{
+  selected_param_labels_ = set<string>();
+  
+  // Check if all labels passed are actually possible
+  set<string> possible_values_labels;
+  getSelectableParameters(possible_values_labels);
+  set<string>::iterator it;
+  for (it = labels.begin(); it != labels.end(); ++it) {
+    if (possible_values_labels.count(*it)==0) {
+      cout << "WARNING: '" << *it << "' is an unknown label in Parameterizable." << endl;
+    } else {
+      selected_param_labels_.insert(*it);
+    }
+  }
+  
+}
+
+int ModelParameters::getParameterVectorSize(void) const 
+{
+  int size = 0;
+  for (const string& label: selected_param_labels_)
+    size += sizes_.at(label);
+  return size;
+}
+
+void ModelParameters::checkMinMax(void) {
+  set<string> labels;
+  getSelectableParameters(labels);
+  for(auto label : labels) {
+    if (min_[label] == max_[label]) {
+        max_[label] = min_[label]+1.0;
+    }
+  }  
+}
 
 
 }

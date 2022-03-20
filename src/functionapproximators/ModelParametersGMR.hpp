@@ -97,17 +97,9 @@ public:
 
   ModelParameters* clone(void) const;
 
-  /** Return all the names of the parameter types that can be selected.
-   * \param[out] selected_values_labels Names of the parameter types that can be selected
-   * @todo Determine which parameters should be modifiable in GMR.
-   */
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const {};
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false) {};
   
   /** Save a Gaussian mixture model to a directory; useful for debugging.
    * \param[in] directory Directory to save to
@@ -208,8 +200,6 @@ private:
    * 1/sqrt((2*pi)^k*|Sigma|). Since we used it often, we cache it here. */
   std::vector<double> mvgd_scale_;
 
-  int  all_values_vector_size_;
-  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

@@ -101,12 +101,8 @@ public:
   void set_slopes_as_angles(bool slopes_as_angles);
   
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const;
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false);
   
   /** Get the number of basis functions in this model.
    * \return The number of basis functions.
@@ -118,8 +114,6 @@ public:
   
   UnifiedModel* toUnifiedModel(void) const;
   
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
@@ -130,7 +124,6 @@ private:
   bool asymmetric_kernels_; // should be const
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
-  int  all_values_vector_size_;
 
 public:
 	/** Turn caching for the function normalizedKernelActivations() on or off.
@@ -184,7 +177,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
     ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
     ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
     ar & BOOST_SERIALIZATION_NVP(caching_);
   }
 

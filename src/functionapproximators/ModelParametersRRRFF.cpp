@@ -46,8 +46,9 @@ ModelParametersRRRFF::ModelParametersRRRFF(Eigen::VectorXd weights, Eigen::Matri
 
   nb_in_dim_ = cosines_periodes.cols();
   // int nb_output_dim = weights.cols();
+
   
-  all_values_vector_size_ = 0;
+  int all_values_vector_size_ = 0;
   all_values_vector_size_ += weights_.rows() * weights_.cols();
   all_values_vector_size_ += cosines_phase_.size();
   all_values_vector_size_ += cosines_periodes_.rows() * cosines_periodes_.cols();
@@ -100,38 +101,16 @@ string ModelParametersRRRFF::toString(void) const
 
 void ModelParametersRRRFF::getSelectableParameters(set<string>& selected_values_labels) const 
 {
+  
   selected_values_labels = set<string>();
+  /*
   selected_values_labels.insert("weights");
   selected_values_labels.insert("phases");
   selected_values_labels.insert("periods");
+  */
 }
 
-void ModelParametersRRRFF::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
-{
-  selected_mask.resize(getParameterVectorAllSize());
-  selected_mask.fill(0);
-  
-  int offset = 0;
-  int size;
-  
-  size = weights_.rows() * weights_.cols();
-  if (selected_values_labels.find("weights")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(1);
-  offset += size;
-  
-  size =  cosines_phase_.size();
-  if (selected_values_labels.find("phases")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(2);
-  offset += size;
-  
-  size = cosines_periodes_.rows() * cosines_periodes_.cols();
-  if (selected_values_labels.find("periods")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(3);
-  offset += size;
-  
-  assert(offset == getParameterVectorAllSize()); 
-}
-
+/*
 void ModelParametersRRRFF::getParameterVectorAll(VectorXd& values) const
 {
   values.resize(getParameterVectorAllSize());
@@ -182,6 +161,7 @@ void ModelParametersRRRFF::setParameterVectorAll(const VectorXd& values)
 
   assert(offset == getParameterVectorAllSize());   
 };
+*/
 
 UnifiedModel* ModelParametersRRRFF::toUnifiedModel(void) const
 {

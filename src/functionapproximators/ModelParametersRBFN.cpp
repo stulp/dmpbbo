@@ -45,19 +45,25 @@ ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const E
   weights_(weights),
   caching_(false)
 {
-#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
-  int n_basis_functions = centers.rows();
+  int n_basis = centers.rows();
   int n_dims = centers.cols();
-#endif  
-  assert(n_basis_functions==widths_.rows());
-  assert(n_dims           ==widths_.cols());
-  assert(n_basis_functions==weights_.rows());
-  assert(1                ==weights_.cols());
+
+  assert(n_basis==widths_.rows());
+  assert(n_dims ==widths_.cols());
+  assert(n_basis==weights_.rows());
+  assert(1      ==weights_.cols());
   
-  all_values_vector_size_ = 0;
-  all_values_vector_size_ += centers_.rows()*centers_.cols();
-  all_values_vector_size_ += widths_.rows() *widths_.cols();
-  all_values_vector_size_ += weights_.rows()*weights_.cols();
+  min_["centers"] = centers_.minCoeff();
+  max_["centers"] = centers_.maxCoeff();
+  min_["widths"] = widths_.minCoeff();
+  max_["widths"] = widths_.maxCoeff();
+  min_["weights"] = weights_.minCoeff();
+  max_["weights"] = weights_.maxCoeff();
+  checkMinMax();
+
+  sizes_["centers"] = n_dims*n_basis;
+  sizes_["widths"] = n_dims*n_basis;
+  sizes_["weights"] = 1*n_basis;
 
 };
 
@@ -107,105 +113,112 @@ string ModelParametersRBFN::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRBFN");
 }
 
-void ModelParametersRBFN::getSelectableParameters(set<string>& selected_values_labels) const 
+
+void ModelParametersRBFN::getSelectableParameters(set<string>& labels) const 
 {
-  selected_values_labels = set<string>();
-  selected_values_labels.insert("centers");
-  selected_values_labels.insert("widths");
-  selected_values_labels.insert("weights");
+  labels = set<string>();
+  labels.insert("centers");
+  labels.insert("widths");
+  labels.insert("weights");
 }
 
-
-void ModelParametersRBFN::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
+void ModelParametersRBFN::getParameterVector(Eigen::VectorXd& values, bool normalized) const
 {
-
-  selected_mask.resize(getParameterVectorAllSize());
-  selected_mask.fill(0);
   
-  int offset = 0;
-  int size;
+  values.resize(getParameterVectorSize());
   
-  // Centers
-  size = centers_.rows()*centers_.cols();
-  if (selected_values_labels.find("centers")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(1);
-  offset += size;
-  
-  // Widths
-  size = widths_.rows()*widths_.cols();
-  if (selected_values_labels.find("widths")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(2);
-  offset += size;
-  
-  // Weights
-  size = weights_.rows()*weights_.cols();
-  if (selected_values_labels.find("weights")!=selected_values_labels.end())
-    selected_mask.segment(offset,size).fill(3);
-  offset += size;
-
-  assert(offset == getParameterVectorAllSize());   
-}
-
-void ModelParametersRBFN::getParameterVectorAll(VectorXd& values) const
-{
-  values.resize(getParameterVectorAllSize());
+  int n_dims = getExpectedInputDim();
+  unsigned int n_basis = getNumberOfBasisFunctions();
   int offset = 0;
   
-  for (int i_dim=0; i_dim<centers_.cols(); i_dim++)
-  {
-    values.segment(offset,centers_.rows()) = centers_.col(i_dim);
-    offset += centers_.rows();
+  double min = 0.0;
+  double max = 1.0;
+  
+  string label = "centers";
+  if (isParameterSelected(label)) {
+    if (normalized) {
+      min = min_.at(label);
+      max = max_.at(label);
+    }
+    
+    for (int i_dim=0; i_dim<n_dims; i_dim++)
+      values.segment(offset+i_dim*n_basis,n_basis) =
+        (centers_.col(i_dim).array()-min)/(max-min);
+        
+    offset += n_dims*n_basis;
   }
   
-  for (int i_dim=0; i_dim<widths_.cols(); i_dim++)
-  {
-    values.segment(offset,widths_.rows()) = widths_.col(i_dim);
-    offset += widths_.rows();
+  label = "widths";
+  if (isParameterSelected(label)) {
+    if (normalized) {
+      min = min_.at(label);
+      max = max_.at(label);
+    }
+    
+    for (int i_dim=0; i_dim<n_dims; i_dim++)
+      values.segment(offset+i_dim*n_basis,n_basis) = 
+        (widths_.col(i_dim).array()-min)/(max-min);
+        
+    offset += n_dims*n_basis;
   }
   
-  values.segment(offset,weights_.rows()) = weights_;
-  offset += weights_.rows();
+  label = "weights";
+  if (isParameterSelected(label)) {
+    if (normalized) {
+      min = min_.at(label);
+      max = max_.at(label);
+    }
+    values.segment(offset,n_basis) = 
+        (weights_.array()-min)/(max-min);
+    offset += n_basis;
+  }
   
-  assert(offset == getParameterVectorAllSize());   
+  assert(offset == getParameterVectorSize());   
 };
 
-void ModelParametersRBFN::setParameterVectorAll(const VectorXd& values) {
+void ModelParametersRBFN::setParameterVector(const VectorXd& values, bool normalized) {
 
-  if (all_values_vector_size_ != values.size())
+  int expected_size = getParameterVectorSize();
+  if (expected_size != values.size())
   {
     cerr << __FILE__ << ":" << __LINE__ << ": values is of wrong size." << endl;
     return;
   }
   
+  int n_dims = getExpectedInputDim();
+  unsigned int n_basis = getNumberOfBasisFunctions();
   int offset = 0;
-  int size = centers_.rows();
-  int n_dims = centers_.cols();
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for kernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(centers_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    centers_.col(i_dim) = values.segment(offset,size);
-    offset += size;
+
+  string l = "centers";
+  if (isParameterSelected(l)) {
+    for (int i_dim=0; i_dim<n_dims; i_dim++)
+      centers_.col(i_dim) = values.segment(offset+i_dim*n_basis,n_basis);
+    if (normalized)
+      centers_ = ((max_[l]-min_[l])*centers_.array())+min_[l];
+    offset += n_dims*n_basis;
+    clearCache(); // Centers updated, activation need to be updated.
   }
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for kernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(widths_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    widths_.col(i_dim) = values.segment(offset,size);
-    offset += size;
+  
+  l = "widths";
+  if (isParameterSelected(l)) {
+    for (int i_dim=0; i_dim<n_dims; i_dim++)
+      widths_.col(i_dim) = values.segment(offset+i_dim*n_basis,n_basis);
+    if (normalized)
+      widths_ = ((max_[l]-min_[l])*widths_.array())+min_[l];
+    offset += n_dims*n_basis;
+    clearCache(); // Centers updated, activation need to be updated.
+  }
+  
+  l = "weights";
+  if (isParameterSelected(l)) {
+    weights_ = values.segment(offset,n_basis);
+    if (normalized)
+      weights_ = ((max_[l]-min_[l])*weights_.array())+min_[l];
+    offset += n_basis;
+    // Cache must not be cleared, because kernelActivations() returns the same values.
   }
 
-  weights_ = values.segment(offset,size);
-  offset += size;
-  // Cache must not be cleared, because kernelActivations() returns the same values.
-
-  assert(offset == getParameterVectorAllSize());   
+  assert(offset == expected_size);   
 };
 
 void ModelParametersRBFN::setParameterVectorModifierPrivate(std::string modifier, bool new_value)

@@ -108,21 +108,6 @@ void ModelParametersGPR::getSelectableParameters(set<string>& selected_values_la
   selected_values_labels = set<string>();
 }
 
-
-void ModelParametersGPR::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
-{
-  selected_mask.resize(0);
-}
-
-void ModelParametersGPR::getParameterVectorAll(VectorXd& values) const
-{
-  values.resize(getParameterVectorAllSize());
-  values.resize(0);
-};
-
-void ModelParametersGPR::setParameterVectorAll(const VectorXd& values) {
-};
-
 UnifiedModel* ModelParametersGPR::toUnifiedModel(void) const
 {
  

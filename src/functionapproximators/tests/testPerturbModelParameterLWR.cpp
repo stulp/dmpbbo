@@ -87,14 +87,14 @@ int main(int n_args, char** args)
 
     VectorXd values;
     bool normalized = false;
-    model_parameters_lwr->getParameterVectorSelected(values,normalized);
+    model_parameters_lwr->getParameterVector(values,normalized);
     cout << "Original values             : " << fixed << setprecision(4) << values.transpose() << endl;
     normalized = true;
-    model_parameters_lwr->getParameterVectorSelected(values,normalized);
+    model_parameters_lwr->getParameterVector(values,normalized);
     cout << "Original values (normalized): " << fixed << setprecision(4) << values.transpose() << endl;
     
     normalized = true;
-    model_parameters_lwr->getParameterVectorSelected(values,normalized);
+    model_parameters_lwr->getParameterVector(values,normalized);
     
     int n_perturbations = 5;
     for (int i_perturbation=0; i_perturbation<n_perturbations; i_perturbation++)
@@ -122,7 +122,7 @@ int main(int n_args, char** args)
       VectorXd perturbations = scale*VectorXd::Random(values.size());
       VectorXd values_perturbed = values.array()+perturbations.array();
 
-      model_parameters_lwr->setParameterVectorSelected(values_perturbed,normalized);
+      model_parameters_lwr->setParameterVector(values_perturbed,normalized);
       //cout << *model_parameters_lwr << endl;
       cout << "Perturbation " << i_perturbation << ": " << fixed << setprecision(4) << values_perturbed.transpose() << endl;
         

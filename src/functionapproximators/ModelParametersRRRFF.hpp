@@ -58,14 +58,9 @@ public:
   ModelParameters* clone(void) const;
 
   void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const {};
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false) {};
   
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
-
   UnifiedModel* toUnifiedModel(void) const;
   
   /** Return the weights of the basis functions.
@@ -79,10 +74,7 @@ public:
    * \param[out] cosine_activations The cosine values, computed for each of the sampels in the input data (size: n_samples X n_basis_functions)
    */
   void cosineActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& cosine_activations) const;
-  
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
-  
+    
 private:
   
   Eigen::VectorXd weights_;
@@ -90,8 +82,6 @@ private:
   Eigen::VectorXd cosines_phase_;
 
   int nb_in_dim_;
-
-  int  all_values_vector_size_;
   
 public:
 	/** Turn caching for the function cosineActivations() on or off.
@@ -142,7 +132,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(cosines_periodes_);
     ar & BOOST_SERIALIZATION_NVP(cosines_phase_);
     ar & BOOST_SERIALIZATION_NVP(nb_in_dim_);
-    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
   }
 
 };

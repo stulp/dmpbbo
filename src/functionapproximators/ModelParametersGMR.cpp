@@ -79,8 +79,6 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
 
   updateCachedMembers();
 
-  all_values_vector_size_ = 0;
-
   n_observations_ = 0;
 }
 
@@ -138,8 +136,6 @@ ModelParametersGMR::ModelParametersGMR(std::vector<double> priors,
 #endif
 
   updateCachedMembers();
-
-  all_values_vector_size_ = 0;
 
   n_observations_ = 0;
 
@@ -383,6 +379,7 @@ void ModelParametersGMR::getSelectableParameters(set<string>& selected_values_la
   // selected_values_labels.insert("inverse_covars_l");
 }
 
+/*
 void ModelParametersGMR::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
 {
   // selected_mask.resize(getParameterVectorAllSize());
@@ -516,7 +513,7 @@ void ModelParametersGMR::setParameterVectorAll(const VectorXd& values)
   // assert(offset == getParameterVectorAllSize());
 
 };
-
+*/
 
 UnifiedModel* ModelParametersGMR::toUnifiedModel(void) const
 {

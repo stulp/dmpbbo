@@ -73,7 +73,6 @@ UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
  
   cosine_basis_functions_ = false;
   
-  initializeAllValuesVectorSize();
 };
 
 UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::VectorXd& offsets, bool normalized_basis_functions, bool lines_pivot_at_max_activation)
@@ -112,7 +111,7 @@ UnifiedModel::UnifiedModel(const Eigen::MatrixXd& centers, const Eigen::MatrixXd
   
   cosine_basis_functions_ = false;
 
-  initializeAllValuesVectorSize();  
+
 }
 
 
@@ -151,7 +150,6 @@ UnifiedModel::UnifiedModel(const Eigen::MatrixXd& angular_frequencies, const Eig
   
   cosine_basis_functions_ = true;
   
-  initializeAllValuesVectorSize();
 }
 
 UnifiedModel::UnifiedModel(
@@ -174,13 +172,13 @@ UnifiedModel::UnifiedModel(
 {
   cosine_basis_functions_ = false;
 
-  initializeAllValuesVectorSize();
 }
 
-void UnifiedModel::initializeAllValuesVectorSize(void)
+/*
+void UnifiedModel::initializeValuesVectorSize(void)
 {
   
-  all_values_vector_size_ = 0;
+  int all_values_vector_size_ = 0;
   int n_basis_functions = centers_.size();
   if (n_basis_functions>0)
   {
@@ -192,7 +190,7 @@ void UnifiedModel::initializeAllValuesVectorSize(void)
   }
 }
 
-
+*/
 
 UnifiedModel* UnifiedModel::clone(void) const {
   return new UnifiedModel(centers_,covars_,slopes_,offsets_,priors_,normalized_basis_functions_,lines_pivot_at_max_activation_); 
@@ -382,21 +380,22 @@ string UnifiedModel::toString(void) const
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("UnifiedModel");
 }
 
+/*
 void UnifiedModel::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
-  selected_values_labels.insert("centers");
-  selected_values_labels.insert("widths");
-  selected_values_labels.insert("offsets");
-  selected_values_labels.insert("slopes");
-  selected_values_labels.insert("priors");
+  // selected_values_labels.insert("centers");
+  // selected_values_labels.insert("widths");
+  // selected_values_labels.insert("offsets");
+  // selected_values_labels.insert("slopes");
+  // selected_values_labels.insert("priors");
 }
 
 
 void UnifiedModel::getParameterVectorMask(const std::set<std::string> selected_values_labels, VectorXi& selected_mask) const
 {
 
-  selected_mask.resize(getParameterVectorAllSize());
+  selected_mask.resize(getParameterVectorSize());
   selected_mask.fill(0);
   
   int offset = 0;
@@ -426,12 +425,12 @@ void UnifiedModel::getParameterVectorMask(const std::set<std::string> selected_v
     selected_mask.segment(offset,size).fill(4);
   offset += size;
 
-  assert(offset == getParameterVectorAllSize());   
+  assert(offset == getParameterVectorSize());   
 }
 
-void UnifiedModel::getParameterVectorAll(VectorXd& values) const
+void UnifiedModel::getParameterVector(VectorXd& values, bool normalized) const
 {
-  values.resize(getParameterVectorAllSize());
+  values.resize(getParameterVectorSize());
   int offset = 0;
   int n_basis_functions = centers_.size();
   int n_dims = getExpectedInputDim();
@@ -445,29 +444,28 @@ void UnifiedModel::getParameterVectorAll(VectorXd& values) const
     values[offset]                = priors_[i_bfs];               offset += 1;
   }
   
-  /*
-  Dead code. But kept in for reference in case slopes_as_angles_ will be implemented
-  VectorXd cur_slopes;
-  for (int i_dim=0; i_dim<slopes_.cols(); i_dim++)
-  {
-    cur_slopes = slopes_.col(i_dim);
-    if (slopes_as_angles_)
-    {
-      // cur_slopes is a slope, but the values vector expects the angle with the x-axis. Do the 
-      // conversion here.
-      for (int ii=0; ii<cur_slopes.size(); ii++)
-        cur_slopes[ii] = atan2(cur_slopes[ii],1.0);
-    }
-    
-    values.segment(offset,slopes_.rows()) = cur_slopes;
-    offset += slopes_.rows();
-  }
-    */
+  //Dead code. But kept in for reference in case slopes_as_angles_ will be implemented
+  //VectorXd cur_slopes;
+  //for (int i_dim=0; i_dim<slopes_.cols(); i_dim++)
+  //{
+  //  cur_slopes = slopes_.col(i_dim);
+  //  if (slopes_as_angles_)
+  //  {
+  //    // cur_slopes is a slope, but the values vector expects the angle with the x-axis. Do the 
+  //    // conversion here.
+  //    for (int ii=0; ii<cur_slopes.size(); ii++)
+  //      cur_slopes[ii] = atan2(cur_slopes[ii],1.0);
+  //  }
+  //  
+  //  values.segment(offset,slopes_.rows()) = cur_slopes;
+  //  offset += slopes_.rows();
+  //}
   
-  assert(offset == getParameterVectorAllSize());   
+  assert(offset == getParameterVectorSize());   
 };
 
-void UnifiedModel::setParameterVectorAll(const VectorXd& values) {
+
+void UnifiedModel::setParameterVector(const VectorXd& values, bool normalized) {
 
   if (all_values_vector_size_ != values.size())
   {
@@ -504,45 +502,54 @@ void UnifiedModel::setParameterVectorAll(const VectorXd& values) {
     priors_[i_bfs]            = values[offset]                ;   offset += 1;
   }
   
-  /*
-  int offset = 0;
-  int size = centers_.rows();
-  int n_dims = centers_.cols();
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(centers_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    centers_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-  }
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    // If the centers change, the cache for normalizedKernelActivations() must be cleared,
-    // because this function will return different values for different centers
-    if ( !(covars_.col(i_dim).array() == values.segment(offset,size).array()).all() )
-      clearCache();
-    
-    covars_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-  }
-
-  offsets_ = values.segment(offset,size);
-  offset += size;
-  // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
-
-  MatrixXd old_slopes = slopes_;
-  for (int i_dim=0; i_dim<n_dims; i_dim++)
-  {
-    slopes_.col(i_dim) = values.segment(offset,size);
-    offset += size;
-    // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
-  }
-*/
-  assert(offset == getParameterVectorAllSize());   
+  //int offset = 0;
+  //int size = centers_.rows();
+  //int n_dims = centers_.cols();
+  //for (int i_dim=0; i_dim<n_dims; i_dim++)
+  //{
+  //  // If the centers change, the cache for normalizedKernelActivations() must be cleared,
+  //  // because this function will return different values for different centers
+  //  if ( !(centers_.col(i_dim).array() == values.segment(offset,size).array()).all() )
+  //    clearCache();
+  //  
+  //  centers_.col(i_dim) = values.segment(offset,size);
+  //  offset += size;
+  //}
+  //for (int i_dim=0; i_dim<n_dims; i_dim++)
+  //{
+  //  // If the centers change, the cache for normalizedKernelActivations() must be cleared,
+  //  // because this function will return different values for different centers
+  //  if ( !(covars_.col(i_dim).array() == values.segment(offset,size).array()).all() )
+  //    clearCache();
+  //  
+  //  covars_.col(i_dim) = values.segment(offset,size);
+  //  offset += size;
+  //}
+  //
+  //offsets_ = values.segment(offset,size);
+  //offset += size;
+  //// Cache must not be cleared, because normalizedKernelActivations() returns the same values.
+  //
+  //MatrixXd old_slopes = slopes_;
+  //for (int i_dim=0; i_dim<n_dims; i_dim++)
+  //{
+  //  slopes_.col(i_dim) = values.segment(offset,size);
+  //  offset += size;
+  //  // Cache must not be cleared, because normalizedKernelActivations() returns the same values.
+  //}
+  assert(offset == getParameterVectorSize());   
 };
+
+void UnifiedModel::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
+{
+  if (modifier.compare("lines_pivot_at_max_activation")==0)
+    set_lines_pivot_at_max_activation(new_value);
+  
+  if (modifier.compare("slopes_as_angles")==0)
+    set_slopes_as_angles(new_value);
+  
+}
+*/
 
 bool UnifiedModel::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
@@ -590,14 +597,5 @@ bool UnifiedModel::saveGridData(const VectorXd& min, const VectorXd& max, const 
   
 }
 
-void UnifiedModel::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
-{
-  if (modifier.compare("lines_pivot_at_max_activation")==0)
-    set_lines_pivot_at_max_activation(new_value);
-  
-  if (modifier.compare("slopes_as_angles")==0)
-    set_slopes_as_angles(new_value);
-  
-}
 
 }

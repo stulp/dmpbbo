@@ -43,7 +43,7 @@ namespace DmpBbo {
  * Also see the page on the \ref page_unified_model
  * \ingroup FunctionApproximators
  */
-class UnifiedModel : public Parameterizable
+class UnifiedModel
 {
   friend class FunctionApproximatorLWR;
   
@@ -132,8 +132,6 @@ public:
    */
   void evaluate(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
   
-  void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
-  
   /** Set whether the offsets should be adapted so that the line segments pivot around the mode of
    * the basis function, rather than the intersection with the y-axis.
    * \param[in] lines_pivot_at_max_activation Whether to pivot around the mode or not.
@@ -147,13 +145,12 @@ public:
    */
   void set_slopes_as_angles(bool slopes_as_angles);
   
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
+  /*
+  void getSelectableParameters(std::set<std::string>& labels) const;
+  void getParameterVector(Eigen::VectorXd& values, bool normalized) const;
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized);
+  void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
+  */
   
   /** Generate a grid of inputs, and output the response of the basis functions and line segments
    * for these inputs.
@@ -169,8 +166,6 @@ public:
    */
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
   std::vector<Eigen::VectorXd> centers_; // n_centers X n_dims
@@ -183,8 +178,6 @@ private:
   bool normalized_basis_functions_;
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
-  int  all_values_vector_size_;
-  void initializeAllValuesVectorSize(void);
 
 public:
 	/** Turn caching for the function normalizedKernelActivations() on or off.
@@ -230,7 +223,7 @@ private:
   template<class Archive>
   void serialize(Archive & ar, const unsigned int version)
   {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
+    //ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
     ar & BOOST_SERIALIZATION_NVP(centers_);
     ar & BOOST_SERIALIZATION_NVP(covars_);
     ar & BOOST_SERIALIZATION_NVP(slopes_);
@@ -239,7 +232,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(normalized_basis_functions_);
     ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
     ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
     ar & BOOST_SERIALIZATION_NVP(caching_);
   }
 

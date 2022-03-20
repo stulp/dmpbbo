@@ -29,9 +29,15 @@
 #include <iosfwd>
 #include <set>
 #include <string>
+#include <unordered_map>
 
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/set.hpp>
+#include <boost/serialization/unordered_map.hpp>
+
+#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 namespace DmpBbo {
 
@@ -43,7 +49,7 @@ class UnifiedModel;
 class ModelParameters : public Parameterizable
 {
 public:
-
+  
   /** Return a pointer to a deep copy of the ModelParameters object.
    *  \return Pointer to a deep copy
    */
@@ -89,7 +95,18 @@ public:
    * \return Unified model parameter representation (NULL if not implemented for a particular subclass)
    */
   virtual UnifiedModel* toUnifiedModel(void) const = 0;
+
+  void setSelectedParameters(const std::set<std::string>& labels);
+  bool isParameterSelected(std::string label) const;
+  int getParameterVectorSize(void) const; 
   
+protected:
+  void checkMinMax(void);
+  std::set<std::string> selected_param_labels_;
+  std::unordered_map<std::string, double> min_;
+  std::unordered_map<std::string, double> max_;
+  std::unordered_map<std::string, int> sizes_;
+
 public:
   
   /** Give boost serialization access to private members. */  
@@ -104,6 +121,10 @@ public:
   void serialize(Archive & ar, const unsigned int version)
   {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
+    ar & BOOST_SERIALIZATION_NVP(selected_param_labels_);
+    ar & BOOST_SERIALIZATION_NVP(min_);
+    ar & BOOST_SERIALIZATION_NVP(max_);
+    ar & BOOST_SERIALIZATION_NVP(sizes_);
   }
 
 };

@@ -214,23 +214,12 @@ public:
    */
   virtual std::string getName(void) const = 0;
   
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void setSelectedParameters(const std::set<std::string>& selected_values_labels);
-  /**
-   * Get the minimum and maximum of the selected parameters in one vector.
-   * \param[out] min The minimum of the selected parameters concatenated in one vector
-   * \param[out] max The minimum of the selected parameters concatenated in one vector
-   */
-  void getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const;
-  int getParameterVectorSelectedSize(void) const;
-  void setParameterVectorSelected(const Eigen::VectorXd& values, bool normalized=false);
-  void getParameterVectorSelected(Eigen::VectorXd& values, bool normalized=false) const;
-
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  int getParameterVectorAllSize(void) const;
-  void getParameterVectorAll(Eigen::VectorXd& values) const;
-  void setParameterVectorAll(const Eigen::VectorXd& values);
-
+  void getSelectableParameters(std::set<std::string>& labels) const;
+  void setSelectedParameters(const std::set<std::string>& labels);
+  int getParameterVectorSize(void) const;
+  void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const;
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized=false);
+  
   /** Return a representation of this function approximator's model as a unified model. 
    * See also the page on \ref page_unified_model 
    * \return Unified model representation of this function approximator's model.
@@ -410,7 +399,7 @@ model_parameters.getParameterVectorSelected(values);
 
 The rationale behind this implementation is that optimizers (such as evolution strategies) should not have to care about whether a particular set of model parameters contains centers, widths or slopes. Therefore, these different types of parameters are provided in one vector without semantics, and the generic interface is provided by the Parameterizable class.
 
-Classes that inherit from Parameterizable (such as all ModelParameters and FunctionApproximator subclasses, must implement the pure virtual methods Parameterizable::getParameterVectorAll()  Parameterizable::setParameterVectorAll and Parameterizable::getParameterVectorMask. Which gets/sets all the possible parameters in one vector, and a mask specifying the semantics of each value in the vector. The work of setting/getting the selected parameters (and normalizing them) is done in the Parameterizable class itself. This approach is a slightly longer run-time than doing the work in the subclasses, but it leads to more legible and robust code (less code duplication).
+Classes that inherit from Parameterizable (such as all ModelParameters and FunctionApproximator subclasses, must implement the pure virtual methods Parameterizable::getParameterVector()  Parameterizable::setParameterVectorAll and Parameterizable::getParameterVectorMask. Which gets/sets all the possible parameters in one vector, and a mask specifying the semantics of each value in the vector. The work of setting/getting the selected parameters (and normalizing them) is done in the Parameterizable class itself. This approach is a slightly longer run-time than doing the work in the subclasses, but it leads to more legible and robust code (less code duplication).
 
 \subsection sec_caching_basisfunctions Caching of basis functions
 

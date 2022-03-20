@@ -152,7 +152,7 @@ void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inp
   
   MatrixXd offsets = beta.rightCols(1);
   MatrixXd slopes = beta.leftCols(n_betas-1);
-  
+
   setModelParameters(new ModelParametersLWR(centers,widths,slopes,offsets,asym_kernels));
   
   preallocateMemory(n_kernels);

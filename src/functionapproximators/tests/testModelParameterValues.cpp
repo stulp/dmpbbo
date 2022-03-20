@@ -105,65 +105,46 @@ int main(int n_args, char** args)
     
     mp->setSelectedParameters(selected_labels);
     
-    cout << "vector size (all     ) = " << mp->getParameterVectorAllSize() << endl;
-    cout << "vector size (selected) = " <<  mp->getParameterVectorSelectedSize() << endl;
+    cout << "vector size  = " <<  mp->getParameterVectorSize() << endl;
     
-    VectorXi selected_mask;
-    mp->getParameterVectorMask(selected_labels,selected_mask);
-    cout << "mask = " << selected_mask.transpose() << endl << endl;
+    //VectorXi selected_mask;
+    //mp->getParameterVectorMask(selected_labels,selected_mask);
+    //cout << "mask = " << selected_mask.transpose() << endl << endl;
     
     VectorXd values, min_values, max_values, values_normalized;
     
-    mp->getParameterVectorAll(values);
-    //mp->getParameterVectorAllMinMax(min_values,max_values);
+    cout << "values     (all     ): " << values.transpose() << endl;
+    //cout << "min_values (all     ): " << min_values.transpose() << endl;
+    //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
+    
+    mp->getParameterVector(values);
+    mp->getParameterVectorNormalized(values_normalized);
+    cout << "values     : " << values.transpose() << endl;
+    cout << "values_norm: " << values_normalized.transpose() << endl << endl;
+    
+    VectorXd new_values = VectorXd::LinSpaced(mp->getParameterVectorSize(),2,20);
+    mp->setParameterVector(new_values);
   
     cout << "values     (all     ): " << values.transpose() << endl;
     //cout << "min_values (all     ): " << min_values.transpose() << endl;
     //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
     
-    mp->getParameterVectorSelected(values);
-    mp->getParameterVectorSelectedMinMax(min_values,max_values);
-    mp->getParameterVectorSelectedNormalized(values_normalized);
-    cout << "values     (selected): " << values.transpose() << endl;
-    cout << "min_values (selected): " << min_values.transpose() << endl;
-    cout << "max_values (selected): " << max_values.transpose() << endl ;
-    cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
+    mp->getParameterVector(values);
+    mp->getParameterVectorNormalized(values_normalized);
+    cout << "values     : " << values.transpose() << endl;
+    cout << "values_norm: " << values_normalized.transpose() << endl << endl;
     
-    VectorXd new_values = VectorXd::LinSpaced(mp->getParameterVectorSelectedSize(),2,20);
-    mp->setParameterVectorSelected(new_values);
-  
-    mp->getParameterVectorAll(values);
-    //mp->getParameterVectorAllMinMax(min_values,max_values);
+    new_values = VectorXd::LinSpaced(mp->getParameterVectorSize(),0.49,0.51);
+    mp->setParameterVectorNormalized(new_values);
   
     cout << "values     (all     ): " << values.transpose() << endl;
     //cout << "min_values (all     ): " << min_values.transpose() << endl;
     //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
     
-    mp->getParameterVectorSelected(values);
-    mp->getParameterVectorSelectedMinMax(min_values,max_values);
-    mp->getParameterVectorSelectedNormalized(values_normalized);
-    cout << "values     (selected): " << values.transpose() << endl;
-    cout << "min_values (selected): " << min_values.transpose() << endl;
-    cout << "max_values (selected): " << max_values.transpose() << endl;
-    cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
-    
-    new_values = VectorXd::LinSpaced(mp->getParameterVectorSelectedSize(),0.49,0.51);
-    mp->setParameterVectorSelectedNormalized(new_values);
-  
-    mp->getParameterVectorAll(values);
-    //mp->getParameterVectorAllMinMax(min_values,max_values);
-  
-    cout << "values     (all     ): " << values.transpose() << endl;
-    //cout << "min_values (all     ): " << min_values.transpose() << endl;
-    //cout << "max_values (all     ): " << max_values.transpose() << endl << endl;
-    
-    mp->getParameterVectorSelected(values);
-    mp->getParameterVectorSelectedMinMax(min_values,max_values);
-    mp->getParameterVectorSelectedNormalized(values_normalized);
-    cout << "values     (selected): " << values.transpose() << endl;
-    cout << "min_values (selected): " << min_values.transpose() << endl;
-    cout << "max_values (selected): " << max_values.transpose() << endl;
-    cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
+    mp->getParameterVector(values);
+    mp->getParameterVectorNormalized(values_normalized);
+    cout << "values     : " << values.transpose() << endl;
+    cout << "values_norm: " << values_normalized.transpose() << endl << endl;
   }
   
   

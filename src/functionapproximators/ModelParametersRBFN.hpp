@@ -36,7 +36,6 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
-
 namespace DmpBbo {
 
   // Forward declaration
@@ -81,15 +80,10 @@ public:
    */
   void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
   
+  void getSelectableParameters(std::set<std::string>& labels) const;
+  void getParameterVector(Eigen::VectorXd& values, bool normalized) const;
+  void setParameterVector(const Eigen::VectorXd& values, bool normalized);
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
-  
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
   
   /** Return the weights of the basis functions.
    * \return weights of the basis functions.
@@ -100,17 +94,12 @@ public:
    * \param[out] weights of the basis functions.
    */
   inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
-
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
   
 private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims
-  Eigen::VectorXd weights_; //         1 X n_dims
-
-  int  all_values_vector_size_;
-
+  Eigen::VectorXd weights_; // n_centers X 1
+    
 public:
 	/** Turn caching for the function kernelActivations() on or off.
 	 * Turning this on should lead to substantial improvements in execution time if the centers and
@@ -162,7 +151,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(centers_);
     ar & BOOST_SERIALIZATION_NVP(widths_);
     ar & BOOST_SERIALIZATION_NVP(weights_);
-    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
     ar & BOOST_SERIALIZATION_NVP(caching_);
   }
 
