@@ -100,6 +100,8 @@ public:
   bool isParameterSelected(std::string label) const;
   int getParameterVectorSize(void) const; 
   
+	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
+	
 protected:
   void checkMinMax(void);
   std::set<std::string> selected_param_labels_;

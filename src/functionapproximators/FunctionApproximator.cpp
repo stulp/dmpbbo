@@ -231,20 +231,10 @@ void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const 
 
 bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
-  if (save_directory.empty())
-    return true;
-  
-  //MatrixXd inputs;
-  //FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-
   if (model_parameters_==NULL)
     return false;
-  UnifiedModel* mp_unified = model_parameters_->toUnifiedModel();
-  if (mp_unified==NULL)
-    return false;
 
-  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
-  
+  return model_parameters_->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
 }
 
 void FunctionApproximator::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets, std::string save_directory, bool overwrite)
