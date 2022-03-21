@@ -460,7 +460,7 @@ void ModelParametersLWR::setParameterVector(const VectorXd& values, bool normali
   if (isParameterSelected(l)) {
     offsets_ = values.segment(offset,n_basis);
     if (normalized)
-      offsets_ = ((max_[l]-min_[l])*slopes_.array())+min_[l];
+      offsets_ = ((max_[l]-min_[l])*offsets_.array())+min_[l];
     offset += n_basis;
     // Cache must not be cleared, because kernelActivations() returns the same values.
   }
