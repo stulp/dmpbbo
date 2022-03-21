@@ -28,6 +28,9 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
+#include "functionapproximators/MetaParametersRBFN.hpp"
+#include "functionapproximators/ModelParametersRBFN.hpp"
+#include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #include "testTargetFunction.hpp"
 
 using namespace std;
@@ -42,11 +45,16 @@ int main(int n_args, char** args)
   //else
   //  usage(args[0],"/tmp/testFunctionApproximatorLWR");
 
-  for (int input_dim=1; input_dim<=2; input_dim++)
+  bool lwr = true;
+  for (int input_dim=2; input_dim>=1; input_dim--)
   {
     cout << "________________________________________________________________________" << endl;
     cout << "________________________________________________________________________" << endl;
 
+    string save_directory;
+    if (!directory.empty())
+      save_directory = directory+"/"+(input_dim==1?"1D":"2D");
+    
     VectorXi n_samples_per_dim = VectorXi::Constant(1,10);
     if (input_dim==2) 
       n_samples_per_dim = VectorXi::Constant(2,25);
@@ -58,43 +66,51 @@ int main(int n_args, char** args)
     double intersection = 0.5;
     int n_rfs = 9;
     if (input_dim==2) 
-      n_rfs = 3;
+      n_rfs = 9;
       
     VectorXi num_rfs_per_dim = VectorXi::Constant(input_dim,n_rfs);
-    MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection);
-
-    string save_directory;
-    if (!directory.empty())
-      save_directory = directory+"/"+(input_dim==1?"1D":"2D");
+    FunctionApproximator* fa = NULL;
     
-    
-    FunctionApproximator* fa = new FunctionApproximatorLWR(meta_parameters);
+    if (lwr) {
+      MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection);
+  
+      fa = new FunctionApproximatorLWR(meta_parameters);
+    } else {
+      MetaParametersRBFN* meta_parameters = new MetaParametersRBFN(input_dim,num_rfs_per_dim,intersection);
+  
+      fa = new FunctionApproximatorRBFN(meta_parameters);
+    }
+      
     bool overwrite = true;
     fa->train(inputs,targets,save_directory,overwrite);
 
     // Now the basic functionality of the LWR FA has been tested.
     // No perturb the model parameters
-    const ModelParametersLWR* model_parameters_lwr_const = static_cast< const ModelParametersLWR*>(fa->getModelParameters());
+    const ModelParameters* model_parameters_const = static_cast< const ModelParameters*>(fa->getModelParameters());
     
     // Get a clone which is not const so that we can modify it
-    ModelParametersLWR* model_parameters_lwr = static_cast< ModelParametersLWR*>(model_parameters_lwr_const->clone());
+    ModelParameters* model_parameters = static_cast< ModelParameters*>(model_parameters_const->clone());
       
     set<string> selected;
-    selected.insert("offsets");
-    selected.insert("slopes");
-    model_parameters_lwr->setSelectedParameters(selected);
-    model_parameters_lwr->set_lines_pivot_at_max_activation(true);
+    if (lwr) {
+      selected.insert("offsets");
+      selected.insert("slopes");
+    } else {
+      selected.insert("weights");
+    }
+    model_parameters->setSelectedParameters(selected);
+    //model_parameters->set_lines_pivot_at_max_activation(true);
 
     VectorXd values;
     bool normalized = false;
-    model_parameters_lwr->getParameterVector(values,normalized);
+    model_parameters->getParameterVector(values,normalized);
     cout << "Original values             : " << fixed << setprecision(4) << values.transpose() << endl;
     normalized = true;
-    model_parameters_lwr->getParameterVector(values,normalized);
+    model_parameters->getParameterVector(values,normalized);
     cout << "Original values (normalized): " << fixed << setprecision(4) << values.transpose() << endl;
     
     normalized = true;
-    model_parameters_lwr->getParameterVector(values,normalized);
+    model_parameters->getParameterVector(values,normalized);
     
     int n_perturbations = 5;
     for (int i_perturbation=0; i_perturbation<n_perturbations; i_perturbation++)
@@ -114,21 +130,20 @@ int main(int n_args, char** args)
           
         string cur_save_directory = save_directory + "/perturbation" + to_string(i_perturbation);
         
-        FunctionApproximatorLWR fa(model_parameters_lwr);
-        fa.saveGridData(min, max, n_samples_per_dim, cur_save_directory, overwrite);
+        model_parameters->saveGridData(min, max, n_samples_per_dim, cur_save_directory, overwrite);
       }
 
       double scale = 0.05;
       VectorXd perturbations = scale*VectorXd::Random(values.size());
       VectorXd values_perturbed = values.array()+perturbations.array();
 
-      model_parameters_lwr->setParameterVector(values_perturbed,normalized);
-      //cout << *model_parameters_lwr << endl;
-      cout << "Perturbation " << i_perturbation << ": " << fixed << setprecision(4) << values_perturbed.transpose() << endl;
+      model_parameters->setParameterVector(values_perturbed,normalized);
+      //cout << *model_parameters << endl;
+      cout << "Perturbation " << i_perturbation << ":\t " << fixed << setprecision(4) << values_perturbed.transpose() << endl;
         
     }
     
-    delete meta_parameters;
+    //delete meta_parameters;
     delete fa;
   }
   
