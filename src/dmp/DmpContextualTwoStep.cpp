@@ -81,14 +81,14 @@ void DmpContextualTwoStep::computeFunctionApproximatorOutput(
   MatrixXd output(1,1);
   for (int dd=0; dd<dim_orig(); dd++)
   { 
-    int n_parameters = function_approximator(dd)->getParameterVectorSelectedSize();
+    int n_parameters = function_approximator(dd)->getParameterVectorSize();
     model_parameters.resize(n_parameters);
     for (int pp=0; pp<n_parameters; pp++)
     {
       policy_parameter_function_[dd][pp]->predict(task_parameters,output);
       model_parameters[pp] = output(0,0);
     }
-    function_approximator(dd)->setParameterVectorSelected(model_parameters);
+    function_approximator(dd)->setParameterVector(model_parameters);
   }
 
   // The parameters of the function_approximators have been set, get their outputs now.  
@@ -163,7 +163,7 @@ void  DmpContextualTwoStep::train(const vector<Trajectory>& trajectories, const 
       // todo Should be argument of constructor
       function_approximator(i_dim)->setSelectedParameters(selected); 
   
-      function_approximator(i_dim)->getParameterVectorSelected(cur_model_parameters);
+      function_approximator(i_dim)->getParameterVector(cur_model_parameters);
       //cout << cur_model_parameters << endl;
       if (i_demo==0)
         all_model_parameters[i_dim].resize(n_demonstrations,cur_model_parameters.size());

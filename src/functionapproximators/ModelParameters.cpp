@@ -48,7 +48,7 @@ void ModelParameters::setSelectedParameters(const std::set<std::string>& labels)
   set<string>::iterator it;
   for (it = labels.begin(); it != labels.end(); ++it) {
     if (possible_values_labels.count(*it)==0) {
-      cout << "WARNING: '" << *it << "' is an unknown label in Parameterizable." << endl;
+      //cout << "WARNING: '" << *it << "' is an unknown label in ModelParameters." << endl;
     } else {
       selected_param_labels_.insert(*it);
     }

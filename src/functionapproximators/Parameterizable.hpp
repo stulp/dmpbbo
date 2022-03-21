@@ -132,32 +132,6 @@ public:
    */
   void setParameterVectorModifier(std::string modifier, bool new_value);
   
-  /** The vector (VectorXd) with parameter values can be split into different parts (as vector<VectorXd>; this function specifices the length of each sub-vector.
-   * 
-   * For instance if the parameter vector is of length 12, getParameterVector(VectorXd) would return a VectorXd of size 12.
-   * If you would like these 16 values to be split into 4 VectorXd of length 3, you would set 
-   * setVectorLengthsPerDimension([3 3 3 3]).
-   * getParameterVector(VectorXd) would still return a VectorXd of size 12, but getParameterVector(std::vector<Eigen::VectorXd>&) would return a std::vector of length 4, with each VectorXd of size 3.
-   *
-   * This is a convenience function to be able to use vector<VectorXd> instead of VectorXd when getting/setting parameter values.
-   *
-   * \param[in] lengths_per_dimension The length of each vector in each dimension.
-   */
-  void setVectorLengthsPerDimension(const Eigen::VectorXi& lengths_per_dimension)
-  {
-    assert(lengths_per_dimension.sum()==getParameterVectorSize());
-    lengths_per_dimension_ = lengths_per_dimension;
-  }
-
-  /** Get the specified length of each vector in each dimension.
-   * \see setVectorLengthsPerDimension()
-   * \return The length of each vector in each dimension.
-   */
-  Eigen::VectorXi getVectorLengthsPerDimension(void) const
-  {
-    return lengths_per_dimension_;
-  }
-
 private:
   /** Turn certain modifiers on or off, see Parameterizable::setParameterVectorModifier().
    *
@@ -170,11 +144,6 @@ private:
   {
     // Can be overridden by subclasses
   }
-  
-  /** 
-   * \see Parameterizable::setVectorLengthsPerDimension()
-   */
-  Eigen::VectorXi lengths_per_dimension_;
   
   // Since this is a cached variable, it needs to be mutable so that const functions may change it.
   mutable Eigen::VectorXd parameter_vector_all_initial_;

@@ -55,7 +55,7 @@ void TaskSolverDmp::set_perturbation(double perturbation_standard_deviation)
 void TaskSolverDmp::performRollout(const Eigen::VectorXd& sample, const Eigen::VectorXd& task_parameters, Eigen::MatrixXd& cost_vars) const
 {
 
-  dmp_->setParameterVectorSelected(sample, use_normalized_parameter_);
+  dmp_->setParameterVector(sample, use_normalized_parameter_);
 
   Trajectory traj;
   MatrixXd forcing_terms;

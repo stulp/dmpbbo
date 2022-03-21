@@ -98,47 +98,28 @@ int main(int n_args, char** args)
   
   dmp->setSelectedParameters(selected_labels);
   
-  cout << "vector size (all     ) = " << dmp->getParameterVectorAllSize() << endl;
-  cout << "vector size (selected) = " <<  dmp->getParameterVectorSelectedSize() << endl;
+  cout << "vector size = " <<  dmp->getParameterVectorSize() << endl;
   
   VectorXi selected_mask;
   VectorXd values, min_values, max_values, values_normalized;
-
-
-  dmp->getParameterVectorMask(selected_labels,selected_mask);
-  cout << "mask = " << selected_mask.transpose() << endl << endl;
   
-  dmp->getParameterVectorAll(values);
-  cout << "values     (all     ): " << values.transpose() << endl;
+  dmp->getParameterVector(values);
+  cout << "values    : " << values.transpose() << endl;
   
-  dmp->getParameterVectorSelected(values);
-  cout << "values     (selected): " << values.transpose() << endl;
-  
-  dmp->getParameterVectorSelectedMinMax(min_values,max_values);
-  cout << "min_values (selected): " << min_values.transpose() << endl;
-  cout << "max_values (selected): " << max_values.transpose() << endl ;
-  
-  dmp->getParameterVectorSelectedNormalized(values_normalized);
-  cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
+  dmp->getParameterVectorNormalized(values_normalized);
+  cout << "values_norm: " << values_normalized.transpose() << endl << endl;
 
   cout << "_______________________________________________" << endl;
   
   VectorXd new_values = 3*values;
-  //VectorXd new_values = VectorXd::LinSpaced(dmp->getParameterVectorSelectedSize(),100,210);
-  dmp->setParameterVectorSelected(new_values);
+  //VectorXd new_values = VectorXd::LinSpaced(dmp->getParameterVectorSize(),100,210);
+  dmp->setParameterVector(new_values);
   
-  dmp->getParameterVectorAll(values);
-  cout << "values     (all     ): " << values.transpose() << endl;
+  dmp->getParameterVector(values);
+  cout << "values    : " << values.transpose() << endl;
   
-  dmp->getParameterVectorSelected(values);
-  cout << "values     (selected): " << values.transpose() << endl;
-  
-  dmp->getParameterVectorSelectedMinMax(min_values,max_values);
-  cout << "min_values (selected): " << min_values.transpose() << endl;
-  cout << "max_values (selected): " << max_values.transpose() << endl ;
-  
-  dmp->getParameterVectorSelectedNormalized(values_normalized);
-  cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
+  dmp->getParameterVectorNormalized(values_normalized);
+  cout << "values_norm: " << values_normalized.transpose() << endl << endl;
 
   cout << "_______________________________________________" << endl;
   vector<VectorXd> vector_values(dim);
@@ -149,20 +130,13 @@ int main(int n_args, char** args)
   vector_values[0] = VectorXd::Constant(2*n_basis_functions_vector[0]+goal_space,-1);
   vector_values[1] = VectorXd::Constant(2*n_basis_functions_vector[1]+goal_space,-1);
   
-  dmp->setParameterVectorSelected(vector_values);
+  dmp->setParameterVector(vector_values);
   
-  dmp->getParameterVectorAll(values);
-  cout << "values     (all     ): " << values.transpose() << endl;
+  dmp->getParameterVector(values);
+  cout << "values    : " << values.transpose() << endl;
   
-  dmp->getParameterVectorSelected(values);
-  cout << "values     (selected): " << values.transpose() << endl;
-  
-  dmp->getParameterVectorSelectedMinMax(min_values,max_values);
-  cout << "min_values (selected): " << min_values.transpose() << endl;
-  cout << "max_values (selected): " << max_values.transpose() << endl ;
-  
-  dmp->getParameterVectorSelectedNormalized(values_normalized);
-  cout << "values_norm(selected): " << values_normalized.transpose() << endl << endl;
+  dmp->getParameterVectorNormalized(values_normalized);
+  cout << "values_norm: " << values_normalized.transpose() << endl << endl;
   
   delete dmp;
  

@@ -379,7 +379,6 @@ void ModelParametersLWR::getParameterVector(Eigen::VectorXd& values, bool normal
     if (normalized) {
       min = min_.at(label);
       max = max_.at(label);
-      cout << label << min << " " << max << endl;
     }
     
     for (int i_dim=0; i_dim<n_dims; i_dim++)
@@ -394,7 +393,6 @@ void ModelParametersLWR::getParameterVector(Eigen::VectorXd& values, bool normal
     if (normalized) {
       min = min_.at(label);
       max = max_.at(label);
-      cout << label << min << " " << max << endl;
     }
     values.segment(offset,n_basis) = 
         (offsets_.array()-min)/(max-min);

@@ -724,135 +724,111 @@ void Dmp::getSelectableParameters(set<string>& selectable_values_labels) const {
       }
     }
   }
-  selectable_values_labels.insert("goal");
-  
-  //cout << "selected_values_labels=["; 
-  //for (string label : selected_values_labels) 
-  //  cout << label << " ";
-  //cout << "]" << endl;
-  
+  selectable_values_labels.insert("goal");  
 }
 
 void Dmp::setSelectedParameters(const set<string>& selected_values_labels)
 {
+  selected_param_labels_ = selected_values_labels;
+
   assert(function_approximators_.size()>0);
   for (int dd=0; dd<dim_orig(); dd++)
     if (function_approximators_[dd]!=NULL)
       if (function_approximators_[dd]->isTrained())
         function_approximators_[dd]->setSelectedParameters(selected_values_labels);
-
-  // Call superclass for initializations
-  Parameterizable::setSelectedParameters(selected_values_labels);
-
-  VectorXi lengths_per_dimension = VectorXi::Zero(dim_orig());
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    if (function_approximators_[dd]!=NULL)
-      if (function_approximators_[dd]->isTrained())
-        lengths_per_dimension[dd] = function_approximators_[dd]->getParameterVectorSelectedSize();
-    
-    if (selected_values_labels.find("goal")!=selected_values_labels.end())
-      lengths_per_dimension[dd]++;
-  }
-  
-  setVectorLengthsPerDimension(lengths_per_dimension);
-      
 }
 
-void Dmp::getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const
-{
-  assert(function_approximators_.size()>0);
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    assert(function_approximators_[dd]!=NULL);
-    assert(function_approximators_[dd]->isTrained());
-  }
-
-  selected_mask.resize(getParameterVectorAllSize());
-  selected_mask.fill(0);
-  
-  const int TMP_GOAL_NUMBER = -1;
-  int offset = 0;
-  VectorXi cur_mask;
-  for (int dd=0; dd<dim_orig(); dd++)
-  {
-    function_approximators_[dd]->getParameterVectorMask(selected_values_labels,cur_mask);
-
-    // This makes sure that the indices for each function approximator are different    
-    int mask_offset = selected_mask.maxCoeff(); 
-    for (int ii=0; ii<cur_mask.size(); ii++)
-      if (cur_mask[ii]!=0)
-        cur_mask[ii] += mask_offset;
-        
-    selected_mask.segment(offset,cur_mask.size()) = cur_mask;
-    offset += cur_mask.size();
-    
-    // Goal
-    if (selected_values_labels.find("goal")!=selected_values_labels.end())
-      selected_mask(offset) = TMP_GOAL_NUMBER;
-    offset++;
-    
-  }
-  assert(offset == getParameterVectorAllSize());
-  
-  // Replace TMP_GOAL_NUMBER with current max value
-  int goal_number = selected_mask.maxCoeff() + 1; 
-  for (int ii=0; ii<selected_mask.size(); ii++)
-    if (selected_mask[ii]==TMP_GOAL_NUMBER)
-      selected_mask[ii] = goal_number;
-    
-}
-
-int Dmp::getParameterVectorAllSize(void) const
+int Dmp::getParameterVectorSize(void) const
 {
   int total_size = 0;
   for (unsigned int dd=0; dd<function_approximators_.size(); dd++)
-    total_size += function_approximators_[dd]->getParameterVectorAllSize();
+    total_size += function_approximators_[dd]->getParameterVectorSize();
   
-  // For the goal
-  total_size += dim_orig();
+  if (isParameterSelected("goal"))
+    total_size += dim_orig();
+  
   return total_size;
 }
 
+bool Dmp::isParameterSelected(std::string label) const {
+   return selected_param_labels_.find(label)!=selected_param_labels_.end();
+}
 
-void Dmp::getParameterVectorAll(VectorXd& values) const
+void Dmp::getParameterVector(VectorXd& values, bool normalized) const
 {
-  values.resize(getParameterVectorAllSize());
+  values.resize(getParameterVectorSize());
   int offset = 0;
   VectorXd cur_values;
   VectorXd attractor = attractor_state();
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    function_approximators_[dd]->getParameterVectorAll(cur_values);
+    function_approximators_[dd]->getParameterVector(cur_values,normalized);
     values.segment(offset,cur_values.size()) = cur_values;
     offset += cur_values.size();
 
-    values(offset) = attractor(dd);
-    offset++;
+    if (isParameterSelected("goal")) {
+      // ggg Goal is not normalized
+      values(offset) = attractor(dd);
+      offset++;
+    }
   }
 }
 
-void Dmp::setParameterVectorAll(const VectorXd& values)
+void Dmp::setParameterVector(const VectorXd& values, bool normalized)
 {
-  assert(values.size()==getParameterVectorAllSize());
+  assert(values.size()==getParameterVectorSize());
   int offset = 0;
   VectorXd cur_values;
   VectorXd attractor(dim_orig());
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    int n_parameters_required = function_approximators_[dd]->getParameterVectorAllSize();
+    int n_parameters_required = function_approximators_[dd]->getParameterVectorSize();
     cur_values = values.segment(offset,n_parameters_required);
-    function_approximators_[dd]->setParameterVectorAll(cur_values);
+    function_approximators_[dd]->setParameterVector(cur_values,normalized);
     offset += n_parameters_required;
     
-    attractor(dd) = values(offset);
-    offset += 1;
+    if (isParameterSelected("goal")) {
+      // ggg Goal is not normalized
+      attractor(dd) = values(offset);
+      offset++;
+    }
   }
   
-  // Set the goal
-  set_attractor_state(attractor); 
+  if (isParameterSelected("goal")) {
+    // Set the goal
+    set_attractor_state(attractor); 
+  }
+  
 }
 
+void Dmp::setParameterVector(const std::vector<Eigen::VectorXd>& vector_values, bool normalized)
+{
+  VectorXd cur_values;
+  VectorXd attractor(dim_orig());
+  for (int dd=0; dd<dim_orig(); dd++)
+  {
+    cur_values = vector_values[dd];
+    
+    int n_fa_pars = function_approximators_[dd]->getParameterVectorSize();
+    if (isParameterSelected("goal")) {
+      assert(cur_values.size()==n_fa_pars+1);
+      // ggg Goal is not normalized
+      attractor(dd) = cur_values[n_fa_pars-1]; // goal is last value
+      cur_values = cur_values.head(n_fa_pars);
+      
+    } else {
+      assert(cur_values.size()==n_fa_pars);
+      
+    }
+    
+    function_approximators_[dd]->setParameterVector(cur_values,normalized);
+  }
+  
+  if (isParameterSelected("goal")) {
+    // Set the goal
+    set_attractor_state(attractor); 
+  }
+}
 
 
 void Dmp::set_tau(double tau) {
