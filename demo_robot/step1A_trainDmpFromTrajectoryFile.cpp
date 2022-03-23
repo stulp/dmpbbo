@@ -132,7 +132,6 @@ int main(int n_args, char** args)
   
   // Initialize the DMP
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
-  dmp->set_name("trained");
 
   cout << "C++    |     Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
