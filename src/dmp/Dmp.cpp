@@ -756,7 +756,10 @@ bool Dmp::isParameterSelected(std::string label) const {
 
 void Dmp::getParameterVector(VectorXd& values, bool normalized) const
 {
-  values.resize(getParameterVectorSize());
+  // Here a programming decision has to be made: Without Dmp:: the getParameterVectorSize is taken from DmpWithGainSchedules
+  // One possibilty is to change all the necessary functions or to adapt the code to be compatible with DmpWithGainSchedules
+  // Before the getParameterVectorSize got the size of the DMP + the gains
+  values.resize(Dmp::getParameterVectorSize());
   int offset = 0;
   VectorXd cur_values;
   VectorXd attractor = attractor_state();
