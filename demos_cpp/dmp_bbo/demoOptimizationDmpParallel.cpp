@@ -113,14 +113,14 @@ int main(int n_args, char* args[])
   
 
   // Make the initial distribution
-  vector<VectorXd> mean_init_vec;
+  VectorXd mean_init_vec;
   dmp->getParameterVector(mean_init_vec);
   
   vector<DistributionGaussian*> distributions(n_dim);
   for (int i_dim=0; i_dim<n_dim; i_dim++)
   {
     //cout << mean_init_vec[i_dim].transpose() << endl;
-    VectorXd mean_init = mean_init_vec[i_dim];
+    VectorXd mean_init = mean_init_vec;
   
     MatrixXd covar_init = 1000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
     
