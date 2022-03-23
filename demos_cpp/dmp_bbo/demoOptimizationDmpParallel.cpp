@@ -114,7 +114,7 @@ int main(int n_args, char* args[])
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;
-  dmp->getParameterVectorSelected(mean_init_vec);
+  dmp->getParameterVector(mean_init_vec);
   
   vector<DistributionGaussian*> distributions(n_dim);
   for (int i_dim=0; i_dim<n_dim; i_dim++)

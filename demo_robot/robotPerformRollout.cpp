@@ -113,7 +113,7 @@ int main(int n_args, char** args)
     else
     {
       // Set DMP parameters to sample
-      dmp->setParameterVectorSelected(sample);
+      dmp->setParameterVector(sample);
       // Save dmp whose parameters have been perturbed, if necessary
       if (!dmp_output_filename.empty())
       {

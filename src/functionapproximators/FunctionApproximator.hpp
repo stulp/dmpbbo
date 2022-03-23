@@ -376,23 +376,23 @@ The life-cycle of a function approximator is as follows:
 
 \subsection sec_fa_changing_modelparameters Changing the ModelParameters of a FunctionApproximator
 
-The user should not be allowed to set the ModelParameters of a trained function approximator directly. Hence, FunctionApproximator::setModelParameters is protected. However, in order to change the values inside the model parameters (for instance when optimizing them), the user may call ModelParameters::getParameterVectorSelected and ModelParameters::setParameterVectorSelected it inherits these functions from Parameterizable). These take a vector of doubles, check if the vector has the right size, and get/set the ModelParameters accordingly.
+The user should not be allowed to set the ModelParameters of a trained function approximator directly. Hence, FunctionApproximator::setModelParameters is protected. However, in order to change the values inside the model parameters (for instance when optimizing them), the user may call ModelParameters::getParameterVector and ModelParameters::setParameterVector it inherits these functions from Parameterizable). These take a vector of doubles, check if the vector has the right size, and get/set the ModelParameters accordingly.
 
-Function approximators often have different types of model parameters. For instance, the model parameters of Locally Weighted Regression (FunctionApproximatorLWR) represent the centers and widths of the basis functions, as well as the slopes of the line segments. If you only want to get/set the slopes when calling ModelParameters::getParameterVectorSelected and ModelParameters::setParameterVectorSelected, you must use ModelParameters::setSelectedParameters(const std::set<std::string>& selected_values_labels), for instance as follows:
+Function approximators often have different types of model parameters. For instance, the model parameters of Locally Weighted Regression (FunctionApproximatorLWR) represent the centers and widths of the basis functions, as well as the slopes of the line segments. If you only want to get/set the slopes when calling ModelParameters::getParameterVector and ModelParameters::setParameterVector, you must use ModelParameters::setSelectedParameters(const std::set<std::string>& selected_values_labels), for instance as follows:
 
 \code
 std::set<std::string> selected;
 selected.insert("slopes");
 model_parameters.setSelectedParameters(selected);
 Eigen::VectorXd values;
-model_parameters.getParameterVectorSelected(values);
+model_parameters.getParameterVector(values);
 // "values" now only contains the slopes of the line segments
 
 selected.clear();
 selected.insert("centers");
 selected.insert("slopes");
 model_parameters.setSelectedParameters(selected);
-model_parameters.getParameterVectorSelected(values);
+model_parameters.getParameterVector(values);
 // "values" now contains the centers of the basis functions AND slopes of the line segments
 
 \endcode

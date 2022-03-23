@@ -116,7 +116,7 @@ int main(int n_args, char* args[])
   
   // Make the initial distribution
   VectorXd mean_init;
-  dmp->getParameterVectorSelected(mean_init);
+  dmp->getParameterVector(mean_init);
   
   MatrixXd covar_init = 1000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
 
