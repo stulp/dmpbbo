@@ -777,6 +777,23 @@ void Dmp::getParameterVector(VectorXd& values, bool normalized) const
   }
 }
 
+void Dmp::getParameterVector(std::vector<Eigen::VectorXd>& vector_values, bool normalized) const
+{
+  // Not tested yet
+  VectorXd cur_values;
+  VectorXd attractor = attractor_state();
+  for (int dd=0; dd<dim_orig(); dd++)
+  {
+    function_approximators_[dd]->getParameterVector(cur_values, normalized);
+
+    if (isParameterSelected("goal")) {
+      // ggg Goal is not normalized
+      cur_values(cur_values.size()-2) = attractor(dd);
+    }
+    vector_values.push_back(cur_values);
+  }
+}
+
 void Dmp::setParameterVector(const VectorXd& values, bool normalized)
 {
   assert(values.size()==getParameterVectorSize());
