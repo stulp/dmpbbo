@@ -73,15 +73,15 @@ void runImitationAndOptimization(vector<FunctionApproximator*> function_approxim
   TaskSolverDmp* task_solver = new TaskSolverDmp(dmp,parameters_to_optimize);
 
   // Make the initial distribution
-  VectorXd mean_init_vec;
+  vector<VectorXd> mean_init_vec;
   dmp->getParameterVector(mean_init_vec);
   
   int n_dims = dmp->dim_orig();
   vector<DistributionGaussian*> distributions(n_dims);
   for (int i_dim=0; i_dim<n_dims; i_dim++)
   {
-    cout << mean_init_vec.transpose() << endl;
-    VectorXd mean_init = mean_init_vec;
+    cout << mean_init_vec[i_dim].transpose() << endl;
+    VectorXd mean_init = mean_init_vec[i_dim];
   
     MatrixXd covar_init = 1000.0*MatrixXd::Identity(mean_init.size(),mean_init.size());
     
