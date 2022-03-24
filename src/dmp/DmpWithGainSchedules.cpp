@@ -388,36 +388,35 @@ void DmpWithGainSchedules::setParameterVector(const VectorXd& values, bool norma
   
 }
 
-/*
 void DmpWithGainSchedules::setParameterVector(const std::vector<Eigen::VectorXd>& vector_values, bool normalized)
 {
-  VectorXd cur_values;
-  VectorXd attractor(dim_orig());
+  // This sets parameters in the Dmp transformation systems and goal
+  Dmp::setParameterVector(vector_values,normalized);
+
+  // Now set the parameter vector of the function approximators for the gains schedules. Within the function approximator, the labels are e.g. "offsets", "weights", etc. So we need to remove the "_gains" postfix first.
+  set<string> labels_gains;
+  for (string label : selected_param_labels_) {
+      if (label.find("_gains") != string::npos) {
+        label.substr(0,label.length()-6); // Remove '_gains' 
+        labels_gains.insert(label);
+      }
+  }
+
+  VectorXd cur_values_gains;
   for (int dd=0; dd<dim_orig(); dd++)
   {
-    cur_values = vector_values[dd];
     
-    int n_fa_pars = function_approximators_[dd]->getParameterVectorSize();
-    if (isParameterSelected("goal")) {
-      assert(cur_values.size()==n_fa_pars+1);
-      // ggg Goal is not normalized
-      attractor(dd) = cur_values[n_fa_pars-1]; // goal is last value
-      cur_values = cur_values.head(n_fa_pars);
-      
-    } else {
-      assert(cur_values.size()==n_fa_pars);
-      
-    }
+    int n_fa_pars = function_approximators_gains_[dd]->getParameterVectorSize();
     
-    function_approximators_[dd]->setParameterVector(cur_values,normalized);
+    // First values related to Dmp, last values (tail) for the 
+    // gain schedules.
+    // THIS HAS NOT BEEN TESTED YET
+    cur_values_gains = vector_values[dd].tail(n_fa_pars);
+    
+    function_approximators_gains_[dd]->setParameterVector(cur_values_gains,normalized);
   }
   
-  if (isParameterSelected("goal")) {
-    // Set the goal
-    set_attractor_state(attractor); 
-  }
 }
-*/
 
 
 }
