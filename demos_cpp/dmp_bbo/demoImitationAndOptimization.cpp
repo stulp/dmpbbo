@@ -74,7 +74,7 @@ void runImitationAndOptimization(vector<FunctionApproximator*> function_approxim
 
   // Make the initial distribution
   vector<VectorXd> mean_init_vec;
-  dmp->getParameterVectorSelected(mean_init_vec);
+  dmp->getParameterVector(mean_init_vec);
   
   int n_dims = dmp->dim_orig();
   vector<DistributionGaussian*> distributions(n_dims);

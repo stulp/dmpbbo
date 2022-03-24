@@ -756,7 +756,10 @@ bool Dmp::isParameterSelected(std::string label) const {
 
 void Dmp::getParameterVector(VectorXd& values, bool normalized) const
 {
-  values.resize(getParameterVectorSize());
+  // Here a programming decision has to be made: Without Dmp:: the getParameterVectorSize is taken from DmpWithGainSchedules
+  // One possibilty is to change all the necessary functions or to adapt the code to be compatible with DmpWithGainSchedules
+  // Before the getParameterVectorSize got the size of the DMP + the gains
+  values.resize(Dmp::getParameterVectorSize());
   int offset = 0;
   VectorXd cur_values;
   VectorXd attractor = attractor_state();
@@ -771,6 +774,23 @@ void Dmp::getParameterVector(VectorXd& values, bool normalized) const
       values(offset) = attractor(dd);
       offset++;
     }
+  }
+}
+
+void Dmp::getParameterVector(std::vector<Eigen::VectorXd>& vector_values, bool normalized) const
+{
+  // Not tested yet
+  VectorXd cur_values;
+  VectorXd attractor = attractor_state();
+  for (int dd=0; dd<dim_orig(); dd++)
+  {
+    function_approximators_[dd]->getParameterVector(cur_values, normalized);
+
+    if (isParameterSelected("goal")) {
+      // ggg Goal is not normalized
+      cur_values(cur_values.size()-2) = attractor(dd);
+    }
+    vector_values.push_back(cur_values);
   }
 }
 

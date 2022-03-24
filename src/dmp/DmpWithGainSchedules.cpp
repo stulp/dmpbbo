@@ -325,7 +325,7 @@ void DmpWithGainSchedules::setSelectedParameters(const set<string>& selected_val
   set<string> labels_gains;
   for (string label : selected_values_labels) {
       if (label.find("_gains") != string::npos) {
-        label.substr(0,label.length()-6); // Remove '_gains' 
+        label = label.substr(0,label.length()-6); // Remove '_gains' 
         labels_gains.insert(label);
       }
   }
@@ -371,11 +371,12 @@ void DmpWithGainSchedules::setParameterVector(const VectorXd& values, bool norma
   int n_params_for_dmp = Dmp::getParameterVectorSize();
 
   VectorXd values_for_dmp = values.segment(0,n_params_for_dmp);
-  Dmp::setParameterVector(values_for_dmp);
+  Dmp::setParameterVector(values_for_dmp, normalized);
 
   int offset = n_params_for_dmp;
   VectorXd cur_values;
-  for (int dd=dim_gains()-1; dd>=0; dd--)
+  // Before the gains were in the wrong order.
+  for (int dd=0; dd<dim_gains(); dd++)
   {
     int n_parameters_required = function_approximators_gains_[dd]->getParameterVectorSize();
     cur_values = values.segment(offset,n_parameters_required);
@@ -395,7 +396,7 @@ void DmpWithGainSchedules::setParameterVector(const std::vector<Eigen::VectorXd>
   set<string> labels_gains;
   for (string label : selected_param_labels_) {
       if (label.find("_gains") != string::npos) {
-        label.substr(0,label.length()-6); // Remove '_gains' 
+        label = label.substr(0,label.length()-6); // Remove '_gains' 
         labels_gains.insert(label);
       }
   }

@@ -132,7 +132,6 @@ int main(int n_args, char** args)
   
   // Initialize the DMP
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
-  dmp->set_name("trained");
 
   cout << "C++    |     Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
@@ -149,7 +148,7 @@ int main(int n_args, char** args)
   
   // Save the initial parameter vector to file
   Eigen::VectorXd parameter_vector;
-  dmp->getParameterVectorSelected(parameter_vector);
+  dmp_gains->getParameterVector(parameter_vector);
   overwrite = true;
   cout << "C++    |     Writing initial parameter vector to file : " << output_parameters_file << endl;
   saveMatrix(output_parameters_file,parameter_vector,overwrite);

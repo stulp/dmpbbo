@@ -304,6 +304,7 @@ public:
 
   virtual int getParameterVectorSize(void) const;
   virtual void getParameterVector(Eigen::VectorXd& values, bool normalized=false) const;
+  virtual void getParameterVector(std::vector<Eigen::VectorXd>& vector_values, bool normalized=false) const;
   virtual void setParameterVector(const Eigen::VectorXd& values, bool normalized=false);
   virtual void setParameterVector(const std::vector<Eigen::VectorXd>& vector_values, bool normalized=false);
   bool isParameterSelected(std::string label) const;
