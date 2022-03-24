@@ -785,10 +785,13 @@ void Dmp::getParameterVector(std::vector<Eigen::VectorXd>& vector_values, bool n
   for (int dd=0; dd<dim_orig(); dd++)
   {
     function_approximators_[dd]->getParameterVector(cur_values, normalized);
-
+    
     if (isParameterSelected("goal")) {
+      // make room for the goal (1 scalar for each dimension)
+      cur_values.conservativeResize(cur_values.size()+1);
+      
       // ggg Goal is not normalized
-      cur_values(cur_values.size()-2) = attractor(dd);
+      cur_values(cur_values.size()-1) = attractor(dd);
     }
     vector_values.push_back(cur_values);
   }
