@@ -25,6 +25,7 @@
  */
 
 #include "dmp/Dmp.hpp"
+#include "dmp/DmpWithGainSchedules.hpp"
 #include "dmp/Trajectory.hpp"
 #include "dmp/serialization.hpp"
 
@@ -132,6 +133,22 @@ int main(int n_args, char** args)
   
   // Initialize the DMP
   Dmp* dmp = new Dmp(n_dims, function_approximators, Dmp::KULVICIUS_2012_JOINING);
+  bool with_gains = true;
+  if (with_gains) {
+
+    // Clone the function approximator for each dimension of the DMP
+    vector<FunctionApproximator*> function_approximators_gains(n_dims);    
+    for (int dd=0; dd<n_dims; dd++)
+      function_approximators_gains[dd] = fa_lwr->clone();
+    
+    // Create a dmp with gain schedules
+    dmp = new DmpWithGainSchedules(dmp,function_approximators_gains);
+    
+    // Add gains to the trajectory (necessary for training)
+    MatrixXd gains = MatrixXd::Ones(ts.size(),n_dims);
+    trajectory.set_misc(gains);
+    cout << trajectory << endl;
+  }
 
   cout << "C++    |     Training Dmp... (n_basis_functions=" << n_basis_functions << ")" << endl;
   bool overwrite = true;
@@ -148,7 +165,7 @@ int main(int n_args, char** args)
   
   // Save the initial parameter vector to file
   Eigen::VectorXd parameter_vector;
-  dmp_gains->getParameterVector(parameter_vector);
+  dmp->getParameterVector(parameter_vector);
   overwrite = true;
   cout << "C++    |     Writing initial parameter vector to file : " << output_parameters_file << endl;
   saveMatrix(output_parameters_file,parameter_vector,overwrite);
