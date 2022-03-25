@@ -122,10 +122,6 @@ int main(int n_args, char** args)
   MetaParametersRBFN* meta_parameters = new MetaParametersRBFN(input_dim,n_basis_functions,intersection);      
   FunctionApproximatorRBFN* fa_lwr = new FunctionApproximatorRBFN(meta_parameters);  
   
-  // Set the parameters to optimize
-  set<string> parameters_to_optimize;
-  parameters_to_optimize.insert("weights");
-  
   // Clone the function approximator for each dimension of the DMP
   vector<FunctionApproximator*> function_approximators(n_dims);    
   for (int dd=0; dd<n_dims; dd++)
@@ -155,6 +151,11 @@ int main(int n_args, char** args)
   dmp->train(trajectory,output_train_directory,overwrite);
 
   // Set which parameters to optimize
+  // Set the parameters to optimize
+  set<string> parameters_to_optimize;
+  parameters_to_optimize.insert("weights"); // Optimize trajectory
+  if (with_gains)
+    parameters_to_optimize.insert("weights_gains"); // Optimize gains
   dmp->setSelectedParameters(parameters_to_optimize);
   
   cout << "C++    |     Writing trained Dmp to XML file: " << output_dmp_file << endl;
