@@ -484,6 +484,8 @@ private:
     ar & BOOST_SERIALIZATION_NVP(trajectory_amplitudes_);
     
     ar & BOOST_SERIALIZATION_NVP(perturbation_standard_deviation_);
+
+    ar & BOOST_SERIALIZATION_NVP(selected_param_labels_);
     
     //ar & BOOST_SERIALIZATION_NVP(lengths_per_dimension_);
   }
