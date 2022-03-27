@@ -22,12 +22,13 @@ class Gaussian:
     
     def activations(centers, widths, inputs, normalized_basis_functions=False):
 
-        if centers.shape!=widths.shape:
-            raise ValueError(f'centers ({centers.shape}) and widths ({widths.shape}) should have same shape.')
-
-        n_basis_functions = centers.size
-        n_samples         = inputs.size
-        n_dims            = 1
+        n_basis_functions = centers.shape[0]
+        n_dims            = centers.shape[1]
+        if n_dims==1:
+            inputs = np.atleast_2d(inputs)
+            if inputs.shape[0]==1:
+                inputs = inputs.T
+        n_samples         = inputs.shape[0]
   
         kernel_activations = np.ones([n_samples,n_basis_functions])
   
@@ -41,7 +42,6 @@ class Gaussian:
             kernel_activations.fill(1.0)
             return kernel_activations
   
-  
         for bb in range(n_basis_functions):
             # Here, we compute the values of a (unnormalized) multi-variate Gaussian:
             #   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
@@ -52,16 +52,12 @@ class Gaussian:
     
 
             for i_dim in range(n_dims):
-               c = centers[bb] # c = centers[bb,i_dim]
+               c = centers[bb,i_dim]
+               w = widths[bb,i_dim]
                for i_s in range(n_samples):
-                   x = inputs[i_s] # x = inputs[i_s,i_dim]
-                   w = widths[bb]  # w = widths[bb,i_dim]
-        
+                   x = inputs[i_s,i_dim]
                    kernel_activations[i_s,bb] *= np.exp(-0.5*np.square(x-c)/(w*w))
-                   
-        #np.set_printoptions(precision=3,suppress=True)
-        #print(kernel_activations)
-                   
+        
         if (normalized_basis_functions):
             # Normalize the basis value; they should sum to 1.0 for each time step.
             for i_sample in range(n_samples):
@@ -75,3 +71,66 @@ class Gaussian:
                         kernel_activations[i_sample,i_basis] /= sum_kernel_activations
                         
         return kernel_activations
+        
+        
+def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height):
+    mins = np.atleast_1d(mins) 
+    maxs = np.atleast_1d(maxs) 
+    n_dims = len(mins)
+    n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
+        
+    centers_per_dim_local = []
+    widths_per_dim_local = []
+    for i_dim in range(n_dims):
+        n_bfs = n_bfs_per_dim[i_dim]
+        
+        cur_centers = np.linspace(mins[i_dim],maxs[i_dim],n_bfs)
+        
+        # Determine the widths from the centers
+        cur_widths = np.ones((n_bfs))
+        h = intersection_height
+        if n_bfs>1:
+            # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
+            # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
+            # And we want the activation at x to be 'intersection'. So
+            #            y = exp(-0.5(x-c0)^2/w^2)
+            # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
+            # intersection = exp(-0.5((0.5*c1-0.5*c0)^2/w^2))
+            # intersection = exp(-0.5((0.5*(c1-c0))^2/w^2))
+            # intersection = exp(-0.5(0.25*(c1-c0)^2/w^2))
+            # intersection = exp(-0.125((c1-c0)^2/w^2))
+            #            w = sqrt((c1-c0)^2/-8*ln(intersection))
+            for cc in range(n_bfs-1):
+                w = np.sqrt(np.square(cur_centers[cc+1]-cur_centers[cc])/(-8*np.log(h)))
+                cur_widths[cc] = w
+            
+            cur_widths[n_bfs-1] = cur_widths[n_bfs-2]
+
+        centers_per_dim_local.append(cur_centers)
+        widths_per_dim_local.append(cur_widths)
+
+    # We now have the centers and widths for each dimension separately.
+    # This is like meshgrid.flatten, but then for any number of dimensions
+    # I'm sure numpy has better functions for this, but I could not find them, and I already
+    # had the code in C++.
+    digit_max = n_bfs_per_dim
+    n_centers = np.prod(digit_max)
+    digit = [0] * n_dims
+
+    centers = np.zeros((n_centers,n_dims))
+    widths = np.zeros((n_centers,n_dims))
+    i_center=0
+    while (digit[0]<digit_max[0]):
+        for i_dim in range(n_dims):
+            centers[i_center,i_dim] = centers_per_dim_local[i_dim][digit[i_dim]];
+            widths[i_center,i_dim] = widths_per_dim_local[i_dim][digit[i_dim]];
+        i_center+=1;
+  
+        # Increment last digit by one
+        digit[n_dims-1]+=1;
+        for i_dim in range(n_dims-1,0,-1):
+            if digit[i_dim]>=digit_max[i_dim]:
+                digit[i_dim] = 0;
+                digit[i_dim-1]+=1;
+    
+    return (centers,widths)

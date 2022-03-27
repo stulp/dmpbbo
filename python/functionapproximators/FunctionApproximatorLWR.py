@@ -21,7 +21,7 @@ lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
 from functionapproximators.FunctionApproximator import FunctionApproximator
-from functionapproximators.BasisFunction import Gaussian
+from functionapproximators.BasisFunction import *
 from functionapproximators.leastSquares import *
 
 class FunctionApproximatorLWR(FunctionApproximator):
@@ -42,31 +42,12 @@ class FunctionApproximatorLWR(FunctionApproximator):
         
     def train(self,inputs,targets):
 
-        
-        # Determine the centers and widths of the basis functions, given the range of the input data
+        # Determine the centers and widths of the basis functions, given the input data range
         min_vals = inputs.min(axis=0)
         max_vals = inputs.max(axis=0)
-
-        n_centers = self._meta_params['n_basis_functions_per_dim']
-        centers = np.linspace(min_vals,max_vals,n_centers)
-        widths = np.ones((n_centers,1))
-        if n_centers>1:
-            # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
-            # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
-            # And we want the activation at x to be 'intersection'. So
-            #            y = exp(-0.5(x-c0)^2/w^2)
-            # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
-            # intersection = exp(-0.5((0.5*c1-0.5*c0)^2/w^2))
-            # intersection = exp(-0.5((0.5*(c1-c0))^2/w^2))
-            # intersection = exp(-0.5(0.25*(c1-c0)^2/w^2))
-            # intersection = exp(-0.125((c1-c0)^2/w^2))
-            #            w = sqrt((c1-c0)^2/-8*ln(intersection))
-            height = self._meta_params['intersection_height']  
-            for cc in range(n_centers-1):
-                w = np.sqrt(np.square(centers[cc+1]-centers[cc])/(-8*np.log(height)))
-                widths[cc] = w
-                
-            widths[n_centers-1] = widths[n_centers-2]
+        n_bfs_per_dim = self._meta_params['n_basis_functions_per_dim']
+        height = self._meta_params['intersection_height']
+        (centers,widths) = getCentersAndWidths(min_vals, max_vals, n_bfs_per_dim, height)
        
         # Get the activations of the basis functions 
         self._model_params['widths'] = widths
@@ -75,7 +56,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         # Parameters for the weighted least squares regressions
         use_offset = True
-        n_kernels = n_centers
+        n_kernels = np.prod(n_bfs_per_dim)
         n_betas = 1
         if (use_offset):
             n_betas += 1
