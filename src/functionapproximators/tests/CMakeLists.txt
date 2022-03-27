@@ -1,3 +1,6 @@
+add_executable(testJson testJson.cpp)
+target_link_libraries(testJson functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+
 add_executable(testTrainingCompareCppPython testTrainingCompareCppPython.cpp)
 target_link_libraries(testTrainingCompareCppPython functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 

@@ -36,6 +36,7 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json.hpp>
 
 namespace DmpBbo {
 
@@ -127,6 +128,14 @@ public:
 	
   UnifiedModel* toUnifiedModel(void) const;
   
+  /**
+   * Default constructor.
+   * \remarks This default constuctor is required for boost::serialization to work. Since this
+   * constructor should not be called by other classes, it is private (boost::serialization is a
+   * friend)
+   */
+  ModelParametersRBFN(void) {};
+  
 private:
   
   mutable Eigen::MatrixXd inputs_cached_;
@@ -138,13 +147,6 @@ private:
     kernel_activations_cached_.resize(0,0);
   }
   
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  ModelParametersRBFN(void) {};
 
   
   /** Give boost serialization access to private members. */  
@@ -165,8 +167,22 @@ private:
     ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
     ar & BOOST_SERIALIZATION_NVP(caching_);
   }
-
+  
+public:
+  // // https://github.com/nlohmann/json/issues/1324
+  //friend void to_json(nlohmann::json& j, const ModelParametersRBFN& p);
+  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& p);
+  void to_json(nlohmann::json& j) const;
+  void from_json(const nlohmann::json& j);
+  
 };
+
+inline void to_json(nlohmann::json& j, const ModelParametersRBFN& p) {
+  p.to_json(j);
+}
+inline void from_json(const nlohmann::json& j, ModelParametersRBFN& p) {
+  p.from_json(j);
+}
 
 }
 

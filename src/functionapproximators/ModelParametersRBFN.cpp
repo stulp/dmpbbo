@@ -32,6 +32,8 @@
 
 #include <eigen3/Eigen/Core>
 
+#include "functionapproximators/eigen_conversion.hpp"
+
 
 using namespace std;
 using namespace Eigen;
@@ -218,6 +220,36 @@ UnifiedModel* ModelParametersRBFN::toUnifiedModel(void) const
   bool normalized_basis_functions = false;
   return new UnifiedModel(centers_, widths_, weights_,normalized_basis_functions); 
 }
+
+void ModelParametersRBFN::to_json(nlohmann::json& j) const {
+    j = nlohmann::json{
+      {"centers", centers_},
+      {"widths", widths_},
+      {"weights", weights_}
+    };
+}
+
+void ModelParametersRBFN::from_json(const nlohmann::json& j) {
+  centers_ = j.at("centers").get<MatrixXd>();
+  widths_ = j.at("widths").get<MatrixXd>();
+  weights_ = j.at("weights").get<VectorXd>();
+}
+
+/*
+void to_json(nlohmann::json& j, const ModelParametersRBFN& mp) {
+    j = nlohmann::json{
+      {"centers", mp.centers_},
+      {"widths", mp.widths_},
+      {"weights", mp.weights_}
+    };
+}
+
+void from_json(const nlohmann::json& j, ModelParametersRBFN& p) {
+  p.centers_ = j.at("centers").get<MatrixXd>();
+  p.widths_ = j.at("widths").get<MatrixXd>();
+  p.weights_ = j.at("weights").get<VectorXd>();
+}
+*/
 
 }
 
