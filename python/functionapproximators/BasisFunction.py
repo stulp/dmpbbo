@@ -33,12 +33,7 @@ class Gaussian:
         kernel_activations = np.ones([n_samples,n_basis_functions])
   
         if normalized_basis_functions and n_basis_functions==1:
-            # Locally Weighted Regression with only one basis function is pretty odd.
-            # Essentially, you are taking the "Locally Weighted" part out of the regression, and it becomes
-            # standard least squares 
-            # Anyhow, for those that still want to "abuse" LWR as R (i.e. without LW), we explicitly
-            # set the normalized kernels to 1 here, to avoid numerical issues in the normalization below.
-            # (normalizing a Gaussian basis function with itself leads to 1 everywhere).
+            # Normalizing one Gaussian basis function with itself leads to 1 everywhere.
             kernel_activations.fill(1.0)
             return kernel_activations
   
