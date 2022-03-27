@@ -28,17 +28,19 @@ class FunctionApproximatorLWR(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
         
-        self._meta_params = {
+        meta_params = {
             'n_basis_functions_per_dim': n_basis_functions_per_dim,
             'intersection_height': intersection_height,
             'regularization': regularization,
         }
 
-        # Initialize model parameters with empty lists
-        labels = ['centers','widths','slopes','offsets']
-        self._model_params = {label: [] for label in labels}
-        
-        self._selected_values_labels = ['slopes','offsets']
+        super().__init__(meta_params)
+
+    def getSelectableParameters(self):
+        return ['centers','widths','slopes','offsets']
+
+    def getSelectableParametersRecommended(self):
+        return ['slopes','offsets']
         
     def train(self,inputs,targets):
 
@@ -50,19 +52,21 @@ class FunctionApproximatorLWR(FunctionApproximator):
         (centers,widths) = getCentersAndWidths(min_vals, max_vals, n_bfs_per_dim, height)
        
         # Get the activations of the basis functions 
+        self._model_params = {}
         self._model_params['widths'] = widths
         self._model_params['centers'] = centers
-        activations = self.getActivations(inputs)
 
         # Parameters for the weighted least squares regressions
         use_offset = True
         n_kernels = np.prod(n_bfs_per_dim)
-        n_betas = 1
+        n_dims = centers.shape[1]
+        n_betas = n_dims
         if (use_offset):
             n_betas += 1
         betas = np.ones([n_kernels,n_betas])
         
         # Perform one weighted least squares regression for each kernel
+        activations = self.getActivations(inputs)
         reg = self._meta_params['regularization']
         for i_kernel in range(n_kernels):
             weights = activations[:,i_kernel]
@@ -86,7 +90,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         offsets = self._model_params['offsets']
         
         # Compute the line segments
-        n_lines = self._model_params['offsets'].size 
+        n_lines = offsets.size 
         n_samples = inputs.shape[0]
         lines = np.zeros([n_samples,n_lines])
         for i_line in range(n_lines):
@@ -98,6 +102,8 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
 
     def predict(self,inputs):
+        if not self.isTrained():
+            raise ValueError('FunctionApproximator is not trained.')
 
         if inputs.ndim==1:
             # Otherwise matrix multiplication below will not work
@@ -111,6 +117,3 @@ class FunctionApproximatorLWR(FunctionApproximator):
         
         outputs = (lines*activations).sum(axis=1)
         return outputs
-        
-    def isTrained(self):
-        return len(self._model_params['offsets'])>0

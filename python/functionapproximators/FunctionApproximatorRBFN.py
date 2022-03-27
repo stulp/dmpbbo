@@ -28,18 +28,19 @@ class FunctionApproximatorRBFN(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.7, regularization=0.0):
         
-        self._meta_params = {
+        meta_params = {
             'n_basis_functions_per_dim': n_basis_functions_per_dim,
             'intersection_height': intersection_height,
             'regularization': regularization,
         }
 
-        # Initialize model parameters with empty lists
-        labels = ['centers','widths','weights']
-        self._model_params = {label: [] for label in labels}
-        
-        self._selected_values_labels = ['weights']
-                
+        super().__init__(meta_params)
+
+    def getSelectableParameters(self):
+        return ['centers','widths','weights']
+
+    def getSelectableParametersRecommended(self):
+        return ['weights']
         
     def train(self,inputs,targets):
         
@@ -51,13 +52,14 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         (centers,widths) = getCentersAndWidths(min_vals, max_vals, n_bfs_per_dim, height)
 
         # Get the activations of the basis functions 
+        self._model_params = {}
         self._model_params['centers'] = centers
         self._model_params['widths'] = widths
-        activations = self.getActivations(inputs)
         
         # Perform one least squares regression
         use_offset = False
         reg = self._meta_params['regularization']
+        activations = self.getActivations(inputs)
         weights = leastSquares(activations,targets,use_offset,reg)
         self._model_params['weights'] = np.atleast_2d(weights).T
     
@@ -70,6 +72,8 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         return activations
 
     def predict(self,inputs):
+        if not self.isTrained():
+            raise ValueError('FunctionApproximator is not trained.')
 
         if inputs.ndim==1:
             # Otherwise matrix multiplication below will not work
@@ -83,9 +87,4 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         for ii in range(n_basis_functions):
             outputs[:,ii] = outputs[:,ii]*self._model_params['weights'][ii]
             
-        outputs = outputs.sum(axis=1)
-            
-        return outputs
-        
-    def isTrained(self):
-        return len(self._model_params['weights'])>0
+        return outputs.sum(axis=1)

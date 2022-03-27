@@ -91,7 +91,7 @@ def train(fa_name,n_dims):
     fig = plt.figure(figsize=(7,7))
     fig.canvas.set_window_title(fa_name)
     ax = fig.add_subplot(111) if n_dims==1 else fig.add_subplot(111,projection='3d')
-    ax.set_title('Python')
+    ax.set_title(fa_name+" "+str(n_dims)+"D")
     plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_per_dim_grid)
     plotDataResiduals(inputs,targets,outputs,ax)
     plotDataTargets(inputs,targets,ax)
@@ -103,10 +103,7 @@ def train(fa_name,n_dims):
 if __name__=='__main__':
     """Run some training sessions and plot results."""
     
-    for fa_name in ["LWR"]:
-        for n_dims in [1]:
-            train(fa_name,n_dims)
-    for fa_name in ["RBFN"]:
+    for fa_name in ["RBFN","LWR"]:
         for n_dims in [1,2]:
             train(fa_name,n_dims)
         
