@@ -76,6 +76,18 @@ class FunctionApproximatorLWR(FunctionApproximator):
         self._model_params['offsets'] = np.atleast_2d(betas[:,-1]).T
         self._model_params['slopes'] = np.atleast_2d(betas[:,0:-1])
 
+    def isTrained(self):
+        """Determine whether the function approximator has already been trained with data or not.
+        
+        Returns:
+            bool: True if the function approximator has already been trained, False otherwise.
+        """
+        if not self._model_params:
+            return False
+        if not 'offsets' in self._model_params:
+            return False
+        return True
+        
     def getActivations(self,inputs):
         normalize_activations = True
         activations = Gaussian.activations(self._model_params['centers'],self._model_params['widths'],inputs,normalize_activations)

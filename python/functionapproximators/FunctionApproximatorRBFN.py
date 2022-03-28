@@ -1,6 +1,6 @@
 # This file is part of DmpBbo, a set of libraries and programs for the 
 # black-box optimization of dynamical movement primitives.
-# Copyright (C) 2018 Freek Stulp
+# Copyright (C) 2018, 2022 Freek Stulp
 # 
 # DmpBbo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -27,6 +27,13 @@ from functionapproximators.leastSquares import *
 class FunctionApproximatorRBFN(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.7, regularization=0.0):
+        """Initialiaze an RBNF function approximator.
+
+        Args:
+            n_basis_functions_per_dim Number of basis functions per input dimension.
+            intersection_height The relative value at which two neighbouring basis functions will intersect (default=0.7)
+            regularization Regularization parameter (default=0.0)
+            """
         
         meta_params = {
             'n_basis_functions_per_dim': n_basis_functions_per_dim,
@@ -43,7 +50,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         return ['weights']
         
     def train(self,inputs,targets):
-        
+
         # Determine the centers and widths of the basis functions, given the input data range
         min_vals = inputs.min(axis=0)
         max_vals = inputs.max(axis=0)
@@ -64,12 +71,35 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         self._model_params['weights'] = np.atleast_2d(weights).T
     
 
+    def isTrained(self):
+        """Determine whether the function approximator has already been trained with data or not.
+        
+        Returns:
+            bool: True if the function approximator has already been trained, False otherwise.
+        """
+        if not self._model_params:
+            return False
+        if not 'weights' in self._model_params:
+            return False
+        return True
+        
     def getActivations(self,inputs):
+        """Get the activations of the basis functions.
+        
+        Uses the centers and widths in the model parameters.
+        
+        Args:
+            inputs (numpy.ndarray): Input values of the query.
+            
+        Raises:
+            ValueError if the function approximator is not yet trained.
+        """
         normalize_activations = False
         centers = self._model_params['centers']
         widths = self._model_params['widths']
         activations = Gaussian.activations(centers,widths,inputs,normalize_activations)
         return activations
+
 
     def predict(self,inputs):
         if not self.isTrained():

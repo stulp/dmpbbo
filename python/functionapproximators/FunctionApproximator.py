@@ -65,12 +65,7 @@ class FunctionApproximator(Parameterizable):
         Returns:
             bool: True if the function approximator has already been trained, False otherwise.
         """
-        if not self._model_params:
-            return False
-        label = self.getSelectableParametersRecommended()[0] # Get first valid label
-        if not label in self._model_params:
-            return False
-        return len(self._model_params[label])>0
+        raise NotImplementedError('subclasses must override isTrained()!')
 
     def setSelectedParameters(self,selected_param_labels):
         """Implements abstract function from the Parameterizable abstract class.

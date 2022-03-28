@@ -21,7 +21,17 @@ import numpy.matlib
 class Gaussian:
     
     def activations(centers, widths, inputs, normalized_basis_functions=False):
-
+        """Get the kernel activations for given centers, widths and inputs.
+        
+        Args:
+            centers: The center of the basis function (size: n_basis_functions X n_dims)
+            widths: The width of the basis function (size: n_basis_functions X n_dims)
+            inputs: The input data (size: n_samples X n_dims)
+            normalized_basis_functions: Whether to normalize the basis functions (default=False)
+            
+        Returns:
+            The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
+         """
         n_basis_functions = centers.shape[0]
         n_dims            = centers.shape[1]
         if n_dims==1:
@@ -68,7 +78,19 @@ class Gaussian:
         return kernel_activations
         
         
-def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height):
+def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height=0.7):
+    """Get the centers and widths of basis functions.
+    
+    Args:
+        mins: Minimum values of input data (one value for each dimension).
+        maxs: Maximum values of input data (one value for each dimension).
+        n_bfs_per_dim: Number of basis functions per input dimension.
+        intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
+    
+    Returns:
+        centers Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
+        widths Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
+    """
     mins = np.atleast_1d(mins) 
     maxs = np.atleast_1d(maxs) 
     n_dims = len(mins)

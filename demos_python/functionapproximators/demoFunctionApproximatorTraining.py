@@ -67,7 +67,9 @@ def train(fa_name,n_dims):
     
     # Initialize function approximator
     if fa_name=="LWR":
-        intersection = 0.5;
+        # This value for intersection is quite low. But for the demo it is nice
+        # because it makes the linear segments quite obvious.
+        intersection = 0.2;
         fa = FunctionApproximatorLWR(n_rfs,intersection)
     else:
         intersection = 0.7;

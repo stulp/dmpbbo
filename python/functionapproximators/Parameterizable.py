@@ -19,21 +19,29 @@ class Parameterizable:
     
 
     def getSelectableParameters(self):
+        """Return the names of the parameters that can be selected.
+        """
         raise NotImplementedError('subclasses must override getSelectableParameters()!')
 
     def getSelectableParametersRecommended(self):
+        """Return the names of the parameters that recommended to be selected.
+        """
         raise NotImplementedError('subclasses must override getSelectableParametersRecommended()!')
         
     def setSelectedParameters(selected_values_labels):
+        """Set the selected parameters."""
         raise NotImplementedError('subclasses must override setSelectedParameters()!')
   
     def getParameterVectorSelected(self):
+        """Get a vector containing the values of the selected parameters."""
         raise NotImplementedError('subclasses must override getParameterVectorSelected()!')
     
     def setParameterVectorSelected(self,values):
+        """Set a vector containing the values of the selected parameters."""
         raise NotImplementedError('subclasses must override setParameterVectorSelected()!')
         
     def getParameterVectorSelectedSize(self):
+        """Get the size of the vector containing the values of the selected parameters."""
         raise NotImplementedError('subclasses must override getParameterVectorSelectedSize()!')
         
         
