@@ -24,24 +24,47 @@ sys.path.append(lib_path)
 from functionapproximators.Parameterizable import Parameterizable
 
 class FunctionApproximator(Parameterizable):
+    """Base class for all function approximators.
+
+    See https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md
+    """
     
     def __init__(self,meta_params):
         """Initialize a function approximator with meta- and optionally model-parameters
         
-        Keyword arguments:
-        meta_parameters -- The meta-parameters for the training algorithm 
+        Args:
+           meta_parameters (dict): The meta-parameters for the training algorithm 
         """
         self._meta_params = meta_params
         self._model_params = None
         self._selected_param_labels = self.getSelectableParametersRecommended()
         
     def train(self,inputs,targets):
+        """Train the function approximator with input and target examples.
+        
+        Args:
+            inputs (numpy.ndarray): Input values of the training examples.
+            targets (numpy.ndarray): Target values of the training examples.
+        """
         raise NotImplementedError('subclasses must override train()!')
 
     def predict(self,inputs):
+        """Query the function approximator to make a prediction.
+        
+        Args:
+            inputs (numpy.ndarray): Input values of the query.
+            
+        Returns:
+            numpy.ndarray: Predicted output values.
+        """
         raise NotImplementedError('subclasses must override predict()!')
         
     def isTrained(self):
+        """Determine whether the function approximator has already been trained with data or not.
+        
+        Returns:
+            bool: True if the function approximator has already been trained, False otherwise.
+        """
         if not self._model_params:
             return False
         label = self.getSelectableParametersRecommended()[0] # Get first valid label
@@ -50,6 +73,8 @@ class FunctionApproximator(Parameterizable):
         return len(self._model_params[label])>0
 
     def setSelectedParameters(self,selected_param_labels):
+        """Implements abstract function from the Parameterizable abstract class.
+        """
         selectable_param_labels = self.getSelectableParameters()
         self._selected_param_labels = []   
         for label in selected_param_labels:
@@ -59,6 +84,8 @@ class FunctionApproximator(Parameterizable):
                 self._selected_param_labels.append(label)
                 
     def getParameterVectorSelected(self):
+        """Implements abstract function from the Parameterizable abstract class.
+        """
         if not self.isTrained():
             raise ValueError('FunctionApproximator is not trained.')
             
@@ -68,6 +95,8 @@ class FunctionApproximator(Parameterizable):
         return np.asarray(values)
             
     def setParameterVectorSelected(self,values):
+        """Implements abstract function from the Parameterizable abstract class.
+        """
         if not self.isTrained():
             raise ValueError('FunctionApproximator is not trained.')
             
@@ -83,6 +112,8 @@ class FunctionApproximator(Parameterizable):
             offset += cur_n_values
             
     def getParameterVectorSelectedSize(self):
+        """Implements abstract function from the Parameterizable abstract class.
+        """
         size = 0
         for label in self._selected_param_labels:
             if label in self._model_params:
