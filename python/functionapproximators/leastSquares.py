@@ -63,7 +63,7 @@ def weightedLeastSquares(inputs, targets, weights, use_offset=True, regularizati
     else:
         X = inputs
   
-    if min_weight<=10000.0: # Still need to implement this and set it to 0
+    if True: # min_weight<=0.0: # Still need to implement this
   
         # Weights matrix
         W = np.diagflat(weights)
@@ -108,8 +108,9 @@ def weightedLeastSquares(inputs, targets, weights, use_offset=True, regularizati
         #                   1.0 1.0  1.0  ]^T  (design matrix, last column = 1)
         #    targets_sub = [0.4 0.5  0.6  ]
         # 
-        # Why all this trouble? Because the submatrices will often be much smaller than the full
-        # ones, so they are much faster to invert (note the .inverse() call)
+        # Why all this trouble? Because the submatrices will often be much 
+        # smaller than the full  ones, so they are much faster to invert (note the
+        # .inverse() call)
         
         #// Get a vector where 1 represents that weights >= min_weight, and 0 otherswise
         #VectorXi large_enough = (weights.array() >= min_weight).select(VectorXi::Ones(weights.size()), VectorXi::Zero(weights.size()));

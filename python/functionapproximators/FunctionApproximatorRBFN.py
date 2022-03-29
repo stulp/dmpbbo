@@ -90,18 +90,17 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         
         Args:
             inputs (numpy.ndarray): Input values of the query.
-            
-        Raises:
-            ValueError if the function approximator is not yet trained.
         """
-        normalize_activations = False
+        normalize = False
         centers = self._model_params['centers']
         widths = self._model_params['widths']
-        activations = Gaussian.activations(centers,widths,inputs,normalize_activations)
+        activations = Gaussian.activations(centers,widths,inputs,normalize)
         return activations
 
 
     def predict(self,inputs):
+        """Implements abstract function FunctionApproximator
+        """
         if not self.isTrained():
             raise ValueError('FunctionApproximator is not trained.')
 

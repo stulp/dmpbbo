@@ -89,8 +89,17 @@ class FunctionApproximatorLWR(FunctionApproximator):
         return True
         
     def getActivations(self,inputs):
-        normalize_activations = True
-        activations = Gaussian.activations(self._model_params['centers'],self._model_params['widths'],inputs,normalize_activations)
+        """Get the activations of the basis functions.
+        
+        Uses the centers and widths in the model parameters.
+        
+        Args:
+            inputs (numpy.ndarray): Input values of the query.
+        """
+        normalize = True
+        centers = self._model_params['centers']
+        widths = self._model_params['widths']
+        activations = Gaussian.activations(centers,widths,inputs,normalize)
         return activations
         
     def getLines(self,inputs):

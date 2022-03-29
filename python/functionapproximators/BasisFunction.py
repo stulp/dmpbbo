@@ -21,7 +21,7 @@ import numpy.matlib
 class Gaussian:
     
     def activations(centers, widths, inputs, normalized_basis_functions=False):
-        """Get the kernel activations for given centers, widths and inputs.
+        """Get the activations for given centers, widths and inputs.
         
         Args:
             centers: The center of the basis function (size: n_basis_functions X n_dims)
@@ -88,8 +88,8 @@ def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height=0.7):
         intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
     
     Returns:
-        centers Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
-        widths Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
+        centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
+        widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
     """
     mins = np.atleast_1d(mins) 
     maxs = np.atleast_1d(maxs) 
