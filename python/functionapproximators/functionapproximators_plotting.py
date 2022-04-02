@@ -206,8 +206,9 @@ def plotBasisFunctions(inputs,activations,ax,n_samples_per_dim,cosine_basis_func
         colormap = plt.cm.Set1
         colors = [colormap(i) for i in numpy.linspace(0, 0.9, n_basis_functions)]
 
-        inputs_0_on_grid = numpy.reshape(inputs[:,0],n_samples_per_dim)
-        inputs_1_on_grid = numpy.reshape(inputs[:,1],n_samples_per_dim)
+        n = n_samples_per_dim
+        inputs_0_on_grid = inputs[:,0].reshape(n,n)
+        inputs_1_on_grid = inputs[:,1].reshape(n,n)
         lines = [];
         values_range = numpy.amax(activations)-numpy.amin(activations)
         for i_basis_function in basis_functions_to_plot:
@@ -215,7 +216,7 @@ def plotBasisFunctions(inputs,activations,ax,n_samples_per_dim,cosine_basis_func
           cur_activations = activations[:,i_basis_function];
           # Make plotting easier by leaving out small numbers
           cur_activations[numpy.abs(cur_activations)<values_range*0.001] = numpy.nan 
-          activations_on_grid = numpy.reshape(cur_activations,n_samples_per_dim)
+          activations_on_grid = cur_activations.reshape(n,n)
           cur_lines = ax.plot_wireframe(inputs_0_on_grid,inputs_1_on_grid,activations_on_grid,linewidth=0.5,rstride=1, cstride=1, color=cur_color)
           lines.append(cur_lines) 
           

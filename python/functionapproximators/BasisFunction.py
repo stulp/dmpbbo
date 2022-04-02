@@ -35,7 +35,7 @@ class Gaussian:
          
         n_samples         = inputs.shape[0]
         n_basis_functions = centers.shape[0]
-        n_dims = centers.shape[1] if len(centers.shape)>1 else 1
+        n_dims = centers.ndim
 
         if (n_dims==1):
             # Make sure arguments have shape (N,1) not (N,) 
@@ -77,7 +77,7 @@ class Gaussian:
                     else:
                         # Standard case, normalize so that they sum to 1.0
                         kernel_activations[i_sample,i_basis] /= sum_kernel_activations
-                        
+                    
         return kernel_activations
         
         
