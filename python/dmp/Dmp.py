@@ -192,6 +192,16 @@ class Dmp(DynamicalSystem,Parameterizable):
         return (x,xd)
 
     def differentialEquation(self,x):
+        """The differential equation which defines the system.
+   
+        It relates state values to rates of change of those state values
+        
+        Args:
+            x - current state (column vector of size dim() X 1)
+            
+        Returns:
+            Rate of change in state (column vector of size dim() X 1)
+        """
         n_dims = self.dim_
         
         xd = np.zeros(x.shape)
@@ -242,6 +252,14 @@ class Dmp(DynamicalSystem,Parameterizable):
 
 
     def computeFunctionApproximatorOutput(self,phase_state):
+        """Compute the outputs of the function approximators.
+        
+        Args:
+            phase_state The phase states for which the outputs are computed.
+            
+        Returns:
+            The outputs of the function approximators.
+        """
         n_time_steps = phase_state.size
         n_dims = self.dim_orig_
         fa_output = np.zeros([n_time_steps,n_dims])
@@ -257,6 +275,18 @@ class Dmp(DynamicalSystem,Parameterizable):
         return fa_output
         
     def analyticalSolution(self,ts=None):
+        """Return analytical solution of the system at certain times
+
+        Args:
+            ts - A vector of times for which to compute the analytical solutions.
+            If None is passed, the ts vector from the trajectory used to train the DMP is used.
+        
+        Returns:
+            xs - Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+            xds - Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+            
+        The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
+        """
         if ts is None:
             if self.ts_train_ is None:
                 print("Neither the argument 'ts' nor the member variable self.ts_train_ was set. Returning None.")
@@ -369,7 +399,11 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         
     def train(self,trajectory):
-  
+        """Train a DMP with a trajectory.
+        
+        Args:
+            trajectory - The trajectory with which to train the DMP.
+        """
         # Set tau, initial_state and attractor_state from the trajectory 
         self.set_tau(trajectory.ts_[-1])
         self.set_initial_state(trajectory.ys_[0,:])
@@ -393,6 +427,18 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.ts_train_ = trajectory.ts_
             
     def computeFunctionApproximatorInputsAndTargets(self,trajectory):
+        """Given a trajectory, compute the inputs and targets for the function approximators.
+   
+        For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the gating function factored out).
+        
+        Args:
+            trajectory - Trajectory, e.g. a demonstration.
+            
+        Returns:
+            fa_inputs_phase - The inputs for the function approximators (phase signal)
+            fa_targets - The targets for the function approximators (forcing term)
+        """
+        
         n_time_steps = trajectory.ts_.size
         dim_data = trajectory.dim_
         assert(self.dim_orig_==dim_data)
@@ -433,10 +479,42 @@ class Dmp(DynamicalSystem,Parameterizable):
         return  (fa_inputs_phase, f_target)
 
     def statesAsTrajectory(self,ts, x_in, xd_in):
-      
+        """Get the output of a DMP dynamical system as a trajectory.
+        
+        As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and gating system. What we are most interested in is the output of the spring system. This function extracts that information, and also computes the accelerations of the spring system, which are only stored implicitely in xd_in because second order systems are converted to first order systems with expanded state.
+
+        Args:
+            ts    - A vector of times 
+            x_in  - State vector over time
+            xd_in - State vector over time (rates of change)
+            
+        Return:
+            Trajectory representation of the DMP state vector output.
+        """
         # Left column is time
         return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self.tau_)
   
+    def set_initial_state(self,initial_state):
+        assert(initial_state.size==self.dim_orig_)
+        super(Dmp,self).set_initial_state(initial_state);
+        
+        # Set value in all relevant subsystems also  
+        self.spring_system_.set_initial_state(initial_state);
+        if self.goal_system_:
+            self.goal_system_.set_initial_state(initial_state);
+        
+    def set_attractor_state(self,attractor_state):
+        assert(attractor_state.size==self.dim_orig_)
+        super(Dmp,self).set_attractor_state(attractor_state);
+  
+        # Set value in all relevant subsystems also  
+        if self.goal_system_:
+            self.goal_system_.set_attractor_state(attractor_state);
+        
+        # Do NOT do the following. The attractor state of the spring system is determined by the
+        # goal system
+        # self.spring_system_.set_attractor_state(attractor_state);
+        
     def getParameterVectorSelected(self):
         values = np.empty(0)
         for fa in self.function_approximators_:
@@ -462,24 +540,4 @@ class Dmp(DynamicalSystem,Parameterizable):
                 size += fa.getParameterVectorSelectedSize()
         return size
 
-    def set_initial_state(self,initial_state):
-        assert(initial_state.size==self.dim_orig_)
-        super(Dmp,self).set_initial_state(initial_state);
-        
-        # Set value in all relevant subsystems also  
-        self.spring_system_.set_initial_state(initial_state);
-        if self.goal_system_:
-            self.goal_system_.set_initial_state(initial_state);
-        
-    def set_attractor_state(self,attractor_state):
-        assert(attractor_state.size==self.dim_orig_)
-        super(Dmp,self).set_attractor_state(attractor_state);
-  
-        # Set value in all relevant subsystems also  
-        if self.goal_system_:
-            self.goal_system_.set_attractor_state(attractor_state);
-        
-        # Do NOT do the following. The attractor state of the spring system is determined by the
-        # goal system
-        # self.spring_system_.set_attractor_state(attractor_state);
     
