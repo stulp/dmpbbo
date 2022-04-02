@@ -44,6 +44,7 @@ if __name__=='__main__':
                 centers = np.linspace(0.0,2.0,n_centers)
                 widths = 0.3*np.ones(n_centers)
                 inputs = np.linspace(-0.5,2.5,n_samples)
+                n_samples_per_dim = n_samples
                 
             else:
                 x = np.linspace(0.0, 2.0, n_centers)
@@ -55,6 +56,8 @@ if __name__=='__main__':
                 xv, yv = np.meshgrid(x, x)
                 inputs = np.column_stack((xv.flatten(), yv.flatten()))
                 
+                n_samples_per_dim = [n_samples, n_samples]
+                
             kernel_acts =  Gaussian.activations(centers, widths, inputs, normalized)
             
             subplot = 220 + n_dims + (0 if normalized else 2)
@@ -63,7 +66,7 @@ if __name__=='__main__':
             else:
                 ax = fig.add_subplot(subplot,projection='3d')
         
-            plotBasisFunctions(inputs,kernel_acts,ax,n_samples)
+            plotBasisFunctions(inputs,kernel_acts,ax,n_samples_per_dim)
           
     plt.show()
 
