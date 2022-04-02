@@ -27,6 +27,8 @@ class DynamicalSystem:
 
     def __init__(self,  order, tau, initial_state, attractor_state, name):
         assert(order==1 or order==2)
+        initial_state = np.atleast_1d(initial_state)
+        attractor_state = np.atleast_1d(attractor_state)
         assert(initial_state.shape==attractor_state.shape)
         
         # For 1st order systems, the dimensionality of the state vector 'x' is

@@ -55,13 +55,24 @@ if __name__=="__main__":
         y_attr = np.linspace(4.0,3.0,n_dims)
     
         # initialize function approximators with random values
-        function_apps = [ FunctionApproximatorRBFN(8), FunctionApproximatorRBFN(9)]
-        for fa in function_apps:
+        function_apps = []
+        intersection_height=0.9
+        for n_basis in [8,9]:
+            
+            fa = FunctionApproximatorRBFN(n_basis,intersection_height)
             fa.train(np.linspace(0,1,100),np.zeros(100))
-            #fa.model_offsets_ = 10*np.random.normal(size=fa.model_offsets_.size)
-        
+            
+            fa.setSelectedParameters('weights')
+            random_weights = 0*np.random.normal(0,1,n_basis)
+            fa.setParameterVectorSelected(random_weights)
+
+            function_apps.append(fa)
+
+
         # Initialize Dmp
         dmp = Dmp(tau, y_init, y_attr, function_apps)
+        dmp.setSelectedParameters('weights')
+        #dmp.setSelectedParameters(['goal','weights'])
     
         # Make the task
         viapoint = 3*np.ones(n_dims)

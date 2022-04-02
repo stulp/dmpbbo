@@ -44,11 +44,13 @@ if __name__=='__main__':
     traj = Trajectory.generatePolynomialTrajectoryThroughViapoint(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
     
 
-    #function_apps = [None]*n_dims
     function_apps = [ FunctionApproximatorLWR(10), FunctionApproximatorLWR(10)]
-    dmp = Dmp(tau, y_init, y_attr, function_apps)
-    
-    dmp.train(traj)
+    name='Dmp'
+    #dmp_type='IJSPEERT_2002_MOVEMENT'
+    dmp_type='KULVICIUS_2012_JOINING'
+    #dmp_type='COUNTDOWN_2013'
+    #function_apps = None
+    dmp = Dmp.from_traj(traj, function_apps, name, dmp_type)
 
     tau_exec = 0.7
     n_time_steps = 71

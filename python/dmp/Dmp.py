@@ -36,40 +36,122 @@ from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 class Dmp(DynamicalSystem,Parameterizable):
 
-    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20,forcing_term_scaling="NO_SCALING"):        
+    def __init__(self, 
+        tau, 
+        y_init, y_attr,
+        function_approximators=None,
+        name='Dmp',
+        sigmoid_max_rate=-20,
+        forcing_term_scaling='NO_SCALING',
+        alpha_spring_damper=20.0, 
+        phase_system=None, gating_system=None, goal_system=None, 
+        ):
+        """Initialize a DMP with function approximators and subsystems 
+        
+        Args:
+            tau           - Time constant
+            y_init        - Initial state
+            y_attr        - Attractor state
+            function_approximators - Function approximators for the forcing term
+            name          - name of the Dmp (for debugging and saving)
+            forcing_term_scaling - Which method to use for scaling the forcing term
+                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+            alpha_spring_damper - \f$\alpha\f$ in the spring-damper system of the dmp
+            goal_system   - Dynamical system to compute delayed goal
+            phase_system  - Dynamical system to compute the phase
+            gating_system - Dynamical system to compute the gating term
+        """
         
         super().__init__(1, tau, y_init, y_attr, name)
         
         dim_orig = self.dim_orig_
 
-        self.goal_system_  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
-        self.gating_system_ = SigmoidSystem(tau,np.ones(1),sigmoid_max_rate,0.9*tau,'gating') 
-        self.phase_system_  = TimeSystem(tau,False,'phase')
-        alpha = 20.0
-        self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
-        
-        self.function_approximators_ = function_apps
+        self.function_approximators_ = function_approximators
         
         self.forcing_term_scaling_ = forcing_term_scaling
+ 
+        self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha_spring_damper)
+        
+        # Set defaults for subsystems if necessary
+        if not phase_system:
+            phase_system = TimeSystem(tau,False,'phase')
+        if not gating_system:
+            o = np.ones(1)
+            gating_system = SigmoidSystem(tau,o,sigmoid_max_rate,0.9*tau,'gating') 
+        if goal_system:
+            goal_system  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
+            
+        self.phase_system_ = phase_system
+        self.gating_system_ = gating_system
+        self.goal_system_ = goal_system
         
         self.ts_train_ = None
 
-        # Make room for the subsystems
         self.dim_ = 3*dim_orig+2
-        
+
+        self.goal_selected = False
+
         self.SPRING    = np.arange(0*dim_orig+0, 0*dim_orig+0 +2*dim_orig)
         self.SPRING_Y  = np.arange(0*dim_orig+0, 0*dim_orig+0 +dim_orig)
         self.SPRING_Z  = np.arange(1*dim_orig+0, 1*dim_orig+0 +dim_orig)
         self.GOAL      = np.arange(2*dim_orig+0, 2*dim_orig+0 +dim_orig)
         self.PHASE     = np.arange(3*dim_orig+0, 3*dim_orig+0 +       1)
         self.GATING    = np.arange(3*dim_orig+1, 3*dim_orig+1 +       1)
-        #print(self.SPRING)
-        #print(self.SPRING_Y)
-        #print(self.SPRING_Z)
-        #print(self.GOAL)
-        #print(self.PHASE)
-        #print(self.GATING)
+        
+    @classmethod
+    def from_traj(cls,
+        trajectory,
+        function_approximators,
+        name='Dmp',
+        dmp_type='KULVICIUS_2012_JOINING',
+        forcing_term_scaling='NO_SCALING'
+        ):
+        """Initialize a DMP by training it from a trajectory. 
+        
+        Args:
+            trajectory    - the trajectory to train on
+            function_approximators - Function approximators for the forcing term
+            name          - name of the Dmp (for debugging and saving)
+            dmp_type      - Type of the Dmp
+                ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
+            forcing_term_scaling - Which method to use for scaling the forcing term
+                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+            phase_system  - Dynamical system to compute the phase
+            gating_system - Dynamical system to compute the gating term
+        """
+        
+        # Relevant variables from trajectory
+        tau = trajectory.ts_[-1]
+        y_init = trajectory.ys_[0,:]
+        y_attr = trajectory.ys_[-1,:]
+        
+        # Initialize dynamical systems
 
+        if dmp_type=='IJSPEERT_2002_MOVEMENT':
+            goal_system   = None
+            phase_system  = ExponentialSystem(tau,1,0,4)
+            gating_system = ExponentialSystem(tau,1,0,4)
+            
+        elif dmp_type in ['KULVICIUS_2012_JOINING','COUNTDOWN_2013']:
+            goal_system   = ExponentialSystem(tau,y_init,y_attr,15)
+            gating_system = SigmoidSystem(tau,1,-10,0.9*tau)
+            count_down = dmp_type=='COUNTDOWN_2013'
+            phase_system  = TimeSystem(tau,count_down);
+
+        alpha_spring_damper=20.0
+        dmp = cls(
+            tau, 
+            y_init, y_attr,
+            function_approximators,
+            'Dmp',
+            None,
+            forcing_term_scaling,
+            alpha_spring_damper, 
+            phase_system, gating_system, goal_system)
+      
+        dmp.train(trajectory)
+      
+        return dmp
         
     def set_tau(self,tau):
         
@@ -109,6 +191,16 @@ class Dmp(DynamicalSystem,Parameterizable):
         return (x,xd)
 
     def differentialEquation(self,x):
+        """The differential equation which defines the system.
+   
+        It relates state values to rates of change of those state values
+        
+        Args:
+            x - current state (column vector of size dim() X 1)
+            
+        Returns:
+            Rate of change in state (column vector of size dim() X 1)
+        """
         n_dims = self.dim_
         
         xd = np.zeros(x.shape)
@@ -159,9 +251,22 @@ class Dmp(DynamicalSystem,Parameterizable):
 
 
     def computeFunctionApproximatorOutput(self,phase_state):
+        """Compute the outputs of the function approximators.
+        
+        Args:
+            phase_state The phase states for which the outputs are computed.
+            
+        Returns:
+            The outputs of the function approximators.
+        """
         n_time_steps = phase_state.size
         n_dims = self.dim_orig_
         fa_output = np.zeros([n_time_steps,n_dims])
+        
+        if not self.function_approximators_:
+            return fa_output # No function approximators, return zeros
+            
+        
         for i_fa in range(n_dims):
             if self.function_approximators_[i_fa]:
                 if self.function_approximators_[i_fa].isTrained():
@@ -169,6 +274,18 @@ class Dmp(DynamicalSystem,Parameterizable):
         return fa_output
         
     def analyticalSolution(self,ts=None):
+        """Return analytical solution of the system at certain times
+
+        Args:
+            ts - A vector of times for which to compute the analytical solutions.
+            If None is passed, the ts vector from the trajectory used to train the DMP is used.
+        
+        Returns:
+            xs - Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+            xds - Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+            
+        The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
+        """
         if ts is None:
             if self.ts_train_ is None:
                 print("Neither the argument 'ts' nor the member variable self.ts_train_ was set. Returning None.")
@@ -281,7 +398,11 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         
     def train(self,trajectory):
-  
+        """Train a DMP with a trajectory.
+        
+        Args:
+            trajectory - The trajectory with which to train the DMP.
+        """
         # Set tau, initial_state and attractor_state from the trajectory 
         self.set_tau(trajectory.ts_[-1])
         self.set_initial_state(trajectory.ys_[0,:])
@@ -291,12 +412,13 @@ class Dmp(DynamicalSystem,Parameterizable):
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
         self.trajectory_amplitudes_ = trajectory.getRangePerDim()
   
-        (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
-  
-        for dd in range(self.dim_orig_):
+        # Do not train function approximators if there are none
+        if self.function_approximators_:
+            (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
 
-            fa_target = f_target[:,dd]
-            self.function_approximators_[dd].train(fa_input_phase,fa_target)
+            for dd in range(self.dim_orig_):
+                fa_target = f_target[:,dd]
+                self.function_approximators_[dd].train(fa_input_phase,fa_target)
         
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call 
@@ -304,6 +426,18 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.ts_train_ = trajectory.ts_
             
     def computeFunctionApproximatorInputsAndTargets(self,trajectory):
+        """Given a trajectory, compute the inputs and targets for the function approximators.
+   
+        For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the gating function factored out).
+        
+        Args:
+            trajectory - Trajectory, e.g. a demonstration.
+            
+        Returns:
+            fa_inputs_phase - The inputs for the function approximators (phase signal)
+            fa_targets - The targets for the function approximators (forcing term)
+        """
+        
         n_time_steps = trajectory.ts_.size
         dim_data = trajectory.dim_
         assert(self.dim_orig_==dim_data)
@@ -344,35 +478,21 @@ class Dmp(DynamicalSystem,Parameterizable):
         return  (fa_inputs_phase, f_target)
 
     def statesAsTrajectory(self,ts, x_in, xd_in):
-      
+        """Get the output of a DMP dynamical system as a trajectory.
+        
+        As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and gating system. What we are most interested in is the output of the spring system. This function extracts that information, and also computes the accelerations of the spring system, which are only stored implicitely in xd_in because second order systems are converted to first order systems with expanded state.
+
+        Args:
+            ts    - A vector of times 
+            x_in  - State vector over time
+            xd_in - State vector over time (rates of change)
+            
+        Return:
+            Trajectory representation of the DMP state vector output.
+        """
         # Left column is time
         return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self.tau_)
   
-    def getParameterVectorSelected(self):
-        values = np.empty(0)
-        for fa in self.function_approximators_:
-            if fa.isTrained():
-                values = np.append(values,fa.getParameterVectorSelected())
-        return values
-        
-    def setParameterVectorSelected(self,values):
-        size = self.getParameterVectorSelectedSize()
-        assert(len(values)==size)
-        offset = 0
-        for fa in self.function_approximators_:
-            if fa.isTrained():
-                cur_size = fa.getParameterVectorSelectedSize()
-                cur_values = values[offset:offset+cur_size]
-                fa.setParameterVectorSelected(cur_values)                
-                offset += cur_size
-            
-    def getParameterVectorSelectedSize(self):
-        size = 0
-        for fa in self.function_approximators_:
-            if fa.isTrained():
-                size += fa.getParameterVectorSelectedSize()
-        return size
-
     def set_initial_state(self,initial_state):
         assert(initial_state.size==self.dim_orig_)
         super(Dmp,self).set_initial_state(initial_state);
@@ -393,4 +513,57 @@ class Dmp(DynamicalSystem,Parameterizable):
         # Do NOT do the following. The attractor state of the spring system is determined by the
         # goal system
         # self.spring_system_.set_attractor_state(attractor_state);
+        
+    def getSelectableParameters(self):
+        selectable = []
+        for fa in self.function_approximators_:
+            selectable.extend(fa.getSelectableParameters())
+        selectable.append('goal')
+        # Remove duplicates
+        return list(dict.fromkeys(selectable))
+
+    def getSelectableParametersRecommended(self):
+        """Return the names of the parameters that recommended to be selected.
+        """
+        for fa in self.function_approximators_:
+            selectable.extend(fa.getSelectableParameters())
+        # Remove duplicates
+        return list(dict.fromkeys(selectable))
+
+    def setSelectedParameters(self,selected_values_labels):
+        for fa in self.function_approximators_:
+            fa.setSelectedParameters(selected_values_labels)
+        self.goal_selected = "goal" in selected_values_labels
+        
+    def getParameterVectorSelected(self):
+        values = np.empty(0)
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                values = np.append(values,fa.getParameterVectorSelected())
+        if self.goal_selected:
+            values = np.append(values,self.attractor_state_)
+        return values
+        
+    def setParameterVectorSelected(self,values):
+        size = self.getParameterVectorSelectedSize()
+        assert(len(values)==size)
+        offset = 0
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                cur_size = fa.getParameterVectorSelectedSize()
+                cur_values = values[offset:offset+cur_size]
+                fa.setParameterVectorSelected(cur_values)                
+                offset += cur_size
+        if self.goal_selected:
+            self.set_attractor_state(values[offset:offset+self.dim_orig_])
+            
+    def getParameterVectorSelectedSize(self):
+        size = 0
+        for fa in self.function_approximators_:
+            if fa.isTrained():
+                size += fa.getParameterVectorSelectedSize()
+        if self.goal_selected:
+            size += self.dim_orig_
+        return size
+
     

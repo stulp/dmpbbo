@@ -29,6 +29,7 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem#
 class SigmoidSystem(DynamicalSystem):
     
     def __init__(self, tau, y_init, max_rate, inflection_point_time, name="SigmoidSystem"):
+        y_init = np.atleast_1d(y_init)
         y_attr = np.zeros(y_init.shape)
         super().__init__(1, tau, y_init, y_attr, name)
         self.max_rate_ = max_rate
