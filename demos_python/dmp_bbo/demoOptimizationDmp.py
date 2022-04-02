@@ -71,6 +71,8 @@ if __name__=="__main__":
 
         # Initialize Dmp
         dmp = Dmp(tau, y_init, y_attr, function_apps)
+        dmp.setSelectedParameters('weights')
+        #dmp.setSelectedParameters(['goal','weights'])
     
         # Make the task
         viapoint = 3*np.ones(n_dims)
