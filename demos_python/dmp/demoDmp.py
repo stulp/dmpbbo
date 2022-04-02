@@ -26,7 +26,7 @@ sys.path.append(lib_path)
 
 from dmp.dmp_plotting import *
 from dmp.Dmp import *
-from functionapproximators.FunctionApproximatorLWR import *
+from functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__=='__main__':
 
@@ -35,11 +35,20 @@ if __name__=='__main__':
     y_init = np.linspace(0.0,0.7,n_dims)
     y_attr = np.linspace(0.4,0.5,n_dims)
 
-    #function_apps = [None]*n_dims
-    function_apps = [ FunctionApproximatorLWR(5), FunctionApproximatorLWR(6)]
-    for fa in function_apps:
-        fa.train(np.linspace(0,1,100),np.zeros(100))
-        fa.model_offsets_ = 10*np.random.normal(size=fa.model_offsets_.size)
+    function_apps = []
+    for n_basis in [5,6]:
+        
+        fa = FunctionApproximatorRBFN(n_basis)
+        
+        n_samples = 100
+        fa.train(np.linspace(0,1,n_samples),np.zeros(n_samples))
+        
+        fa.setSelectedParameters('weights')
+        random_weights = 10*np.random.normal(0,1,n_basis)
+        fa.setParameterVectorSelected(random_weights)
+        
+        function_apps.append(fa)
+
         
     dmp = Dmp(tau, y_init, y_attr, function_apps)
 

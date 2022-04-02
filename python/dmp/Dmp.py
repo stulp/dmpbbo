@@ -36,40 +36,123 @@ from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 class Dmp(DynamicalSystem,Parameterizable):
 
-    def __init__(self,  tau, y_init, y_attr, function_apps, name="Dmp", sigmoid_max_rate=-20,forcing_term_scaling="NO_SCALING"):        
+    def __init__(self, 
+        tau, 
+        y_init, y_attr,
+        function_approximators=None,
+        name='Dmp',
+        sigmoid_max_rate=-20,
+        forcing_term_scaling='NO_SCALING',
+        alpha_spring_damper=20.0, 
+        phase_system=None, gating_system=None, goal_system=None, 
+        ):
+        """Initialize a DMP with function approximators and subsystems 
+        
+        Args:
+            tau           - Time constant
+            y_init        - Initial state
+            y_attr        - Attractor state
+            function_approximators - Function approximators for the forcing term
+            name          - name of the Dmp (for debugging and saving)
+            forcing_term_scaling - Which method to use for scaling the forcing term
+                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+            alpha_spring_damper - \f$\alpha\f$ in the spring-damper system of the dmp
+            goal_system   - Dynamical system to compute delayed goal
+            phase_system  - Dynamical system to compute the phase
+            gating_system - Dynamical system to compute the gating term
+        """
         
         super().__init__(1, tau, y_init, y_attr, name)
         
         dim_orig = self.dim_orig_
 
-        self.goal_system_  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
-        self.gating_system_ = SigmoidSystem(tau,np.ones(1),sigmoid_max_rate,0.9*tau,'gating') 
-        self.phase_system_  = TimeSystem(tau,False,'phase')
-        alpha = 20.0
-        self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha)
-        
-        self.function_approximators_ = function_apps
+        self.function_approximators_ = function_approximators
         
         self.forcing_term_scaling_ = forcing_term_scaling
+ 
+        self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha_spring_damper)
+        
+        # Set defaults for subsystems if necessary
+        if not phase_system:
+            phase_system = TimeSystem(tau,False,'phase')
+        if not gating_system:
+            o = np.ones(1)
+            gating_system = SigmoidSystem(tau,o,sigmoid_max_rate,0.9*tau,'gating') 
+        if goal_system:
+            goal_system  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
+            
+        self.phase_system_ = phase_system
+        self.gating_system_ = gating_system
+        self.goal_system_ = goal_system
         
         self.ts_train_ = None
 
-        # Make room for the subsystems
         self.dim_ = 3*dim_orig+2
         
+        self.initStateIndices(dim_orig)
+        
+    def initStateIndices(self,dim_orig):
         self.SPRING    = np.arange(0*dim_orig+0, 0*dim_orig+0 +2*dim_orig)
         self.SPRING_Y  = np.arange(0*dim_orig+0, 0*dim_orig+0 +dim_orig)
         self.SPRING_Z  = np.arange(1*dim_orig+0, 1*dim_orig+0 +dim_orig)
         self.GOAL      = np.arange(2*dim_orig+0, 2*dim_orig+0 +dim_orig)
         self.PHASE     = np.arange(3*dim_orig+0, 3*dim_orig+0 +       1)
         self.GATING    = np.arange(3*dim_orig+1, 3*dim_orig+1 +       1)
-        #print(self.SPRING)
-        #print(self.SPRING_Y)
-        #print(self.SPRING_Z)
-        #print(self.GOAL)
-        #print(self.PHASE)
-        #print(self.GATING)
+        
+    @classmethod
+    def from_traj(cls,
+        trajectory,
+        function_approximators,
+        name='Dmp',
+        dmp_type='KULVICIUS_2012_JOINING',
+        forcing_term_scaling='NO_SCALING'
+        ):
+        """Initialize a DMP by training it from a trajectory. 
+        
+        Args:
+            trajectory    - the trajectory to train on
+            function_approximators - Function approximators for the forcing term
+            name          - name of the Dmp (for debugging and saving)
+            dmp_type      - Type of the Dmp
+                ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
+            forcing_term_scaling - Which method to use for scaling the forcing term
+                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+            phase_system  - Dynamical system to compute the phase
+            gating_system - Dynamical system to compute the gating term
+        """
+        
+        # Relevant variables from trajectory
+        tau = trajectory.ts_[-1]
+        y_init = trajectory.ys_[0,:]
+        y_attr = trajectory.ys_[-1,:]
+        
+        # Initialize dynamical systems
 
+        if dmp_type=='IJSPEERT_2002_MOVEMENT':
+            goal_system   = None
+            phase_system  = ExponentialSystem(tau,1,0,4)
+            gating_system = ExponentialSystem(tau,1,0,4)
+            
+        elif dmp_type in ['KULVICIUS_2012_JOINING','COUNTDOWN_2013']:
+            goal_system   = ExponentialSystem(tau,y_init,y_attr,15)
+            gating_system = SigmoidSystem(tau,1,-10,0.9*tau)
+            count_down = dmp_type=='COUNTDOWN_2013'
+            phase_system  = TimeSystem(tau,count_down);
+
+        alpha_spring_damper=20.0
+        dmp = cls(
+            tau, 
+            y_init, y_attr,
+            function_approximators,
+            'Dmp',
+            None,
+            forcing_term_scaling,
+            alpha_spring_damper, 
+            phase_system, gating_system, goal_system)
+      
+        dmp.train(trajectory)
+      
+        return dmp
         
     def set_tau(self,tau):
         
@@ -162,6 +245,11 @@ class Dmp(DynamicalSystem,Parameterizable):
         n_time_steps = phase_state.size
         n_dims = self.dim_orig_
         fa_output = np.zeros([n_time_steps,n_dims])
+        
+        if not self.function_approximators_:
+            return fa_output # No function approximators, return zeros
+            
+        
         for i_fa in range(n_dims):
             if self.function_approximators_[i_fa]:
                 if self.function_approximators_[i_fa].isTrained():
@@ -291,12 +379,13 @@ class Dmp(DynamicalSystem,Parameterizable):
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
         self.trajectory_amplitudes_ = trajectory.getRangePerDim()
   
-        (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
-  
-        for dd in range(self.dim_orig_):
+        # Do not train function approximators if there are none
+        if self.function_approximators_:
+            (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
 
-            fa_target = f_target[:,dd]
-            self.function_approximators_[dd].train(fa_input_phase,fa_target)
+            for dd in range(self.dim_orig_):
+                fa_target = f_target[:,dd]
+                self.function_approximators_[dd].train(fa_input_phase,fa_target)
         
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call 
