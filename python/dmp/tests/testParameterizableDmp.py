@@ -45,11 +45,12 @@ if __name__=='__main__':
     traj = Trajectory.generatePolynomialTrajectoryThroughViapoint(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
     
 
-    #function_apps = [None]*n_dims
     function_apps = [ FunctionApproximatorRBFN(12,0.7), FunctionApproximatorRBFN(10,0.7)]
-    dmp = Dmp(tau, y_init, y_attr, function_apps)
-    
-    dmp.train(traj)
+    dmp = Dmp.from_traj(traj, function_apps)
+    print(dmp.getSelectableParameters())
+    dmp.setSelectedParameters('weights')
+    #dmp.setSelectedParameters('goal')
+    #dmp.setSelectedParameters(['weights','goal'])
 
     tau_exec = 0.7
     n_time_steps = 71

@@ -88,10 +88,9 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.ts_train_ = None
 
         self.dim_ = 3*dim_orig+2
-        
-        self.initStateIndices(dim_orig)
-        
-    def initStateIndices(self,dim_orig):
+
+        self.goal_selected = False
+
         self.SPRING    = np.arange(0*dim_orig+0, 0*dim_orig+0 +2*dim_orig)
         self.SPRING_Y  = np.arange(0*dim_orig+0, 0*dim_orig+0 +dim_orig)
         self.SPRING_Z  = np.arange(1*dim_orig+0, 1*dim_orig+0 +dim_orig)
@@ -515,11 +514,34 @@ class Dmp(DynamicalSystem,Parameterizable):
         # goal system
         # self.spring_system_.set_attractor_state(attractor_state);
         
+    def getSelectableParameters(self):
+        selectable = []
+        for fa in self.function_approximators_:
+            selectable.extend(fa.getSelectableParameters())
+        selectable.append('goal')
+        # Remove duplicates
+        return list(dict.fromkeys(selectable))
+
+    def getSelectableParametersRecommended(self):
+        """Return the names of the parameters that recommended to be selected.
+        """
+        for fa in self.function_approximators_:
+            selectable.extend(fa.getSelectableParameters())
+        # Remove duplicates
+        return list(dict.fromkeys(selectable))
+
+    def setSelectedParameters(self,selected_values_labels):
+        for fa in self.function_approximators_:
+            fa.setSelectedParameters(selected_values_labels)
+        self.goal_selected = "goal" in selected_values_labels
+        
     def getParameterVectorSelected(self):
         values = np.empty(0)
         for fa in self.function_approximators_:
             if fa.isTrained():
                 values = np.append(values,fa.getParameterVectorSelected())
+        if self.goal_selected:
+            values = np.append(values,self.attractor_state_)
         return values
         
     def setParameterVectorSelected(self,values):
@@ -532,12 +554,16 @@ class Dmp(DynamicalSystem,Parameterizable):
                 cur_values = values[offset:offset+cur_size]
                 fa.setParameterVectorSelected(cur_values)                
                 offset += cur_size
+        if self.goal_selected:
+            self.set_attractor_state(values[offset:offset+self.dim_orig_])
             
     def getParameterVectorSelectedSize(self):
         size = 0
         for fa in self.function_approximators_:
             if fa.isTrained():
                 size += fa.getParameterVectorSelectedSize()
+        if self.goal_selected:
+            size += self.dim_orig_
         return size
 
     
