@@ -17,6 +17,7 @@
 
 import os, sys
 import numpy as np
+import warnings
 
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
@@ -71,10 +72,13 @@ class FunctionApproximator(Parameterizable):
         """Implements abstract function from the Parameterizable abstract class.
         """
         selectable_param_labels = self.getSelectableParameters()
-        self._selected_param_labels = []   
+        self._selected_param_labels = []
+        if isinstance(selected_param_labels,str):
+            # Make sure it is a list
+            selected_param_labels = [selected_param_labels]
         for label in selected_param_labels:
             if not label in selectable_param_labels:
-                warning(label+" not in ["+', '.join(selectable_param_labels)+']: Ignoring')
+                warnings.warn(label+" not in ["+', '.join(selectable_param_labels)+']: Ignoring')
             else:
                 self._selected_param_labels.append(label)
                 
