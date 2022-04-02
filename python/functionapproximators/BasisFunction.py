@@ -31,14 +31,17 @@ class Gaussian:
             
         Returns:
             The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
-         """
-        n_basis_functions = centers.shape[0]
-        n_dims            = centers.shape[1]
-        if n_dims==1:
-            inputs = np.atleast_2d(inputs)
-            if inputs.shape[0]==1:
-                inputs = inputs.T
+        """
+         
         n_samples         = inputs.shape[0]
+        n_basis_functions = centers.shape[0]
+        n_dims = centers.shape[1] if len(centers.shape)>1 else 1
+
+        if (n_dims==1):
+            # Make sure arguments have shape (N,1) not (N,) 
+            centers = centers.reshape(n_basis_functions,1)
+            widths = widths.reshape(n_basis_functions,1)
+            inputs = inputs.reshape(n_samples,1)
   
         kernel_activations = np.ones([n_samples,n_basis_functions])
   
