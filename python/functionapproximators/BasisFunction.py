@@ -35,7 +35,7 @@ class Gaussian:
          
         n_samples         = inputs.shape[0]
         n_basis_functions = centers.shape[0]
-        n_dims = centers.ndim
+        n_dims = centers.shape[1] if len(centers.shape)>1 else 1
 
         if (n_dims==1):
             # Make sure arguments have shape (N,1) not (N,) 
