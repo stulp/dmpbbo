@@ -1,6 +1,6 @@
 # This file is part of DmpBbo, a set of libraries and programs for the 
 # black-box optimization of dynamical movement primitives.
-# Copyright (C) 2018 Freek Stulp
+# Copyright (C) 2022 Freek Stulp
 # 
 # DmpBbo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
