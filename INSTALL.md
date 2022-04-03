@@ -24,7 +24,7 @@ Otherwise, for manual installation see [below](#manual_installation).
 
 ### Required packages
 
-`sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev libeigen3-dev `
+`sudo apt-get install cmake libboost-filesystem-dev libboost-system-dev libboost-serialization-dev libeigen3-dev nlohmann-json3-dev`
 
 ### Optional packages
 
