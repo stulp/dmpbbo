@@ -28,6 +28,7 @@
 #include <iostream>
 #include <unordered_map>
 
+#include <nlohmann/json.hpp>
 
 using namespace Eigen;
 using namespace std;
@@ -179,9 +180,35 @@ void MetaParametersRBFN::getCentersAndWidths(const VectorXd& min, const VectorXd
   
 }
 
+MetaParametersRBFN* MetaParametersRBFN::from_jsonpickle(nlohmann::json json) {
+  int input_dim=1; // mmm
+  int n_bfs = json["n_basis_functions_per_dim"];
+  double intersection_height = json["intersection_height"];
+  double regularization = json["regularization"];
+  
+  return new MetaParametersRBFN(input_dim, n_bfs, intersection_height, regularization);
+}
+
+
 string MetaParametersRBFN::toString(void) const
 {
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersRBFN");
 }
+
+/*
+void to_json(nlohmann::json& j, const MetaParametersRBFN& mp) {
+    j = nlohmann::json{
+      //{"n_bfs_per_dim", mp.n_bfs_per_dim_},
+      {"intersection_height", mp.intersection_height_},
+      {"regularization", mp.regularization_}
+    };
+}
+
+void from_json(const nlohmann::json& j, MetaParametersRBFN& p) {
+  //p.n_bfs_per_dim_ = j.at("n_bfs_per_dim").get<VectorXi>();
+  p.intersection_height_ = j.at("intersection_height").get<double>();
+  p.regularization_ = j.at("regularization").get<double>();
+}
+*/
 
 }

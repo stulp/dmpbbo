@@ -1,3 +1,4 @@
+add_subdirectory(eigen)
 add_subdirectory(dmpbbo_io)
 add_subdirectory(functionapproximators)
 add_subdirectory(dynamicalsystems)

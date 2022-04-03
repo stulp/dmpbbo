@@ -27,6 +27,8 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
 #include <iostream>
 #include <fstream>
 
@@ -430,6 +432,21 @@ UnifiedModel* ModelParametersLWR::toUnifiedModel(void) const
   bool normalized_basis_functions = true;
   return new UnifiedModel(centers_, widths_, slopes_, offsets_, normalized_basis_functions); 
   
+}
+
+ModelParametersLWR* ModelParametersLWR::from_jsonpickle(const nlohmann::json& json) {
+  cout << "ModelParametersLWR::from_jsonpickle" << endl;
+  
+  MatrixXd centers;
+  from_json(json.at("centers").at("values"),centers);
+  MatrixXd widths;
+  from_json(json["widths"]["values"],widths);
+  MatrixXd slopes;
+  from_json(json["slopes"]["values"],slopes);
+  MatrixXd offsets;
+  from_json(json["offsets"]["values"],offsets);
+  
+  return new ModelParametersLWR(centers,widths,slopes,offsets);
 }
 
 }

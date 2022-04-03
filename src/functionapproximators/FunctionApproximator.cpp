@@ -228,10 +228,20 @@ void FunctionApproximator::setParameterVectorAll(const Eigen::VectorXd& values) 
     model_parameters_->setParameterVectorAll(values);
 };
 
+
 string FunctionApproximator::toString(void) const
 {
+  /*
   string name = "FunctionApproximator"+getName();
   RETURN_STRING_FROM_BOOST_SERIALIZATION_XML(name.c_str());
+  */
+  std::stringstream s;
+  s << "FunctionApproximator"+getName() << endl;
+  if (meta_parameters_!=NULL)
+    s << *meta_parameters_ << endl;
+  if (model_parameters_!=NULL)
+    s << *model_parameters_ << endl;
+  return s.str();
 }
 
 void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_grid)

@@ -26,6 +26,8 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
+#include <nlohmann/json_fwd.hpp>
+
 /** @defgroup LWR Locally Weighted Regression (LWR)
  *  @ingroup FunctionApproximators
  */
@@ -59,7 +61,11 @@ public:
    */
   FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters);
 
+  FunctionApproximatorLWR(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
+  
 	FunctionApproximator* clone(void) const;
+  
+  static FunctionApproximatorLWR* from_jsonpickle(nlohmann::json json);
   
 	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 

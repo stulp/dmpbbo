@@ -36,7 +36,7 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
-#include <nlohmann/json.hpp>
+#include <nlohmann/json_fwd.hpp>
 
 namespace DmpBbo {
 
@@ -169,20 +169,10 @@ private:
   }
   
 public:
-  // // https://github.com/nlohmann/json/issues/1324
-  //friend void to_json(nlohmann::json& j, const ModelParametersRBFN& p);
-  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& p);
-  void to_json(nlohmann::json& j) const;
-  void from_json(const nlohmann::json& j);
+  // https://github.com/nlohmann/json/issues/1324
+  static ModelParametersRBFN* from_jsonpickle(const nlohmann::json& json);
   
 };
-
-inline void to_json(nlohmann::json& j, const ModelParametersRBFN& p) {
-  p.to_json(j);
-}
-inline void from_json(const nlohmann::json& j, ModelParametersRBFN& p) {
-  p.from_json(j);
-}
 
 }
 

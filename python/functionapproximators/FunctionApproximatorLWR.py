@@ -28,6 +28,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
     
     def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
         
+        if isinstance(n_basis_functions_per_dim,int):
+            n_basis_functions_per_dim = [n_basis_functions_per_dim]
+        
         meta_params = {
             'n_basis_functions_per_dim': n_basis_functions_per_dim,
             'intersection_height': intersection_height,

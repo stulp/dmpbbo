@@ -35,6 +35,9 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
+
 namespace DmpBbo {
 
 /** \brief Model parameters for the Locally Weighted Regression (LWR) function approximator
@@ -146,6 +149,8 @@ public:
 	  if (!caching_) clearCache();
 	}
 	
+  static ModelParametersLWR* from_jsonpickle(const nlohmann::json& json);
+  
 private:
   
   mutable Eigen::MatrixXd inputs_cached_;

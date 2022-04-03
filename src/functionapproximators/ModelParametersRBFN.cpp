@@ -27,16 +27,19 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <eigen3/Eigen/Core>
 
-#include "functionapproximators/eigen_conversion.hpp"
 
 
 using namespace std;
 using namespace Eigen;
+using namespace nlohmann;
 
 namespace DmpBbo {
 
@@ -102,11 +105,6 @@ void ModelParametersRBFN::kernelActivations(const Eigen::Ref<const Eigen::Matrix
     kernel_activations_cached_ = kernel_activations;
   }
   
-}
-
-string ModelParametersRBFN::toString(void) const
-{
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRBFN");
 }
 
 void ModelParametersRBFN::getSelectableParameters(set<string>& selected_values_labels) const 
@@ -221,35 +219,22 @@ UnifiedModel* ModelParametersRBFN::toUnifiedModel(void) const
   return new UnifiedModel(centers_, widths_, weights_,normalized_basis_functions); 
 }
 
-void ModelParametersRBFN::to_json(nlohmann::json& j) const {
-    j = nlohmann::json{
-      {"centers", centers_},
-      {"widths", widths_},
-      {"weights", weights_}
-    };
+ModelParametersRBFN* ModelParametersRBFN::from_jsonpickle(const nlohmann::json& json) {
+  
+  MatrixXd centers;
+  from_json(json.at("centers").at("values"),centers);
+  MatrixXd widths;
+  from_json(json["widths"]["values"],widths);
+  MatrixXd weights;
+  from_json(json["weights"]["values"],weights);
+  
+  return new ModelParametersRBFN(centers,widths,weights);
 }
 
-void ModelParametersRBFN::from_json(const nlohmann::json& j) {
-  centers_ = j.at("centers").get<MatrixXd>();
-  widths_ = j.at("widths").get<MatrixXd>();
-  weights_ = j.at("weights").get<VectorXd>();
+string ModelParametersRBFN::toString(void) const
+{
+  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRBFN");
 }
-
-/*
-void to_json(nlohmann::json& j, const ModelParametersRBFN& mp) {
-    j = nlohmann::json{
-      {"centers", mp.centers_},
-      {"widths", mp.widths_},
-      {"weights", mp.weights_}
-    };
-}
-
-void from_json(const nlohmann::json& j, ModelParametersRBFN& p) {
-  p.centers_ = j.at("centers").get<MatrixXd>();
-  p.widths_ = j.at("widths").get<MatrixXd>();
-  p.weights_ = j.at("weights").get<VectorXd>();
-}
-*/
 
 }
 

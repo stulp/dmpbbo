@@ -31,6 +31,8 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 
 /** @defgroup RBFN Radial Basis Function Network (RBFN)
  *  @ingroup FunctionApproximators
@@ -65,6 +67,8 @@ public:
    */
   FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters);
 
+  static FunctionApproximatorRBFN* from_jsonpickle(nlohmann::json json);
+  
 	FunctionApproximator* clone(void) const;
   
 	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
@@ -82,7 +86,6 @@ public:
 
 	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 	
-private:  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this
@@ -91,6 +94,7 @@ private:
    */
   FunctionApproximatorRBFN(void) {};
    
+private:  
   /** Preallocated memory to make things realtime and more efficient. */
   mutable Eigen::VectorXd weights_prealloc_;
   

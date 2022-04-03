@@ -25,6 +25,8 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
 #include <iostream>
 #include <unordered_map>
 
@@ -181,6 +183,20 @@ void MetaParametersLWR::getCentersAndWidths(const VectorXd& min, const VectorXd&
     }
   }
   
+}
+
+
+MetaParametersLWR* MetaParametersLWR::from_jsonpickle(nlohmann::json json) {
+  cout << "MetaParametersLWR::from_jsonpickle" << endl;
+  cout <<  json.at("n_basis_functions_per_dim") << endl;
+  
+  int input_dim=1; // mmm
+  VectorXi n_basis_functions_per_dim;
+  from_json(json.at("n_basis_functions_per_dim"),n_basis_functions_per_dim);
+  double intersection_height = json["intersection_height"];
+  double regularization = json["regularization"];
+  
+  return new MetaParametersLWR(input_dim, n_basis_functions_per_dim, intersection_height, regularization);
 }
 
 string MetaParametersLWR::toString(void) const

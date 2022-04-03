@@ -36,6 +36,8 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 
 namespace DmpBbo {
 
@@ -83,6 +85,8 @@ public:
    */
 	MetaParametersLWR(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
 
+	static MetaParametersLWR* from_jsonpickle(nlohmann::json json);
+	
 	/** Get the centers and widths of the basis functions.
 	 *  \param[in] min Minimum values of input data (one value for each dimension).
 	 *  \param[in] max Maximum values of input data (one value for each dimension).

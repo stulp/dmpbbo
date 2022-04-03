@@ -1,5 +1,5 @@
 ################################################################################
-file(GLOB SOURCES leastSquares.cpp BasisFunction.cpp Parameterizable.cpp MetaParameters.cpp ModelParameters.cpp FunctionApproximator.cpp UnifiedModel.cpp *LWR.cpp *RRRFF.cpp *GMR.cpp *RBFN.cpp *GPR.cpp getFunctionApproximatorByName.cpp) 
+file(GLOB SOURCES from_jsonpickle.cpp leastSquares.cpp BasisFunction.cpp Parameterizable.cpp MetaParameters.cpp ModelParameters.cpp FunctionApproximator.cpp UnifiedModel.cpp *LWR.cpp *RRRFF.cpp *GMR.cpp *RBFN.cpp *GPR.cpp getFunctionApproximatorByName.cpp) 
 if(LWPR_FOUND)
   if (BUILD_SHARED_LIBS) # LWPR doesn't work with shared libs
     message(WARNING  "LWPR cannot be used with .so libraries.")

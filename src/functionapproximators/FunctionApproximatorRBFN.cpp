@@ -34,6 +34,8 @@
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/LU>
 
+#include <nlohmann/json.hpp>
+
 using namespace std;
 using namespace Eigen;
 
@@ -195,5 +197,16 @@ bool FunctionApproximatorRBFN::saveGridData(const VectorXd& min, const VectorXd&
   
 }
 
+FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) {
+  MetaParametersRBFN* meta = NULL;
+  if (json.contains("_meta_params"))
+    meta = MetaParametersRBFN::from_jsonpickle(json["_meta_params"]);
+  
+  ModelParametersRBFN* model = NULL;
+  if (json.contains("_model_params"))
+    model = ModelParametersRBFN::from_jsonpickle(json["_model_params"]);
+  
+  return new FunctionApproximatorRBFN(meta,model);
+}
 
 }

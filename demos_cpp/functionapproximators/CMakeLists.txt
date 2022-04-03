@@ -3,5 +3,5 @@ target_link_libraries(demoLeastSquares functionapproximators ${Boost_LIBRARIES})
 install(TARGETS demoLeastSquares DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(demoFunctionApproximatorTraining demoFunctionApproximatorTraining.cpp)
-target_link_libraries(demoFunctionApproximatorTraining functionapproximators ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(demoFunctionApproximatorTraining functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 install(TARGETS demoFunctionApproximatorTraining DESTINATION ${CMAKE_CURRENT_SOURCE_DIR})

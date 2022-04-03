@@ -36,6 +36,7 @@
 #include <boost/serialization/nvp.hpp>
 #include <boost/serialization/vector.hpp>
 
+#include <nlohmann/json_fwd.hpp>
 
 namespace DmpBbo {
 
@@ -80,6 +81,8 @@ public:
    */
 	MetaParametersRBFN(int expected_input_dim, int n_basis_functions=10, double intersection_height=0.5, double regularization=0.0);
 
+	static MetaParametersRBFN* from_jsonpickle(nlohmann::json json);
+  
 	/** Accessor function for regularization.
 	 * \return Regularization parameter.
 	 */
@@ -103,6 +106,10 @@ public:
 
 	std::string toString(void) const;
 
+  // // https://github.com/nlohmann/json/issues/1324
+  //friend void to_json(nlohmann::json& j, const MetaParametersRBFN& p);
+  //friend void from_json(const nlohmann::json& j, MetaParametersRBFN& p);
+  
 private:
   Eigen::VectorXi n_bfs_per_dim_; // should be const
   std::vector<Eigen::VectorXd> centers_per_dim_; // should be const
@@ -133,7 +140,6 @@ private:
     ar & BOOST_SERIALIZATION_NVP(intersection_height_);
     ar & BOOST_SERIALIZATION_NVP(regularization_);
   }
-
 
 };
 

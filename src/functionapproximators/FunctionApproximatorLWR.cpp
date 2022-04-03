@@ -34,6 +34,9 @@
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/LU>
 
+#include <nlohmann/json.hpp>
+
+
 using namespace std;
 using namespace Eigen;
 
@@ -63,6 +66,12 @@ void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
   activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
+FunctionApproximatorLWR::FunctionApproximatorLWR(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, double regularization, bool asymmetric_kernels)
+:
+  FunctionApproximator(new MetaParametersLWR(expected_input_dim,n_bfs_per_dim,intersection_height,regularization,asymmetric_kernels))
+{  
+  
+}
 
 FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
   // All error checking and cloning is left to the FunctionApproximator constructor.
@@ -237,6 +246,26 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
   }
   
 }
+
+FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
+
+  cout << "FunctionApproximatorLWR::from_jsonpickle" << endl;
+  
+  MetaParametersLWR* meta = NULL;
+  if (json.contains("_meta_params")) {
+    meta = MetaParametersLWR::from_jsonpickle(json["_meta_params"]);
+    cout << "  meta=" << meta << endl;
+  }
+  
+  ModelParametersLWR* model = NULL;
+  if (json.contains("_model_params")) {
+    model = ModelParametersLWR::from_jsonpickle(json["_model_params"]);
+    cout << "  model=" << model << endl;
+  }
+  
+  return new FunctionApproximatorLWR(meta,model);
+}
+
 
 bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
 {
