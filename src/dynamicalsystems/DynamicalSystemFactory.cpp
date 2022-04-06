@@ -19,11 +19,14 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>. 
  */
- 
-#include "functionapproximators/from_jsonpickle.hpp"
-#include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/FunctionApproximatorLWR.hpp"
+
+#include "dynamicalsystems/DynamicalSystemFactory.hpp"
+
+
+#include "dynamicalsystems/ExponentialSystem.hpp"
+#include "dynamicalsystems/SigmoidSystem.hpp"
+#include "dynamicalsystems/SpringDamperSystem.hpp"
+#include "dynamicalsystems/TimeSystem.hpp"
 
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -32,20 +35,26 @@ using namespace std;
 
 namespace DmpBbo {
 
-void FunctionApproximatorFactory::from_jsonpickle(const nlohmann::json& json, FunctionApproximator*& fa) {
+void DynamicalSystemFactory::from_jsonpickle(const nlohmann::json& json, DynamicalSystem*& ds) {
   
   string class_name = json.at("py/object").get<string>();
   
-  if (class_name.find("FunctionApproximatorRBFN") != string::npos) {
-    fa = FunctionApproximatorRBFN::from_jsonpickle(json);
+  if (class_name.find("ExponentialSystem") != string::npos) {
+    ds = ExponentialSystem::from_jsonpickle(json);
     
-  } else if (class_name.find("FunctionApproximatorLWR") != string::npos) {
-    fa = FunctionApproximatorLWR::from_jsonpickle(json);
+  } else if (class_name.find("SigmoidSystem") != string::npos) {
+    ds = SigmoidSystem::from_jsonpickle(json);
+    
+  } else if (class_name.find("SpringDamperSystem") != string::npos) {
+    ds = SpringDamperSystem::from_jsonpickle(json);
+    
+  } else if (class_name.find("TimeSystem") != string::npos) {
+    ds = TimeSystem::from_jsonpickle(json);
     
   } else {
     cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Unknown FunctionApproximator: " << class_name << endl;
-    fa = NULL;
+    cerr << "Unknown DynamicalSystem: " << class_name << endl;
+    ds = NULL;
   }
   
 }

@@ -27,7 +27,8 @@
 #include <nlohmann/json.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
-#include "dynamicalsystems/from_jsonpickle.hpp"
+#include "dynamicalsystems/DynamicalSystemFactory.hpp"
+
 
 
 using namespace std;

@@ -30,7 +30,7 @@
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #include "functionapproximators/ModelParametersRBFN.hpp"
 
-#include "functionapproximators/from_jsonpickle.hpp"
+#include "functionapproximators/FunctionApproximatorFactory.hpp"
 
 
 using namespace std;
@@ -52,7 +52,7 @@ int main(int n_args, char** args)
   cout << j << endl;
   
   FunctionApproximator* fa = NULL;
-  from_jsonpickle(j,fa);
+  FunctionApproximatorFactory::from_jsonpickle(j,fa);
   cout << *fa << endl;
   
   return 0;

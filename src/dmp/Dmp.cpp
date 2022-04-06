@@ -26,13 +26,14 @@
 #include "dmp/Trajectory.hpp"
 
 #include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/from_jsonpickle.hpp"
+#include "functionapproximators/FunctionApproximatorFactory.hpp"
 
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
-#include "dynamicalsystems/from_jsonpickle.hpp"
+#include "dynamicalsystems/DynamicalSystemFactory.hpp"
+
 
 
 #include "dmpbbo_io/EigenFileIO.hpp"

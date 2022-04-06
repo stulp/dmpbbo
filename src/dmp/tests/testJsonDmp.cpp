@@ -27,7 +27,7 @@
 #include <nlohmann/json.hpp>
 
 #include "dmp/Dmp.hpp"
-#include "dmp/from_jsonpickle.hpp"
+#include "dmp/DmpFactory.hpp"
 
 
 using namespace std;
