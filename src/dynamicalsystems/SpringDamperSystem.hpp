@@ -156,6 +156,10 @@ private:
     ar & BOOST_SERIALIZATION_NVP(spring_constant_);
     ar & BOOST_SERIALIZATION_NVP(mass_);
   }
+  
+public:
+  friend void to_json(nlohmann::json& j, const SpringDamperSystem& p);
+  //friend void from_json(const nlohmann::json& j, SpringDamperSystem& p);
 };
 
 }

@@ -29,6 +29,20 @@ using namespace Eigen;
 
 namespace DmpBbo {
   
+  
+void to_json(nlohmann::json& j, const MatrixXd& matrix)
+{
+    for (int row = 0; row < matrix.rows(); ++row)
+    {
+        nlohmann::json column = nlohmann::json::array();
+        for (int col = 0; col < matrix.cols(); ++col)
+        {
+            column.push_back(matrix(row, col));
+        }
+        j.push_back(column);
+    }
+}
+
 void from_json(const nlohmann::json& j, VectorXi& vector)
 {
     //using Scalar = typename MatrixXi::Scalar;

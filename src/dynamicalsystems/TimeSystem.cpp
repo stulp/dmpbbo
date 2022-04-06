@@ -153,9 +153,20 @@ TimeSystem* TimeSystem::from_jsonpickle(const nlohmann::json& json) {
   return new TimeSystem(tau,count_down,name);
 }
 
+void to_json(nlohmann::json& j, const TimeSystem& obj) {
+  obj.DynamicalSystem::to_json_base(j);
+  
+  j["count_down_"] = obj.count_down_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.TimeSystem.TimeSystem";
+}
+
 string TimeSystem::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("TimeSystem");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

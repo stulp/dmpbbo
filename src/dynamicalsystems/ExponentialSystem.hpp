@@ -112,6 +112,9 @@ private:
     ar & BOOST_SERIALIZATION_NVP(alpha_);
   }
 
+public:
+  friend void to_json(nlohmann::json& j, const ExponentialSystem& p);
+  //friend void from_json(const nlohmann::json& j, ExponentialSystem& p);
 };
 
 }

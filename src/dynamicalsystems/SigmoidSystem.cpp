@@ -188,9 +188,21 @@ SigmoidSystem* SigmoidSystem::from_jsonpickle(const nlohmann::json& json) {
   return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time,name);
 }
   
+void to_json(nlohmann::json& j, const SigmoidSystem& obj) {
+  obj.DynamicalSystem::to_json_base(j);
+  
+  j["max_rate_"] = obj.max_rate_;
+  j["inflection_point_time_"] = obj.inflection_point_time_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.SigmoidSystem.SigmoidSystem";
+}
+
 string SigmoidSystem::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("SigmoidSystem");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

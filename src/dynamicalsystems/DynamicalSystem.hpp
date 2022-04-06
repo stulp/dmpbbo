@@ -29,6 +29,7 @@
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
+#include <nlohmann/json_fwd.hpp>
 
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
@@ -371,7 +372,6 @@ private:
   /** Which integration method to use. See DynamicalSystem::IntegrationMethod */
   IntegrationMethod integration_method_;
   
-
 protected:
   /**
    * Default constructor.
@@ -400,7 +400,11 @@ private:
     ar & BOOST_SERIALIZATION_NVP(name_);
     ar & BOOST_SERIALIZATION_NVP(integration_method_);
   }
-
+public:
+  // // https://github.com/nlohmann/json/issues/1324
+  void to_json_base(nlohmann::json& j) const;
+  //friend void from_json(const nlohmann::json& j, MetaParametersRBFN& p);
+  
 };
 
 }

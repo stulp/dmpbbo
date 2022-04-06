@@ -101,6 +101,10 @@ private:
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
     ar & BOOST_SERIALIZATION_NVP(count_down_);
   }
+  
+public:
+  friend void to_json(nlohmann::json& j, const TimeSystem& p);
+  //friend void from_json(const nlohmann::json& j, TimeSystem& p);
 
 };
 

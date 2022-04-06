@@ -27,6 +27,8 @@
 
 namespace DmpBbo {
   
+void to_json(nlohmann::json& j, const Eigen::MatrixXd& matrix);
+  
 void from_json(const nlohmann::json& j, Eigen::VectorXd& vector);
 
 void from_json(const nlohmann::json& j, Eigen::VectorXi& vector);

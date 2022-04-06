@@ -23,9 +23,12 @@
  
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
+#include "eigen/eigen_json.hpp"
+
 #include <cmath>
 #include <iostream>
 #include <eigen3/Eigen/Core>
+#include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace Eigen;
@@ -109,5 +112,22 @@ void DynamicalSystem::integrateStepRungeKutta(double dt, const Ref<const VectorX
   x_updated = x + dt*(k1 + 2.0*(k2+k3) + k4)/6.0;
   differentialEquation(x_updated,xd_updated); 
 }
+
+void DynamicalSystem::to_json_base(nlohmann::json& j) const {
+  
+  j["dim_"] = dim_;
+  j["dim_orig_"] = dim_orig_;
+  j["tau_"] = tau_;
+  nlohmann::json j_initial_state, j_attractor_state;
+  to_json(j_initial_state,initial_state_);
+  j["initial_state_"] = j_initial_state;
+  to_json(j_attractor_state,attractor_state_);
+  j["attractor_state_"] = j_attractor_state;
+  j["name_"] = name_;
+  // Avoiding NLOHMANN_JSON_SERIALIZE_ENUM
+  j["integration_method_"] = (integration_method_==EULER) ? "EULER" : "RUNGE_KUTTA" ;
+  
+}
+
 
 }

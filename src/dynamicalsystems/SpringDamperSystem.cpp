@@ -208,9 +208,22 @@ SpringDamperSystem* SpringDamperSystem::from_jsonpickle(const nlohmann::json& js
   return new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass,name);
 }
 
+void to_json(nlohmann::json& j, const SpringDamperSystem& obj) {
+  obj.DynamicalSystem::to_json_base(j);
+  
+  j["damping_coefficient_"] = obj.damping_coefficient_;
+  j["spring_constant_"] = obj.spring_constant_;
+  j["mass_"] = obj.mass_;
+
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.SpringDamperSystem.SpringDamperSystem";
+}
+
 string SpringDamperSystem::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("SpringDamperSystem");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 

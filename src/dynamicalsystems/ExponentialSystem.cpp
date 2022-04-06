@@ -26,6 +26,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <sstream>
 #include <eigen3/Eigen/Core>
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
@@ -115,9 +116,20 @@ ExponentialSystem* ExponentialSystem::from_jsonpickle(const nlohmann::json& json
   return new ExponentialSystem(tau,y_init,y_attr,alpha,name);
 }
 
+void to_json(nlohmann::json& j, const ExponentialSystem& obj) {
+  obj.DynamicalSystem::to_json_base(j);
+  
+  j["alpha_"] = obj.alpha_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.ExponentialSystem.ExponentialSystem";
+}
+
 string ExponentialSystem::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ExponentialSystem");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

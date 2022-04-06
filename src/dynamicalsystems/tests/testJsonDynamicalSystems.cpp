@@ -47,7 +47,7 @@ int main(int n_args, char** args)
   
   ifstream file(filename);
   json j = json::parse(file);
-  cout << j << endl;
+  cout << j << endl << endl;
 
   
   DynamicalSystem* dyn_sys = NULL;

@@ -101,6 +101,10 @@ private:
     ar & BOOST_SERIALIZATION_NVP(inflection_point_time_);
     ar & BOOST_SERIALIZATION_NVP(Ks_);
   }
+  
+public:
+  friend void to_json(nlohmann::json& j, const SigmoidSystem& p);
+  //friend void from_json(const nlohmann::json& j, SigmoidSystem& p);
 
 };
 
