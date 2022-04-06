@@ -15,47 +15,17 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-
 import numpy as np
 import os, sys
-
-import json
-import jsonpickle
-from jsonpickle import handlers
-
-import jsonpickle.ext.numpy as jsonpickle_numpy
-jsonpickle_numpy.register_handlers()
-handler = jsonpickle.ext.numpy.NumpyNDArrayHandlerView(size_threshold=None)
-handlers.registry.unregister(np.ndarray)
-handlers.registry.register(np.ndarray, handler, base=True)
-    
-import pprint
 
 # Include scripts for plotting
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
+from to_jsonpickle import *
+
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
-
-
-class NumpyArrayEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, np.integer):
-            return int(obj)
-        elif isinstance(obj, np.floating):
-            return float(obj)
-        elif isinstance(obj, np.ndarray):
-            return obj.squeeze().tolist()
-        else:
-            return super(NumpyArrayEncoder, self).default(obj)
-
-def toJson(obj):
-    new_dict = {"class": obj.__class__.__name__}
-    for key, val in obj.__dict__.items():
-        #new_key = key[1:] if key[0]=='_' else key
-        new_dict[key] = val 
-    return json.dumps(new_dict,cls=NumpyArrayEncoder)
 
 def getTrainingData(n_dims):
 
@@ -103,15 +73,9 @@ if __name__=='__main__':
             # Train function approximator with data
             fa.train(inputs,targets)
             
-            #jsonpickle.set_encoder_options('json', indent=4)# Didn't work
-            
-            # First do the pickle
-            jp = jsonpickle.encode(fa)
-            # Then load/dump for pretty formatting
-            #j = json.dumps(json.loads(jp), cls=NumpyArrayEncoder, indent=2, sort_keys=False)
-            j = json.dumps(json.loads(jp), indent=2, sort_keys=False)
+            s = to_jsonpickle(fa)
             
             # Save to file
             with open(f"{fa_name}_{n_dims}D.json", "w") as text_file:
-                text_file.write(j)
+                text_file.write(s)
 

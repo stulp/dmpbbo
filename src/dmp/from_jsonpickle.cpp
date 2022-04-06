@@ -1,5 +1,5 @@
 /**
- * @file   from_jsonpickle.hpp
+ * @file   from_jsonpickle.cpp
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
@@ -19,29 +19,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>. 
  */
-
-#ifndef _FA_FROM_JSONPICKLE_H_
-#define _FA_FROM_JSONPICKLE_H_
-
-#include <nlohmann/json_fwd.hpp>
-
-
-/** @ingroup FunctionApproximators
- */
-
  
+#include "dmp/Dmp.hpp"
+
+#include <iostream>
+#include <nlohmann/json.hpp>
+
+using namespace std;
+
 namespace DmpBbo {
 
-// Forward declaration
-class FunctionApproximator;
-
-class FunctionApproximatorFactory {
-
-public:
-  static void from_jsonpickle(const nlohmann::json& json, FunctionApproximator*& fa);
-
-};
-
+void from_jsonpickle(const nlohmann::json& json, Dmp*& dmp) {
+  
+  string class_name = json.at("py/object").get<string>();
+  
+  if (class_name.find("Dmp") != string::npos) {
+    dmp = Dmp::from_jsonpickle(json);
+    
+  } else {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "Unknown Dmp: " << class_name << endl;
+    dmp = NULL;
+  }
+  
 }
 
-#endif // _FA_FROM_JSONPICKLE_H_
+}

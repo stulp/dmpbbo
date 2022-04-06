@@ -41,6 +41,10 @@
 //#include "dmpbbo_io/EigenBoostSerialization.hpp"
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
+#include <nlohmann/json.hpp>
+
 using namespace std;
 using namespace Eigen;
 
@@ -171,6 +175,18 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
   }
 }
 
+SigmoidSystem* SigmoidSystem::from_jsonpickle(const nlohmann::json& json) {
+
+  double tau = from_json_to_double(json.at("tau_"));
+  double max_rate = from_json_to_double(json.at("max_rate_"));
+  double inflection_point_time = from_json_to_double(json.at("inflection_point_time_"));
+  string name = json.at("name_");
+  
+  VectorXd y_init;
+  from_json(json.at("initial_state_").at("values"),y_init);
+  
+  return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time,name);
+}
   
 string SigmoidSystem::toString(void) const
 {

@@ -33,4 +33,12 @@ void from_json(const nlohmann::json& j, Eigen::VectorXi& vector);
 
 void from_json(const nlohmann::json& j, Eigen::MatrixXd& matrix);
 
+//int from_json_to_int(const nlohmann::json& j);
+
+/**
+ * Read int from json. can be "4.0", "[4.0]", "[[4.0]]"
+ */
+int from_json_to_double(const nlohmann::json& j);
+
+
 }

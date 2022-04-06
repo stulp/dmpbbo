@@ -40,6 +40,10 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
+#include <nlohmann/json.hpp>
+
 using namespace std;
 using namespace Eigen;
 
@@ -137,6 +141,16 @@ void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& 
     xs.transposeInPlace();
     xds.transposeInPlace();
   }
+}
+
+TimeSystem* TimeSystem::from_jsonpickle(const nlohmann::json& json) {
+
+  double tau = from_json_to_double(json.at("tau_"));
+  int count_down_int = json.at("count_down_");
+  bool count_down = count_down_int >0;
+  string name = json.at("name_");
+
+  return new TimeSystem(tau,count_down,name);
 }
 
 string TimeSystem::toString(void) const

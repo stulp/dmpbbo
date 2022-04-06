@@ -20,6 +20,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <iostream>
+
 #include "eigen/eigen_json.hpp"
 
 using namespace std;
@@ -102,5 +104,36 @@ void from_json(const nlohmann::json& j, MatrixXd& matrix)
         }
     }
 }
+
+int from_json_to_double(const nlohmann::json& j) {
+  
+  // value
+  if (j.contains("value")) {
+    return j.at("value");
+  }
+  
+  // values
+  if (j.contains("values")) {
+    MatrixXd matrix;
+    from_json(j.at("values"), matrix); 
+    
+    if (matrix.rows()!=1) {
+      cerr << __FILE__ << ":" << __LINE__ << ":";
+      cerr << "'values' should have 1 row, but has " << matrix.rows() << endl;
+    }
+    if (matrix.cols()!=1) {
+      cerr << __FILE__ << ":" << __LINE__ << ":";
+      cerr << "'values' should have 1 cols, but has " << matrix.rows() << endl;
+    }
+    
+    return matrix(0,0);
+  }
+
+  // double
+  double d = j;
+  return d;
+  
+}
+
 
 }

@@ -29,6 +29,8 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace DmpBbo {
 
 /** \brief Dynamical System modelling the evolution of a time: \f$\dot{x} = 1/\tau\f$.
@@ -56,6 +58,8 @@ public:
   ~TimeSystem(void);
   
   DynamicalSystem* clone(void) const;
+  
+  static TimeSystem* from_jsonpickle(const nlohmann::json& json);
   
    void differentialEquation(
      const Eigen::Ref<const Eigen::VectorXd>& x, 

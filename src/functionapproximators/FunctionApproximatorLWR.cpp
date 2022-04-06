@@ -249,18 +249,14 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
 
 FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
 
-  cout << "FunctionApproximatorLWR::from_jsonpickle" << endl;
-  
   MetaParametersLWR* meta = NULL;
   if (json.contains("_meta_params")) {
     meta = MetaParametersLWR::from_jsonpickle(json["_meta_params"]);
-    cout << "  meta=" << meta << endl;
   }
   
   ModelParametersLWR* model = NULL;
   if (json.contains("_model_params")) {
     model = ModelParametersLWR::from_jsonpickle(json["_model_params"]);
-    cout << "  model=" << model << endl;
   }
   
   return new FunctionApproximatorLWR(meta,model);

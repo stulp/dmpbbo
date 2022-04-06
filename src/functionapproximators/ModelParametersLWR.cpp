@@ -435,7 +435,6 @@ UnifiedModel* ModelParametersLWR::toUnifiedModel(void) const
 }
 
 ModelParametersLWR* ModelParametersLWR::from_jsonpickle(const nlohmann::json& json) {
-  cout << "ModelParametersLWR::from_jsonpickle" << endl;
   
   MatrixXd centers;
   from_json(json.at("centers").at("values"),centers);

@@ -26,34 +26,32 @@
 
 #include <nlohmann/json.hpp>
 
-#include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/ModelParametersRBFN.hpp"
-
-#include "functionapproximators/from_jsonpickle.hpp"
+#include "dynamicalsystems/DynamicalSystem.hpp"
+#include "dynamicalsystems/from_jsonpickle.hpp"
 
 
 using namespace std;
-using namespace Eigen;
 using namespace DmpBbo;
 using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
   
-  string directory = "../../../../python/functionapproximators/tests/";
-  string filename = "RBFN_1D.json";  
+  string directory = "../../../../python/dynamicalsystems/tests/";
+  string filename = "ExponentialSystem_1D.json";  
   if (n_args>1)
     filename = string(args[1]);
   filename = directory + filename;  
   
+  
   ifstream file(filename);
   json j = json::parse(file);
   cout << j << endl;
+
   
-  FunctionApproximator* fa = NULL;
-  from_jsonpickle(j,fa);
-  cout << *fa << endl;
+  DynamicalSystem* dyn_sys = NULL;
+  DynamicalSystemFactory::from_jsonpickle(j,dyn_sys);
+  cout << *dyn_sys << endl;
   
   return 0;
 }

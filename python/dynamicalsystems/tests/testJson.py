@@ -19,21 +19,11 @@
 import numpy as np
 import os, sys
 
-import json
-import jsonpickle
-from jsonpickle import handlers
-
-import jsonpickle.ext.numpy as jsonpickle_numpy
-jsonpickle_numpy.register_handlers()
-handler = jsonpickle.ext.numpy.NumpyNDArrayHandlerView(size_threshold=None)
-handlers.registry.unregister(np.ndarray)
-handlers.registry.register(np.ndarray, handler, base=True)
-    
-import pprint
-
 # Include scripts for plotting
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
+
+from to_jsonpickle import *
 
 from dynamicalsystems.ExponentialSystem import *
 from dynamicalsystems.SigmoidSystem import *
@@ -41,16 +31,12 @@ from dynamicalsystems.SpringDamperSystem import *
 from dynamicalsystems.TimeSystem import *
 
 def save_jsonpickle(obj,filename):
-
-    # First do the pickle
-    jp = jsonpickle.encode(obj)
-    # Then load/dump for pretty formatting
-    j = json.dumps(json.loads(jp), indent=2, sort_keys=False)
+    
+    s = to_jsonpickle(obj)
     
     # Save to file
     with open(filename, "w") as text_file:
-        text_file.write(j)
-
+        text_file.write(s)
 
 if __name__=='__main__':
     """Run some training sessions and plot results."""

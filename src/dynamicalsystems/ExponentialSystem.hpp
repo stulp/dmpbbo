@@ -29,6 +29,8 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 #include <iosfwd>
 
 
@@ -54,8 +56,11 @@ public:
    *  \param alpha   Decay constant, cf. ExponentialSystem::alpha()
    *  \param name    Name for the sytem, cf. DynamicalSystem::name()     
    */
-   ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name="ExponentialSystem");
+  ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name="ExponentialSystem");
   
+  static ExponentialSystem* from_jsonpickle(const nlohmann::json& json);
+
+    
   /** Destructor. */
   ~ExponentialSystem(void);
   

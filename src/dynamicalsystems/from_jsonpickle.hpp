@@ -20,28 +20,25 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-#ifndef _FA_FROM_JSONPICKLE_H_
-#define _FA_FROM_JSONPICKLE_H_
+#ifndef _DS_FROM_JSONPICKLE_H_
+#define _DS_FROM_JSONPICKLE_H_
 
 #include <nlohmann/json_fwd.hpp>
 
-
-/** @ingroup FunctionApproximators
+/** @ingroup DynamicalSystem
  */
 
  
 namespace DmpBbo {
 
 // Forward declaration
-class FunctionApproximator;
+class DynamicalSystem;
 
-class FunctionApproximatorFactory {
-
+class DynamicalSystemFactory {
 public:
-  static void from_jsonpickle(const nlohmann::json& json, FunctionApproximator*& fa);
-
+  static void from_jsonpickle(const nlohmann::json& json, DynamicalSystem*& fa);
 };
 
 }
 
-#endif // _FA_FROM_JSONPICKLE_H_
+#endif // _DS_FROM_JSONPICKLE_H_

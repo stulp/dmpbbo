@@ -26,34 +26,32 @@
 
 #include <nlohmann/json.hpp>
 
-#include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/ModelParametersRBFN.hpp"
-
-#include "functionapproximators/from_jsonpickle.hpp"
+#include "dmp/Dmp.hpp"
+#include "dmp/from_jsonpickle.hpp"
 
 
 using namespace std;
-using namespace Eigen;
 using namespace DmpBbo;
 using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
   
-  string directory = "../../../../python/functionapproximators/tests/";
-  string filename = "RBFN_1D.json";  
+  string directory = "../../../../python/dmp/tests/";
+  string filename = "Dmp.json";  
   if (n_args>1)
     filename = string(args[1]);
   filename = directory + filename;  
   
+  
   ifstream file(filename);
   json j = json::parse(file);
   cout << j << endl;
+
   
-  FunctionApproximator* fa = NULL;
-  from_jsonpickle(j,fa);
-  cout << *fa << endl;
+  Dmp* dmp = NULL;
+  from_jsonpickle(j,dmp);
+  cout << *dmp << endl;
   
   return 0;
 }

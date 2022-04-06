@@ -29,6 +29,8 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace DmpBbo {           
 
 /** \brief Dynamical System modelling the evolution of a sigmoidal system \f$\dot{x} = -\alpha x(1-x/K)\f$.
@@ -52,6 +54,8 @@ public:
   /** Destructor. */
   ~SigmoidSystem(void);
 
+  static SigmoidSystem* from_jsonpickle(const nlohmann::json& json);
+  
   DynamicalSystem* clone(void) const;
 
    void differentialEquation(

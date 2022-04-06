@@ -25,6 +25,8 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
 #include <iostream>
 #include <unordered_map>
 
@@ -181,10 +183,15 @@ void MetaParametersRBFN::getCentersAndWidths(const VectorXd& min, const VectorXd
 }
 
 MetaParametersRBFN* MetaParametersRBFN::from_jsonpickle(nlohmann::json json) {
-  int input_dim=1; // mmm
-  int n_bfs = json["n_basis_functions_per_dim"];
+  
+  VectorXi n_bfs;
+  from_json(json.at("n_basis_functions_per_dim").at("values"),n_bfs);
+  
+  int input_dim = n_bfs.size();
+  
   double intersection_height = json["intersection_height"];
   double regularization = json["regularization"];
+  
   
   return new MetaParametersRBFN(input_dim, n_bfs, intersection_height, regularization);
 }

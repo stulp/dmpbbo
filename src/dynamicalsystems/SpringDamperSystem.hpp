@@ -29,6 +29,8 @@
 #include <boost/serialization/access.hpp>
 #include <boost/serialization/nvp.hpp>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace DmpBbo {
 
 /** Value indicating that the spring constant should be set such that the
@@ -64,6 +66,8 @@ public:
 
   DynamicalSystem* clone(void) const;
 
+  static SpringDamperSystem* from_jsonpickle(const nlohmann::json& json);
+  
    void differentialEquation(
      const Eigen::Ref<const Eigen::VectorXd>& x, 
      Eigen::Ref<Eigen::VectorXd> xd

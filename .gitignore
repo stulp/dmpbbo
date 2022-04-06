@@ -1,4 +1,5 @@
 *~
+*.marks
 *.bak
 *.back
 *.pyc

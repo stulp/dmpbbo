@@ -35,8 +35,10 @@ class FunctionApproximatorRBFN(FunctionApproximator):
             regularization Regularization parameter (default=0.0)
             """
         
+        n_bfs_per_dim = np.atleast_1d(n_basis_functions_per_dim)
+        
         meta_params = {
-            'n_basis_functions_per_dim': n_basis_functions_per_dim,
+            'n_basis_functions_per_dim': n_bfs_per_dim,
             'intersection_height': intersection_height,
             'regularization': regularization,
         }

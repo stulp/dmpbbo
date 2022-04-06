@@ -24,11 +24,20 @@
 #include "dmp/Dmp.hpp"
 
 #include "dmp/Trajectory.hpp"
+
 #include "functionapproximators/FunctionApproximator.hpp"
+#include "functionapproximators/from_jsonpickle.hpp"
+
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
+#include "dynamicalsystems/from_jsonpickle.hpp"
+
+
+#include "dmpbbo_io/EigenFileIO.hpp"
+
+#include "eigen/eigen_json.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -37,7 +46,7 @@
 #include <string>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include <nlohmann/json.hpp>
 
 
 using namespace std;
@@ -894,9 +903,54 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
   analytical_solution_perturber_ = NULL;
 }
 
+Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
+
+  double tau = from_json_to_double(json.at("tau_"));
+  
+  string name = json.at("name_");
+  double alpha_spring_damper = from_json_to_double(json.at("spring_system_").at("damping_coefficient_"));
+
+  VectorXd y_init;
+  VectorXd y_attr;
+  from_json(json.at("initial_state_").at("values"),y_init);
+  from_json(json.at("attractor_state_").at("values"),y_attr);
+
+  DynamicalSystem* goal_system;
+  DynamicalSystemFactory::from_jsonpickle(json.at("goal_system_"), goal_system);
+  
+  DynamicalSystem* phase_system;
+  DynamicalSystemFactory::from_jsonpickle(json.at("phase_system_"), phase_system);
+  
+  DynamicalSystem* gating_system;
+  DynamicalSystemFactory::from_jsonpickle(json.at("gating_system_"), gating_system);
+  
+  string forcing_term_scaling = json.at("forcing_term_scaling_");
+  ForcingTermScaling scaling = NO_SCALING;
+  if (forcing_term_scaling==string("G_MINUS_Y0_SCALING")) {
+    scaling = G_MINUS_Y0_SCALING;
+  } else if (forcing_term_scaling==string("AMPLITUDE_SCALING")) {
+    scaling = AMPLITUDE_SCALING;
+  }
+  
+  int n_dims = y_attr.size();
+  vector<FunctionApproximator*> function_approximators;
+  const auto& jrow = json.at("function_approximators_");
+  if (jrow.is_array()) {
+    for (int i_dim=0; i_dim<n_dims; i_dim++) {
+      FunctionApproximator* fa;
+      FunctionApproximatorFactory::from_jsonpickle(jrow.at(i_dim),fa);
+      function_approximators.push_back(fa);
+    }
+  }
+          
+  return new Dmp(tau,y_init,y_attr,function_approximators,alpha_spring_damper,
+    goal_system, phase_system, gating_system, scaling);
+}
+
 
 string Dmp::toString(void) const
 {
+  
   Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
 
   stringstream stream;

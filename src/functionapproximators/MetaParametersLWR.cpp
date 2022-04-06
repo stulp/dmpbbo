@@ -187,16 +187,16 @@ void MetaParametersLWR::getCentersAndWidths(const VectorXd& min, const VectorXd&
 
 
 MetaParametersLWR* MetaParametersLWR::from_jsonpickle(nlohmann::json json) {
-  cout << "MetaParametersLWR::from_jsonpickle" << endl;
-  cout <<  json.at("n_basis_functions_per_dim") << endl;
   
-  int input_dim=1; // mmm
-  VectorXi n_basis_functions_per_dim;
-  from_json(json.at("n_basis_functions_per_dim"),n_basis_functions_per_dim);
-  double intersection_height = json["intersection_height"];
+  VectorXi n_bfs_per_dim;
+  from_json(json.at("n_basis_functions_per_dim"),n_bfs_per_dim);
+  
+  int input_dim = n_bfs_per_dim.size();
+  
+  double height = json["intersection_height"];
   double regularization = json["regularization"];
   
-  return new MetaParametersLWR(input_dim, n_basis_functions_per_dim, intersection_height, regularization);
+  return new MetaParametersLWR(input_dim, n_bfs_per_dim, height, regularization);
 }
 
 string MetaParametersLWR::toString(void) const

@@ -42,6 +42,8 @@
 
 #include <set>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace DmpBbo {
   
 // forward declaration
@@ -138,6 +140,8 @@ public:
   
   /** Destructor. */
   ~Dmp(void);
+  
+  static Dmp* from_jsonpickle(const nlohmann::json& json);
   
   /** Return a deep copy of this object 
    * \return A deep copy of this object

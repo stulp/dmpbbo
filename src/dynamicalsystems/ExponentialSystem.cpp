@@ -30,6 +30,9 @@
 
 #include "dmpbbo_io/BoostSerializationToString.hpp"
 
+#include "eigen/eigen_json.hpp"
+
+#include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace Eigen;  
@@ -96,6 +99,20 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, Mat
     xs.transposeInPlace();
     xds.transposeInPlace();
   }
+}
+
+ExponentialSystem* ExponentialSystem::from_jsonpickle(const nlohmann::json& json) {
+
+  double tau = from_json_to_double(json.at("tau_"));
+  string name = json.at("name_");
+  double alpha = from_json_to_double(json.at("alpha_"));
+  
+  VectorXd y_init;
+  VectorXd y_attr;
+  from_json(json.at("initial_state_").at("values"),y_init);
+  from_json(json.at("attractor_state_").at("values"),y_attr);
+  
+  return new ExponentialSystem(tau,y_init,y_attr,alpha,name);
 }
 
 string ExponentialSystem::toString(void) const
