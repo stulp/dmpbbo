@@ -180,10 +180,8 @@ SigmoidSystem* SigmoidSystem::from_jsonpickle(const nlohmann::json& json) {
   double tau = from_json_to_double(json.at("tau_"));
   double max_rate = from_json_to_double(json.at("max_rate_"));
   double inflection_point_time = from_json_to_double(json.at("inflection_point_time_"));
+  VectorXd y_init = json.at("initial_state_").at("values");
   string name = json.at("name_");
-  
-  VectorXd y_init;
-  from_json(json.at("initial_state_").at("values"),y_init);
   
   return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time,name);
 }

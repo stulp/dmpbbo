@@ -118,11 +118,8 @@ void DynamicalSystem::to_json_base(nlohmann::json& j) const {
   j["dim_"] = dim_;
   j["dim_orig_"] = dim_orig_;
   j["tau_"] = tau_;
-  nlohmann::json j_initial_state, j_attractor_state;
-  to_json(j_initial_state,initial_state_);
-  j["initial_state_"] = j_initial_state;
-  to_json(j_attractor_state,attractor_state_);
-  j["attractor_state_"] = j_attractor_state;
+  j["initial_state_"] = initial_state_;
+  j["attractor_state_"] = attractor_state_;
   j["name_"] = name_;
   // Avoiding NLOHMANN_JSON_SERIALIZE_ENUM
   j["integration_method_"] = (integration_method_==EULER) ? "EULER" : "RUNGE_KUTTA" ;

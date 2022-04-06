@@ -172,6 +172,9 @@ public:
   // https://github.com/nlohmann/json/issues/1324
   static ModelParametersRBFN* from_jsonpickle(const nlohmann::json& json);
   
+  friend void to_json(nlohmann::json& j, const ModelParametersRBFN& m);
+  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& m);
+  
 };
 
 }

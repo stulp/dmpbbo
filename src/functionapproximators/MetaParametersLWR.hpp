@@ -87,6 +87,10 @@ public:
 
 	static MetaParametersLWR* from_jsonpickle(nlohmann::json json);
 	
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const MetaParametersLWR& m);
+  //friend void from_json(const nlohmann::json& j, MetaParametersLWR& m);
+  
 	/** Get the centers and widths of the basis functions.
 	 *  \param[in] min Minimum values of input data (one value for each dimension).
 	 *  \param[in] max Maximum values of input data (one value for each dimension).

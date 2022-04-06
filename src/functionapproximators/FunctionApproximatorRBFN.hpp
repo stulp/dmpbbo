@@ -68,6 +68,9 @@ public:
   FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters);
 
   static FunctionApproximatorRBFN* from_jsonpickle(nlohmann::json json);
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& m);
+  //friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN& m);
   
 	FunctionApproximator* clone(void) const;
   

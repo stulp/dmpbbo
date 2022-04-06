@@ -254,7 +254,7 @@ public:
   /** Returns a string representation of the object.
    * \return A string representation of the object.
    */
-  std::string toString(void) const;
+  virtual std::string toString(void) const;
   
   
   /** Accessor for FunctionApproximator::meta_parameters_

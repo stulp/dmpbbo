@@ -149,7 +149,12 @@ public:
 	  if (!caching_) clearCache();
 	}
 	
+public:
   static ModelParametersLWR* from_jsonpickle(const nlohmann::json& json);
+  
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const ModelParametersLWR& m);
+  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& m);
   
 private:
   

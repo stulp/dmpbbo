@@ -199,9 +199,23 @@ MetaParametersLWR* MetaParametersLWR::from_jsonpickle(nlohmann::json json) {
   return new MetaParametersLWR(input_dim, n_bfs_per_dim, height, regularization);
 }
 
+void to_json(nlohmann::json& j, const MetaParametersLWR& obj) {
+  
+  j["n_bfs_per_dim_"] = obj.n_bfs_per_dim_;
+  j["centers_per_dim_"] = obj.centers_per_dim_;
+  j["intersection_height_"] = obj.intersection_height_;
+  j["regularization_"] = obj.regularization_;
+  j["asymmetric_kernels_"] = obj.asymmetric_kernels_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.MetaParametersLWR.MetaParametersLWR";
+}
+
 string MetaParametersLWR::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersLWR");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

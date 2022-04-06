@@ -221,19 +221,28 @@ UnifiedModel* ModelParametersRBFN::toUnifiedModel(void) const
 
 ModelParametersRBFN* ModelParametersRBFN::from_jsonpickle(const nlohmann::json& json) {
   
-  MatrixXd centers;
-  from_json(json.at("centers").at("values"),centers);
-  MatrixXd widths;
-  from_json(json["widths"]["values"],widths);
-  MatrixXd weights;
-  from_json(json["weights"]["values"],weights);
+  MatrixXd centers = json.at("centers").at("values");
+  MatrixXd widths = json.at("widths").at("values");
+  MatrixXd weights = json.at("weights").at("values");
   
   return new ModelParametersRBFN(centers,widths,weights);
 }
 
+void to_json(nlohmann::json& j, const ModelParametersRBFN& obj) {
+  
+  j["centers_"] = obj.centers_;
+  j["widths_"] = obj.widths_;
+  j["weights_"] = obj.weights_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.ModelParametersRBFN.ModelParametersRBFN";
+}
+
 string ModelParametersRBFN::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRBFN");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

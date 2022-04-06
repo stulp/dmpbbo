@@ -278,11 +278,6 @@ void ModelParametersLWR::kernelActivationsSymmetric(const MatrixXd& centers, con
 */
 
 
-string ModelParametersLWR::toString(void) const
-{
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersLWR");
-}
-
 void ModelParametersLWR::getSelectableParameters(set<string>& selected_values_labels) const 
 {
   selected_values_labels = set<string>();
@@ -436,16 +431,30 @@ UnifiedModel* ModelParametersLWR::toUnifiedModel(void) const
 
 ModelParametersLWR* ModelParametersLWR::from_jsonpickle(const nlohmann::json& json) {
   
-  MatrixXd centers;
-  from_json(json.at("centers").at("values"),centers);
-  MatrixXd widths;
-  from_json(json["widths"]["values"],widths);
-  MatrixXd slopes;
-  from_json(json["slopes"]["values"],slopes);
-  MatrixXd offsets;
-  from_json(json["offsets"]["values"],offsets);
+  MatrixXd centers = json.at("centers").at("values");
+  MatrixXd widths = json.at("widths").at("values");
+  MatrixXd slopes = json.at("slopes").at("values");
+  MatrixXd offsets = json.at("offsets").at("values");
   
   return new ModelParametersLWR(centers,widths,slopes,offsets);
+}
+
+void to_json(nlohmann::json& j, const ModelParametersLWR& obj) {
+  
+  j["centers_"] = obj.centers_;
+  j["widths_"] = obj.widths_;
+  j["offsets_"] = obj.offsets_;
+  j["slopes_"] = obj.slopes_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.ModelParametersLWR.ModelParametersLWR";
+}
+
+string ModelParametersLWR::toString(void) const
+{
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

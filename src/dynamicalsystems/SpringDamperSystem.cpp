@@ -198,12 +198,9 @@ SpringDamperSystem* SpringDamperSystem::from_jsonpickle(const nlohmann::json& js
   double damping_coefficient = from_json_to_double(json.at("damping_coefficient_"));
   double spring_constant = from_json_to_double(json.at("spring_constant_"));
   double mass = from_json_to_double(json.at("mass_"));
+  VectorXd y_init = json.at("initial_state_").at("values");
+  VectorXd y_attr = json.at("attractor_state_").at("values");
   string name = json.at("name_");
-  
-  VectorXd y_init;
-  VectorXd y_attr;
-  from_json(json.at("initial_state_").at("values"),y_init);
-  from_json(json.at("attractor_state_").at("values"),y_attr);
   
   return new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass,name);
 }

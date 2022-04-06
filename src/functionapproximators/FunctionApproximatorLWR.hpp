@@ -66,6 +66,9 @@ public:
 	FunctionApproximator* clone(void) const;
   
   static FunctionApproximatorLWR* from_jsonpickle(nlohmann::json json);
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const FunctionApproximatorLWR& m);
+  //friend void from_json(const nlohmann::json& j, FunctionApproximatorLWR& m);
   
 	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
 

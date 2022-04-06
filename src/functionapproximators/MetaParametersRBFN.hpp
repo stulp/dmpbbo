@@ -106,9 +106,9 @@ public:
 
 	std::string toString(void) const;
 
-  // // https://github.com/nlohmann/json/issues/1324
-  //friend void to_json(nlohmann::json& j, const MetaParametersRBFN& p);
-  //friend void from_json(const nlohmann::json& j, MetaParametersRBFN& p);
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const MetaParametersRBFN& m);
+  //friend void from_json(const nlohmann::json& j, MetaParametersRBFN& m);
   
 private:
   Eigen::VectorXi n_bfs_per_dim_; // should be const

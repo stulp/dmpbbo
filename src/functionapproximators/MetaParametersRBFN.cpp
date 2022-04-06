@@ -184,38 +184,30 @@ void MetaParametersRBFN::getCentersAndWidths(const VectorXd& min, const VectorXd
 
 MetaParametersRBFN* MetaParametersRBFN::from_jsonpickle(nlohmann::json json) {
   
-  VectorXi n_bfs;
-  from_json(json.at("n_basis_functions_per_dim").at("values"),n_bfs);
-  
-  int input_dim = n_bfs.size();
-  
+  VectorXi n_bfs = json.at("n_basis_functions_per_dim").at("values");
   double intersection_height = json["intersection_height"];
   double regularization = json["regularization"];
-  
+  int input_dim = n_bfs.size();
   
   return new MetaParametersRBFN(input_dim, n_bfs, intersection_height, regularization);
 }
 
+void to_json(nlohmann::json& j, const MetaParametersRBFN& obj) {
+  
+  j["n_bfs_per_dim_"] = obj.n_bfs_per_dim_;
+  j["centers_per_dim_"] = obj.centers_per_dim_;
+  j["intersection_height_"] = obj.intersection_height_;
+  j["regularization_"] = obj.regularization_;
+  
+  // for jsonpickle
+  j["py/object"] = "dynamicalsystems.MetaParametersRBFN.MetaParametersRBFN";
+}
 
 string MetaParametersRBFN::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersRBFN");
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
-
-/*
-void to_json(nlohmann::json& j, const MetaParametersRBFN& mp) {
-    j = nlohmann::json{
-      //{"n_bfs_per_dim", mp.n_bfs_per_dim_},
-      {"intersection_height", mp.intersection_height_},
-      {"regularization", mp.regularization_}
-    };
-}
-
-void from_json(const nlohmann::json& j, MetaParametersRBFN& p) {
-  //p.n_bfs_per_dim_ = j.at("n_bfs_per_dim").get<VectorXi>();
-  p.intersection_height_ = j.at("intersection_height").get<double>();
-  p.regularization_ = j.at("regularization").get<double>();
-}
-*/
 
 }
