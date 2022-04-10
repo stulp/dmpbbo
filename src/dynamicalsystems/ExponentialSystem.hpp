@@ -51,9 +51,8 @@ public:
    *  \param y_init  Initial state, cf. DynamicalSystem::initial_state()
    *  \param y_attr  Attractor state, cf. DynamicalSystem::attractor_state()
    *  \param alpha   Decay constant, cf. ExponentialSystem::alpha()
-   *  \param name    Name for the sytem, cf. DynamicalSystem::name()     
    */
-  ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name="ExponentialSystem");
+  ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha);
   
   static ExponentialSystem* from_jsonpickle(const nlohmann::json& json);
 

@@ -36,8 +36,8 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-SpringDamperSystem::SpringDamperSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double damping_coefficient, double spring_constant, double mass, std::string name)
-  : DynamicalSystem(2, tau, y_init, y_attr, name),
+SpringDamperSystem::SpringDamperSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double damping_coefficient, double spring_constant, double mass)
+  : DynamicalSystem(2, tau, y_init, y_attr),
   damping_coefficient_(damping_coefficient),spring_constant_(spring_constant),mass_(mass)
 {
   if (spring_constant_==CRITICALLY_DAMPED)
@@ -58,7 +58,7 @@ SpringDamperSystem::~SpringDamperSystem(void)
 DynamicalSystem* SpringDamperSystem::clone(void) const
 {
   return new SpringDamperSystem(tau(),initial_state(),attractor_state(),
-                        damping_coefficient_,spring_constant_,mass_,name());
+                        damping_coefficient_,spring_constant_,mass_);
 }
 
 void SpringDamperSystem::differentialEquation(
@@ -186,9 +186,8 @@ SpringDamperSystem* SpringDamperSystem::from_jsonpickle(const nlohmann::json& js
   double mass = from_json_to_double(json.at("mass_"));
   VectorXd y_init = json.at("initial_state_").at("values");
   VectorXd y_attr = json.at("attractor_state_").at("values");
-  string name = json.at("name_");
   
-  return new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass,name);
+  return new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass);
 }
 
 void to_json(nlohmann::json& j, const SpringDamperSystem& obj) {

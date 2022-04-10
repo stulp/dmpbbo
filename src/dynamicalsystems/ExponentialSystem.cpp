@@ -38,8 +38,8 @@ using namespace Eigen;
 
 namespace DmpBbo {
     
-ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha, std::string name)
-  : DynamicalSystem(1, tau, y_init, y_attr, name),
+ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha)
+  : DynamicalSystem(1, tau, y_init, y_attr),
   alpha_(alpha)
 {
   attractor_state_prealloc_ = VectorXd::Zero(dim_orig());
@@ -51,7 +51,7 @@ ExponentialSystem::~ExponentialSystem(void)
 
 DynamicalSystem* ExponentialSystem::clone(void) const
 {
-  return new ExponentialSystem(tau(),initial_state(),attractor_state(),alpha_,name());
+  return new ExponentialSystem(tau(),initial_state(),attractor_state(),alpha_);
 }
 
 
@@ -103,12 +103,11 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, Mat
 ExponentialSystem* ExponentialSystem::from_jsonpickle(const nlohmann::json& json) {
 
   double tau = from_json_to_double(json.at("tau_"));
-  string name = json.at("name_");
   double alpha = from_json_to_double(json.at("alpha_"));
   VectorXd y_init = json.at("initial_state_").at("values");
   VectorXd y_attr = json.at("attractor_state_").at("values");
   
-  return new ExponentialSystem(tau,y_init,y_attr,alpha,name);
+  return new ExponentialSystem(tau,y_init,y_attr,alpha);
 }
 
 void to_json(nlohmann::json& j, const ExponentialSystem& obj) {

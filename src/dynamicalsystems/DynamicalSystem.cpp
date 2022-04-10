@@ -35,7 +35,7 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DynamicalSystem::DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state, Eigen::VectorXd attractor_state, std::string name)
+DynamicalSystem::DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state, Eigen::VectorXd attractor_state)
   : 
   // For 1st order systems, the dimensionality of the state vector 'x' is 'dim'
   // For 2nd order systems, the system is expanded to x = [y z], where 'y' and
@@ -44,7 +44,7 @@ DynamicalSystem::DynamicalSystem(int order, double tau, Eigen::VectorXd initial_
   // The dimensionality of the system before a potential rewrite
   dim_orig_(initial_state.size()),
   tau_(tau),initial_state_(initial_state),attractor_state_(attractor_state),
-  name_(name),integration_method_(RUNGE_KUTTA)
+  integration_method_(RUNGE_KUTTA)
 {
   assert(order==1 || order==2);
   assert(initial_state.size()==attractor_state.size());
@@ -120,7 +120,6 @@ void DynamicalSystem::to_json_base(nlohmann::json& j) const {
   j["tau_"] = tau_;
   j["initial_state_"] = initial_state_;
   j["attractor_state_"] = attractor_state_;
-  j["name_"] = name_;
   // Avoiding NLOHMANN_JSON_SERIALIZE_ENUM
   j["integration_method_"] = (integration_method_==EULER) ? "EULER" : "RUNGE_KUTTA" ;
   

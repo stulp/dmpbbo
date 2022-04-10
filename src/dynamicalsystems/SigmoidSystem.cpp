@@ -37,8 +37,8 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time, std::string name)
-: DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size()), name),
+SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time)
+: DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size())),
   max_rate_(max_rate),
   inflection_point_time_(inflection_point_time)
 {
@@ -51,7 +51,7 @@ SigmoidSystem::~SigmoidSystem(void)
 
 DynamicalSystem* SigmoidSystem::clone(void) const
 {
-  return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_,name());
+  return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_);
 }
 
 void SigmoidSystem::set_tau(double new_tau) {
@@ -168,9 +168,8 @@ SigmoidSystem* SigmoidSystem::from_jsonpickle(const nlohmann::json& json) {
   double max_rate = from_json_to_double(json.at("max_rate_"));
   double inflection_point_time = from_json_to_double(json.at("inflection_point_time_"));
   VectorXd y_init = json.at("initial_state_").at("values");
-  string name = json.at("name_");
   
-  return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time,name);
+  return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time);
 }
   
 void to_json(nlohmann::json& j, const SigmoidSystem& obj) {

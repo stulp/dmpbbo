@@ -47,9 +47,8 @@ public:
    *  Initialization constructor.
    *  \param tau              Time constant,                cf. DynamicalSystem::tau()
    *  \param count_down       Whether timer increases (false) or decreases (true)
-   *  \param name             Name for the sytem,           cf. DynamicalSystem::name()
    */
-  TimeSystem(double tau, bool count_down=false, std::string name="TimeSystem");
+  TimeSystem(double tau, bool count_down=false);
   
   /** Destructor. */
   ~TimeSystem(void);

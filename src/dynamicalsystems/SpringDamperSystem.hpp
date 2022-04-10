@@ -53,10 +53,9 @@ public:
    *  \param spring_constant  Spring constant, cf. SpringDamperSystem::spring_constant()
    *  \param damping_coefficient  Damping coefficient, cf. SpringDamperSystem::damping_coefficient()
    *  \param mass    Mass,                     cf. SpringDamperSystem::mass()
-   *  \param name    Name for the sytem,       cf. DynamicalSystem::name()
    */
   SpringDamperSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
-    double damping_coefficient, double spring_constant=CRITICALLY_DAMPED, double mass=1.0, std::string name="SpringDamperSystem");
+    double damping_coefficient, double spring_constant=CRITICALLY_DAMPED, double mass=1.0);
     
   /** Destructor. */
   ~SpringDamperSystem(void);

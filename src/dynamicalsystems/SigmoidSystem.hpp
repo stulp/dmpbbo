@@ -44,9 +44,8 @@ public:
    *  \param x_init           Initial state,                cf. DynamicalSystem::initial_state()
    *  \param max_rate         Maximum rate of change,       cf. SigmoidSystem::max_rate()
    *  \param inflection_point_time Time at which maximum rate of change is achieved,  cf. SigmoidSystem::inflection_point_time()
-   *  \param name             Name for the sytem,           cf. DynamicalSystem::name()
    */
-   SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time, std::string name="SigmoidSystem");
+   SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate, double inflection_point_time);
   
   /** Destructor. */
   ~SigmoidSystem(void);

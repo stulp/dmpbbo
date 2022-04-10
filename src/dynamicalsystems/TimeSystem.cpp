@@ -37,9 +37,9 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-TimeSystem::TimeSystem(double tau, bool count_down, std::string name)
+TimeSystem::TimeSystem(double tau, bool count_down)
 : 
-  DynamicalSystem(1, tau, VectorXd::Zero(1), VectorXd::Ones(1), name),
+  DynamicalSystem(1, tau, VectorXd::Zero(1), VectorXd::Ones(1)),
   count_down_(count_down)
 {
   if (count_down_)
@@ -55,7 +55,7 @@ TimeSystem::~TimeSystem(void)
 
 DynamicalSystem* TimeSystem::clone(void) const
 {
-  return new TimeSystem(tau(),count_down(),name());
+  return new TimeSystem(tau(),count_down());
 }
 
 void TimeSystem::differentialEquation(
@@ -136,9 +136,8 @@ TimeSystem* TimeSystem::from_jsonpickle(const nlohmann::json& json) {
   double tau = from_json_to_double(json.at("tau_"));
   int count_down_int = json.at("count_down_");
   bool count_down = count_down_int >0;
-  string name = json.at("name_");
 
-  return new TimeSystem(tau,count_down,name);
+  return new TimeSystem(tau,count_down);
 }
 
 void to_json(nlohmann::json& j, const TimeSystem& obj) {

@@ -180,7 +180,6 @@ int main(int n_args, char** args)
     }
     
     dmp = new Dmp(tau, y_init, y_attr, function_approximators, dmp_type);
-    dmp->set_name("testDmp");
   }
 
   VectorXd x(dmp->dim(),1);

@@ -90,7 +90,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          DynamicalSystem* phase_system, 
          DynamicalSystem* gating_system,     
          ForcingTermScaling scaling)
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"),
+  : DynamicalSystem(1, tau, y_init, y_attr),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system), 
   forcing_term_scaling_(scaling)
@@ -104,7 +104,7 @@ Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximato
    double alpha_spring_damper, DynamicalSystem* goal_system,
    DynamicalSystem* phase_system, DynamicalSystem* gating_system,     
    ForcingTermScaling scaling)
-  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
+  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system),
   forcing_term_scaling_(scaling)
@@ -117,7 +117,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type,     
          ForcingTermScaling scaling)
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"),
+  : DynamicalSystem(1, tau, y_init, y_attr),
     forcing_term_scaling_(scaling)
 {  
   initSubSystems(dmp_type);
@@ -127,7 +127,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
 Dmp::Dmp(int n_dims_dmp, 
          std::vector<FunctionApproximator*> function_approximators, 
          DmpType dmp_type, ForcingTermScaling scaling)
-  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp), "name"),
+  : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
     forcing_term_scaling_(scaling)
 {
   initSubSystems(dmp_type);
@@ -135,7 +135,7 @@ Dmp::Dmp(int n_dims_dmp,
 }
 
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
-  : DynamicalSystem(1, tau, y_init, y_attr, "name"), forcing_term_scaling_(NO_SCALING)
+  : DynamicalSystem(1, tau, y_init, y_attr), forcing_term_scaling_(NO_SCALING)
 {
   
   VectorXd one_1 = VectorXd::Ones(1);
@@ -185,7 +185,6 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
   set_dim(3*dim_orig()+2);
     
   spring_system_ = new SpringDamperSystem(tau(),initial_state(),attractor_state(),alpha_spring_damper);  
-  spring_system_->set_name(name()+"_spring-damper");
 
   goal_system_ = goal_system;
   if (goal_system!=NULL)
@@ -193,14 +192,11 @@ void Dmp::initSubSystems(double alpha_spring_damper, DynamicalSystem* goal_syste
     assert(goal_system->dim()==dim_orig());
     // Initial state of the goal system is that same as that of the DMP
     goal_system_->set_initial_state(initial_state());
-    goal_system_->set_name(name()+"_goal");
   }
 
   phase_system_ = phase_system;
-  phase_system_->set_name(name()+"_phase");
 
   gating_system_ = gating_system;
-  gating_system_->set_name(name()+"_gating");
   
   // Pre-allocate memory for real-time execution
   attractor_state_prealloc_ = VectorXd(dim_orig());
@@ -830,7 +826,6 @@ Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
 
   double tau = from_json_to_double(json.at("tau_"));
   
-  string name = json.at("name_");
   double alpha_spring_damper = from_json_to_double(json.at("spring_system_").at("damping_coefficient_"));
 
   VectorXd y_init;
@@ -879,7 +874,6 @@ string Dmp::toString(void) const
   stringstream stream;
   
   stream << "Dmp(";
-  stream << "name=" << name() << ", ";
   stream << "dim_orig=" << dim_orig() << ", ";
   stream << "dim=" << dim() << ", ";
   stream << "tau=" << tau() << ", ";

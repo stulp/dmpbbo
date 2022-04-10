@@ -75,9 +75,8 @@ public:
    * \param tau              Time constant, see tau()
    * \param initial_state    Initial state, see initial_state()
    * \param attractor_state  Attractor state, see attractor_state()
-   * \param name             A name you give, see name()
    */
-   DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state, Eigen::VectorXd attractor_state, std::string name);
+   DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state, Eigen::VectorXd attractor_state);
 
   /** Destructor */
   virtual ~DynamicalSystem(void);
@@ -283,19 +282,6 @@ public:
     assert(attractor_state.size()==dim_orig_);
     attractor_state_ = attractor_state;
   }
-
-  /**
-   * Accessor function for the name of the dynamical system.
-   * \return Name of the dynamical system.
-   */
-  inline std::string name(void) const { return name_; }
-
-  /** Mutator function for the name of the dynamical system.
-   *  \param[in] name Name of the dynamical system.
-   */
-  inline virtual void set_name(std::string name) {
-    name_ = name;
-  }
   
 protected:
   /**
@@ -358,11 +344,6 @@ private:
    *  to avoid function calls and copying of vectors).
    */
   Eigen::VectorXd attractor_state_;
-
-  /** A name you may give to the system.
-   * Has no direct functionality, but may perhaps be useful for output or debugging purposes.
-   */
-  std::string name_;
 
   /** Which integration method to use. See DynamicalSystem::IntegrationMethod */
   IntegrationMethod integration_method_;
