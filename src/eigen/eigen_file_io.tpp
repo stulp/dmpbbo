@@ -1,5 +1,5 @@
 /**
- * @file EigenFileIO.tpp
+ * @file eigen_file_io.tpp
  * @brief  Source file for input/output of Eigen matrices to ASCII files.
  * @author Freek Stulp
  *
