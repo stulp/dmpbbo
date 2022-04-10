@@ -23,7 +23,6 @@
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "eigen/eigen_file_io.hpp"
@@ -39,14 +38,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-
-FunctionApproximatorLWR::FunctionApproximatorLWR(const MetaParametersLWR *const meta_parameters, const ModelParametersLWR *const model_parameters) 
-:
-  FunctionApproximator(meta_parameters,model_parameters)
-{
-  if (model_parameters!=NULL)
-    preallocateMemory(model_parameters->getNumberOfBasisFunctions());
-}
 
 FunctionApproximatorLWR::FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters) 
 :
@@ -64,17 +55,9 @@ void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
   activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
-FunctionApproximatorLWR::FunctionApproximatorLWR(int expected_input_dim, const Eigen::VectorXi& n_bfs_per_dim, double intersection_height, double regularization, bool asymmetric_kernels)
-:
-  FunctionApproximator(new MetaParametersLWR(expected_input_dim,n_bfs_per_dim,intersection_height,regularization,asymmetric_kernels))
-{  
-  
-}
-
 FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
   // All error checking and cloning is left to the FunctionApproximator constructor.
   return new FunctionApproximatorLWR(
-    dynamic_cast<const MetaParametersLWR*>(getMetaParameters()),
     dynamic_cast<const ModelParametersLWR*>(getModelParameters())
     );
 };
@@ -161,17 +144,12 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
 
 FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
 
-  MetaParametersLWR* meta = NULL;
-  if (json.contains("_meta_params")) {
-    meta = MetaParametersLWR::from_jsonpickle(json["_meta_params"]);
-  }
-  
   ModelParametersLWR* model = NULL;
   if (json.contains("_model_params")) {
     model = ModelParametersLWR::from_jsonpickle(json["_model_params"]);
   }
   
-  return new FunctionApproximatorLWR(meta,model);
+  return new FunctionApproximatorLWR(model);
 }
 
 }

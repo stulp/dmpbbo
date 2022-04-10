@@ -41,22 +41,6 @@ public:
 
 static void from_jsonpickle(const nlohmann::json& json, FunctionApproximator*& fa);
 
-/** Initialize a function approximator from its name.
- \param[in] name Name of the function approximator, e.g. "LWR"
- \param[in] n_input_dims Dimensionality of the input data
- \return A pointer to an initialized function approximator.
- */
-static FunctionApproximator* getFunctionApproximatorByName(std::string name, int n_input_dims=1);
-
-/**
-LWR : n_basis_functions (int), intersection (double)
-RBFN : n_basis_functions (int), intersection (double)
-LWPR: w_gen, w_prune, update_D, init_alpha, penalty, init_d    
-GMR: n_basis_functions (int)
-RRRFF n_basis_functions (int), regularization (double), gamma (double)
-GPR: maximum_covariance (double), length (double)
- */
-static FunctionApproximator* getFunctionApproximatorFromArgs(int n_args, char* args[], int n_input_dims=1);
 
 };
 

@@ -23,7 +23,6 @@
 
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
 #include "functionapproximators/ModelParametersRBFN.hpp"
-#include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "eigen/eigen_file_io.hpp"
@@ -38,14 +37,6 @@ using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
-
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(const MetaParametersRBFN *const meta_parameters, const ModelParametersRBFN *const model_parameters) 
-:
-  FunctionApproximator(meta_parameters,model_parameters)
-{
-  if (model_parameters!=NULL)
-    preallocateMemory(model_parameters->getNumberOfBasisFunctions());
-}
 
 FunctionApproximatorRBFN::FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters) 
 :
@@ -65,7 +56,6 @@ void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
 FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
   // All error checking and cloning is left to the FunctionApproximator constructor.
   return new FunctionApproximatorRBFN(
-    dynamic_cast<const MetaParametersRBFN*>(getMetaParameters()),
     dynamic_cast<const ModelParametersRBFN*>(getModelParameters())
     );
 };
@@ -124,15 +114,12 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
 }
 
 FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) {
-  MetaParametersRBFN* meta = NULL;
-  if (json.contains("_meta_params"))
-    meta = MetaParametersRBFN::from_jsonpickle(json["_meta_params"]);
-  
+
   ModelParametersRBFN* model = NULL;
   if (json.contains("_model_params"))
     model = ModelParametersRBFN::from_jsonpickle(json["_model_params"]);
   
-  return new FunctionApproximatorRBFN(meta,model);
+  return new FunctionApproximatorRBFN(model);
 }
 
 }

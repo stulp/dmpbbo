@@ -29,7 +29,6 @@
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-#include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
 #include "eigen/eigen_file_io.hpp"
@@ -140,7 +139,7 @@ int main(int n_args, char** args)
     Dmp::DmpType dmp_type = Dmp::KULVICIUS_2012_JOINING;
     dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
     
-    int input_dim = 1;
+    //int input_dim = 1;
     
     int n_basis_functions = 9;
     
@@ -174,9 +173,8 @@ int main(int n_args, char** args)
     for (int dd=0; dd<dim; dd++)
     {
       VectorXd cur_slopes = slopes.row(dd);
-      MetaParametersLWR* meta_parameters = new MetaParametersLWR(input_dim,n_basis_functions);      
       ModelParametersLWR* model_parameters = new ModelParametersLWR(centers,widths,cur_slopes,offsets);
-      function_approximators[dd] = new FunctionApproximatorLWR(meta_parameters,model_parameters);
+      function_approximators[dd] = new FunctionApproximatorLWR(model_parameters);
     }
     
     dmp = new Dmp(tau, y_init, y_attr, function_approximators, dmp_type);

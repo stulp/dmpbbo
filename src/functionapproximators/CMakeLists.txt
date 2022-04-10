@@ -1,5 +1,5 @@
 ################################################################################
-file(GLOB SOURCES BasisFunction.cpp Parameterizable.cpp MetaParameters.cpp ModelParameters.cpp FunctionApproximator.cpp *LWR.cpp *RBFN.cpp FunctionApproximatorFactory.cpp) 
+file(GLOB SOURCES BasisFunction.cpp Parameterizable.cpp ModelParameters.cpp FunctionApproximator.cpp *LWR.cpp *RBFN.cpp FunctionApproximatorFactory.cpp) 
 
 ################################################################################
 add_library(functionapproximators ${SHARED_OR_STATIC} ${SOURCES})

@@ -24,7 +24,6 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 
 #include "functionapproximators/ModelParameters.hpp"
-#include "functionapproximators/MetaParameters.hpp"
 
 #include "eigen/eigen_file_io.hpp"
 
@@ -42,47 +41,17 @@ using namespace Eigen;
 
 namespace DmpBbo { 
 
-/******************************************************************************/
-FunctionApproximator::FunctionApproximator(const MetaParameters *const meta_parameters, const ModelParameters *const model_parameters) 
-{
-  // At least one of them should not be NULL
-  assert(meta_parameters!=NULL || model_parameters!=NULL); 
-  
-  if (meta_parameters==NULL)
-    meta_parameters_ = NULL;
-  else
-    meta_parameters_ = meta_parameters->clone();
-  
-  if (model_parameters==NULL)
-    model_parameters_ = NULL;
-  else
-    model_parameters_ = model_parameters->clone();
-
-  // If both meta- and model-parameters were set, check if they have the same expected input dim.
-  if (meta_parameters_!=NULL && model_parameters_!=NULL)
-    assert(model_parameters_->getExpectedInputDim()==meta_parameters_->getExpectedInputDim());
-  
-}
-
 FunctionApproximator::FunctionApproximator(const ModelParameters *const model_parameters) 
 {
   assert(model_parameters!=NULL);
-  meta_parameters_  = NULL;
   model_parameters_ = model_parameters->clone();
 }
 
 FunctionApproximator::~FunctionApproximator(void) 
 {
-  delete meta_parameters_;
   delete model_parameters_;
 }
 
-
-/******************************************************************************/
-const MetaParameters* FunctionApproximator::getMetaParameters(void) const 
-{ 
-  return meta_parameters_; 
-};
   
 /******************************************************************************/
 const ModelParameters* FunctionApproximator::getModelParameters(void) const 
@@ -104,18 +73,12 @@ void FunctionApproximator::setModelParameters(ModelParameters* model_parameters)
 
 int FunctionApproximator::getExpectedInputDim(void) const
 {
-  if (model_parameters_!=NULL)
-    return model_parameters_->getExpectedInputDim();
-  else
-    return meta_parameters_->getExpectedInputDim();
+  return model_parameters_->getExpectedInputDim();
 }
 
 int FunctionApproximator::getExpectedOutputDim(void) const
 {
-  if (model_parameters_!=NULL)
-    return model_parameters_->getExpectedOutputDim();
-  else
-    return meta_parameters_->getExpectedOutputDim();
+  return model_parameters_->getExpectedOutputDim();
 }
 
 
@@ -211,8 +174,6 @@ string FunctionApproximator::toString(void) const
 {
   std::stringstream s;
   s << "FunctionApproximator"+getName() << endl;
-  if (meta_parameters_!=NULL)
-    s << *meta_parameters_ << endl;
   if (model_parameters_!=NULL)
     s << *model_parameters_ << endl;
   return s.str();
