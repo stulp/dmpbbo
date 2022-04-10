@@ -95,9 +95,6 @@ private:
   /** Default constructor.*/
   ModelParametersRBFN(void) {};
   
-  mutable Eigen::MatrixXd inputs_cached_;
-  mutable Eigen::MatrixXd kernel_activations_cached_;
-  
   
 };
 
