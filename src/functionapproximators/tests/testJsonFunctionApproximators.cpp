@@ -28,7 +28,6 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/ModelParametersRBFN.hpp"
 
 #include "functionapproximators/FunctionApproximatorFactory.hpp"
 

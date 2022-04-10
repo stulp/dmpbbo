@@ -29,7 +29,6 @@
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-#include "functionapproximators/ModelParametersLWR.hpp"
 
 #include "eigen/eigen_file_io.hpp"
 
@@ -169,12 +168,10 @@ int main(int n_args, char** args)
       slopes = 3*slopes;
     }
               
-    //double intersection_ratio = 0.5;
     for (int dd=0; dd<dim; dd++)
     {
       VectorXd cur_slopes = slopes.row(dd);
-      ModelParametersLWR* model_parameters = new ModelParametersLWR(centers,widths,cur_slopes,offsets);
-      function_approximators[dd] = new FunctionApproximatorLWR(model_parameters);
+      function_approximators[dd] = new FunctionApproximatorLWR(centers,widths,cur_slopes,offsets);
     }
     
     dmp = new Dmp(tau, y_init, y_attr, function_approximators, dmp_type);

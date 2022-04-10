@@ -22,58 +22,52 @@
  */
 
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/ModelParametersRBFN.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigen/eigen_json.hpp"
+
+#include <nlohmann/json.hpp>
 
 #include <iostream>
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/LU>
 
-#include <nlohmann/json.hpp>
 
 using namespace std;
 using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN* model_parameters) 
+FunctionApproximatorRBFN::FunctionApproximatorRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights) 
+:
+  n_basis_functions_(centers.rows()),
+  centers_(centers),
+  widths_(widths),
+  weights_(weights)
 {
-  model_parameters_ = model_parameters;
-  preallocateMemory(model_parameters->getNumberOfBasisFunctions());
-}
-
-FunctionApproximatorRBFN::~FunctionApproximatorRBFN(void) 
-{
-  delete model_parameters_;
-}
-
-void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
-{
-  weights_prealloc_ = VectorXd(n_basis_functions);
-  activations_one_prealloc_ = MatrixXd(1,n_basis_functions);
-  activations_prealloc_ = MatrixXd(1,n_basis_functions);
-}
-
+  assert(n_basis_functions_==widths_.rows());
+  assert(n_basis_functions_==weights_.rows());
+  assert(centers.cols()==widths_.cols()); // # number of dimensions should match
+  assert(weights_.cols()==1);
+  
+  activations_one_prealloc_ = MatrixXd(1,n_basis_functions_);
+};
 
 void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
-  model_parameters_->weights(weights_prealloc_);
   
-  int n_basis_functions = model_parameters_->getNumberOfBasisFunctions();
-  
-  bool only_one_sample = (inputs.rows()==1);
-  if (only_one_sample)
+  int n_time_steps = inputs.rows();
+  if (n_time_steps==1) // Only one sample
   {
     ENTERING_REAL_TIME_CRITICAL_CODE
     
     // Get the basis function activations  
-    model_parameters_->kernelActivations(inputs,activations_one_prealloc_);
+    // false, false => normalized_basis_functions, asymmetric_kernels;
+    BasisFunction::Gaussian::activations(centers_,widths_,inputs,activations_one_prealloc_,false,false);
       
     // Weight the basis function activations  
-    for (int b=0; b<n_basis_functions; b++)
-      activations_one_prealloc_.col(b).array() *= weights_prealloc_(b);
+    for (int b=0; b<n_basis_functions_; b++)
+      activations_one_prealloc_.col(b).array() *= weights_(b);
   
     // Sum over weighed basis functions
     outputs = activations_one_prealloc_.rowwise().sum();
@@ -82,40 +76,46 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
   }
   else 
   {
-    int n_time_steps = inputs.rows();
 
-    // The next two lines may not be real-time, as they may allocate memory.
-    // (if the size are already correct, it will be realtime)
-    activations_prealloc_.resize(n_time_steps,n_basis_functions);
-    outputs.resize(n_time_steps,1);
+    // The next line is not be real-time, as it allocates memory.
+    MatrixXd activations(n_time_steps,n_basis_functions_);
     
     // Get the basis function activations  
-    model_parameters_->kernelActivations(inputs,activations_prealloc_);
+    // false, false => normalized_basis_functions, asymmetric_kernels;
+    BasisFunction::Gaussian::activations(centers_,widths_,inputs,activations,false,false);
       
     // Weight the basis function activations  
-    for (int b=0; b<n_basis_functions; b++)
-      activations_prealloc_.col(b).array() *= weights_prealloc_(b);
+    for (int b=0; b<n_basis_functions_; b++)
+      activations.col(b).array() *= weights_(b);
   
     // Sum over weighed basis functions
-    outputs = activations_prealloc_.rowwise().sum();
+    outputs = activations.rowwise().sum();
   }
     
 }
 
-FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) {
+FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) 
+{
+  nlohmann::json j = json.at("_model_params");
+  MatrixXd centers = j.at("centers").at("values");
+  MatrixXd widths = j.at("widths").at("values");
+  MatrixXd weights = j.at("weights").at("values");  
+  return new FunctionApproximatorRBFN(centers,widths,weights);
+}
 
-  ModelParametersRBFN* model = NULL;
-  if (json.contains("_model_params"))
-    model = ModelParametersRBFN::from_jsonpickle(json["_model_params"]);
-  
-  return new FunctionApproximatorRBFN(model);
+void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& obj) 
+{
+  j["centers_"] = obj.centers_;
+  j["widths_"] = obj.widths_;
+  j["weights_"] = obj.weights_;
+  j["py/object"] = "dynamicalsystems.ModelParametersRBFN.ModelParametersRBFN"; // for jsonpickle
 }
 
 string FunctionApproximatorRBFN::toString(void) const
 {
-  std::stringstream s;
-  s << "FunctionApproximatorRBFN" << endl;
-  return s.str();
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
 
 }

@@ -45,14 +45,17 @@ class FunctionApproximatorLWR : public FunctionApproximator
 {
 public:
 
-  /** Initialize a function approximator with model parameters
-   *  \param[in] model_parameters The parameters of the (previously) trained model.
+  /** Constructor for the model parameters of the LWPR function approximator.
+   *  \param[in] centers Centers of the basis functions
+   *  \param[in] widths  Widths of the basis functions. 
+   *  \param[in] slopes  Slopes of the line segments. 
+   *  \param[in] offsets Offsets of the line segments, i.e. the value of the line segment at its intersection with the y-axis.
+   * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not, cf MetaParametersLWR::asymmetric_kernels()
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0 (false), or at the center of the kernel (x=x_c)
    */
-  FunctionApproximatorLWR(ModelParametersLWR* model_parameters);
-
-  FunctionApproximatorLWR(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
+  FunctionApproximatorLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels=false, bool lines_pivot_at_max_activation=false);
   
-  ~FunctionApproximatorLWR(void);
+  ~FunctionApproximatorLWR(void) {};
   
   static FunctionApproximatorLWR* from_jsonpickle(nlohmann::json json);
   // https://github.com/nlohmann/json/issues/1324
@@ -72,12 +75,33 @@ public:
    */
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs) const;
 
+  /** Set whether the offsets should be adapted so that the line segments pivot around the mode of
+   * the basis function, rather than the intersection with the y-axis.
+   * \param[in] lines_pivot_at_max_activation Whether to pivot around the mode or not.
+   *
+   */
+  void set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation);
+
+  /** Whether to return slopes as angles or slopes in ModelParametersLWR::getParameterVectorAll()
+   * \param[in] slopes_as_angles Whether to return as slopes (true) or angles (false)
+   * \todo Implement and document
+   */
+  void set_slopes_as_angles(bool slopes_as_angles);
+  
 	std::string toString(void) const;
 	
 private:  
   /** The model parameters of the function approximator.
    */
-  ModelParametersLWR* model_parameters_;
+  int n_basis_functions_;
+  Eigen::MatrixXd centers_; // n_centers X n_dims
+  Eigen::MatrixXd widths_;  // n_centers X n_dims
+  Eigen::MatrixXd slopes_;  // n_centers X n_dims
+  Eigen::VectorXd offsets_; // n_centers X 1
+
+  bool asymmetric_kernels_;
+  bool lines_pivot_at_max_activation_;
+  bool slopes_as_angles_;
   
   /**
    * Default constructor.
@@ -87,8 +111,6 @@ private:
    */
   FunctionApproximatorLWR(void) {};
    
-  void preallocateMemory(int n_basis_functions);
-  
   /** Preallocated memory for one time step, required to make the predict() function real-time. */
   mutable Eigen::MatrixXd lines_one_prealloc_;
   
@@ -101,6 +123,14 @@ private:
   /** Preallocated memory to make things more efficient. */
   mutable Eigen::MatrixXd activations_prealloc_;
   
+  /** Get the output of each linear model (unweighted) for the given inputs.
+   * \param[in] inputs The inputs for which to compute the output of the lines models (size: n_samples X  n_input_dims)
+   * \param[out] lines The output of the linear models (size: n_samples X n_basis_functions) 
+   *
+   * If "lines" is passed as a Matrix of correct size (n_samples X n_basis_functions), this function
+   * will not allocate any memory, and is real-time.
+   */
+  void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
 };
 
 }

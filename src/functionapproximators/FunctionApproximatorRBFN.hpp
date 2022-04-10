@@ -35,9 +35,6 @@
 
 namespace DmpBbo {
   
-// Forward declarations
-class ModelParametersRBFN;
-
 /** \brief RBFN (Radial Basis Function Network) function approximator
  * \ingroup FunctionApproximators
  * \ingroup RBFN  
@@ -47,10 +44,12 @@ class FunctionApproximatorRBFN : public FunctionApproximator
 public:
   
 
-  /** Initialize a function approximator with model parameters
-   *  \param[in] model_parameters The parameters of the (previously) trained model.
+  /** Constructor for the model parameters of the function approximator.
+   *  \param[in] centers Centers of the basis functions
+   *  \param[in] widths  Widths of the basis functions. 
+   *  \param[in] weights Weight of each basis function
    */
-  FunctionApproximatorRBFN(ModelParametersRBFN* model_parameters);
+  FunctionApproximatorRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights);
 
   static FunctionApproximatorRBFN* from_jsonpickle(nlohmann::json json);
   // https://github.com/nlohmann/json/issues/1324
@@ -58,11 +57,6 @@ public:
   //friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN& m);
   
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
-  
-	/** Preallocate memory to make certain functions real-time.
-	 * \param[in] n_basis_functions Number of basis functions in the RBFN.
-	 */
-  void preallocateMemory(int n_basis_functions);
   
   /**
    * Default constructor.
@@ -72,25 +66,21 @@ public:
    */
   FunctionApproximatorRBFN(void) {};
 
-  ~FunctionApproximatorRBFN(void);
+  ~FunctionApproximatorRBFN(void) {};
 
+  
 	std::string toString(void) const;
 	
 private:  
   
-  /** The model parameters of the function approximator.
-   */
-  ModelParametersRBFN* model_parameters_;
-  
-  /** Preallocated memory to make things realtime and more efficient. */
-  mutable Eigen::VectorXd weights_prealloc_;
+  int n_basis_functions_;
+  Eigen::MatrixXd centers_; // n_basis_functions_ X n_dims
+  Eigen::MatrixXd widths_;  // n_basis_functions_ X n_dims
+  Eigen::VectorXd weights_; //                  1 X n_dims
   
   /** Preallocated memory for one time step, required to make the predict() function real-time. */
   mutable Eigen::MatrixXd activations_one_prealloc_;
   
-  /** Preallocated memory to make things more efficient. */
-  mutable Eigen::MatrixXd activations_prealloc_;
-
 };
 
 }

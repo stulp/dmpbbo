@@ -22,16 +22,17 @@
  */
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-#include "functionapproximators/ModelParametersLWR.hpp"
+#include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigen/eigen_json.hpp"
+
+#include <nlohmann/json.hpp>
 
 #include <iostream>
 #include <eigen3/Eigen/SVD>
 #include <eigen3/Eigen/LU>
 
-#include <nlohmann/json.hpp>
 
 
 using namespace std;
@@ -39,41 +40,50 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorLWR::FunctionApproximatorLWR(ModelParametersLWR* model_parameters) 
+FunctionApproximatorLWR::FunctionApproximatorLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels, bool lines_pivot_at_max_activation) 
+:
+  n_basis_functions_(centers.rows()),
+  centers_(centers),
+  widths_(widths),
+  slopes_(slopes), 
+  offsets_(offsets),
+  asymmetric_kernels_(asymmetric_kernels),
+  lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
+  slopes_as_angles_(false)
 {
-  model_parameters_ = model_parameters;
-  preallocateMemory(model_parameters->getNumberOfBasisFunctions());
-}
-
-FunctionApproximatorLWR::~FunctionApproximatorLWR(void) 
-{
-  delete model_parameters_;
-}
-
-
-
-void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
-{
-  lines_one_prealloc_ = MatrixXd(1,n_basis_functions);
-  activations_one_prealloc_ = MatrixXd(1,n_basis_functions);
+#ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
+  int n_dims = centers.cols();
+#endif  
+  assert(n_basis_functions_==widths_.rows());
+  assert(n_dims            ==widths_.cols());
+  assert(n_basis_functions_==slopes_.rows());
+  assert(n_dims            ==slopes_.cols());
+  assert(n_basis_functions_==offsets_.rows());
+  assert(1                 ==offsets_.cols());
   
-  lines_prealloc_ = MatrixXd(1,n_basis_functions);
-  activations_prealloc_ = MatrixXd(1,n_basis_functions);
-}
+  lines_one_prealloc_ = MatrixXd(1,n_basis_functions_);
+  activations_one_prealloc_ = MatrixXd(1,n_basis_functions_);
+  
+};
+
 
 void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
   
-  bool only_one_sample = (inputs.rows()==1);
-  if (only_one_sample)
+  int n_time_steps = inputs.rows();
+  if (n_time_steps==1) // Only one sample
   {
     ENTERING_REAL_TIME_CRITICAL_CODE
 
     // Only 1 sample, so real-time execution is possible. No need to allocate memory.
-    model_parameters_->getLines(inputs, lines_one_prealloc_);
+    getLines(inputs, lines_one_prealloc_);
 
     // Weight the values for each line with the normalized basis function activations  
-    model_parameters_->kernelActivations(inputs,activations_one_prealloc_);
+    bool normalize_activations = true;
+    BasisFunction::Gaussian::activations(
+      centers_,widths_,inputs,
+      activations_one_prealloc_,
+      normalize_activations,asymmetric_kernels_);
   
     outputs = (lines_one_prealloc_.array()*activations_one_prealloc_.array()).rowwise().sum();  
     
@@ -83,41 +93,208 @@ void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& i
   else
   {
     
-    int n_time_steps = inputs.rows();
-    int n_basis_functions = model_parameters_->getNumberOfBasisFunctions();
+    // The next two lines are not real-time, as they allocate memory
+    MatrixXd lines(n_time_steps,n_basis_functions_);
+    MatrixXd activations(n_time_steps,n_basis_functions_);
     
-    // The next two lines are not be real-time, as they allocate memory
-    lines_prealloc_.resize(n_time_steps,n_basis_functions);
-    activations_prealloc_.resize(n_time_steps,n_basis_functions);
-    outputs.resize(n_time_steps,1);
-    
-    model_parameters_->getLines(inputs, lines_prealloc_);
+    getLines(inputs, lines);
 
     // Weight the values for each line with the normalized basis function activations  
-    model_parameters_->kernelActivations(inputs,activations_prealloc_);
+    bool normalize_activations = true;
+    BasisFunction::Gaussian::activations(
+      centers_,widths_,inputs,
+      activations,
+      normalize_activations,asymmetric_kernels_);
   
-    outputs = (lines_prealloc_.array()*activations_prealloc_.array()).rowwise().sum();  
+    outputs = (lines.array()*activations.array()).rowwise().sum();  
     
   }
   
 }
 
-FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
+void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation)
+{
+  // If no change, just return
+  if (lines_pivot_at_max_activation_ == lines_pivot_at_max_activation)
+    return;
 
-  ModelParametersLWR* model = NULL;
-  if (json.contains("_model_params")) {
-    model = ModelParametersLWR::from_jsonpickle(json["_model_params"]);
+  //cout << "________________" << endl;
+  //cout << centers_.transpose() << endl;  
+  //cout << slopes_.transpose() << endl;  
+  //cout << offsets_.transpose() << endl;  
+  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
+  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
+  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
+
+  // If you pivot lines around the point when the basis function has maximum activation (i.e.
+  // at the center of the Gaussian), you must compute the new offset corresponding to this
+  // slope, and vice versa    
+  int n_lines = centers_.rows();
+  VectorXd ac(n_lines); // slopes*centers
+  for (int i_line=0; i_line<n_lines; i_line++)
+  {
+    ac[i_line] = slopes_.row(i_line) * centers_.row(i_line).transpose();
   }
+    
+  if (lines_pivot_at_max_activation)
+  {
+    // Representation was "y = ax + b", now it will be "y = a(x-c) + b^new" 
+    // Since "y = ax + b" can be rewritten as "y = a(x-c) + (b+ac)", we know that "b^new = (ac+b)"
+    offsets_ = offsets_ + ac;
+  }
+  else
+  {
+    // Representation was "y = a(x-c) + b", now it will be "y = ax + b^new" 
+    // Since "y = a(x-c) + b" can be rewritten as "y = ax + (b-ac)", we know that "b^new = (b-ac)"
+    offsets_ = offsets_ - ac;
+  } 
+  // Remark, the above could have been done as a one-liner, but I prefer the more legible version.
   
-  return new FunctionApproximatorLWR(model);
+  //cout << offsets_.transpose() << endl;  
+  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
+  
+  lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
 }
 
+void FunctionApproximatorLWR::set_slopes_as_angles(bool slopes_as_angles)
+{
+  slopes_as_angles_ = slopes_as_angles;
+  cerr << __FILE__ << ":" << __LINE__ << ":";
+  cerr << "Not implemented yet!!!" << endl;
+  slopes_as_angles_ = false;
+}
+
+/*
+The code below was previously implemted as follows. Below is the real-time version.
+
+
+void FunctionApproximatorLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
+{
+  int n_time_steps = inputs.rows();
+
+  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
+  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
+  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
+  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
+  
+  // Compute values along lines for each time step  
+  // Line representation is "y = ax + b"
+  lines = inputs*slopes_.transpose() + offsets_.transpose().replicate(n_time_steps,1);
+  
+  if (lines_pivot_at_max_activation_)
+  {
+    // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
+    // Therefore, we still have to subtract "ac"
+    int n_lines = centers_.rows();
+    VectorXd ac(n_lines); // slopes*centers  = ac
+    for (int i_line=0; i_line<n_lines; i_line++)
+      ac[i_line] = slopes_.row(i_line) * centers_.row(i_line).transpose();
+    //cout << "ac = " << ac.rows() << "X" << ac.cols() << endl;
+    lines = lines - ac.transpose().replicate(n_time_steps,1);
+  }
+  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
+}
+*/
+
+void FunctionApproximatorLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& lines) const
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+  
+  //cout  << endl << "========================" << endl;
+  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
+  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
+  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
+  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
+  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
+  
+  int n_time_steps = inputs.rows();
+  int n_lines = centers_.rows();
+  lines.resize(n_time_steps,n_lines);
+  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
+
+
+  // Compute values along lines for each time step  
+  // Line representation is "y = ax + b"
+  for (int i_line=0; i_line<n_lines; i_line++)
+  {
+    lines.col(i_line).noalias() = inputs*slopes_.row(i_line).transpose();
+    lines.col(i_line).array() += offsets_(i_line);
+  
+    if (lines_pivot_at_max_activation_)
+    {
+      // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
+      // Therefore, we still have to subtract "ac"
+      double ac = slopes_.row(i_line).dot(centers_.row(i_line));
+      lines.col(i_line).array() -= ac;
+    }
+  }
+  
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
+/*
+void FunctionApproximatorLWR::kernelActivationsSymmetric(const MatrixXd& centers, const MatrixXd& widths, const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& kernel_activations)
+{
+  cout << __FILE__ << ":" << __LINE__ << ":Here" << endl;
+  // Check and set sizes
+  // centers     = n_basis_functions x n_dim
+  // widths      = n_basis_functions x n_dim
+  // inputs      = n_samples         x n_dim
+  // activations = n_samples         x n_basis_functions
+  int n_basis_functions = centers.rows();
+  int n_samples         = inputs.rows();
+  int n_dims            = centers.cols();
+  assert( (n_basis_functions==widths.rows()) & (n_dims==widths.cols()) ); 
+  assert( (n_samples==inputs.rows()        ) & (n_dims==inputs.cols()) ); 
+  kernel_activations.resize(n_samples,n_basis_functions);  
+
+
+  VectorXd center, width;
+  for (int bb=0; bb<n_basis_functions; bb++)
+  {
+    center = centers.row(bb);
+    width  = widths.row(bb);
+
+    // Here, we compute the values of a (unnormalized) multi-variate Gaussian:
+    //   activation = exp(-0.5*(x-mu)*Sigma^-1*(x-mu))
+    // Because Sigma is diagonal in our case, this simplifies to
+    //   activation = exp(\sum_d=1^D [-0.5*(x_d-mu_d)^2/Sigma_(d,d)]) 
+    //              = \prod_d=1^D exp(-0.5*(x_d-mu_d)^2/Sigma_(d,d)) 
+    // This last product is what we compute below incrementally
+    
+    kernel_activations.col(bb).fill(1.0);
+    for (int i_dim=0; i_dim<n_dims; i_dim++)
+    {
+      kernel_activations.col(bb).array() *= exp(-0.5*pow(inputs.col(i_dim).array()-center[i_dim],2)/(width[i_dim]*width[i_dim])).array();
+    }
+  }
+}
+*/
+
+
+FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
+  nlohmann::json j = json.at("_model_params");
+  MatrixXd centers = j.at("centers").at("values");
+  MatrixXd widths = j.at("widths").at("values");
+  MatrixXd slopes = j.at("slopes").at("values");
+  MatrixXd offsets = j.at("offsets").at("values");  
+  return new FunctionApproximatorLWR(centers,widths,slopes,offsets);
+}
+
+void to_json(nlohmann::json& j, const FunctionApproximatorLWR& obj) {
+  j["centers_"] = obj.centers_;
+  j["widths_"] = obj.widths_;
+  j["offsets_"] = obj.offsets_;
+  j["slopes_"] = obj.slopes_;
+  j["py/object"] = "dynamicalsystems.FunctionApproximatorLWR.FunctionApproximatorLWR"; // jsonpickle
+}
 
 string FunctionApproximatorLWR::toString(void) const
 {
-  std::stringstream s;
-  s << "FunctionApproximatorLWR" << endl;
-  return s.str();
+  nlohmann::json j;
+  to_json(j,*this);
+  return j.dump(4);
 }
+
 
 }
