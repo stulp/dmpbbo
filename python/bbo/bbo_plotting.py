@@ -125,7 +125,6 @@ def plotExplorationCurve(exploration_curve,ax):
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
         column 1: The exploration at that update 
-        column 2...: Individual cost components (column 1 is their sum)
     \param[in] ax Axis to plot the learning curve on.
     """
     exploration_curve = np.array(exploration_curve)
