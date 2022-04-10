@@ -12,3 +12,6 @@ target_link_libraries(testDmpModelParameterValues dmp dynamicalsystems functiona
 
 add_executable(testJsonDmp testJsonDmp.cpp)
 target_link_libraries(testJsonDmp dmp dynamicalsystems functionapproximators eigen ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
+
+add_executable(testDmpCompareCppPython testDmpCompareCppPython.cpp)
+target_link_libraries(testDmpCompareCppPython dmp dynamicalsystems functionapproximators eigen ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
