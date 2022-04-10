@@ -105,6 +105,12 @@ public:
     return centers_.rows();
   }
   
+  static ModelParametersLWR* from_jsonpickle(const nlohmann::json& json);
+  
+  // https://github.com/nlohmann/json/issues/1324
+  friend void to_json(nlohmann::json& j, const ModelParametersLWR& m);
+  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& m);
+  
 private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims
@@ -114,45 +120,8 @@ private:
   bool asymmetric_kernels_; // should be const
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
-
-public:
-	/** Turn caching for the function normalizedKernelActivations() on or off.
-	 * Turning this on should lead to substantial improvements in execution time if the centers and
-	 * widths of the kernels do not change often AND you call normalizedKernelActivations with the
-	 * same inputs over and over again.
-	 * \param[in] caching Whether to turn caching on or off
-	 * \remarks In the constructor, caching is set to true, so by default it is on.
-	 */
-	inline void set_caching(bool caching)
-	{
-	  caching_ = caching;
-	  if (!caching_) clearCache();
-	}
-	
-public:
-  static ModelParametersLWR* from_jsonpickle(const nlohmann::json& json);
   
-  // https://github.com/nlohmann/json/issues/1324
-  friend void to_json(nlohmann::json& j, const ModelParametersLWR& m);
-  //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& m);
-  
-private:
-  
-  mutable Eigen::MatrixXd inputs_cached_;
-  mutable Eigen::MatrixXd kernel_activations_cached_;
-  bool caching_;
-  inline void clearCache(void) 
-  {
-    inputs_cached_.resize(0,0);
-    kernel_activations_cached_.resize(0,0);
-  }
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
+  /** Default constructor to faciliate deserialization */
   ModelParametersLWR(void) {};
 };
 

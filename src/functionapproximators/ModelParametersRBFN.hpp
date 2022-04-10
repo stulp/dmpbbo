@@ -81,50 +81,23 @@ public:
    */
   inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
 
-private:
-  Eigen::MatrixXd centers_; // n_centers X n_dims
-  Eigen::MatrixXd widths_;  // n_centers X n_dims
-  Eigen::VectorXd weights_; //         1 X n_dims
-
-public:
-	/** Turn caching for the function kernelActivations() on or off.
-	 * Turning this on should lead to substantial improvements in execution time if the centers and
-	 * widths of the kernels do not change often AND you call normalizedKernelActivations with the
-	 * same inputs over and over again.
-	 * \param[in] caching Whether to turn caching on or off
-	 * \remarks In the constructor, caching is set to true, so by default it is on.
-	 */
-	inline void set_caching(bool caching)
-	{
-	  caching_ = caching;
-	  if (!caching_) clearCache();
-	}
-	
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  ModelParametersRBFN(void) {};
-  
-private:
-  
-  mutable Eigen::MatrixXd inputs_cached_;
-  mutable Eigen::MatrixXd kernel_activations_cached_;
-  bool caching_;
-  inline void clearCache(void) 
-  {
-    inputs_cached_.resize(0,0);
-    kernel_activations_cached_.resize(0,0);
-  }
-  
-public:
   // https://github.com/nlohmann/json/issues/1324
   static ModelParametersRBFN* from_jsonpickle(const nlohmann::json& json);
   
   friend void to_json(nlohmann::json& j, const ModelParametersRBFN& m);
   //friend void from_json(const nlohmann::json& j, ModelParametersRBFN& m);
+  
+private:
+  Eigen::MatrixXd centers_; // n_centers X n_dims
+  Eigen::MatrixXd widths_;  // n_centers X n_dims
+  Eigen::VectorXd weights_; //         1 X n_dims
+
+  /** Default constructor.*/
+  ModelParametersRBFN(void) {};
+  
+  mutable Eigen::MatrixXd inputs_cached_;
+  mutable Eigen::MatrixXd kernel_activations_cached_;
+  
   
 };
 

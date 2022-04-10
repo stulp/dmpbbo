@@ -45,8 +45,7 @@ ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const E
 :
   centers_(centers),
   widths_(widths),
-  weights_(weights),
-  caching_(false)
+  weights_(weights)
 {
 #ifndef NDEBUG // Variables below are only required for asserts; check for NDEBUG to avoid warnings.
   int n_basis_functions = centers.rows();
@@ -60,39 +59,12 @@ ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const E
 
 void ModelParametersRBFN::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
 {
-  if (caching_)
-  {
-    // If the cached inputs matrix has the same size as the one now requested
-    //     (this also takes care of the case when inputs_cached is empty and need to be initialized)
-    if ( inputs.rows()==inputs_cached_.rows() && inputs.cols()==inputs_cached_.cols() )
-    {
-      // And they have the same values
-      if ( (inputs.array()==inputs_cached_.array()).all() )
-      {
-        // Then you can return the cached values
-        kernel_activations = kernel_activations_cached_;
-        return;
-      }
-    }
-  }
-  
   ENTERING_REAL_TIME_CRITICAL_CODE
-
-  // Cache could not be used, actually do the work
   bool normalized_basis_functions=false;  
   bool asymmetric_kernels=false;
   BasisFunction::Gaussian::activations(centers_,widths_,inputs,kernel_activations,
     normalized_basis_functions,asymmetric_kernels);
-  
   EXITING_REAL_TIME_CRITICAL_CODE
-
-  if (caching_)
-  {
-    // Cache the current results now.  
-    inputs_cached_ = inputs;
-    kernel_activations_cached_ = kernel_activations;
-  }
-  
 }
 
 ModelParametersRBFN* ModelParametersRBFN::from_jsonpickle(const nlohmann::json& json) {
