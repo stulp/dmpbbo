@@ -55,6 +55,7 @@ def delete_keys_from_dict(dictionary, keys):
 
 def from_jsonpickle(json_string):
     j = json.loads(json_string)
+    unpickler = Unpickler()
     return unpickler._restore(j)
     
 def to_jsonpickle(obj):
