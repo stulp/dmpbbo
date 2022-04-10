@@ -24,7 +24,7 @@
 #ifndef PARAMETERIZABLE_H
 #define PARAMETERIZABLE_H
 
-#include "eigen_realtime/eigen_realtime_check.hpp" // Include this before Eigen header files
+#include "eigen/eigen_realtime_check.hpp" // Include this before Eigen header files
 
 
 #include <set>

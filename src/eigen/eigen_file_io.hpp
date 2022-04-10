@@ -1,5 +1,5 @@
 /**
- * @file EigenFileIO.hpp
+ * @file eigen_file_io.hpp
  * @brief  Header file for input/output of Eigen matrices to ASCII files.
  * @author Freek Stulp
  *
@@ -23,8 +23,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EIGENSAVEMATRIX_HPP
-#define EIGENSAVEMATRIX_HPP
+#ifndef EIGEN_FILE_IO_HPP
+#define EIGEN_FILE_IO_HPP
 
 #include <string>
 #include <fstream>
@@ -65,9 +65,9 @@ bool saveMatrix(std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,Col
 template<typename Scalar, int RowsAtCompileTime, int ColsAtCompileTime>
 bool saveMatrix(std::string directory, std::string filename, Eigen::Matrix<Scalar,RowsAtCompileTime,ColsAtCompileTime> matrix, bool overwrite=false);
 
-#include "EigenFileIO.tpp"
+#include "eigen_file_io.tpp"
 
 }
 
-#endif        //  #ifndef EIGENSAVEMATRIX_HPP
+#endif        //  #ifndef EIGEN_FILE_IO_HPP
 

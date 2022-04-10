@@ -25,7 +25,7 @@
 
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <iostream>
 #include <iomanip> 

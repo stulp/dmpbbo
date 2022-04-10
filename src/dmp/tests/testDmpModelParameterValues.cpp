@@ -32,7 +32,7 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <boost/filesystem.hpp>

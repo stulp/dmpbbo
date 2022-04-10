@@ -40,7 +40,7 @@
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <boost/filesystem.hpp>
 

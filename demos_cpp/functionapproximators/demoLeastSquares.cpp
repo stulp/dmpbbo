@@ -31,9 +31,9 @@
 #include <ctime>
 
 // This must be included before any Eigen header files are included
-#include "eigen_realtime/eigen_realtime_check.hpp"
+#include "eigen/eigen_realtime_check.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include "functionapproximators/leastSquares.hpp"
 

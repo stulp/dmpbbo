@@ -25,7 +25,7 @@
 #define _DMP_WITH_GAIN_SCHEDULES_H_
 
 // This must be included before any Eigen header files are included
-#include "eigen_realtime/eigen_realtime_check.hpp"
+#include "eigen/eigen_realtime_check.hpp"
 
 #include "dmp/Dmp.hpp"
 

@@ -27,7 +27,7 @@
 #include "functionapproximators/leastSquares.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <eigen3/Eigen/LU>
 

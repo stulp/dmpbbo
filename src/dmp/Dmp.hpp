@@ -25,7 +25,7 @@
 #define _DMP_H_
 
 // This must be included before any Eigen header files are included
-#include "eigen_realtime/eigen_realtime_check.hpp"
+#include "eigen/eigen_realtime_check.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "functionapproximators/Parameterizable.hpp"

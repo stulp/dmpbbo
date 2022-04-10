@@ -27,7 +27,7 @@
 #include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/leastSquares.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <iostream>
 #include <eigen3/Eigen/SVD>

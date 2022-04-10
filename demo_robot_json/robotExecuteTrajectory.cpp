@@ -29,7 +29,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 #include <boost/filesystem.hpp>
 #include <iostream>

@@ -33,7 +33,7 @@
 #include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
 
-#include "dmpbbo_io/EigenFileIO.hpp"
+#include "eigen/eigen_file_io.hpp"
 
 using namespace std;
 using namespace Eigen;
