@@ -25,18 +25,8 @@
 
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
-#include "functionapproximators/MetaParametersGMR.hpp"
-#include "functionapproximators/FunctionApproximatorGMR.hpp"
-#include "functionapproximators/MetaParametersRRRFF.hpp"
-#include "functionapproximators/FunctionApproximatorRRRFF.hpp"
-#include "functionapproximators/MetaParametersGPR.hpp"
-#include "functionapproximators/FunctionApproximatorGPR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#ifdef USE_LWPR
-#include "functionapproximators/MetaParametersLWPR.hpp"
-#include "functionapproximators/FunctionApproximatorLWPR.hpp"
-#endif // USE_LWPR
 
 #include <vector>
 #include <iostream>
@@ -56,11 +46,7 @@ void getFunctionApproximatorsVector(int input_dim, std::vector<FunctionApproxima
 {
   std::vector<std::string> names;
   names.push_back("LWR");
-  names.push_back("LWPR");
-  names.push_back("GMR");
-  names.push_back("RRRFF");
   names.push_back("RBFN");
-  names.push_back("GPR");
 
   for (unsigned int i_name=0; i_name<names.size(); i_name++)
   {
@@ -87,24 +73,6 @@ FunctionApproximator* getFunctionApproximatorByName(std::string name, int input_
     MetaParametersLWR* meta_params = new MetaParametersLWR(input_dim,num_rfs_per_dim,intersection,regularization);
     fa = new FunctionApproximatorLWR(meta_params);
   }
-  else if (name.compare("GMR")==0)
-  {
-    // Gaussian Mixture Regression  
-    int number_of_gaussians = 10;
-    if (input_dim==2) number_of_gaussians = 10;
-    MetaParametersGMR* meta_params = new MetaParametersGMR(input_dim,number_of_gaussians);
-    fa = new FunctionApproximatorGMR(meta_params);
-  }
-  else if (name.compare("RRRFF")==0)
-  {
-    // RRRFF
-    int number_of_basis_functions=18;
-    if (input_dim==2) number_of_basis_functions = 100;
-    double regularization=0.2;
-    double gamma=5;
-    MetaParametersRRRFF* meta_params = new MetaParametersRRRFF(input_dim,number_of_basis_functions,regularization,gamma);
-    fa = new FunctionApproximatorRRRFF(meta_params);
-  }
   else if (name.compare("RBFN")==0)
   {
     // Radial Basis Function Network
@@ -116,38 +84,6 @@ FunctionApproximator* getFunctionApproximatorByName(std::string name, int input_
     MetaParametersRBFN* meta_params = new MetaParametersRBFN(input_dim,num_rfs_per_dim,intersection,regularization);
     fa = new FunctionApproximatorRBFN(meta_params);
   }
-  else if (name.compare("GPR")==0)
-  {
-    // Gaussian Process Regression
-    double maximum_covariance = 1.1*1.1;
-    double length = 0.1;
-    if (input_dim==2) 
-    {
-      maximum_covariance = 0.1*0.1;
-      length = 0.2;
-    }
-    MetaParametersGPR* meta_params = new MetaParametersGPR(input_dim,maximum_covariance,length);
-    fa = new FunctionApproximatorGPR(meta_params);
-  }
-  else if (name.compare("LWPR")==0)
-  {
-    // Locally Weighted Projection Regression
-#ifdef USE_LWPR
-    double   w_gen=0.2;
-    double   w_prune=0.8;
-    bool     update_D=true;
-    double   init_alpha=0.1;
-    double   penalty=0.005;
-    Eigen::VectorXd init_D=Eigen::VectorXd::Constant(input_dim,200);
-    MetaParametersLWPR* meta_params = new MetaParametersLWPR(input_dim,init_D,w_gen,w_prune,update_D,init_alpha,penalty);
-    fa = new FunctionApproximatorLWPR(dynamic_cast<MetaParametersLWPR*>(meta_params));
-#else
-    std::cerr << __FILE__ << ":" << __LINE__ << ":";
-    std::cerr << "Sorry, LWPR is not available. Is it installed? Returning NULL." << std::endl;
-    return NULL;
-#endif // USE_LWPR
-  }
-
 
   
   if (fa==NULL)

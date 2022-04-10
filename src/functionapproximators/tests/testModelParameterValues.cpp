@@ -24,9 +24,8 @@
 #include <string>
 #include <set>
 
-#include "functionapproximators/ModelParametersGMR.hpp"
+
 #include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/ModelParametersRRRFF.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -46,41 +45,6 @@ int main(int n_args, char** args)
   VectorXd slopes  = VectorXd::Ones(n_basis_functions);
   
   model_parameters.push_back(new ModelParametersLWR(centers, widths, slopes, offsets));
-
-  // RRRFF  
-  MatrixXd linear_models = (100.0*MatrixXd::Random(n_basis_functions,n_dims)).cast<int>().cast<double>().array().abs();
-  MatrixXd cosines_periodes = 
-  (100.0*MatrixXd::Random(n_basis_functions,n_dims)).cast<int>().cast<double>().array().abs();
-  VectorXd cosines_phase = 
-  (100.0*VectorXd::Random(n_basis_functions)).cast<int>().cast<double>().array().abs();
-
-  model_parameters.push_back(new ModelParametersRRRFF(linear_models, cosines_periodes, cosines_phase));
-
-  // GMR
-  /*
-  vector<VectorXd> centers_gmr;
-  vector<double> priors_gmr;
-  vector<MatrixXd> slopes_gmr;
-  vector<VectorXd> biases_gmr;
-  vector<MatrixXd> inverseCovarsL_gmr;
-  
-  VectorXd centers_gmr_1 = (100.0*VectorXd::Random(n_dims)).cast<int>().cast<double>().array().abs();
-  centers_gmr.push_back(centers_gmr_1);
-
-  double a = 0.3;
-  priors_gmr.push_back(a);
-
-  MatrixXd slopes_gmr_1 = (100.0*MatrixXd::Random(n_dims,n_dims)).cast<int>().cast<double>().array().abs();
-  slopes_gmr.push_back(slopes_gmr_1);
-  
-  VectorXd biases_gmr_1 = (100.0*VectorXd::Random(n_dims)).cast<int>().cast<double>().array().abs(); 
-  biases_gmr.push_back(biases_gmr_1);
-
-  MatrixXd inverseCovarsL_gmr_1 = (100.0*MatrixXd::Random(n_dims,n_dims)).cast<int>().cast<double>().array().abs();
-  inverseCovarsL_gmr.push_back(inverseCovarsL_gmr_1);
-  
-  model_parameters.push_back(new ModelParametersGMR(centers_gmr,priors_gmr,slopes_gmr,biases_gmr,inverseCovarsL_gmr));
-  */
   
   for (unsigned int mm=0; mm<model_parameters.size(); mm++)
   {
@@ -96,12 +60,6 @@ int main(int n_args, char** args)
     //selected_labels.insert("offsets");
     selected_labels.insert("slopes");
     selected_labels.insert("centers");
-    
-    
-    // RRRFF
-    //selected_labels.insert("linear_model");
-    selected_labels.insert("phases");
-    //selected_labels.insert("periods");
     
     mp->setSelectedParameters(selected_labels);
     

@@ -27,13 +27,10 @@
 #include <time.h>
 #include <boost/filesystem.hpp>
 
-#include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/FunctionApproximatorRBFN.hpp"
-#include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/MetaParametersRBFN.hpp"
-#include "functionapproximators/ModelParametersLWPR.hpp"
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/ModelParametersRBFN.hpp"
 

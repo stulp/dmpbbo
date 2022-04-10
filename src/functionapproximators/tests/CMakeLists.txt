@@ -29,15 +29,3 @@ target_link_libraries(testPerturbModelParameterLWR functionapproximators eigen $
 add_executable(testBasisFunctionsLWR testBasisFunctionsLWR.cpp)
 target_link_libraries(testBasisFunctionsLWR functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 
-
-################################################################################
-# GMR
-add_executable(testSaveGMMMatrix testSaveGMMMatrix.cpp)
-target_link_libraries(testSaveGMMMatrix functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable(testMultiDimOutput testMultiDimOutput.cpp)
-target_link_libraries(testMultiDimOutput functionapproximators eigen ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
-
-add_executable(testIncrementalTrainingGMR testIncrementalTrainingGMR.cpp)
-target_link_libraries(testIncrementalTrainingGMR functionapproximators eigen ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
-
