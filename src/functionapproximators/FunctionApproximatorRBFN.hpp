@@ -50,14 +50,12 @@ public:
   /** Initialize a function approximator with model parameters
    *  \param[in] model_parameters The parameters of the (previously) trained model.
    */
-  FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters);
+  FunctionApproximatorRBFN(ModelParametersRBFN* model_parameters);
 
   static FunctionApproximatorRBFN* from_jsonpickle(nlohmann::json json);
   // https://github.com/nlohmann/json/issues/1324
   friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& m);
   //friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN& m);
-  
-	FunctionApproximator* clone(void) const;
   
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
   
@@ -66,12 +64,6 @@ public:
 	 */
   void preallocateMemory(int n_basis_functions);
   
-	inline std::string getName(void) const {
-    return std::string("RBFN");  
-  };
-
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
-	
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this
@@ -79,8 +71,17 @@ public:
    * friend)
    */
   FunctionApproximatorRBFN(void) {};
-   
+
+  ~FunctionApproximatorRBFN(void);
+
+	std::string toString(void) const;
+	
 private:  
+  
+  /** The model parameters of the function approximator.
+   */
+  ModelParametersRBFN* model_parameters_;
+  
   /** Preallocated memory to make things realtime and more efficient. */
   mutable Eigen::VectorXd weights_prealloc_;
   

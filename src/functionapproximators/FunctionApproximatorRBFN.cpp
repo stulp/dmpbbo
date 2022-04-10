@@ -38,11 +38,15 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorRBFN::FunctionApproximatorRBFN(const ModelParametersRBFN *const model_parameters) 
-:
-  FunctionApproximator(model_parameters)
+FunctionApproximatorRBFN::FunctionApproximatorRBFN(ModelParametersRBFN* model_parameters) 
 {
+  model_parameters_ = model_parameters;
   preallocateMemory(model_parameters->getNumberOfBasisFunctions());
+}
+
+FunctionApproximatorRBFN::~FunctionApproximatorRBFN(void) 
+{
+  delete model_parameters_;
 }
 
 void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
@@ -53,26 +57,11 @@ void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
 }
 
 
-FunctionApproximator* FunctionApproximatorRBFN::clone(void) const {
-  // All error checking and cloning is left to the FunctionApproximator constructor.
-  return new FunctionApproximatorRBFN(
-    dynamic_cast<const ModelParametersRBFN*>(getModelParameters())
-    );
-};
-
 void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {
-  if (!isTrained())  
-  {
-    cerr << "WARNING: You may not call FunctionApproximatorLWPR::predict if you have not trained yet. Doing nothing." << endl;
-    return;
-  }
-
-  const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
+  model_parameters_->weights(weights_prealloc_);
   
-  model_parameters_rbfn->weights(weights_prealloc_);
-  
-  int n_basis_functions = model_parameters_rbfn->getNumberOfBasisFunctions();
+  int n_basis_functions = model_parameters_->getNumberOfBasisFunctions();
   
   bool only_one_sample = (inputs.rows()==1);
   if (only_one_sample)
@@ -80,7 +69,7 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
     ENTERING_REAL_TIME_CRITICAL_CODE
     
     // Get the basis function activations  
-    model_parameters_rbfn->kernelActivations(inputs,activations_one_prealloc_);
+    model_parameters_->kernelActivations(inputs,activations_one_prealloc_);
       
     // Weight the basis function activations  
     for (int b=0; b<n_basis_functions; b++)
@@ -98,10 +87,10 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
     // The next two lines may not be real-time, as they may allocate memory.
     // (if the size are already correct, it will be realtime)
     activations_prealloc_.resize(n_time_steps,n_basis_functions);
-    outputs.resize(n_time_steps,getExpectedOutputDim());
+    outputs.resize(n_time_steps,1);
     
     // Get the basis function activations  
-    model_parameters_rbfn->kernelActivations(inputs,activations_prealloc_);
+    model_parameters_->kernelActivations(inputs,activations_prealloc_);
       
     // Weight the basis function activations  
     for (int b=0; b<n_basis_functions; b++)
@@ -120,6 +109,13 @@ FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::js
     model = ModelParametersRBFN::from_jsonpickle(json["_model_params"]);
   
   return new FunctionApproximatorRBFN(model);
+}
+
+string FunctionApproximatorRBFN::toString(void) const
+{
+  std::stringstream s;
+  s << "FunctionApproximatorRBFN" << endl;
+  return s.str();
 }
 
 }

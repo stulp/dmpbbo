@@ -28,7 +28,6 @@
 #include "eigen/eigen_realtime_check.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
-#include "functionapproximators/Parameterizable.hpp"
 
 #include <boost/random.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -52,7 +51,7 @@ class Trajectory;
  * \brief Implementation of Dynamical Movement Primitives.
  * \ingroup Dmps
  */
-class Dmp : public DynamicalSystem, public Parameterizable
+class Dmp : public DynamicalSystem
 {
 public:
   
@@ -140,7 +139,7 @@ public:
   /** Return a deep copy of this object 
    * \return A deep copy of this object
    */
-  Dmp* clone(void) const;
+  Dmp* clone(void) const { return NULL; };
 
   
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const;
@@ -280,16 +279,6 @@ public:
 
 	std::string toString(void) const;
     
-  //virtual bool isTrained(void) const;
-  
-  void getSelectableParameters(std::set<std::string>& selectable_values_labels) const;
-  void setSelectedParameters(const std::set<std::string>& selected_values_labels);
-
-  int getParameterVectorAllSize(void) const;
-  void getParameterVectorAll(Eigen::VectorXd& values) const;
-  void setParameterVectorAll(const Eigen::VectorXd& values);
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-
   /** Given a trajectory, compute the inputs and targets for the function approximators.
    * For a standard Dmp (such as the one in this class) the inputs will be the phase over time, and
    * the targets will be the forcing term (with the gating function factored out).

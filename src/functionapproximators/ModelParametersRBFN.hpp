@@ -24,9 +24,6 @@
 #ifndef MODELPARAMETERSRBFN_H
 #define MODELPARAMETERSRBFN_H
 
-#include "functionapproximators/ModelParameters.hpp"
-
-
 #include <iosfwd>
 #include <vector>
 
@@ -42,7 +39,7 @@ namespace DmpBbo {
  * \ingroup FunctionApproximators
  * \ingroup RBFN
  */
-class ModelParametersRBFN : public ModelParameters
+class ModelParametersRBFN
 {
   friend class FunctionApproximatorRBFN;
   
@@ -55,8 +52,6 @@ public:
   ModelParametersRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights);
   
   std::string toString(void) const;
-  
-	ModelParameters* clone(void) const;
 	
   int getExpectedInputDim(void) const  {
     return centers_.cols();
@@ -76,16 +71,6 @@ public:
    */
   void kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const;
   
-  void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
-  
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  void getParameterVectorAll(Eigen::VectorXd& all_values) const;
-  inline int getParameterVectorAllSize(void) const
-  {
-    return all_values_vector_size_;
-  }
-  
   /** Return the weights of the basis functions.
    * \return weights of the basis functions.
    */
@@ -96,9 +81,6 @@ public:
    */
   inline void weights(Eigen::VectorXd& weights) const { weights=weights_; }  
 
-protected:
-  void setParameterVectorAll(const Eigen::VectorXd& values);
-  
 private:
   Eigen::MatrixXd centers_; // n_centers X n_dims
   Eigen::MatrixXd widths_;  // n_centers X n_dims

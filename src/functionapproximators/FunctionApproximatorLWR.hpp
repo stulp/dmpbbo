@@ -48,11 +48,11 @@ public:
   /** Initialize a function approximator with model parameters
    *  \param[in] model_parameters The parameters of the (previously) trained model.
    */
-  FunctionApproximatorLWR(const ModelParametersLWR *const model_parameters);
+  FunctionApproximatorLWR(ModelParametersLWR* model_parameters);
 
   FunctionApproximatorLWR(int expected_input_dim, const Eigen::VectorXi& n_basis_functions_per_dim, double intersection_height=0.5, double regularization=0.0, bool asymmetric_kernels=false);
   
-	FunctionApproximator* clone(void) const;
+  ~FunctionApproximatorLWR(void);
   
   static FunctionApproximatorLWR* from_jsonpickle(nlohmann::json json);
   // https://github.com/nlohmann/json/issues/1324
@@ -71,14 +71,14 @@ public:
    * memory for outputs is preallocated.
    */
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs);
-  
-	inline std::string getName(void) const {
-    return std::string("LWR");  
-  };
-  
-	bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 
+	std::string toString(void) const;
+	
 private:  
+  /** The model parameters of the function approximator.
+   */
+  ModelParametersLWR* model_parameters_;
+  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

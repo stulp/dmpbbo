@@ -27,155 +27,38 @@
 #ifndef _FUNCTIONAPPROXIMATOR_H_
 #define _FUNCTIONAPPROXIMATOR_H_
 
-#include "Parameterizable.hpp"
 
 #include <string>
 #include <vector>
 #include <eigen3/Eigen/Core>
 
 namespace DmpBbo {
-  
-// Forward declarations
-class MetaParameters;
-class ModelParameters;
 
-/** \brief Base class for all function approximators.
+/** \brief Pure abstract class for all function approximators.
  *  \ingroup FunctionApproximators
  */
-class FunctionApproximator : public Parameterizable
+class FunctionApproximator
 {
 
 public:
   
-  /** Initialize a function approximator with meta- and optionally model-parameters
-   *  \param[in] meta_parameters  The training algorithm meta-parameters
-   *  \param[in] model_parameters The parameters of the trained model. If this parameter is not
-   *                              passed, the function approximator is initialized as untrained. 
-   *                              In this case, you must call FunctionApproximator::train() before
-   *                              being able to call FunctionApproximator::predict().
-   * Either meta_parameters XOR model-parameters can passed as NULL, but not both.
-   */
-  FunctionApproximator(const MetaParameters *const meta_parameters, const ModelParameters *const model_parameters=NULL);
-  
-  /** Initialize a function approximator with model-parameters
-   *  \param[in] model_parameters The parameters of the trained model.
-   */
-  FunctionApproximator(const ModelParameters *const model_parameters);
+  /** Initialize a function approximator. */
+  FunctionApproximator() {};
 
-  virtual ~FunctionApproximator(void);
-  
-  /** Return a pointer to a deep copy of the FunctionApproximator object.
-   *  \return Pointer to a deep copy
-   */
-  virtual FunctionApproximator* clone(void) const = 0;
+  virtual ~FunctionApproximator(void) {};
   
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values
-   *
-   * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
-   * Therefore, this function cannot be const.
    */
   virtual void predict(
     const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& outputs) = 0;
-
-  /** Query the function approximator to make a prediction, and also to predict its variance
-   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
-   *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
-   *
-   * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
-   * Therefore, this function cannot be const.
-   */
-  virtual void predict(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    Eigen::MatrixXd& outputs,
-    Eigen::MatrixXd& variances)
-  {
-    predict(inputs, outputs);
-    variances.fill(0);
-  }
-
-  /** Query the function approximator to make a prediction, and also to predict its variance
-   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
-   *  \param[out] outputs  Predicted output values (n_samples X n_dims_out)
-   *  \param[out] variances Predicted covariance matrices for the output values. It is is of size  (n_samples X n_dims_out X n_dims_out), which has been implemented as a std::vector of Eigen::MatrixXd.
-   *
-   * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict or RRRFF::predict ).
-   * Therefore, this function cannot be const.
-   */
-  virtual void predict(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    Eigen::MatrixXd& outputs, 
-    std::vector<Eigen::MatrixXd>& variances)
-  {
-    predict(inputs, outputs);
-    for (unsigned int i=0; i<variances.size(); i++)
-      variances[i].fill(0);
-  }
-
   
-  /** Query the function approximator to get the variance of a prediction
-   * This function is not implemented by all function approximators. Therefore, the default
-   * implementation fills outputs with 0s.
-   *  \param[in]  inputs   Input values of the query (n_samples X n_dims_in)
-   *  \param[out] variances Predicted variances for the output values  (n_samples X n_dims_out). Note that if the output has a dimensionality>1, these variances should actuall be covariance matrices (use function predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs, std::vector<Eigen::MatrixXd>& variances) to get the full covariance matrices). So for an output dimensionality of 1 this function works fine. For dimensionality>1 we return only the diagional of the covariance matrix, which may not always be what you want.
-   *
-   * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict).
-   * Therefore, this function cannot be const.
+  /** Returns a string representation of the object.
+   * \return A string representation of the object.
    */
-  virtual void predictVariance(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs,
-    Eigen::MatrixXd& variances)
-  {
-    variances.fill(0);
-  }
-  
-  /** Determine whether the function approximator has already been trained with data or not.
-   *  \return true if the function approximator has already been trained, false otherwise.
-   */
-  bool isTrained(void) const
-  {
-    return (model_parameters_!=NULL);
-  }
-  
-  /** The expected dimensionality of the input data.
-   * \return Expected dimensionality of the input data
-   */
-  int getExpectedInputDim(void) const;
-  
-  /** The expected dimensionality of the output data.
-   * \return Expected dimensionality of the output data
-   * \todo "int getExpectedOutputDim(void) const" should be pure virtual
-   */
-  int getExpectedOutputDim(void) const;
-  
-  /** Get the name of this function approximator
-   *  \return Name of this function approximator
-   */
-  virtual std::string getName(void) const = 0;
-  
-  void getSelectableParameters(std::set<std::string>& selected_values_labels) const;
-  void setSelectedParameters(const std::set<std::string>& selected_values_labels);
-  /**
-   * Get the minimum and maximum of the selected parameters in one vector.
-   * \param[out] min The minimum of the selected parameters concatenated in one vector
-   * \param[out] max The minimum of the selected parameters concatenated in one vector
-   */
-  void getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const;
-  int getParameterVectorSelectedSize(void) const;
-  void setParameterVectorSelected(const Eigen::VectorXd& values, bool normalized=false);
-  void getParameterVectorSelected(Eigen::VectorXd& values, bool normalized=false) const;
-
-  void getParameterVectorMask(const std::set<std::string> selected_values_labels, Eigen::VectorXi& selected_mask) const;
-  int getParameterVectorAllSize(void) const;
-  void getParameterVectorAll(Eigen::VectorXd& values) const;
-  void setParameterVectorAll(const Eigen::VectorXd& values);
+  virtual std::string toString(void) const = 0;
   
   /** Print to output stream. 
    *
@@ -191,60 +74,7 @@ public:
     return output;
   }
   
-  /** Returns a string representation of the object.
-   * \return A string representation of the object.
-   */
-  virtual std::string toString(void) const;
-  
-  
-  /** Accessor for FunctionApproximator::meta_parameters_
-   *  \return The meta-parameters of the algorithm
-   */
-  const MetaParameters* getMetaParameters(void) const;
-  
-  /** Accessor for FunctionApproximator::model_parameters_
-   *  \return The model parameters of the trained model
-   */
-  const ModelParameters* getModelParameters(void) const;
-  
-  void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
 	
-protected:
-
-  /** Accessor for FunctionApproximator::model_parameters_
-   *  \param[in] model_parameters The model parameters of a trained model
-   */
-  void setModelParameters(ModelParameters* model_parameters);
-  
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  FunctionApproximator(void) {};
-  
-	
-private:
-  
-  /** The meta-parameters of the function approximator.
-   *
-   *  These are all the algorithmic parameters that are used when training the function 
-   *  approximator. These are thus only used in the FunctionApproximator::train function.
-   */
-  MetaParameters*  meta_parameters_;
-  
-  /** The model parameters of the function approximator.
-   *
-   *  These are all the parameters of a trained function approximator. These are determined when 
-   *  training the function approximator in FunctionApproximator::train, and used to make
-   *  predictions in FunctionApproximator::predict.
-   */
-  ModelParameters* model_parameters_;
-  
-  bool checkModelParametersInitialized(void) const;
-
 };
 
 }

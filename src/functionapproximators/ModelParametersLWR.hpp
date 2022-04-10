@@ -24,11 +24,9 @@
 #ifndef MODELPARAMETERSLWR_H
 #define MODELPARAMETERSLWR_H
 
-#include "functionapproximators/ModelParameters.hpp"
-
-
 #include <iosfwd>
 #include <vector>
+#include <set>
 #include <eigen3/Eigen/Core>
 
 
@@ -41,7 +39,7 @@ namespace DmpBbo {
  * \ingroup FunctionApproximators
  * \ingroup LWR
  */
-class ModelParametersLWR : public ModelParameters
+class ModelParametersLWR
 {
   friend class FunctionApproximatorLWR;
   
@@ -57,8 +55,7 @@ public:
   ModelParametersLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels=false, bool lines_pivot_at_max_activation=false);
   
   std::string toString(void) const;
-  
-	ModelParameters* clone(void) const;
+
 	
   int getExpectedInputDim(void) const  {
     return centers_.cols();
