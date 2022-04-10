@@ -13,16 +13,3 @@ The bottom-up approach to understanding the functionality of the code would impl
 * Function Approximation (in functionapproximators/) This module provides implementations (but mostly wrappers around external libraries) of several function approximators. DMPs use function approximators to learn and reproduce arbitrary smooth movements. This module is completely independent of all other modules.
 
 * Dynamical Movement Primitives (in dmp/) This module provides an implementation of several types of DMPs. It depends on both the DynamicalSystems and FunctionApproximators modules, but no other.
-
-* Black Box Optimization (in bbo/) This module provides implementations of several stochastic optimization algorithms for the optimization of black-box cost functions. This module is completely independent of all other modules.
-
-* Black Box Optimization of Dynamical Movement Primitives (in dmp_bbo/) This module applies black-box optimization to the parameters of a DMP. It depends on all the other modules.
-
-
-
-
-
-
-
-
-

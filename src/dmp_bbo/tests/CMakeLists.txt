@@ -1,2 +1,0 @@
-add_executable(testTaskViapoint testTaskViapoint.cpp)
-target_link_libraries( testTaskViapoint taskviapoint dmp_bbo dmp dynamicalsystems functionapproximators bbo ${Boost_LIBRARIES} ${LWPR_LIBRARIES})
