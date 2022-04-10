@@ -47,7 +47,6 @@
 #include "functionapproximators/FunctionApproximatorLWPR.hpp"
 #endif // USE_LWPR
 
-//#include "getFunctionApproximatorsVector.hpp"
 #include "targetFunction.hpp"
 
 using namespace std;
