@@ -22,7 +22,6 @@
  */
  
 #include "functionapproximators/ModelParametersLWR.hpp"
-#include "functionapproximators/UnifiedModel.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 
@@ -416,15 +415,6 @@ void ModelParametersLWR::setParameterVectorModifierPrivate(std::string modifier,
   
   if (modifier.compare("slopes_as_angles")==0)
     set_slopes_as_angles(new_value);
-  
-}
-
-UnifiedModel* ModelParametersLWR::toUnifiedModel(void) const
-{
-
-  // LWR uses normalized basis functions
-  bool normalized_basis_functions = true;
-  return new UnifiedModel(centers_, widths_, slopes_, offsets_, normalized_basis_functions); 
   
 }
 

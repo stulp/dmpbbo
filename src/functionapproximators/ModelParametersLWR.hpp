@@ -116,8 +116,6 @@ public:
     return centers_.rows();
   }
   
-  UnifiedModel* toUnifiedModel(void) const;
-  
 protected:
   void setParameterVectorAll(const Eigen::VectorXd& values);
   

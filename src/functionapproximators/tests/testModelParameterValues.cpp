@@ -34,7 +34,7 @@ using namespace DmpBbo;
 int main(int n_args, char** args)
 {
   int n_basis_functions = 3; 
-  int n_dims = 1;
+  //int n_dims = 1;
   
   vector<ModelParameters*> model_parameters;
   

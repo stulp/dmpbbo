@@ -123,37 +123,6 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
     
 }
 
-bool FunctionApproximatorRBFN::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  MatrixXd inputs_grid;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs_grid);
-      
-  const ModelParametersRBFN* model_parameters_rbfn = static_cast<const ModelParametersRBFN*>(getModelParameters());
-  
-  MatrixXd activations_grid;
-  model_parameters_rbfn->kernelActivations(inputs_grid, activations_grid);
-  
-  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
-  saveMatrix(save_directory,"activations_grid.txt",activations_grid,overwrite);
-
-  // Weight the basis function activations  
-  VectorXd weights = model_parameters_rbfn->weights();
-  for (int b=0; b<activations_grid.cols(); b++)
-    activations_grid.col(b).array() *= weights(b);
-  saveMatrix(save_directory,"activations_weighted_grid.txt",activations_grid,overwrite);
-  
-  // Sum over weighed basis functions
-  MatrixXd predictions_grid = activations_grid.rowwise().sum();
-  saveMatrix(save_directory,"predictions_grid.txt",predictions_grid,overwrite);
-  
-  return true;
-  
-}
-
 FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) {
   MetaParametersRBFN* meta = NULL;
   if (json.contains("_meta_params"))

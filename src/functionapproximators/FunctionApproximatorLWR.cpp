@@ -174,41 +174,4 @@ FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json
   return new FunctionApproximatorLWR(meta,model);
 }
 
-
-bool FunctionApproximatorLWR::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  MatrixXd inputs;
-  FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-
-  const ModelParametersLWR* model_parameters_lwr = static_cast<const ModelParametersLWR*>(getModelParameters());
-  
-  int n_samples = inputs.rows();
-  int n_basis_functions = model_parameters_lwr->getNumberOfBasisFunctions();
-  
-  MatrixXd lines(n_samples,n_basis_functions);
-  model_parameters_lwr->getLines(inputs, lines);
-  
-  MatrixXd unnormalized_activations(n_samples,n_basis_functions);
-  model_parameters_lwr->unnormalizedKernelActivations(inputs, unnormalized_activations);
-
-  MatrixXd activations(n_samples,n_basis_functions);
-  model_parameters_lwr->kernelActivations(inputs, activations);
-
-  MatrixXd predictions = (lines.array()*activations.array()).rowwise().sum();
-  
-  saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim,overwrite);
-  saveMatrix(save_directory,"inputs_grid.txt",inputs,overwrite);
-  saveMatrix(save_directory,"lines_grid.txt",lines,overwrite);
-  saveMatrix(save_directory,"activations_unnormalized_grid.txt",unnormalized_activations,overwrite);
-  saveMatrix(save_directory,"activations_grid.txt",activations,overwrite);
-  saveMatrix(save_directory,"predictions_grid.txt",predictions,overwrite);
-
-  
-  return true;
-  
-}
-
 }

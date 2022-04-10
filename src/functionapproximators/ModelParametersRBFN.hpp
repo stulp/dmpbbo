@@ -37,9 +37,6 @@
 
 namespace DmpBbo {
 
-  // Forward declaration
-class UnifiedModel;
-
 
 /** \brief Model parameters for the Radial Basis Function Network (RBFN) function approximator
  * \ingroup FunctionApproximators
@@ -123,8 +120,6 @@ public:
 	  if (!caching_) clearCache();
 	}
 	
-  UnifiedModel* toUnifiedModel(void) const;
-  
   /**
    * Default constructor.
    * \remarks This default constuctor is required for boost::serialization to work. Since this

@@ -25,7 +25,6 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 #include "functionapproximators/MetaParameters.hpp"
-#include "functionapproximators/UnifiedModel.hpp"
 
 #include "eigen/eigen_file_io.hpp"
 
@@ -102,12 +101,6 @@ void FunctionApproximator::setModelParameters(ModelParameters* model_parameters)
 
   model_parameters_ = model_parameters;
 }
-
-UnifiedModel* FunctionApproximator::getUnifiedModel(void) const
-{
-  return model_parameters_->toUnifiedModel();
-}
-
 
 int FunctionApproximator::getExpectedInputDim(void) const
 {
@@ -223,56 +216,6 @@ string FunctionApproximator::toString(void) const
   if (model_parameters_!=NULL)
     s << *model_parameters_ << endl;
   return s.str();
-}
-
-void FunctionApproximator::generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_grid)
-{
-  int n_dims = min.size();
-  assert(n_dims==max.size());
-  assert(n_dims==n_samples_per_dim.size());
-  
-  if (n_dims==1)
-  {
-    inputs_grid = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-  }
-  else if (n_dims==2)
-  {
-    int n_samples = n_samples_per_dim[0]*n_samples_per_dim[1];
-    inputs_grid = MatrixXd::Zero(n_samples, n_dims);
-    VectorXd x1 = VectorXd::LinSpaced(n_samples_per_dim[0], min[0], max[0]);
-    VectorXd x2 = VectorXd::LinSpaced(n_samples_per_dim[1], min[1], max[1]);
-    for (int ii=0; ii<x1.size(); ii++)
-    {
-      for (int jj=0; jj<x2.size(); jj++)
-      {
-        inputs_grid(ii*x2.size()+jj,0) = x1[ii];
-        inputs_grid(ii*x2.size()+jj,1) = x2[jj];
-      }
-    }
-  }  
-  else
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Can only generate input grids for n_dims<3, but found " << n_dims << endl;
-  }
-}
-
-bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max, const VectorXi& n_samples_per_dim, string save_directory, bool overwrite) const
-{
-  if (save_directory.empty())
-    return true;
-  
-  //MatrixXd inputs;
-  //FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim, inputs);
-
-  if (model_parameters_==NULL)
-    return false;
-  UnifiedModel* mp_unified = model_parameters_->toUnifiedModel();
-  if (mp_unified==NULL)
-    return false;
-
-  return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
-  
 }
 
 void FunctionApproximator::setParameterVectorModifierPrivate(std::string modifier, bool new_value)

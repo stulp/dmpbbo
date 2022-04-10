@@ -38,7 +38,6 @@ namespace DmpBbo {
 // Forward declarations
 class MetaParameters;
 class ModelParameters;
-class UnifiedModel;
 
 /** \brief Base class for all function approximators.
  *  \ingroup FunctionApproximators
@@ -177,12 +176,6 @@ public:
   int getParameterVectorAllSize(void) const;
   void getParameterVectorAll(Eigen::VectorXd& values) const;
   void setParameterVectorAll(const Eigen::VectorXd& values);
-
-  /** Return a representation of this function approximator's model as a unified model. 
-   * See also the page on \ref page_unified_model 
-   * \return Unified model representation of this function approximator's model.
-   */
-  UnifiedModel* getUnifiedModel(void) const;
   
   /** Print to output stream. 
    *
@@ -215,33 +208,6 @@ public:
   const ModelParameters* getModelParameters(void) const;
   
   void setParameterVectorModifierPrivate(std::string modifier, bool new_value);
-  
-  /** Generate a input samples that lie on a grid (much like Matlab's meshgrid)
-   * For instance, if min = [2 6], and max = [3 8], and n_samples_per_dim = [3 5]
-   * then this function first makes linearly spaces samples along each dimension, e.g.
-   * samples_dim1 = [2 2.5 3] and samples_dim2 = [6 6.5 7 7.5 8]
-   * and then combine the combination of samples along all dimensions: 
-   * inputs_grid = [2 6; 2 6.5; 2 7; 2 7.5 2 8; 2.5 6; 2.5 6.5; 2.5 7; 2.5 7.5 2.5 8; 3 6; 3 6.5; 3 7; 3 7.5 3 8;
-   * \param[in] min Minimum values in the grid along each dimension 
-   * \param[in] max Maximum values in the grid along each dimension
-   * \param[in] n_samples_per_dim Number of samples along each dimension in the grid
-   * \param[out] inputs_grid A grid of samples
-   */
-  static void generateInputsGrid(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, Eigen::MatrixXd& inputs_grid);
-  
-  /** Generate a grid of inputs, and output the response of the basis functions and line segments
-   * for these inputs.
-   * This function is not pure virtual, because this might not make sense for every model parameters
-   * class.
-   *
-   * \param[in] min Minimum values for the grid (one for each dimension)
-   * \param[in] max Maximum values for the grid (one for each dimension)
-   * \param[in] n_samples_per_dim Number of samples in the grid along each dimension
-   * \param[in] directory Directory to which to save the results to.
-   * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
-   * \return Whether saving the data was successful.
-   */
-	virtual bool saveGridData(const Eigen::VectorXd& min, const Eigen::VectorXd& max, const Eigen::VectorXi& n_samples_per_dim, std::string directory, bool overwrite=false) const;
 	
 protected:
 

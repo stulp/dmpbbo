@@ -23,7 +23,6 @@
 
 #include "functionapproximators/ModelParametersRBFN.hpp"
 #include "functionapproximators/BasisFunction.hpp"
-#include "functionapproximators/UnifiedModel.hpp"
 
 
 #include "eigen/eigen_json.hpp"
@@ -209,13 +208,6 @@ void ModelParametersRBFN::setParameterVectorAll(const VectorXd& values) {
 
 void ModelParametersRBFN::setParameterVectorModifierPrivate(std::string modifier, bool new_value)
 {
-}
-
-UnifiedModel* ModelParametersRBFN::toUnifiedModel(void) const
-{
-  // RBFN does not use normalized basis functions
-  bool normalized_basis_functions = false;
-  return new UnifiedModel(centers_, widths_, weights_,normalized_basis_functions); 
 }
 
 ModelParametersRBFN* ModelParametersRBFN::from_jsonpickle(const nlohmann::json& json) {
