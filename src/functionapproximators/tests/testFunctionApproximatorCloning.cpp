@@ -38,26 +38,7 @@ int main(int n_args, char** args)
 {
   int n_input_dims = 1;
   vector<FunctionApproximator*> function_approximators;
-  if (n_args==1)
-  {
-    // No name passed, get all function approximators
-    getFunctionApproximatorsVector(n_input_dims,function_approximators);
-  }
-  else
-  {
-    // Assume the arguments are names of function approximatores
-    for (int i_arg=1; i_arg<n_args; i_arg++)
-    {
-      FunctionApproximator* fa =  getFunctionApproximatorByName(args[i_arg],n_input_dims);
-      if (fa==NULL)
-        return -1;
-      function_approximators.push_back(fa);
-    }
-  }
-
-  VectorXi n_samples_per_dim = VectorXi::Constant(n_input_dims,50);
-  MatrixXd inputs, targets;
-  targetFunction(n_samples_per_dim, inputs, targets);
+  getFunctionApproximatorsVector(n_input_dims,function_approximators);
   
   for (unsigned int dd=0; dd<function_approximators.size(); dd++)
   {
@@ -71,27 +52,13 @@ int main(int n_args, char** args)
     cout << "Original   :" << endl << "    " << *cur_fa << endl;
     cout << "Clone      :" << endl << "    " << *cloned << endl;
 
-    cout << endl << "TRAINING CLONE" << endl;
-    cloned->train(inputs,targets);
-    cout << "Original   :" << endl << "    " << *cur_fa << endl;
-    cout << "Clone      :" << endl << "    " << *cloned << endl;
-
-    cout << endl << "CLONE OF TRAINED CLONE" << endl;
-    FunctionApproximator* cloned_cloned = cloned->clone(); 
-    cout << "Original   :" << endl << "    " << *cur_fa << endl;
-    cout << "Clone      :" << endl << "    " << *cloned << endl;
-    cout << "Clone clone:" << endl << "    " << *cloned_cloned << endl;
 
     cout << endl << "DELETING CLONE" << endl;
     delete cloned;
     cout << "Original   :" << endl << "    " << *cur_fa << endl;
-    cout << "Clone clone:" << endl << "    " << *cloned_cloned << endl;
 
     cout << endl << "DELETING ORIGINAL" << endl;
     delete cur_fa;
-    cout << "Clone clone:" << endl << "    " << *cloned_cloned << endl;
-    
-    delete cloned_cloned;
     
   }
 }

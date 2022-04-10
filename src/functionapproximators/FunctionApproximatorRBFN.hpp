@@ -69,8 +69,6 @@ public:
   
 	FunctionApproximator* clone(void) const;
   
-	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
-
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
   
 	/** Preallocate memory to make certain functions real-time.

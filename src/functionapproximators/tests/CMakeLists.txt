@@ -1,9 +1,6 @@
 add_executable(testJsonFunctionApproximators testJsonFunctionApproximators.cpp)
 target_link_libraries(testJsonFunctionApproximators functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(testTrainingCompareCppPython testTrainingCompareCppPython.cpp)
-target_link_libraries(testTrainingCompareCppPython functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-
 add_executable(testFunctionApproximatorCloning testFunctionApproximatorCloning.cpp)
 target_link_libraries(testFunctionApproximatorCloning functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 
@@ -13,19 +10,8 @@ target_link_libraries(testFunctionApproximatorRealtime functionapproximators eig
 add_executable(testModelParameterValues testModelParameterValues.cpp)
 target_link_libraries(testModelParameterValues functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 
-add_executable(testToUnifiedModel testToUnifiedModel.cpp)
-target_link_libraries(testToUnifiedModel functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-
-
 
 ################################################################################
 # LWR
 add_executable(testMetaParametersLWR testMetaParametersLWR.cpp)
 target_link_libraries(testMetaParametersLWR functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable(testPerturbModelParameterLWR testPerturbModelParameterLWR.cpp)
-target_link_libraries(testPerturbModelParameterLWR functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-
-add_executable(testBasisFunctionsLWR testBasisFunctionsLWR.cpp)
-target_link_libraries(testBasisFunctionsLWR functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
-

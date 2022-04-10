@@ -125,20 +125,6 @@ int FunctionApproximator::getExpectedOutputDim(void) const
     return meta_parameters_->getExpectedOutputDim();
 }
 
-void FunctionApproximator::reTrain(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
-{
-  delete model_parameters_;
-  model_parameters_ = NULL;
-  train(inputs,targets);
-}
-
-void FunctionApproximator::reTrain(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets, std::string save_directory, bool overwrite)
-{
-  delete model_parameters_;
-  model_parameters_ = NULL;
-  train(inputs,targets,save_directory,overwrite);
-}
-
 
 void FunctionApproximator::getParameterVectorSelectedMinMax(Eigen::VectorXd& min, Eigen::VectorXd& max) const
 {
@@ -286,108 +272,6 @@ bool FunctionApproximator::saveGridData(const VectorXd& min, const VectorXd& max
     return false;
 
   return mp_unified->saveGridData(min,max,n_samples_per_dim,save_directory,overwrite);
-  
-}
-
-void FunctionApproximator::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets, std::string save_directory, bool overwrite)
-{
-  train(inputs,targets);
-  
-  if (save_directory.empty())
-    return;
-  
-  if (!isTrained())
-    return;
-  
-  if (getExpectedInputDim()<3)
-  {
-    
-    VectorXd min = inputs.colwise().minCoeff();
-    VectorXd max = inputs.colwise().maxCoeff();
-    
-    int n_samples_per_dim = 100;
-    if (getExpectedInputDim()==2) n_samples_per_dim = 40;
-    VectorXi n_samples_per_dim_vec = VectorXi::Constant(getExpectedInputDim(),n_samples_per_dim);
-
-    MatrixXd inputs_grid;
-    FunctionApproximator::generateInputsGrid(min, max, n_samples_per_dim_vec, inputs_grid);
-    
-    MatrixXd outputs_grid(inputs_grid.rows(),getExpectedOutputDim());
-    predict(inputs_grid,outputs_grid);
-    
-    saveMatrix(save_directory,"n_samples_per_dim.txt",n_samples_per_dim_vec,overwrite);
-    saveMatrix(save_directory,"inputs_grid.txt",inputs_grid,overwrite);
-    saveMatrix(save_directory,"outputs_grid.txt",outputs_grid,overwrite);
-
-
-    MatrixXd variances_grid(inputs_grid.rows(),getExpectedOutputDim());
-    predictVariance(inputs_grid,variances_grid);
-    if (!variances_grid.size()==0)
-    {
-      variances_grid = variances_grid.array().sqrt();
-      saveMatrix(save_directory,"variances_grid.txt",variances_grid,overwrite);
-    }
-    
-    saveGridData(min, max, n_samples_per_dim_vec, save_directory, overwrite);
-    
-  }
-
-  MatrixXd outputs(inputs.rows(),getExpectedOutputDim());
-  predict(inputs,outputs);
-
-    
-  // saveMatrix does not accept Ref, but only Matrix
-  MatrixXd save_matrix;
-  save_matrix = inputs;
-  saveMatrix(save_directory,"inputs.txt",save_matrix,overwrite);
-  save_matrix = targets;
-  saveMatrix(save_directory,"targets.txt",save_matrix,overwrite);
-  save_matrix = outputs;
-  saveMatrix(save_directory,"outputs.txt",save_matrix,overwrite);
-  
-  
-  
-  string filename = save_directory+"/plotdata.py";
-  ofstream outfile;
-  outfile.open(filename.c_str()); 
-  if (!outfile.is_open())
-  {
-    cerr << __FILE__ << ":" << __LINE__ << ":";
-    cerr << "Could not open file " << filename << " for writing." << endl;
-  } 
-  else
-  {
-    // Python code generation in C++. Rock 'n' roll! ;-)
-    if (inputs.cols()==2) {                                                                                           
-      outfile << "from mpl_toolkits.mplot3d import Axes3D                                       \n";
-    }
-    outfile   << "import numpy                                                                  \n";
-    outfile   << "import matplotlib.pyplot as plt                                               \n";
-    outfile   << "directory = '" << "./" << "'                                        \n";
-    outfile   << "inputs   = numpy.loadtxt(directory+'/inputs.txt')                             \n";
-    outfile   << "targets  = numpy.loadtxt(directory+'/targets.txt')                            \n";
-    outfile   << "outputs  = numpy.loadtxt(directory+'/outputs.txt')                            \n";
-    outfile   << "fig = plt.figure()                                                            \n";
-    if (inputs.cols()==2) {                                                                                           
-      outfile << "ax = Axes3D(fig)                                                              \n";
-      outfile << "ax.plot(inputs[:,0],inputs[:,1],targets, '.', label='targets',color='black')  \n";
-      outfile << "ax.plot(inputs[:,0],inputs[:,1],outputs, '.', label='predictions',color='red')\n";
-      outfile << "ax.set_xlabel('input_1'); ax.set_ylabel('input_2'); ax.set_zlabel('output')   \n";
-      outfile << "ax.legend(loc='lower right')                                                  \n";
-    } else {                                                                                           
-      outfile << "plt.plot(inputs,targets, '.', label='targets',color='black')                  \n";
-      outfile << "plt.plot(inputs,outputs, '.', label='predictions',color='red')                \n";
-      outfile << "plt.xlabel('input'); plt.ylabel('output');                                    \n";
-      outfile << "plt.legend(loc='lower right')                                                 \n";
-    }                                                                                           
-    outfile   << "plt.show()                                                                    \n";
-    outfile << endl;
-
-    outfile.close();
-    //cout << "        ______________________________________________________________" << endl;
-    //cout << "        | Plot saved data with:" << " 'python " << filename << "'." << endl;
-    //cout << "        |______________________________________________________________" << endl;
-  }
   
 }
 

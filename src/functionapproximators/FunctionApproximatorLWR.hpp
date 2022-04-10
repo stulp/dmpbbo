@@ -70,8 +70,6 @@ public:
   friend void to_json(nlohmann::json& j, const FunctionApproximatorLWR& m);
   //friend void from_json(const nlohmann::json& j, FunctionApproximatorLWR& m);
   
-	void train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets);
-
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values

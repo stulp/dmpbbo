@@ -70,52 +70,6 @@ public:
    */
   virtual FunctionApproximator* clone(void) const = 0;
   
-  /** Train the function approximator with corresponding input and target examples.
-   *  \param[in] inputs  Input values of the training examples
-   *  \param[in] targets Target values of the training examples
-   */
-  virtual void train(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    const Eigen::Ref<const Eigen::MatrixXd>& targets) = 0;
-  
-  /** Train the function approximator with corresponding input and target examples (and write results to file).
-   *  \param[in] inputs  Input values of the training examples
-   *  \param[in] targets Target values of the training examples
-   *  \param[in] save_directory Directory to which to write results.
-   * \param[in] overwrite Whether to overwrite existing files. true=do overwrite, false=don't overwrite and give a warning.
-   */
-  void train(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
-    std::string save_directory, 
-    bool overwrite=false);
-
-  /** Re-train the function approximator with corresponding input and target examples.
-   *  \param[in] inputs  Input values of the training examples
-   *  \param[in] targets Target values of the training examples
-   *  Re-training could in principle have been enabled through FunctionApproximator::train, but we
-   *  wanted to keep a clear disctinction between training (which must be done at least once before 
-   *  FunctionApproximator::predict) can be called and re-training.
-   */
-  void reTrain(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    const Eigen::Ref<const Eigen::MatrixXd>& targets);
-  
-  /** Re-train the function approximator with corresponding input and target examples (and write results to file).
-   *  \param[in] inputs  Input values of the training examples
-   *  \param[in] targets Target values of the training examples
-   *  \param[in] save_directory Directory to which to write results.
-   * \param[in] overwrite Overwrite existing files in the directory above (default: false)
-   *  Re-training could in principle have been enabled through FunctionApproximator::train, but we
-   *  wanted to keep a clear disctinction between training (which must be done at least once before 
-   *  FunctionApproximator::predict) can be called and re-training.
-   */
-  void reTrain(
-    const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    const Eigen::Ref<const Eigen::MatrixXd>& targets, 
-    std::string save_directory, 
-    bool overwrite=false);
-  
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values

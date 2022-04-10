@@ -25,7 +25,6 @@
 #include "functionapproximators/ModelParametersLWR.hpp"
 #include "functionapproximators/MetaParametersLWR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
-#include "functionapproximators/leastSquares.hpp"
 
 #include "eigen/eigen_file_io.hpp"
 
@@ -79,92 +78,6 @@ FunctionApproximator* FunctionApproximatorLWR::clone(void) const {
     dynamic_cast<const ModelParametersLWR*>(getModelParameters())
     );
 };
-
-
-
-///** Compute Moore-Penrose pseudo-inverse. 
-// * Taken from: http://eigen.tuxfamily.org/bz/show_bug.cgi?id=257
-// * \param[in]  a       The matrix to be inversed.
-// * \param[out] result  The pseudo-inverse of the matrix.
-// * \param[in]  epsilon Don't know, not my code ;-)
-// * \return     true if pseudo-inverse possible, false otherwise
-//template<typename _Matrix_Type_>
-//bool pseudoInverse(const _Matrix_Type_ &a, _Matrix_Type_ &result, double
-//epsilon = std::numeric_limits<typename _Matrix_Type_::Scalar>::epsilon())
-//{
-//  if(a.rows()<a.cols())
-//      return false;
-//
-//  Eigen::JacobiSVD< _Matrix_Type_ > svd = a.jacobiSvd(Eigen::ComputeThinU |
-//Eigen::ComputeThinV);
-//
-//  typename _Matrix_Type_::Scalar tolerance = epsilon * std::max(a.cols(),
-//a.rows()) * svd.singularValues().array().abs().maxCoeff();
-//
-//  result = svd.matrixV() * _Matrix_Type_( (svd.singularValues().array().abs() >
-//tolerance).select(svd.singularValues().
-//      array().inverse(), 0) ).asDiagonal() * svd.matrixU().adjoint();
-//      
-//  return true;
-//}
-
-void FunctionApproximatorLWR::train(const Eigen::Ref<const Eigen::MatrixXd>& inputs, const Eigen::Ref<const Eigen::MatrixXd>& targets)
-{
-  if (isTrained())  
-  {
-    cerr << "WARNING: You may not call FunctionApproximatorLWR::train more than once. Doing nothing." << endl;
-    cerr << "   (if you really want to retrain, call reTrain function instead)" << endl;
-    return;
-  }
-  
-  assert(inputs.rows() == targets.rows());
-  assert(inputs.cols()==getExpectedInputDim());
-
-  const MetaParametersLWR* meta_parameters_lwr = 
-    dynamic_cast<const MetaParametersLWR*>(getMetaParameters());
-
-  // Determine the centers and widths of the basis functions, given the range of the input data
-  VectorXd min = inputs.colwise().minCoeff();
-  VectorXd max = inputs.colwise().maxCoeff();
-  MatrixXd centers, widths;
-  meta_parameters_lwr->getCentersAndWidths(min,max,centers,widths);
-  bool normalize_activations = true; 
-  bool asym_kernels = meta_parameters_lwr->asymmetric_kernels(); 
-
-  // Get the activations of the basis functions 
-  int n_samples = inputs.rows();
-  int n_kernels = centers.rows(); 
-  MatrixXd activations(n_samples,n_kernels);
-  BasisFunction::Gaussian::activations(centers,widths,inputs,activations,normalize_activations,asym_kernels);
-  
-  // Parameters for the weighted least squares regressions
-  bool use_offset = true;
-  double regularization = meta_parameters_lwr->regularization();
-  double min_weight = 0.000001*activations.maxCoeff();
-
-  // Prepare matrices
-  int n_betas = inputs.cols();
-  if (use_offset)
-    n_betas++;
-  MatrixXd beta(n_kernels,n_betas);
-  VectorXd cur_beta(n_betas);
-  VectorXd weights(inputs.rows());
-  
-  // Perform one weighted least squares regression for each kernel
-  for (int i_kernel=0; i_kernel<n_kernels; i_kernel++)
-  {
-    weights = activations.col(i_kernel);
-    cur_beta = weightedLeastSquares(inputs,targets,weights,use_offset,regularization,min_weight);
-    beta.row(i_kernel) = cur_beta;
-  }
-  
-  MatrixXd offsets = beta.rightCols(1);
-  MatrixXd slopes = beta.leftCols(n_betas-1);
-  
-  setModelParameters(new ModelParametersLWR(centers,widths,slopes,offsets,asym_kernels));
-  
-  preallocateMemory(n_kernels);
-}
 
 void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
 {

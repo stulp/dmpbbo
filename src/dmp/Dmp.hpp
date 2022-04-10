@@ -244,20 +244,6 @@ public:
    *  
    */
   virtual void statesAsTrajectory(const Eigen::VectorXd& ts, const Eigen::MatrixXd& x_in, const Eigen::MatrixXd& xd_in, Trajectory& trajectory) const;
-  
-  /**
-   * Train a DMP with a trajectory.
-   * \param[in] trajectory The trajectory with which to train the DMP.
-   */
-  virtual void train(const Trajectory& trajectory);
-      
-  /**
-   * Train a DMP with a trajectory, and write results to file
-   * \param[in] trajectory The trajectory with which to train the DMP.
-   * \param[in] save_directory The directory to which to save the results.
-   * \param[in] overwrite Overwrite existing files in the directory above (default: false)
-   */
-  virtual void train(const Trajectory& trajectory, std::string save_directory, bool overwrite=false);
 
   /**
    * Accessor function for the time constant.
