@@ -42,7 +42,7 @@ def plotFunctionApproximatorTrainingFromDirectory(directory,ax):
 if __name__=='__main__':
     """Pass a directory argument, read inputs, targets and predictions from that directory, and plot."""
 
-    executable = "../../../bin_test/testPerturbModelParameterLWR"
+    executable = "../../../build_dir_debug/src/functionapproximators/tests/testPerturbModelParameterLWR"
     
     if (not os.path.isfile(executable)):
         print("")

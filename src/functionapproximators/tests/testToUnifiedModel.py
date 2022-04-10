@@ -33,7 +33,7 @@ sys.path.append(lib_path)
 from functionapproximators.functionapproximators_plotting import *
 
 if __name__=='__main__':
-    executable = "../../../bin_test/testToUnifiedModel"
+    executable = "../../../build_dir_debug/src/functionapproximators/tests/testToUnifiedModel"
     
     if (not os.path.isfile(executable)):
         print("")
@@ -42,7 +42,7 @@ if __name__=='__main__':
         print("")
         sys.exit(-1);
     
-    function_approximator_names = ["LWR","RBFN","GPR","GMR","LWPR","RRRFF"]
+    function_approximator_names = ["LWR","RBFN","GPR","GMR","RRRFF"]
     
     # Call the executable with the directory to which results should be written
     directory = "/tmp/testToModelParametersUnified"

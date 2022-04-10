@@ -33,7 +33,7 @@ sys.path.append(lib_path)
 from functionapproximators.functionapproximators_plotting import *
 
 if __name__=='__main__':
-    executable = "../../../bin_test/testBasisFunctionsLWR"
+    executable = "../../../build_dir_debug/src/functionapproximators/tests/testBasisFunctionsLWR"
     
     if (not os.path.isfile(executable)):
         print("")
