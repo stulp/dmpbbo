@@ -23,8 +23,8 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef EIGEN_FILE_IO_HPP
-#define EIGEN_FILE_IO_HPP
+#ifndef _EIGEN_FILE_IO_HPP_
+#define _EIGEN_FILE_IO_HPP_
 
 #include <string>
 #include <fstream>
@@ -69,5 +69,5 @@ bool saveMatrix(std::string directory, std::string filename, Eigen::Matrix<Scala
 
 }
 
-#endif        //  #ifndef EIGEN_FILE_IO_HPP
+#endif //  #ifndef _EIGEN_FILE_IO_HPP_
 

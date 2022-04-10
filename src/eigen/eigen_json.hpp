@@ -20,14 +20,17 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef _EIGEN_JSON_HPP_
+#define _EIGEN_JSON_HPP_
 
 #include <eigen3/Eigen/Core>
 #include <nlohmann/json.hpp>
+#include <iostream>
 
 namespace Eigen {
 
-// Adapted from
+
+// Below code was adapted from
 // https://gitlab.com/Simox/simox/-/blob/master/SimoxUtility/json/eigen_conversion.h
     
 template <typename Derived>
@@ -35,21 +38,6 @@ void to_json(nlohmann::json& j, const MatrixBase<Derived>& matrix);
 
 template <typename Derived>
 void from_json(const nlohmann::json& j, MatrixBase<Derived>& vector);
-
-/*
-void from_json(const nlohmann::json& j, Eigen::VectorXd& vector);
-
-void from_json(const nlohmann::json& j, Eigen::MatrixXd& matrix);
-
-void from_json(const nlohmann::json& j, Eigen::VectorXi& vector);
-*/
-//int from_json_to_int(const nlohmann::json& j);
-
-/**
- * Read int from json. can be "4.0", "[4.0]", "[[4.0]]"
- */
-double from_json_to_double(const nlohmann::json& j);
-
 
 template <typename Derived>
 void to_json(nlohmann::json& j, const MatrixBase<Derived>& matrix)
@@ -102,5 +90,39 @@ void from_json(const nlohmann::json& j, Eigen::MatrixBase<Derived>& matrix)
 }
 
 
+/**
+ * Read int from json. can be "4.0", "[4.0]", "[[4.0]]"
+ */
+inline double from_json_to_double(const nlohmann::json& j) {
+  
+  if (j.contains("value")) {
+    double dv = j.at("value");
+    return dv;
+  }
+  
+  // values
+  if (j.contains("values")) {
+    Eigen::MatrixXd matrix;
+    from_json(j.at("values"), matrix); 
+    
+    if (matrix.rows()!=1) {
+      std::cerr << __FILE__ << ":" << __LINE__ << ":";
+      std::cerr << "'values' should have 1 row, but has " << matrix.rows() << std::endl;
+    }
+    if (matrix.cols()!=1) {
+      std::cerr << __FILE__ << ":" << __LINE__ << ":";
+      std::cerr << "'values' should have 1 cols, but has " << matrix.rows() << std::endl;
+    }
+    
+    return matrix(0,0);
+  }
+
+  // double
+  double d = j;
+  return d;
+  
+}
 
 }
+
+#endif //  #ifndef _EIGEN_JSON_HPP_
