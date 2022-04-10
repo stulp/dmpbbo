@@ -71,6 +71,7 @@ include_directories ( ${Boost_INCLUDE_DIRS} )
 add_subdirectory(src)
 add_subdirectory(demos_cpp)
 add_subdirectory(demo_robot)
+add_subdirectory(demo_robot_json)
 
 ###############################################################################
 # Generate doxygen documentation from CMake
