@@ -1,5 +1,5 @@
 /**
- * @file   from_jsonpickle.cpp
+ * @file   FunctionApproximatorFactory.cpp
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the 
