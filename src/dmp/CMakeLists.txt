@@ -1,4 +1,4 @@
-file(GLOB SOURCES *.cpp) 
+file(GLOB SOURCES Trajectory.cpp Dmp.cpp DmpFactory.cpp) 
 add_library(dmp ${SHARED_OR_STATIC} ${SOURCES})
 
 install(TARGETS dmp DESTINATION ${LIB_INSTALL_DIR})
