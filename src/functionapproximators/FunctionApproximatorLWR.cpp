@@ -61,7 +61,7 @@ void FunctionApproximatorLWR::preallocateMemory(int n_basis_functions)
   activations_prealloc_ = MatrixXd(1,n_basis_functions);
 }
 
-void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
+void FunctionApproximatorLWR::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
   
   bool only_one_sample = (inputs.rows()==1);

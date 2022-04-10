@@ -57,7 +57,7 @@ public:
   friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& m);
   //friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN& m);
   
-	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
   
 	/** Preallocate memory to make certain functions real-time.
 	 * \param[in] n_basis_functions Number of basis functions in the RBFN.

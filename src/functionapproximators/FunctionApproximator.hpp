@@ -53,7 +53,7 @@ public:
    */
   virtual void predict(
     const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
-    Eigen::MatrixXd& outputs) = 0;
+    Eigen::MatrixXd& outputs) const = 0;
   
   /** Returns a string representation of the object.
    * \return A string representation of the object.

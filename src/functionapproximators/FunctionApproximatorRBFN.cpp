@@ -57,7 +57,7 @@ void FunctionApproximatorRBFN::preallocateMemory(int n_basis_functions)
 }
 
 
-void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs)
+void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
   model_parameters_->weights(weights_prealloc_);
   

@@ -70,7 +70,7 @@ public:
    * This function is realtime if inputs.rows()==1 (i.e. only one input sample is provided), and the
    * memory for outputs is preallocated.
    */
-	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs);
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs) const;
 
 	std::string toString(void) const;
 	
