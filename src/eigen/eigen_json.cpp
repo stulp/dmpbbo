@@ -30,11 +30,11 @@ using namespace std;
 namespace Eigen {
   
 
-int from_json_to_double(const nlohmann::json& j) {
+double from_json_to_double(const nlohmann::json& j) {
   
-  // value
   if (j.contains("value")) {
-    return j.at("value");
+    double dv = j.at("value");
+    return dv;
   }
   
   // values

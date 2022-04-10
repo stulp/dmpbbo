@@ -48,7 +48,7 @@ void from_json(const nlohmann::json& j, Eigen::VectorXi& vector);
 /**
  * Read int from json. can be "4.0", "[4.0]", "[[4.0]]"
  */
-int from_json_to_double(const nlohmann::json& j);
+double from_json_to_double(const nlohmann::json& j);
 
 
 template <typename Derived>
@@ -72,9 +72,6 @@ void from_json(const nlohmann::json& j, Eigen::MatrixBase<Derived>& matrix)
     using Scalar = typename Eigen::MatrixBase<Derived>::Scalar;
     using Index = typename Eigen::MatrixBase<Derived>::Index;
 
-    std::cout << "  j=" << j << " " << j.size() << std::endl;
-    std::cout << "  matrix=" << matrix.rows() << " X " << matrix.cols() << std::endl;
-    
     bool resized = false;
     for (std::size_t row = 0; row < j.size(); ++row)
     {
