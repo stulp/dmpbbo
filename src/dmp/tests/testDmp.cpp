@@ -30,7 +30,7 @@
 
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigenutils/eigen_file_io.hpp"
 
 #include <eigen3/Eigen/Core>
 #include <boost/filesystem.hpp>

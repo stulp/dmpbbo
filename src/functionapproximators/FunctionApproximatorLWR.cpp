@@ -25,7 +25,7 @@
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "eigen/eigen_json.hpp"
+#include "eigenutils/eigen_json.hpp"
 
 #include <nlohmann/json.hpp>
 

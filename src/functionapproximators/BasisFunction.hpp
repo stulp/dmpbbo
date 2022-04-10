@@ -27,7 +27,7 @@
 #ifndef _BASISFUNCTION_H_
 #define _BASISFUNCTION_H_
 
-#include "eigen/eigen_realtime_check.hpp" // Include this before Eigen header files
+#include "eigenutils/eigen_realtime_check.hpp" // Include this before Eigen header files
 
 #include <vector>
 #include <eigen3/Eigen/Core>

@@ -23,7 +23,7 @@
  
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-#include "eigen/eigen_json.hpp"
+#include "eigenutils/eigen_json.hpp"
 
 #include <cmath>
 #include <iostream>

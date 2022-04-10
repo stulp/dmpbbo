@@ -24,7 +24,7 @@
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "testDynamicalSystemFunction.hpp"
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigenutils/eigen_file_io.hpp"
 
 #include <iostream>
 #include <fstream>

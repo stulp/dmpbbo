@@ -23,7 +23,7 @@
 
 #include "dmp/Trajectory.hpp"
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigenutils/eigen_file_io.hpp"
 
 #include <fstream>
 #include <iostream>

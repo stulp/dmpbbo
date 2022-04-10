@@ -36,9 +36,9 @@
 
 
 
-#include "eigen/eigen_file_io.hpp"
+#include "eigenutils/eigen_file_io.hpp"
 
-#include "eigen/eigen_json.hpp"
+#include "eigenutils/eigen_json.hpp"
 
 #include <cmath>
 #include <iostream>

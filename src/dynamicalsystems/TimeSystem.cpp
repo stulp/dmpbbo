@@ -28,7 +28,7 @@
 #include <iostream>
 #include <eigen3/Eigen/Core>
 
-#include "eigen/eigen_json.hpp"
+#include "eigenutils/eigen_json.hpp"
 
 #include <nlohmann/json.hpp>
 
