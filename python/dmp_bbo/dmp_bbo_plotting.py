@@ -19,6 +19,7 @@
 import numpy as np
 import os
 import sys
+from to_jsonpickle import *
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
@@ -37,7 +38,7 @@ def containsNewDistribution(directory):
 
 def plotOptimizationRolloutsTask(directory,fig,task,plot_all_rollouts=False):
     plotOptimizationRollouts(directory,fig,task.plotRollout,plot_all_rollouts,task.costLabels())
-
+    
 def plotOptimizationRollouts(directory,fig,plotRollout=None,plot_all_rollouts=False,cost_labels=[]):
     
     if not fig:    
