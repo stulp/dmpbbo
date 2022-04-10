@@ -60,8 +60,6 @@ public:
   /** Destructor. */
   ~SpringDamperSystem(void);
 
-  DynamicalSystem* clone(void) const;
-
   static SpringDamperSystem* from_jsonpickle(const nlohmann::json& json);
   
    void differentialEquation(

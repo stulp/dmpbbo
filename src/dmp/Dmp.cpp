@@ -555,14 +555,6 @@ void Dmp::computeFunctionApproximatorInputsAndTargets(const Trajectory& trajecto
   MatrixXd xs_ana;
   MatrixXd xds_ana;
   
-  // Before, we would make clone of the dmp, and integrate it with the tau, and initial/attractor
-  // state of the trajectory. However, Thibaut needed to call this from outside the Dmp as well,
-  // with the tau/states of the this object. Therefore, we no longer clone. 
-  // Dmp* dmp_clone = static_cast<Dmp*>(this->clone());
-  // dmp_clone->set_tau(trajectory.duration());
-  // dmp_clone->set_initial_state(trajectory.initial_y());
-  // dmp_clone->set_attractor_state(trajectory.final_y());
-  // dmp_clone->analyticalSolution(trajectory.ts(),xs_ana,xds_ana);
   analyticalSolution(trajectory.ts(),xs_ana,xds_ana);
   MatrixXd xs_goal   = xs_ana.GOALM(n_time_steps);
   MatrixXd xs_gating = xs_ana.GATINGM(n_time_steps);

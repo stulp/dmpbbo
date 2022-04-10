@@ -53,8 +53,6 @@ public:
   /** Destructor. */
   ~TimeSystem(void);
   
-  DynamicalSystem* clone(void) const;
-  
   static TimeSystem* from_jsonpickle(const nlohmann::json& json);
   
    void differentialEquation(

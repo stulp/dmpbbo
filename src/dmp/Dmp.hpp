@@ -136,12 +136,6 @@ public:
   
   static Dmp* from_jsonpickle(const nlohmann::json& json);
   
-  /** Return a deep copy of this object 
-   * \return A deep copy of this object
-   */
-  Dmp* clone(void) const { return NULL; };
-
-  
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const;
   
   void differentialEquation(

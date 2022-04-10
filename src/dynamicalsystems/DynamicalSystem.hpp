@@ -80,11 +80,6 @@ public:
 
   /** Destructor */
   virtual ~DynamicalSystem(void);
-
-  /** Return a pointer to a deep copy of the DynamicalSystem object.
-   *  \return Pointer to a deep copy
-   */
-  virtual DynamicalSystem* clone(void) const = 0;
   
   /** @} */ 
    

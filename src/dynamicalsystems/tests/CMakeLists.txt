@@ -1,6 +1,3 @@
-add_executable(testDynamicalSystemCloning testDynamicalSystemCloning.cpp getDynamicalSystemsVector.cpp)
-target_link_libraries(testDynamicalSystemCloning dynamicalsystems eigen ${Boost_LIBRARIES})
-
 add_executable(testJsonDynamicalSystems testJsonDynamicalSystems.cpp)
 target_link_libraries(testJsonDynamicalSystems dynamicalsystems eigen ${Boost_LIBRARIES})
 

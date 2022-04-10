@@ -60,8 +60,6 @@ public:
   /** Destructor. */
   ~ExponentialSystem(void);
   
-  DynamicalSystem* clone(void) const;
-  
    void differentialEquation(
      const Eigen::Ref<const Eigen::VectorXd>& x, 
      Eigen::Ref<Eigen::VectorXd> xd

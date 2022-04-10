@@ -53,11 +53,6 @@ TimeSystem::~TimeSystem(void)
 {
 }
 
-DynamicalSystem* TimeSystem::clone(void) const
-{
-  return new TimeSystem(tau(),count_down());
-}
-
 void TimeSystem::differentialEquation(
    const Eigen::Ref<const Eigen::VectorXd>& x, 
    Eigen::Ref<Eigen::VectorXd> xd) const

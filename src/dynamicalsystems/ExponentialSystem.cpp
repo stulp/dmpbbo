@@ -49,12 +49,6 @@ ExponentialSystem::~ExponentialSystem(void)
 {
 }
 
-DynamicalSystem* ExponentialSystem::clone(void) const
-{
-  return new ExponentialSystem(tau(),initial_state(),attractor_state(),alpha_);
-}
-
-
 void ExponentialSystem::differentialEquation(
   const Eigen::Ref<const Eigen::VectorXd>& x, 
   Eigen::Ref<Eigen::VectorXd> xd) const

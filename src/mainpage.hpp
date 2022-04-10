@@ -40,7 +40,7 @@ This page explains the overal design rationale for DmpBbo
 
 \section sec_remarks General Remarks
 
-\li Code legibility is more important to me than absolute execution speed (except for those parts of the code likely to be called in a time-critical context) or using all of the design patterns known to man (that is why I do not use PIMPL; it is not so legible for the uninitiated user. Also, I do not use the factory design pattern, but rather have clone() functions in classes ).
+\li Code legibility is more important to me than absolute execution speed (except for those parts of the code likely to be called in a time-critical context) or using all of the design patterns known to man (that is why I do not use PIMPL; it is not so legible for the uninitiated user.
 
 \li I learned to use Eigen whilst coding this project (learning-by-doing). So especially the parts I coded first might have some convoluted solutions (I didn't learn about Eigen::Ref til later...). Any suggestions for making the code more legible or efficient are welcome. The same goes for Python actually. So be gentle on me on this one; I myself will probably look back at this Python code in a few years and think: "How cute... I was just a Python baby when I coded that."
 

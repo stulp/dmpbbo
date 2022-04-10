@@ -55,12 +55,6 @@ SpringDamperSystem::~SpringDamperSystem(void)
 {
 }
 
-DynamicalSystem* SpringDamperSystem::clone(void) const
-{
-  return new SpringDamperSystem(tau(),initial_state(),attractor_state(),
-                        damping_coefficient_,spring_constant_,mass_);
-}
-
 void SpringDamperSystem::differentialEquation(
    const Eigen::Ref<const Eigen::VectorXd>& x, 
    Eigen::Ref<Eigen::VectorXd> xd) const

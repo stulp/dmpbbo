@@ -49,11 +49,6 @@ SigmoidSystem::~SigmoidSystem(void)
 {
 }
 
-DynamicalSystem* SigmoidSystem::clone(void) const
-{
-  return new SigmoidSystem(tau(),initial_state(),max_rate_,inflection_point_time_);
-}
-
 void SigmoidSystem::set_tau(double new_tau) {
 
   // Get previous tau from superclass with tau() and set it with set_tau()  
