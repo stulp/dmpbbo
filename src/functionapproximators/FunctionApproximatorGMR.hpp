@@ -26,12 +26,6 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
-
 /** @defgroup GMR Gaussian Mixture Regression (GMR)
  *  @ingroup FunctionApproximators
  */
@@ -181,19 +175,6 @@ private:
    */
   FunctionApproximatorGMR(void) {};
   
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
-  }
   
   void preallocateMatrices(int n_gaussians, int n_input_dims, int n_output_dims);
   /** This is a cached variable whose memory is allocated once during construction. */

@@ -26,7 +26,6 @@
 #include "functionapproximators/BasisFunction.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -379,7 +378,7 @@ void UnifiedModel::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& in
 
 string UnifiedModel::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("UnifiedModel");
+  return string("UnifiedModel");
 }
 
 void UnifiedModel::getSelectableParameters(set<string>& selected_values_labels) const 

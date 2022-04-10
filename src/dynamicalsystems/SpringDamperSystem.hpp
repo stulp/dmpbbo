@@ -26,9 +26,6 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 #include <nlohmann/json_fwd.hpp>
 
 namespace DmpBbo {
@@ -137,25 +134,8 @@ private:
    */
   SpringDamperSystem(void) {};
   
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
   /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time execution of the differentialEquation() function. */
   mutable Eigen::VectorXd y_,z_,yd_,zd_,y_attr_;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-    ar & BOOST_SERIALIZATION_NVP(damping_coefficient_);
-    ar & BOOST_SERIALIZATION_NVP(spring_constant_);
-    ar & BOOST_SERIALIZATION_NVP(mass_);
-  }
   
 public:
   friend void to_json(nlohmann::json& j, const SpringDamperSystem& p);

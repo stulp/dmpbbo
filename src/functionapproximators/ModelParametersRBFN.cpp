@@ -25,7 +25,6 @@
 #include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include "eigen/eigen_json.hpp"
 

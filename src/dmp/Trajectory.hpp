@@ -24,13 +24,10 @@
 #ifndef _TRAJECTORY_H_
 #define _TRAJECTORY_H_
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
 #include <iosfwd>
 #include <eigen3/Eigen/Core>
 
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/access.hpp>
 
 
 namespace DmpBbo {
@@ -223,24 +220,6 @@ private:
   Eigen::MatrixXd yds_;
   Eigen::MatrixXd ydds_;
   Eigen::MatrixXd misc_;
-
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * \see page_serialization
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_NVP(ts_);
-    ar & BOOST_SERIALIZATION_NVP(ys_);
-    ar & BOOST_SERIALIZATION_NVP(yds_);
-    ar & BOOST_SERIALIZATION_NVP(ydds_);
-    ar & BOOST_SERIALIZATION_NVP(misc_);
-  }
 
 };
 

@@ -28,8 +28,6 @@
 #include "functionapproximators/FunctionApproximator.hpp"
 #include "functionapproximators/FunctionApproximatorLWR.hpp"
 
-#include <boost/serialization/vector.hpp>
-
 #include <iostream>
 #include <eigen3/Eigen/Core>
 

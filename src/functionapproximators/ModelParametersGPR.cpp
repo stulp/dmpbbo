@@ -26,7 +26,6 @@
 
 #include "functionapproximators/BasisFunction.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -100,7 +99,7 @@ void ModelParametersGPR::kernelActivations(const Eigen::Ref<const Eigen::MatrixX
 
 string ModelParametersGPR::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGPR");
+  return string("ModelParametersGPR");
 }
 
 void ModelParametersGPR::getSelectableParameters(set<string>& selected_values_labels) const 

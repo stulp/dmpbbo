@@ -29,9 +29,6 @@
 
 #include <nlohmann/json.hpp>
 
-#include "dmp/serialization.hpp"
-
-
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <boost/filesystem.hpp>

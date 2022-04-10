@@ -23,7 +23,6 @@
 
 #include "functionapproximators/MetaParametersLWR.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include "eigen/eigen_json.hpp"
 

@@ -27,7 +27,6 @@
 #include "functionapproximators/leastSquares.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <eigen3/Eigen/LU>

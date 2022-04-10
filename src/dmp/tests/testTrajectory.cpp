@@ -22,11 +22,6 @@
 
 #include "dmp/Trajectory.hpp"
 
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
-#include <boost/archive/xml_oarchive.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <eigen3/Eigen/Core>
@@ -71,25 +66,6 @@ int main(int n_args, char** args)
   cout << traj;
   cout << "__________________" << endl;
   cout << traj_reread_misc;
-
-  // create and open a character archive for output
-  std::string filename_xml("/tmp/trajectory.xml");
-
-  std::ofstream ofs(filename_xml);
-  boost::archive::xml_oarchive oa(ofs);
-  oa << boost::serialization::make_nvp("traj",traj);
-  ofs.close();
-
-  std::ifstream ifs(filename_xml);
-  boost::archive::xml_iarchive ia(ifs);
-  Trajectory traj_out;
-  ia >> BOOST_SERIALIZATION_NVP(traj_out);
-  ifs.close();
-  
-  cout << "___________________________________________" << endl;
-  cout << "  filename_xml=" << filename_xml << endl;
-  cout << traj << endl;
-  cout << traj_out << endl;
 
   return 0;
 }

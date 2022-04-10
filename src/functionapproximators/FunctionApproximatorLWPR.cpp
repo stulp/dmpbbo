@@ -25,7 +25,6 @@
 #include "functionapproximators/MetaParametersLWPR.hpp"
 #include "functionapproximators/ModelParametersLWPR.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include "lwpr.hh"
 

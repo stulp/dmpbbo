@@ -91,31 +91,6 @@ int main()
     updaters[i_updater]->updateDistribution(distribution, samples, costs, distribution);
     cout << "  distribution = " << distribution << endl;
     
-    
-    /*
-    
-    SERIALIZATION NO LONGER SUPPORTED FOR THIS MODULE
-    
-    // create and open a character archive for output
-    std::string filename("/tmp/updater_");
-    filename += to_string(i_updater)+".xml";
-    std::ofstream ofs(filename);
-    boost::archive::xml_oarchive oa(ofs);
-    oa << boost::serialization::make_nvp("test_updater",updaters[i_updater]);
-    ofs.close();
-  
-    std::ifstream ifs(filename);
-    boost::archive::xml_iarchive ia(ifs);
-    Updater* updater_out;
-    ia >> BOOST_SERIALIZATION_NVP(updater_out);
-    ifs.close();
-    
-    cout << "___________________________________________" << endl;
-    cout << filename << endl;
-    cout << *(updaters[i_updater]) << endl;
-    cout << *updater_out << endl;
-    */
-    
   }
   
 }

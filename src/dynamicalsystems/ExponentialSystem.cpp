@@ -29,8 +29,6 @@
 #include <sstream>
 #include <eigen3/Eigen/Core>
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
-
 #include "eigen/eigen_json.hpp"
 
 #include <nlohmann/json.hpp>

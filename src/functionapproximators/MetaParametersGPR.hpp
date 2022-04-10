@@ -26,14 +26,9 @@
 
 #include "functionapproximators/MetaParameters.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 #include <iosfwd>
 #include <vector>
 #include <eigen3/Eigen/Core>
-
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
 
@@ -87,21 +82,6 @@ private:
    * friend)
    */
   MetaParametersGPR(void) {}; 
-  
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
-    ar & BOOST_SERIALIZATION_NVP(maximum_covariance_);
-    ar & BOOST_SERIALIZATION_NVP(sigmas_);
-  }
   
 };
 

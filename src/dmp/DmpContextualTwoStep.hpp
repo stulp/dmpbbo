@@ -28,8 +28,6 @@
 
 #include <set>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
 
 
 
@@ -78,23 +76,6 @@ protected:
    * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
    */
    DmpContextualTwoStep(void) {}; 
-   
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * \see page_serialization
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DmpContextual);
-    ar & BOOST_SERIALIZATION_NVP(policy_parameter_function_);
-  }
-    
 
 };
 

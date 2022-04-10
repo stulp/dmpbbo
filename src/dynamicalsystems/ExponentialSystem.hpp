@@ -26,9 +26,6 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 #include <nlohmann/json_fwd.hpp>
 
 #include <iosfwd>
@@ -98,19 +95,6 @@ private:
   /** Preallocated memory to make ExponentialSystem::differentialEquation() realtime. */
   mutable Eigen::VectorXd attractor_state_prealloc_;
   
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-    ar & BOOST_SERIALIZATION_NVP(alpha_);
-  }
 
 public:
   friend void to_json(nlohmann::json& j, const ExponentialSystem& p);

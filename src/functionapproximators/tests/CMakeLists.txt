@@ -10,9 +10,6 @@ target_link_libraries(testFunctionApproximatorCloning functionapproximators eige
 add_executable(testFunctionApproximatorRealtime testFunctionApproximatorRealtime.cpp)
 target_link_libraries(testFunctionApproximatorRealtime functionapproximators eigen ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
 
-add_executable(testFunctionApproximatorSerialization testFunctionApproximatorSerialization.cpp)
-target_link_libraries(testFunctionApproximatorSerialization functionapproximators eigen ${LWPR_LIBRARIES}  ${Boost_LIBRARIES})
-
 add_executable(testModelParameterValues testModelParameterValues.cpp)
 target_link_libraries(testModelParameterValues functionapproximators eigen ${LWPR_LIBRARIES} ${Boost_LIBRARIES})
 

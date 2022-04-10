@@ -25,7 +25,6 @@
 #include "functionapproximators/BasisFunction.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 
@@ -94,7 +93,7 @@ int ModelParametersRRRFF::getExpectedInputDim(void) const
 
 string ModelParametersRRRFF::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersRRRFF");
+  return string("ModelParametersRRRFF");
 };
 
 

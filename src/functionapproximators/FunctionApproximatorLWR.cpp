@@ -28,7 +28,6 @@
 #include "functionapproximators/leastSquares.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <eigen3/Eigen/SVD>

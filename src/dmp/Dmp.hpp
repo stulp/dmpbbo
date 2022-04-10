@@ -30,12 +30,6 @@
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "functionapproximators/Parameterizable.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-#include <boost/serialization/vector.hpp>
-
 #include <boost/random.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -430,34 +424,7 @@ private:
   
 protected:
    Dmp(void) {};
-
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * \see page_serialization
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Parameterizable);
-    
-    ar & BOOST_SERIALIZATION_NVP(goal_system_);
-    ar & BOOST_SERIALIZATION_NVP(spring_system_);
-    ar & BOOST_SERIALIZATION_NVP(phase_system_);
-    ar & BOOST_SERIALIZATION_NVP(gating_system_);
-    ar & BOOST_SERIALIZATION_NVP(function_approximators_);
-    
-    ar & BOOST_SERIALIZATION_NVP(forcing_term_scaling_);
-    ar & BOOST_SERIALIZATION_NVP(trajectory_amplitudes_);
-    
-    ar & BOOST_SERIALIZATION_NVP(perturbation_standard_deviation_);
-  }
-  
+   
 };
 
 }

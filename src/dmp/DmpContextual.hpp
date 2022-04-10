@@ -28,8 +28,6 @@
 
 #include <set>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
 
@@ -191,25 +189,6 @@ protected:
 
 protected:
    DmpContextual(void) {};
-
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * \see page_serialization
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Dmp);
-    
-    // Do not archive task_parameters_; these will change constantly, 
-    // depending on the task being solved.
-  }
 
 };
 

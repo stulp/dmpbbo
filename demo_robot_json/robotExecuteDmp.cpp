@@ -24,13 +24,11 @@
 
 #include "runSimulationThrowBall.hpp"
 
+#include "dmp/Dmp.hpp"
 #include "dmp/DmpFactory.hpp"
 #include "dmp/Trajectory.hpp"
 
 #include <nlohmann/json.hpp>
-
-#include "dmp/serialization.hpp"
-
 
 #include "dmpbbo_io/EigenFileIO.hpp"
 

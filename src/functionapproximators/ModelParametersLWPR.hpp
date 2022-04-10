@@ -29,10 +29,7 @@
 
 #include "functionapproximators/ModelParameters.hpp"
 
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
 
 // Forward declarations
 class LWPR_Object;
@@ -102,36 +99,6 @@ private:
    * friend)
    */
   ModelParametersLWPR(void) {};
-
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \todo Implement this function
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    // serialize base class information
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ModelParameters);
-    
-    std::cerr << "ERROR: Don't know how to serialize ModelParametersLWPR yet..." << std::endl;
-  
-    /*
-    ar & BOOST_SERIALIZATION_NVP(centers_);
-    ar & BOOST_SERIALIZATION_NVP(widths_);
-    ar & BOOST_SERIALIZATION_NVP(slopes_);
-    ar & BOOST_SERIALIZATION_NVP(offsets_);
-    ar & BOOST_SERIALIZATION_NVP(asymmetric_kernels_);
-    ar & BOOST_SERIALIZATION_NVP(lines_pivot_at_max_activation_);
-    ar & BOOST_SERIALIZATION_NVP(slopes_as_angles_);
-    ar & BOOST_SERIALIZATION_NVP(all_values_vector_size_);
-    ar & BOOST_SERIALIZATION_NVP(caching_);
-    */
-  }
 
 };
 

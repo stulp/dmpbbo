@@ -130,28 +130,6 @@ int main(int n_args, char* args[])
     cout << endl << "Plot results in Matlab as follows:" << endl << endl;
     cout << "clf; for dd=0:"<<n_demos-1<<", data = load(sprintf('"<<directory<<"demonstration%02d.txt',dd)); tp = load(sprintf('"<<directory<<"task_parameters%02d.txt',dd)); viapoint_time = load(sprintf('"<<directory<<"viapoint_time%02d.txt',dd)); for ss=1:3, subplot(1,3,ss); plot(data(:,1),data(:,ss+1)'); hold on; if (ss==1), plot(viapoint_time,tp,'ro'); end; axis square; axis tight; end; end" << endl;
   }
-  
-  /*
-  SERIALIZATION DISABLED IN DMP_BBO MODULE
-    // create and open a character archive for output
-    std::string filename_xml("/tmp/task_viapoint.xml");
-  
-    std::ofstream ofs(filename_xml);
-    boost::archive::xml_oarchive oa(ofs);
-    oa << boost::serialization::make_nvp("task",task);
-    ofs.close();
-  
-    std::ifstream ifs(filename_xml);
-    boost::archive::xml_iarchive ia(ifs);
-    TaskViapoint* task_out;
-    ia >> BOOST_SERIALIZATION_NVP(task_out);
-    ifs.close();
-    
-    cout << "___________________________________________" << endl;
-    cout << "  filename_xml=" << filename_xml << endl;
-    cout << task << endl;
-    cout << task_out << endl;
-*/
 
     
 }

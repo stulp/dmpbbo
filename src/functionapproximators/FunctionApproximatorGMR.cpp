@@ -25,7 +25,6 @@
 #include "functionapproximators/ModelParametersGMR.hpp"
 #include "functionapproximators/MetaParametersGMR.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream> 
 #include <eigen3/Eigen/LU>

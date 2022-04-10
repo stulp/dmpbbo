@@ -62,7 +62,7 @@ endif()
 
 ###############################################################################
 # Find boost packages
-find_package( Boost 1.34 COMPONENTS filesystem system serialization REQUIRED)
+find_package( Boost 1.34 COMPONENTS filesystem system REQUIRED)
 link_directories ( ${Boost_LIBRARY_DIRS} )
 include_directories ( ${Boost_INCLUDE_DIRS} )
 
@@ -70,7 +70,6 @@ include_directories ( ${Boost_INCLUDE_DIRS} )
 # Things to compile are in the src/ directory
 add_subdirectory(src)
 add_subdirectory(demos_cpp)
-add_subdirectory(demo_robot)
 add_subdirectory(demo_robot_json)
 
 ###############################################################################

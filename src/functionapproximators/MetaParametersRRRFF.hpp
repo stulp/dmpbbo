@@ -28,8 +28,6 @@
 
 #include <iosfwd>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
 
 namespace DmpBbo {
 
@@ -73,23 +71,6 @@ private:
    * friend)
    */
    MetaParametersRRRFF(void) {};
-   
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(MetaParameters);
-    ar & BOOST_SERIALIZATION_NVP(number_of_basis_functions_);
-    ar & BOOST_SERIALIZATION_NVP(regularization_);
-    ar & BOOST_SERIALIZATION_NVP(gamma_);
-  }
-  
 
 };
 

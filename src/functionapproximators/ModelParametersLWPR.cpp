@@ -24,7 +24,6 @@
 #include "functionapproximators/ModelParametersLWPR.hpp"
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include "lwpr.hh"
 
@@ -76,7 +75,7 @@ ModelParameters* ModelParametersLWPR::clone(void) const
 
 string ModelParametersLWPR::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersLWPR");
+  return string("ModelParametersLWPR");
   
   /*
   output << "{ \"ModelParametersLWPR\": { \"lwpr_object_xml_string\": \"";

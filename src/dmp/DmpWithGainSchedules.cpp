@@ -30,8 +30,6 @@
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
-
 #include <cmath>
 #include <iostream>
 #include <fstream>

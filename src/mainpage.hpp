@@ -108,8 +108,6 @@ See \ref page_serialization
 
 \todo Check if true: "An example is given in TaskViapoint, which implements a Task in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by TaskSolverDmp, which is able to generate such trajectories."
 
-\todo EigenToString.tpp from EigenBoostSerialization? Or move into EigenFileIO?
-
  */ 
 
 /** \defgroup Demos Demos

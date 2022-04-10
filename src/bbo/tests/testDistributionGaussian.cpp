@@ -86,27 +86,6 @@ int main(int n_args, char* args[])
     }
   }
 
-  /*
-  DistributionGaussian distribution_out(2*mean, 2*covar); 
-
-  // create and open a character archive for output
-  std::string filename("/tmp/distribution.xml");
-  std::ofstream ofs(filename);
-  boost::archive::xml_oarchive oa(ofs);
-  oa << BOOST_SERIALIZATION_NVP(distribution1);
-  ofs.close();
-
-  std::ifstream ifs(filename);
-  boost::archive::xml_iarchive ia(ifs);
-  ia >> BOOST_SERIALIZATION_NVP(distribution_out);
-  ifs.close();
-  
-  cout << "___________________________________________" << endl;
-  cout << distribution1 << endl;
-  cout << distribution_out << endl;
-  distribution_out.generateSamples(10, samples);
-  cout << samples << endl;
-  */  
 }
 
 

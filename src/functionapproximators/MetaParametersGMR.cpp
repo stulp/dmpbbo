@@ -23,7 +23,6 @@
 
 #include "functionapproximators/MetaParametersGMR.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 
@@ -45,7 +44,7 @@ MetaParametersGMR* MetaParametersGMR::clone(void) const
 
 string MetaParametersGMR::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersGMR");
+  return string("MetaParametersGMR");
 }
 
 }

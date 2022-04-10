@@ -23,7 +23,6 @@
 
 #include "functionapproximators/MetaParametersGPR.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <unordered_map>
@@ -60,7 +59,7 @@ MetaParametersGPR* MetaParametersGPR::clone(void) const
 
 string MetaParametersGPR::toString(void) const
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersGPR");
+  return string("MetaParametersGPR");
 }
 
 }

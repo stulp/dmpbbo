@@ -21,7 +21,6 @@
  */
 
 #include "dmp/Dmp.hpp"
-#include "dmp/serialization.hpp"
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"

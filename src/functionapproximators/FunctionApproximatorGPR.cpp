@@ -26,7 +26,6 @@
 #include "functionapproximators/MetaParametersGPR.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>

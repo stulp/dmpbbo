@@ -23,7 +23,6 @@
 
 #include "functionapproximators/MetaParametersRRRFF.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 
@@ -48,7 +47,7 @@ MetaParametersRRRFF* MetaParametersRRRFF::clone(void) const
 
 string MetaParametersRRRFF::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersRRRFF");
+  return string("MetaParametersRRRFF");
 }
 
 }

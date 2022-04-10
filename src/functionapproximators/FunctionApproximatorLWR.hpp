@@ -100,20 +100,6 @@ private:
    */
   FunctionApproximatorLWR(void) {};
    
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(FunctionApproximator);
-  }
-  
   void preallocateMemory(int n_basis_functions);
   
   /** Preallocated memory for one time step, required to make the predict() function real-time. */

@@ -25,7 +25,6 @@
 
 #include <iostream>
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 using namespace Eigen;
 using namespace std;
@@ -61,7 +60,7 @@ MetaParametersLWPR* MetaParametersLWPR::clone(void) const
 }
 
 string MetaParametersLWPR::toString(void) const {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("MetaParametersLWPR");
+  return string("MetaParametersLWPR");
 }
 
 

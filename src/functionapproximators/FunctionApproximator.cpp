@@ -28,7 +28,6 @@
 #include "functionapproximators/UnifiedModel.hpp"
 
 #include "dmpbbo_io/EigenFileIO.hpp"
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -231,10 +230,6 @@ void FunctionApproximator::setParameterVectorAll(const Eigen::VectorXd& values) 
 
 string FunctionApproximator::toString(void) const
 {
-  /*
-  string name = "FunctionApproximator"+getName();
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML(name.c_str());
-  */
   std::stringstream s;
   s << "FunctionApproximator"+getName() << endl;
   if (meta_parameters_!=NULL)

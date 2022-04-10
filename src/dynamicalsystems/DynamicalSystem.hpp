@@ -31,11 +31,6 @@
 #include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
-#include "dmpbbo_io/EigenBoostSerialization.hpp"
-
 namespace DmpBbo {
 
 /** \defgroup DynamicalSystems Dynamical Systems Module
@@ -379,27 +374,6 @@ protected:
    */
   DynamicalSystem(void) {};
    
-private:
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_NVP(dim_);
-    ar & BOOST_SERIALIZATION_NVP(dim_orig_);
-    // Const doesn't work, see sec_boost_serialization_ugliness in the docu
-    //ar & boost::serialization::make_nvp("dim_orig_", const_cast<int&>(dim_orig_));
-    ar & BOOST_SERIALIZATION_NVP(tau_);
-    ar & BOOST_SERIALIZATION_NVP(initial_state_);
-    ar & BOOST_SERIALIZATION_NVP(attractor_state_);
-    ar & BOOST_SERIALIZATION_NVP(name_);
-    ar & BOOST_SERIALIZATION_NVP(integration_method_);
-  }
 public:
   // // https://github.com/nlohmann/json/issues/1324
   void to_json_base(nlohmann::json& j) const;

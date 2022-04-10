@@ -26,9 +26,6 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-#include <boost/serialization/access.hpp>
-#include <boost/serialization/nvp.hpp>
-
 #include <nlohmann/json_fwd.hpp>
 
 namespace DmpBbo {
@@ -86,21 +83,6 @@ private:
    * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
    */
   TimeSystem(void) {};
-  
-  /** Give boost serialization access to private members. */  
-  friend class boost::serialization::access;
-  
-  /** Serialize class data members to boost archive. 
-   * \param[in] ar Boost archive
-   * \param[in] version Version of the class
-   * See http://www.boost.org/doc/libs/1_55_0/libs/serialization/doc/tutorial.html#simplecase
-   */
-  template<class Archive>
-  void serialize(Archive & ar, const unsigned int version)
-  {
-    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(DynamicalSystem);
-    ar & BOOST_SERIALIZATION_NVP(count_down_);
-  }
   
 public:
   friend void to_json(nlohmann::json& j, const TimeSystem& p);

@@ -25,10 +25,10 @@
 
 #include "functionapproximators/UnifiedModel.hpp"
 
-#include "dmpbbo_io/BoostSerializationToString.hpp"
 #include "dmpbbo_io/EigenFileIO.hpp"
 
 #include <iostream>
+#include <iomanip> 
 #include <eigen3/Eigen/LU>
 
 using namespace Eigen;
@@ -208,7 +208,7 @@ ModelParameters* ModelParametersGMR::clone(void) const
 
 string ModelParametersGMR::toString(void) const 
 {
-  RETURN_STRING_FROM_BOOST_SERIALIZATION_XML("ModelParametersGMR");
+  return string("ModelParametersGMR");
 };
 
 bool ModelParametersGMR::saveGMM(std::string directory, const std::vector<Eigen::VectorXd>& centers, const std::vector<Eigen::MatrixXd>& covars, bool overwrite, int iter)
