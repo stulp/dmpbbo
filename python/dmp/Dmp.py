@@ -33,6 +33,7 @@ from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.TimeSystem import TimeSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
+from to_jsonpickle import *
 
 class Dmp(DynamicalSystem,Parameterizable):
 
@@ -477,6 +478,9 @@ class Dmp(DynamicalSystem,Parameterizable):
  
         return  (fa_inputs_phase, f_target)
 
+    def stateAsPosVelAcc(self, x_in, xd_in):
+        return (x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z]/self.tau_)
+        
     def statesAsTrajectory(self,ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
         
@@ -566,4 +570,5 @@ class Dmp(DynamicalSystem,Parameterizable):
             size += self.dim_orig_
         return size
 
-    
+    def __str__(self):    
+        return to_jsonpickle(self)
