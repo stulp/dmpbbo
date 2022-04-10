@@ -35,7 +35,6 @@ if __name__=='__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write intermediate results to")
-    parser.add_argument("--show", action='store_true', help="show result plots")
     args = parser.parse_args()
 
     os.makedirs(args.directory,exist_ok=True)
@@ -152,8 +151,7 @@ if __name__=='__main__':
     fig3 = plt.figure(3)
     plotDmp(cpp_ts_xs_xds,fig3,cpp_forcing_terms,cpp_fa_output)
        
-    if args.show:
-        plt.show()
+    plt.show()
     
     
 
