@@ -86,8 +86,6 @@ private:
   Eigen::MatrixXd widths_;  // n_centers X n_dims
   Eigen::VectorXd weights_; //         1 X n_dims
 
-  int  all_values_vector_size_;
-
 public:
 	/** Turn caching for the function kernelActivations() on or off.
 	 * Turning this on should lead to substantial improvements in execution time if the centers and

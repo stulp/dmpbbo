@@ -56,12 +56,6 @@ ModelParametersRBFN::ModelParametersRBFN(const Eigen::MatrixXd& centers, const E
   assert(n_dims           ==widths_.cols());
   assert(n_basis_functions==weights_.rows());
   assert(1                ==weights_.cols());
-  
-  all_values_vector_size_ = 0;
-  all_values_vector_size_ += centers_.rows()*centers_.cols();
-  all_values_vector_size_ += widths_.rows() *widths_.cols();
-  all_values_vector_size_ += weights_.rows()*weights_.cols();
-
 };
 
 void ModelParametersRBFN::kernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const

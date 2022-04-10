@@ -59,13 +59,6 @@ ModelParametersLWR::ModelParametersLWR(const Eigen::MatrixXd& centers, const Eig
   assert(n_dims           ==slopes_.cols());
   assert(n_basis_functions==offsets_.rows());
   assert(1                ==offsets_.cols());
-  
-  all_values_vector_size_ = 0;
-  all_values_vector_size_ += centers_.rows()*centers_.cols();
-  all_values_vector_size_ += widths_.rows() *widths_.cols();
-  all_values_vector_size_ += offsets_.rows()*offsets_.cols();
-  all_values_vector_size_ += slopes_.rows() *slopes_.cols();
-
 };
 
 void ModelParametersLWR::unnormalizedKernelActivations(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& kernel_activations) const
