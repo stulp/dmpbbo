@@ -73,13 +73,38 @@ public:
    */
   void set_slopes_as_angles(bool slopes_as_angles);
   
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
   friend void from_json(const nlohmann::json& j, FunctionApproximatorLWR*& obj);
   
-  inline void to_json(nlohmann::json& j, const FunctionApproximatorLWR* const & obj) const {
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  inline friend void to_json(nlohmann::json& j, const FunctionApproximatorLWR* const & obj) {
     obj->to_json_helper(j);
   }
   
 private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  void to_json_helper(nlohmann::json& j) const;
+  
   /** The model parameters of the function approximator.
    */
   int n_basis_functions_;
@@ -113,7 +138,6 @@ private:
    */
   void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
   
-  void to_json_helper(nlohmann::json& j) const;
 };
 
 }

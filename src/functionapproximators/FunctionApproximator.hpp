@@ -67,14 +67,36 @@ public:
    */ 
   friend std::ostream& operator<<(std::ostream& output, const FunctionApproximator& function_approximator);
   
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
   friend void from_json(const nlohmann::json& j, FunctionApproximator*& obj);
-
+  
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
   inline friend void to_json(nlohmann::json& j, const FunctionApproximator* const & obj) {
     obj->to_json_helper(j);
   }
   
-private:
-  // https://github.com/nlohmann/json/issues/716
+private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
   virtual void to_json_helper(nlohmann::json& j) const = 0;
 
 	

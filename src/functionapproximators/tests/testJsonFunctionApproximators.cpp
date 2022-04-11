@@ -38,19 +38,19 @@ int main(int n_args, char** args)
   
   string directory = "../../../../python/functionapproximators/tests/";
   
-  vector<string> filenames = {"LWR_1D.json","RBFN_1D.json","LWR_2D.json","RBFN_2D.json"};
+  for (string filename: {"LWR_1D","RBFN_1D","LWR_2D","RBFN_2D"}) {
   
-  for (string filename: filenames) {
-  
-    ifstream file(directory+filename);
-    json j = json::parse(file);
+    filename = directory+filename+".json";
     cout << "=================================================================" << endl;
-    cout << filename << endl;
+    cout <<  filename << endl;
+    
     cout << "===============" << endl;   
+    ifstream file(filename);
+    json j = json::parse(file);
     cout << j << endl;
     
-    FunctionApproximator* fa = j.get<FunctionApproximator*>();
     cout << "===============" << endl;   
+    FunctionApproximator* fa = j.get<FunctionApproximator*>();
     cout << *fa << endl;
   }
   

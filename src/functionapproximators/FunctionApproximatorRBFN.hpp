@@ -59,15 +59,38 @@ public:
    */
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
 
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
   friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN*& obj);
   
-  // https://github.com/nlohmann/json/issues/1324
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
   inline friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN* const & obj) {
-    // https://github.com/nlohmann/json/issues/716
     obj->to_json_helper(j);
   }
   
 private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  void to_json_helper(nlohmann::json& j) const;
+  
   
   int n_basis_functions_;
   Eigen::MatrixXd centers_; // n_basis_functions_ X n_dims
@@ -77,7 +100,6 @@ private:
   /** Preallocated memory for one time step, required to make the predict() function real-time. */
   mutable Eigen::MatrixXd activations_one_prealloc_;
   
-  void to_json_helper(nlohmann::json& j) const;
 };
 
 }
