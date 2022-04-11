@@ -131,6 +131,8 @@ public:
   void append(const Trajectory& trajectory);
   
   /** Return the trajectory as one large matrix. 
+   *
+   * \param[out] as_matrix The trajectory represented as a matrix.
    */
   void asMatrix(Eigen::MatrixXd& as_matrix) const;
 

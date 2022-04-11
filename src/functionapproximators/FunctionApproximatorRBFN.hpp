@@ -57,7 +57,7 @@ public:
    *
    * This function is realtime if inputs.rows()==1.
    */
-	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs) const;
 
 	/** Read an object from json.
    *  \param[in]  j   json input 

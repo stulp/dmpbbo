@@ -308,7 +308,7 @@ public:
   }
    
 	/** Read an object from json.
-   *  \param[in]  j   json input 
+   *  \param[in]  j json input 
    *  \param[out] obj The object read from json
    *
 	 * See also: https://github.com/nlohmann/json/issues/1324

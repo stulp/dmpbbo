@@ -155,10 +155,10 @@ public:
   /** Write a DynamicalSystem to an output stream.
    *
    *  \param[in] output  Output stream to which to write to
-   *  \param[in] dyn_sys Dynamical system to write
+   *  \param[in] d Dynamical system to write
    *  \return    Output stream
    */
-  friend std::ostream& operator<<(std::ostream& output, const DynamicalSystem& dyn_sys);
+  friend std::ostream& operator<<(std::ostream& output, const DynamicalSystem& d);
 
   /** @} */ 
   
@@ -300,6 +300,11 @@ protected:
   }
   
 protected:  
+	/** Write an members from this base class to to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: https://github.com/nlohmann/json/issues/716
+   */
   void to_json_base(nlohmann::json& j) const;
     
 private:  

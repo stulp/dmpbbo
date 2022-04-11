@@ -86,7 +86,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          DynamicalSystem* goal_system,
          DynamicalSystem* phase_system, 
          DynamicalSystem* gating_system,     
-         string scaling)
+         std::string scaling)
   : DynamicalSystem(1, tau, y_init, y_attr),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system), 
@@ -100,7 +100,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
 Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
    double alpha_spring_damper, DynamicalSystem* goal_system,
    DynamicalSystem* phase_system, DynamicalSystem* gating_system,     
-   string scaling)
+   std::string scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system),
@@ -112,8 +112,8 @@ Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximato
     
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
          std::vector<FunctionApproximator*> function_approximators, 
-         string dmp_type,     
-         string scaling)
+         std::string dmp_type,     
+         std::string scaling)
   : DynamicalSystem(1, tau, y_init, y_attr),
     forcing_term_scaling_(scaling)
 {  
@@ -123,7 +123,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
   
 Dmp::Dmp(int n_dims_dmp, 
          std::vector<FunctionApproximator*> function_approximators, 
-         string dmp_type, string scaling)
+         std::string dmp_type, std::string scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
     forcing_term_scaling_(scaling)
 {
@@ -147,7 +147,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alph
   initFunctionApproximators(function_approximators);  
 }
 
-void Dmp::initSubSystems(string dmp_type)
+void Dmp::initSubSystems(std::string dmp_type)
 {
   VectorXd one_1 = VectorXd::Ones(1);
   VectorXd one_0 = VectorXd::Zero(1);
@@ -628,27 +628,27 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
   analytical_solution_perturber_ = NULL;
 }
 
-void from_json(const nlohmann::json& json, Dmp*& obj)
+void from_json(const nlohmann::json& j, Dmp*& obj)
 {
-  double tau = from_json_to_double(json.at("tau_"));
+  double tau = from_json_to_double(j.at("tau_"));
   
-  double alpha_spring_damper = from_json_to_double(json.at("spring_system_").at("damping_coefficient_"));
+  double alpha_spring_damper = from_json_to_double(j.at("spring_system_").at("damping_coefficient_"));
 
   VectorXd y_init;
   VectorXd y_attr;
-  from_json(json.at("initial_state_").at("values"),y_init);
-  from_json(json.at("attractor_state_").at("values"),y_attr);
+  from_json(j.at("initial_state_").at("values"),y_init);
+  from_json(j.at("attractor_state_").at("values"),y_attr);
 
   DynamicalSystem *goal_system, *phase_system, *gating_system;
-  goal_system = json.at("goal_system_").get<DynamicalSystem*>();
-  phase_system = json.at("phase_system_").get<DynamicalSystem*>();
-  gating_system = json.at("gating_system_").get<DynamicalSystem*>();
+  goal_system = j.at("goal_system_").get<DynamicalSystem*>();
+  phase_system = j.at("phase_system_").get<DynamicalSystem*>();
+  gating_system = j.at("gating_system_").get<DynamicalSystem*>();
   
-  string forcing_term_scaling = json.at("forcing_term_scaling_");
+  string forcing_term_scaling = j.at("forcing_term_scaling_");
   
   int n_dims = y_attr.size();
   vector<FunctionApproximator*> function_approximators;
-  const auto& jrow = json.at("function_approximators_");
+  const auto& jrow = j.at("function_approximators_");
   if (jrow.is_array()) {
     for (int i_dim=0; i_dim<n_dims; i_dim++) {
       FunctionApproximator* fa = jrow.at(i_dim).get<FunctionApproximator*>();
