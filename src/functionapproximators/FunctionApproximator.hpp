@@ -32,6 +32,8 @@
 #include <vector>
 #include <eigen3/Eigen/Core>
 
+#include <nlohmann/json_fwd.hpp>
+
 namespace DmpBbo {
 
 /** \brief Pure abstract class for all function approximators.
@@ -50,30 +52,31 @@ public:
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values
+   *
+   * This function should be realtime if inputs.rows()==1.
    */
   virtual void predict(
     const Eigen::Ref<const Eigen::MatrixXd>& inputs, 
     Eigen::MatrixXd& outputs) const = 0;
-  
-  /** Returns a string representation of the object.
-   * \return A string representation of the object.
-   */
-  virtual std::string toString(void) const = 0;
-  
+    
   /** Print to output stream. 
    *
    *  \param[in] output  Output stream to which to write to
    *  \param[in] function_approximator Function approximator to write
    *  \return    Output stream
-   *
-   *  \remark Calls virtual function FunctionApproximator::toString, which must be implemented by
-   * subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */ 
-  friend std::ostream& operator<<(std::ostream& output, const FunctionApproximator& function_approximator) {
-    output << function_approximator.toString();
-    return output;
+  friend std::ostream& operator<<(std::ostream& output, const FunctionApproximator& function_approximator);
+  
+  friend void from_json(const nlohmann::json& j, FunctionApproximator*& obj);
+
+  inline friend void to_json(nlohmann::json& j, const FunctionApproximator* const & obj) {
+    obj->to_json_helper(j);
   }
   
+private:
+  // https://github.com/nlohmann/json/issues/716
+  virtual void to_json_helper(nlohmann::json& j) const = 0;
+
 	
 };
 

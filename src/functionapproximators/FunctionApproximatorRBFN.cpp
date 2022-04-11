@@ -94,28 +94,21 @@ void FunctionApproximatorRBFN::predict(const Eigen::Ref<const Eigen::MatrixXd>& 
     
 }
 
-FunctionApproximatorRBFN* FunctionApproximatorRBFN::from_jsonpickle(nlohmann::json json) 
+void from_json(const nlohmann::json& json, FunctionApproximatorRBFN*& obj)
 {
   nlohmann::json j = json.at("_model_params");
   MatrixXd centers = j.at("centers").at("values");
   MatrixXd widths = j.at("widths").at("values");
   MatrixXd weights = j.at("weights").at("values");  
-  return new FunctionApproximatorRBFN(centers,widths,weights);
+  obj = new FunctionApproximatorRBFN(centers,widths,weights);
 }
 
-void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& obj) 
+void FunctionApproximatorRBFN::to_json_helper(nlohmann::json& j) const 
 {
-  j["centers_"] = obj.centers_;
-  j["widths_"] = obj.widths_;
-  j["weights_"] = obj.weights_;
-  j["py/object"] = "dynamicalsystems.ModelParametersRBFN.ModelParametersRBFN"; // for jsonpickle
-}
-
-string FunctionApproximatorRBFN::toString(void) const
-{
-  nlohmann::json j;
-  to_json(j,*this);
-  return j.dump(4);
+  j["centers_"] = centers_;
+  j["widths_"] = widths_;
+  j["weights_"] = weights_;
+  j["py/object"] = "dynamicalsystems.FunctionApproximatorRBFN.FunctionApproximatorRBFN"; // for jsonpickle
 }
 
 }

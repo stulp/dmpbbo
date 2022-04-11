@@ -27,10 +27,6 @@
 #include <nlohmann/json.hpp>
 
 #include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/FunctionApproximatorRBFN.hpp"
-
-#include "functionapproximators/FunctionApproximatorFactory.hpp"
-
 
 using namespace std;
 using namespace Eigen;
@@ -41,18 +37,22 @@ int main(int n_args, char** args)
 {
   
   string directory = "../../../../python/functionapproximators/tests/";
-  string filename = "RBFN_1D.json";  
-  if (n_args>1)
-    filename = string(args[1]);
-  filename = directory + filename;  
   
-  ifstream file(filename);
-  json j = json::parse(file);
-  cout << j << endl;
+  vector<string> filenames = {"LWR_1D.json","RBFN_1D.json","LWR_2D.json","RBFN_2D.json"};
   
-  FunctionApproximator* fa = NULL;
-  FunctionApproximatorFactory::from_jsonpickle(j,fa);
-  cout << *fa << endl;
+  for (string filename: filenames) {
+  
+    ifstream file(directory+filename);
+    json j = json::parse(file);
+    cout << "=================================================================" << endl;
+    cout << filename << endl;
+    cout << "===============" << endl;   
+    cout << j << endl;
+    
+    FunctionApproximator* fa = j.get<FunctionApproximator*>();
+    cout << "===============" << endl;   
+    cout << *fa << endl;
+  }
   
   return 0;
 }

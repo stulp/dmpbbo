@@ -26,7 +26,6 @@
 #include "dmp/Trajectory.hpp"
 
 #include "functionapproximators/FunctionApproximator.hpp"
-#include "functionapproximators/FunctionApproximatorFactory.hpp"
 
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
@@ -664,8 +663,7 @@ Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
   const auto& jrow = json.at("function_approximators_");
   if (jrow.is_array()) {
     for (int i_dim=0; i_dim<n_dims; i_dim++) {
-      FunctionApproximator* fa;
-      FunctionApproximatorFactory::from_jsonpickle(jrow.at(i_dim),fa);
+      FunctionApproximator* fa = jrow.at(i_dim).get<FunctionApproximator*>();
       function_approximators.push_back(fa);
     }
   }

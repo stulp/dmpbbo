@@ -271,30 +271,21 @@ void FunctionApproximatorLWR::kernelActivationsSymmetric(const MatrixXd& centers
 }
 */
 
-
-FunctionApproximatorLWR* FunctionApproximatorLWR::from_jsonpickle(nlohmann::json json) {
+void from_json(const nlohmann::json& json, FunctionApproximatorLWR*& obj) {
   nlohmann::json j = json.at("_model_params");
   MatrixXd centers = j.at("centers").at("values");
   MatrixXd widths = j.at("widths").at("values");
   MatrixXd slopes = j.at("slopes").at("values");
   MatrixXd offsets = j.at("offsets").at("values");  
-  return new FunctionApproximatorLWR(centers,widths,slopes,offsets);
+  obj = new FunctionApproximatorLWR(centers,widths,slopes,offsets);
 }
 
-void to_json(nlohmann::json& j, const FunctionApproximatorLWR& obj) {
-  j["centers_"] = obj.centers_;
-  j["widths_"] = obj.widths_;
-  j["offsets_"] = obj.offsets_;
-  j["slopes_"] = obj.slopes_;
+void FunctionApproximatorLWR::to_json_helper(nlohmann::json& j) const {
+  j["centers_"] = centers_;
+  j["widths_"] = widths_;
+  j["offsets_"] = offsets_;
+  j["slopes_"] = slopes_;
   j["py/object"] = "dynamicalsystems.FunctionApproximatorLWR.FunctionApproximatorLWR"; // jsonpickle
 }
-
-string FunctionApproximatorLWR::toString(void) const
-{
-  nlohmann::json j;
-  to_json(j,*this);
-  return j.dump(4);
-}
-
 
 }

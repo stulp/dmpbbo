@@ -50,27 +50,23 @@ public:
    *  \param[in] weights Weight of each basis function
    */
   FunctionApproximatorRBFN(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& weights);
-
-  static FunctionApproximatorRBFN* from_jsonpickle(nlohmann::json json);
-  // https://github.com/nlohmann/json/issues/1324
-  friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN& m);
-  //friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN& m);
   
-	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
+  /** Query the function approximator to make a prediction
+   *  \param[in]  inputs   Input values of the query
+   *  \param[out] outputs  Predicted output values
+   *
+   * This function is realtime if inputs.rows()==1.
    */
-  FunctionApproximatorRBFN(void) {};
+	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& output) const;
 
-  ~FunctionApproximatorRBFN(void) {};
-
+  friend void from_json(const nlohmann::json& j, FunctionApproximatorRBFN*& obj);
   
-	std::string toString(void) const;
-	
+  // https://github.com/nlohmann/json/issues/1324
+  inline friend void to_json(nlohmann::json& j, const FunctionApproximatorRBFN* const & obj) {
+    // https://github.com/nlohmann/json/issues/716
+    obj->to_json_helper(j);
+  }
+  
 private:  
   
   int n_basis_functions_;
@@ -81,6 +77,7 @@ private:
   /** Preallocated memory for one time step, required to make the predict() function real-time. */
   mutable Eigen::MatrixXd activations_one_prealloc_;
   
+  void to_json_helper(nlohmann::json& j) const;
 };
 
 }

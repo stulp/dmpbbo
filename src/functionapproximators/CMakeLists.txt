@@ -1,5 +1,5 @@
 ################################################################################
-file(GLOB SOURCES BasisFunction.cpp *LWR.cpp *RBFN.cpp FunctionApproximatorFactory.cpp) 
+file(GLOB SOURCES *.cpp) 
 
 ################################################################################
 add_library(functionapproximators ${SHARED_OR_STATIC} ${SOURCES})

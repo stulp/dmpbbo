@@ -34,9 +34,6 @@
 
 namespace DmpBbo {
   
-// Forward declarations
-class ModelParametersLWR;
-
 /** \brief LWR (Locally Weighted Regression) function approximator
  * \ingroup FunctionApproximators
  * \ingroup LWR  
@@ -55,23 +52,11 @@ public:
    */
   FunctionApproximatorLWR(const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths, const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets, bool asymmetric_kernels=false, bool lines_pivot_at_max_activation=false);
   
-  ~FunctionApproximatorLWR(void) {};
-  
-  static FunctionApproximatorLWR* from_jsonpickle(nlohmann::json json);
-  // https://github.com/nlohmann/json/issues/1324
-  friend void to_json(nlohmann::json& j, const FunctionApproximatorLWR& m);
-  //friend void from_json(const nlohmann::json& j, FunctionApproximatorLWR& m);
-  
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
    *  \param[out] outputs  Predicted output values
    *
-   * \remark This method should be const. But third party functions which is called in this function
-   * have not always been implemented as const (Examples: LWPRObject::predict).
-   * Therefore, this function cannot be const.
-   *
-   * This function is realtime if inputs.rows()==1 (i.e. only one input sample is provided), and the
-   * memory for outputs is preallocated.
+   * This function is realtime if inputs.rows()==1.
    */
 	void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& outputs) const;
 
@@ -82,14 +67,18 @@ public:
    */
   void set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation);
 
-  /** Whether to return slopes as angles or slopes in ModelParametersLWR::getParameterVectorAll()
+  /** Whether to return slopes as angles or slopes
    * \param[in] slopes_as_angles Whether to return as slopes (true) or angles (false)
    * \todo Implement and document
    */
   void set_slopes_as_angles(bool slopes_as_angles);
   
-	std::string toString(void) const;
-	
+  friend void from_json(const nlohmann::json& j, FunctionApproximatorLWR*& obj);
+  
+  inline void to_json(nlohmann::json& j, const FunctionApproximatorLWR* const & obj) const {
+    obj->to_json_helper(j);
+  }
+  
 private:  
   /** The model parameters of the function approximator.
    */
@@ -102,14 +91,6 @@ private:
   bool asymmetric_kernels_;
   bool lines_pivot_at_max_activation_;
   bool slopes_as_angles_;
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  FunctionApproximatorLWR(void) {};
    
   /** Preallocated memory for one time step, required to make the predict() function real-time. */
   mutable Eigen::MatrixXd lines_one_prealloc_;
@@ -131,6 +112,8 @@ private:
    * will not allocate any memory, and is real-time.
    */
   void getLines(const Eigen::Ref<const Eigen::MatrixXd>& inputs, Eigen::MatrixXd& lines) const;
+  
+  void to_json_helper(nlohmann::json& j) const;
 };
 
 }
