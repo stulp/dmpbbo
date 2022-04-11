@@ -135,8 +135,7 @@ int main(int n_args, char** args)
     
   if (dmp==NULL)
   {
-    Dmp::DmpType dmp_type = Dmp::KULVICIUS_2012_JOINING;
-    dmp_type = Dmp::IJSPEERT_2002_MOVEMENT;
+    string dmp_type = "KULVICIUS_2012_JOINING";
     
     //int input_dim = 1;
     
@@ -156,7 +155,7 @@ int main(int n_args, char** args)
 
               VectorXd centers = VectorXd::LinSpaced(n_basis_functions,0,1);
     VectorXd widths  = VectorXd::Constant(n_basis_functions,centers[1]-centers[0]);
-    if (dmp_type==Dmp::IJSPEERT_2002_MOVEMENT)
+    if (dmp_type=="IJSPEERT_2002_MOVEMENT")
     {
       centers = VectorXd::LinSpaced(n_basis_functions,0,tau);
       double alpha = 4.0;

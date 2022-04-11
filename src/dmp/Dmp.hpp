@@ -55,12 +55,6 @@ class Dmp : public DynamicalSystem
 {
 public:
   
-  /** Different types of DMPs that can be initialized. */
-  enum DmpType { IJSPEERT_2002_MOVEMENT, KULVICIUS_2012_JOINING, COUNTDOWN_2013  };
-
-  /** Different ways to scale the forcing term. */
-  enum ForcingTermScaling { NO_SCALING, G_MINUS_Y0_SCALING, AMPLITUDE_SCALING };
-  
   /**
    *  Initialization constructor.
    *  \param tau             Time constant
@@ -71,13 +65,13 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
-   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
+   *  \param scaling         Which method to use for scaling the forcing term ("NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING")
    */
    Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
      std::vector<FunctionApproximator*> function_approximators,
      double alpha_spring_damper, DynamicalSystem* goal_system,
      DynamicalSystem* phase_system, DynamicalSystem* gating_system, 
-     ForcingTermScaling scaling=NO_SCALING);
+     std::string scaling="NO_SCALING");
   
   /**
    *  Initialization constructor for Dmps of known dimensionality, but with unknown initial and
@@ -88,12 +82,12 @@ public:
    *  \param phase_system    Dynamical system to compute the phase
    *  \param gating_system   Dynamical system to compute the gating term
    *  \param function_approximators Function approximators for the forcing term
-   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
+   *  \param scaling         Which method to use for scaling the forcing term ("NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING")
    */
    Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
      double alpha_spring_damper, DynamicalSystem* goal_system,
      DynamicalSystem* phase_system, DynamicalSystem* gating_system,
-     ForcingTermScaling scaling=NO_SCALING);
+     std::string scaling="NO_SCALING");
     
   /**
    *  Constructor that initializes the DMP with default dynamical systems.
@@ -101,13 +95,13 @@ public:
    *  \param y_init    Initial state
    *  \param y_attr    Attractor state
    *  \param function_approximators Function approximators for the forcing term
-   *  \param dmp_type  The type of DMP, see Dmp::DmpType    
-   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
+   *  \param dmp_type  The type of DMP ("IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
+   *  \param scaling         Which method to use for scaling the forcing term ("NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING")
    */
   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
     std::vector<FunctionApproximator*> function_approximators, 
-    DmpType dmp_type=KULVICIUS_2012_JOINING,   
-    ForcingTermScaling scaling=NO_SCALING);
+    std::string dmp_type="KULVICIUS_2012_JOINING",   
+    std::string scaling="NO_SCALING");
 
   
   /**
@@ -115,11 +109,11 @@ public:
    *  attractor states. Initializes the DMP with default dynamical systems.
    *  \param n_dims_dmp      Dimensionality of the DMP
    *  \param function_approximators Function approximators for the forcing term
-   *  \param dmp_type  The type of DMP, see Dmp::DmpType    
-   *  \param scaling         Which method to use for scaling the forcing term (see Dmp::ForcingTermScaling)
+   *  \param dmp_type  The type of DMP ("IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
+   *  \param scaling         Which method to use for scaling the forcing term ("NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING")
    */
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
-    DmpType dmp_type=KULVICIUS_2012_JOINING, ForcingTermScaling scaling=NO_SCALING);      
+    std::string dmp_type="KULVICIUS_2012_JOINING", std::string scaling="NO_SCALING");      
    
   /**
    *  Initialization constructor for Dmps without a forcing term.
@@ -269,8 +263,6 @@ public:
    */
   void set_spring_constant(double spring_constant);
 
-	std::string toString(void) const;
-    
   /** Given a trajectory, compute the inputs and targets for the function approximators.
    * For a standard Dmp (such as the one in this class) the inputs will be the phase over time, and
    * the targets will be the forcing term (with the gating function factored out).
@@ -368,7 +360,7 @@ private:
   std::vector<FunctionApproximator*> function_approximators_;
   
   /** How is the forcing term scaled? */
-  ForcingTermScaling forcing_term_scaling_;
+  std::string forcing_term_scaling_;
   
   /** Ranges of the trajectory (per dimension) for (optional) scaling of forcing term.  */
   Eigen::VectorXd trajectory_amplitudes_;
@@ -410,7 +402,7 @@ private:
   void initSubSystems(double alpha_spring_system, DynamicalSystem* goal_system,
     DynamicalSystem* phase_system, DynamicalSystem* gating_system);
   
-  void initSubSystems(DmpType dmp_type);
+  void initSubSystems(std::string dmp_type);
   
   void initFunctionApproximators(std::vector<FunctionApproximator*> function_approximators);
   

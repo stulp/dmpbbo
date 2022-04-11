@@ -49,7 +49,7 @@ public:
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
    */
   DmpContextualOneStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
-    DmpType dmp_type=KULVICIUS_2012_JOINING);
+    DmpType dmp_type="KULVICIUS_2012_JOINING");
     
   // Overrides DmpContextual::computeFunctionApproximatorOutput
   void computeFunctionApproximatorOutput(

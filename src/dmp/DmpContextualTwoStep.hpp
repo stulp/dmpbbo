@@ -52,7 +52,7 @@ public:
    *  \param policy_parameter_function Function approximators for the policy parameter function
    *  \param dmp_type  The type of DMP, see Dmp::DmpType    
    */
-  DmpContextualTwoStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, FunctionApproximator* policy_parameter_function, DmpType dmp_type=KULVICIUS_2012_JOINING);
+  DmpContextualTwoStep(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, FunctionApproximator* policy_parameter_function, DmpType dmp_type="KULVICIUS_2012_JOINING");
   
   // Overloads Dmp::computeFunctionApproximatorOutput
   void computeFunctionApproximatorOutput(

@@ -86,7 +86,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          DynamicalSystem* goal_system,
          DynamicalSystem* phase_system, 
          DynamicalSystem* gating_system,     
-         ForcingTermScaling scaling)
+         string scaling)
   : DynamicalSystem(1, tau, y_init, y_attr),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system), 
@@ -100,7 +100,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
 Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators, 
    double alpha_spring_damper, DynamicalSystem* goal_system,
    DynamicalSystem* phase_system, DynamicalSystem* gating_system,     
-   ForcingTermScaling scaling)
+   string scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
   goal_system_(goal_system),
   phase_system_(phase_system), gating_system_(gating_system),
@@ -112,8 +112,8 @@ Dmp::Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximato
     
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, 
          std::vector<FunctionApproximator*> function_approximators, 
-         DmpType dmp_type,     
-         ForcingTermScaling scaling)
+         string dmp_type,     
+         string scaling)
   : DynamicalSystem(1, tau, y_init, y_attr),
     forcing_term_scaling_(scaling)
 {  
@@ -123,7 +123,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
   
 Dmp::Dmp(int n_dims_dmp, 
          std::vector<FunctionApproximator*> function_approximators, 
-         DmpType dmp_type, ForcingTermScaling scaling)
+         string dmp_type, string scaling)
   : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp), VectorXd::Ones(n_dims_dmp)),
     forcing_term_scaling_(scaling)
 {
@@ -132,7 +132,7 @@ Dmp::Dmp(int n_dims_dmp,
 }
 
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha_spring_damper, DynamicalSystem* goal_system) 
-  : DynamicalSystem(1, tau, y_init, y_attr), forcing_term_scaling_(NO_SCALING)
+  : DynamicalSystem(1, tau, y_init, y_attr), forcing_term_scaling_("NO_SCALING")
 {
   
   VectorXd one_1 = VectorXd::Ones(1);
@@ -147,7 +147,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alph
   initFunctionApproximators(function_approximators);  
 }
 
-void Dmp::initSubSystems(DmpType dmp_type)
+void Dmp::initSubSystems(string dmp_type)
 {
   VectorXd one_1 = VectorXd::Ones(1);
   VectorXd one_0 = VectorXd::Zero(1);
@@ -155,17 +155,17 @@ void Dmp::initSubSystems(DmpType dmp_type)
   DynamicalSystem *goal_system=NULL;
   DynamicalSystem *phase_system=NULL;
   DynamicalSystem *gating_system=NULL;
-  if (dmp_type==IJSPEERT_2002_MOVEMENT)
+  if (dmp_type=="IJSPEERT_2002_MOVEMENT")
   {
     goal_system   = NULL;
     phase_system  = new ExponentialSystem(tau(),one_1,one_0,4);
     gating_system = new ExponentialSystem(tau(),one_1,one_0,4); 
   }                                                          
-  else if (dmp_type==KULVICIUS_2012_JOINING || dmp_type==COUNTDOWN_2013)
+  else if (dmp_type=="KULVICIUS_2012_JOINING" || dmp_type=="COUNTDOWN_2013")
   {
     goal_system   = new ExponentialSystem(tau(),initial_state(),attractor_state(),15);
     gating_system = new SigmoidSystem(tau(),one_1,-10,0.9*tau()); 
-    bool count_down = (dmp_type==COUNTDOWN_2013);    
+    bool count_down = (dmp_type=="COUNTDOWN_2013");    
     phase_system  = new TimeSystem(tau(),count_down);
   }
   
@@ -347,13 +347,13 @@ void Dmp::differentialEquation(
   
   
   // Scale the forcing term, if necessary
-  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  if (forcing_term_scaling_=="G_MINUS_Y0_SCALING")
   {
     initial_state(initial_state_prealloc_);  
     g_minus_y0_prealloc_ = (attractor_state_prealloc_-initial_state_prealloc_).transpose();
     forcing_term_prealloc_ = forcing_term_prealloc_.array()*g_minus_y0_prealloc_.array();
   }
-  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  else if (forcing_term_scaling_=="AMPLITUDE_SCALING")
   {
     forcing_term_prealloc_ = forcing_term_prealloc_.array()*trajectory_amplitudes_.array();
   }
@@ -436,12 +436,12 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eig
   forcing_terms = fa_outputs.array()*xs_gating_rep.array();
   
   // Scale the forcing term, if necessary
-  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  if (forcing_term_scaling_=="G_MINUS_Y0_SCALING")
   {
     MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1);
     forcing_terms = forcing_terms.array()*g_minus_y0_rep.array();
   }
-  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  else if (forcing_term_scaling_=="AMPLITUDE_SCALING")
   {
     MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1);
     forcing_terms = forcing_terms.array()*trajectory_amplitudes_rep.array();
@@ -576,12 +576,12 @@ void Dmp::computeFunctionApproximatorInputsAndTargets(const Trajectory& trajecto
     f_target.col(dd) = f_target.col(dd).array()/xs_gating.array();
   
   // Factor out scaling
-  if (forcing_term_scaling_==G_MINUS_Y0_SCALING)
+  if (forcing_term_scaling_=="G_MINUS_Y0_SCALING")
   {
     MatrixXd g_minus_y0_rep = (attractor_state()-initial_state()).transpose().replicate(n_time_steps,1);
     f_target = f_target.array()/g_minus_y0_rep.array();
   }
-  else if (forcing_term_scaling_==AMPLITUDE_SCALING)
+  else if (forcing_term_scaling_=="AMPLITUDE_SCALING")
   {
     MatrixXd trajectory_amplitudes_rep = trajectory_amplitudes_.transpose().replicate(n_time_steps,1);
     f_target = f_target.array()/trajectory_amplitudes_rep.array();
@@ -645,12 +645,6 @@ void from_json(const nlohmann::json& json, Dmp*& obj)
   gating_system = json.at("gating_system_").get<DynamicalSystem*>();
   
   string forcing_term_scaling = json.at("forcing_term_scaling_");
-  Dmp::ForcingTermScaling scaling = Dmp::NO_SCALING;
-  if (forcing_term_scaling==string("G_MINUS_Y0_SCALING")) {
-    scaling = Dmp::G_MINUS_Y0_SCALING;
-  } else if (forcing_term_scaling==string("AMPLITUDE_SCALING")) {
-    scaling = Dmp::AMPLITUDE_SCALING;
-  }
   
   int n_dims = y_attr.size();
   vector<FunctionApproximator*> function_approximators;
@@ -663,50 +657,21 @@ void from_json(const nlohmann::json& json, Dmp*& obj)
   }
           
   obj = new Dmp(tau,y_init,y_attr,function_approximators,alpha_spring_damper,
-    goal_system, phase_system, gating_system, scaling);
+    goal_system, phase_system, gating_system, forcing_term_scaling);
 }
-
-
-
 
 void Dmp::to_json_helper(nlohmann::json& j) const 
 {
   to_json_base(j); // Get the json string from the base class
 
   j["spring_system_"]["damping_coefficient_"] = spring_system_->damping_coefficient();
-  
   j["goal_system_"] =   goal_system_;
   j["phase_system_"] =  phase_system_;
   j["gating_system_"] = gating_system_;
-
-  string scaling = "NO_SCALING";
-  if (forcing_term_scaling_==Dmp::G_MINUS_Y0_SCALING) {
-    scaling = "G_MINUS_Y0_SCALING";
-  } else if (forcing_term_scaling_==Dmp::AMPLITUDE_SCALING) {
-    scaling = "AMPLITUDE_SCALING";
-  }
-  j["forcing_term_scaling_"] = scaling;
+  j["forcing_term_scaling_"] = forcing_term_scaling_;
 
   string c("Dmp");
   j["py/object"] = "dmp."+c+"."+c; // for jsonpickle
-}
-
-string Dmp::toString(void) const
-{
-  
-  Eigen::IOFormat my_format(StreamPrecision, DontAlignCols, ", ", "; ", "", "", "[", "]");
-
-  stringstream stream;
-  
-  stream << "Dmp(";
-  stream << "dim_orig=" << dim_orig() << ", ";
-  stream << "dim=" << dim() << ", ";
-  stream << "tau=" << tau() << ", ";
-  stream << "y_init=" << initial_state().format(my_format) << ", ";
-  stream << "y_attr=" << attractor_state().format(my_format);
-  stream << ")";
-  
-  return stream.str();
 }
 
 }
