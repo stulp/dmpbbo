@@ -56,7 +56,8 @@ std::ostream& operator<<(std::ostream& output, const FunctionApproximator& funct
 {
   nlohmann::json j;
   function_approximator.to_json_helper(j);
-  output << j.dump(4);
+  //output << j.dump(4);
+  output << j.dump();
   return output;
 }
 

@@ -158,7 +158,8 @@ std::ostream& operator<<(std::ostream& output, const DynamicalSystem& d)
 {
   nlohmann::json j;
   d.to_json_helper(j);
-  output << j.dump(4);
+  //output << j.dump(4);
+  output << j.dump();
   return output;
 }
 
