@@ -1,0 +1,7 @@
+---
+BasedOnStyle: Google
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction:   true
+...
+
