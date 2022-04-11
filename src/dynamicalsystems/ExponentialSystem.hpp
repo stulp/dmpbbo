@@ -54,9 +54,6 @@ public:
    */
   ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr, double alpha);
   
-  static ExponentialSystem* from_jsonpickle(const nlohmann::json& json);
-
-    
   /** Destructor. */
   ~ExponentialSystem(void);
   

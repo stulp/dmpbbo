@@ -53,8 +53,6 @@ public:
   /** Destructor. */
   ~TimeSystem(void);
   
-  static TimeSystem* from_jsonpickle(const nlohmann::json& json);
-  
    void differentialEquation(
      const Eigen::Ref<const Eigen::VectorXd>& x, 
      Eigen::Ref<Eigen::VectorXd> xd
