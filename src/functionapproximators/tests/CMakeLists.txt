@@ -1,5 +1,5 @@
 add_executable(testJsonFunctionApproximators testJsonFunctionApproximators.cpp)
 target_link_libraries(testJsonFunctionApproximators functionapproximators ${Boost_LIBRARIES})
 
-#add_executable(testFunctionApproximatorRealtime testFunctionApproximatorRealtime.cpp)
-#target_link_libraries(testFunctionApproximatorRealtime functionapproximators  ${Boost_LIBRARIES})
+add_executable(testFunctionApproximatorRealtime testFunctionApproximatorRealtime.cpp)
+target_link_libraries(testFunctionApproximatorRealtime functionapproximators  ${Boost_LIBRARIES})

@@ -50,6 +50,8 @@ int main(int n_args, char** args)
     cout << "===============" << endl;
     FunctionApproximator* fa = j.get<FunctionApproximator*>();
     cout << *fa << endl;
+
+    delete fa;
   }
 
   return 0;

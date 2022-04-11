@@ -27,6 +27,8 @@
 #include <eigen3/Eigen/SVD>
 #include <iostream>
 
+#include "eigenutils/eigen_realtime_check.hpp"
+
 using namespace Eigen;
 using namespace std;
 

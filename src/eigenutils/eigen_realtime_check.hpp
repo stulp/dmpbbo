@@ -25,9 +25,6 @@
 
 #ifdef REALTIME_CHECKS
 
-// If REALTIME_CHECKS is defined, we want to check for dynamic memory
-// allocation. Make Eigen check for dynamic memory allocation
-#define EIGEN_RUNTIME_NO_MALLOC
 // We define ENTERING_REAL_TIME_CRITICAL_CODE and
 // EXITING_REAL_TIME_CRITICAL_CODE to start/stop checking dynamic memory
 // allocation

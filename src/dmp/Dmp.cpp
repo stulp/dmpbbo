@@ -24,7 +24,6 @@
 #include "dmp/Dmp.hpp"
 
 #include <cmath>
-#include <eigen3/Eigen/Core>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -39,6 +38,7 @@
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "eigenutils/eigen_file_io.hpp"
 #include "eigenutils/eigen_json.hpp"
+#include "eigenutils/eigen_realtime_check.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
 
 using namespace std;

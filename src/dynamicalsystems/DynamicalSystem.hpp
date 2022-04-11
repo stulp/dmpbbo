@@ -24,12 +24,12 @@
 #ifndef _DYNAMICALSYSTEM_H_
 #define _DYNAMICALSYSTEM_H_
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
 #include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 #include <string>
 #include <vector>
-
-#include "eigenutils/eigen_realtime_check.hpp"  // Include this before Eigen header files
 
 namespace DmpBbo {
 

@@ -24,9 +24,7 @@
 #ifndef _DMP_WITH_GAIN_SCHEDULES_H_
 #define _DMP_WITH_GAIN_SCHEDULES_H_
 
-// This must be included before any Eigen header files are included
 #include "dmp/Dmp.hpp"
-#include "eigenutils/eigen_realtime_check.hpp"
 
 /*
 //Implement: extra states with an attractor.

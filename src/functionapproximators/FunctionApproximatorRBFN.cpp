@@ -29,6 +29,7 @@
 #include <nlohmann/json.hpp>
 
 #include "eigenutils/eigen_json.hpp"
+#include "eigenutils/eigen_realtime_check.hpp"
 #include "functionapproximators/BasisFunction.hpp"
 
 using namespace std;

@@ -27,6 +27,8 @@
 #ifndef _FUNCTIONAPPROXIMATOR_H_
 #define _FUNCTIONAPPROXIMATOR_H_
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
 #include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 #include <string>

@@ -24,7 +24,6 @@
 #ifndef _DMP_H_
 #define _DMP_H_
 
-// This must be included before any Eigen header files are included
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 #include <boost/random/variate_generator.hpp>
@@ -32,7 +31,6 @@
 #include <set>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
-#include "eigenutils/eigen_realtime_check.hpp"
 
 namespace DmpBbo {
 

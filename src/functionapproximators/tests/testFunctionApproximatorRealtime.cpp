@@ -25,46 +25,45 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <nlohmann/json.hpp>
 #include <string>
 
+#include "eigenutils/eigen_realtime_check.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
-
-//#include "getFunctionApproximatorsVector.hpp"
 #include "testTargetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;
 using namespace DmpBbo;
+using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  for (int n_input_dims = 1; n_input_dims <= 2; n_input_dims++) {
-    vector<FunctionApproximator*> fas;
-    getFunctionApproximatorsVector(n_input_dims, fas);
+  string directory = "../../../../python/functionapproximators/tests/";
 
-    for (unsigned int i_fa = 0; i_fa < fas.size(); i_fa++) {
-      FunctionApproximator* cur_fa = fas[i_fa];
+  for (int n_dims : {1, 2}) {
+    for (string filename : {"LWR", "RBFN"}) {
+      filename = directory + filename + "_" + to_string(n_dims) + "D.json";
+      cout << "=====================================================" << endl;
+      cout << filename << endl;
 
-      VectorXi n_samples_per_dim = VectorXi::Constant(1, 30);
-      if (n_input_dims == 2) n_samples_per_dim = VectorXi::Constant(2, 10);
-
-      MatrixXd inputs, targets, outputs;
-      targetFunction(n_samples_per_dim, inputs, targets);
+      ifstream file(filename);
+      json j = json::parse(file);
+      FunctionApproximator* fa = j.get<FunctionApproximator*>();
 
       // Here, we time the predict function on single inputs, i.e. typical usage
       // in a real-time loop on a robot. We check if memory is allocated with
       // ENTERING_REAL_TIME_CRITICAL_CODE
 
-      MatrixXd input = inputs.row(0);
-      MatrixXd output(1, outputs.cols());
-      for (int ii = 0; ii < inputs.rows(); ii++) {
-        input = inputs.row(ii);
+      MatrixXd input = MatrixXd::Ones(1, n_dims);
+      MatrixXd output(1, 1);
+      for (int ii = 0; ii < 3; ii++) {
         ENTERING_REAL_TIME_CRITICAL_CODE
-        cur_fa->predict(input, output);
+        fa->predict(input, output);
         EXITING_REAL_TIME_CRITICAL_CODE
       }
 
-      delete cur_fa;
+      delete fa;
     }
   }
 
