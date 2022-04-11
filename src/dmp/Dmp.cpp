@@ -27,13 +27,11 @@
 
 #include "functionapproximators/FunctionApproximator.hpp"
 
+#include "dynamicalsystems/DynamicalSystem.hpp"
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 #include "dynamicalsystems/ExponentialSystem.hpp"
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "dynamicalsystems/SigmoidSystem.hpp"
-#include "dynamicalsystems/DynamicalSystemFactory.hpp"
-
-
 
 #include "eigenutils/eigen_file_io.hpp"
 
@@ -630,8 +628,8 @@ void Dmp::set_perturbation_analytical_solution(double perturbation_standard_devi
   analytical_solution_perturber_ = NULL;
 }
 
-Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
-
+void from_json(const nlohmann::json& json, Dmp*& obj)
+{
   double tau = from_json_to_double(json.at("tau_"));
   
   double alpha_spring_damper = from_json_to_double(json.at("spring_system_").at("damping_coefficient_"));
@@ -641,21 +639,17 @@ Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
   from_json(json.at("initial_state_").at("values"),y_init);
   from_json(json.at("attractor_state_").at("values"),y_attr);
 
-  DynamicalSystem* goal_system;
-  DynamicalSystemFactory::from_jsonpickle(json.at("goal_system_"), goal_system);
-  
-  DynamicalSystem* phase_system;
-  DynamicalSystemFactory::from_jsonpickle(json.at("phase_system_"), phase_system);
-  
-  DynamicalSystem* gating_system;
-  DynamicalSystemFactory::from_jsonpickle(json.at("gating_system_"), gating_system);
+  DynamicalSystem *goal_system, *phase_system, *gating_system;
+  goal_system = json.at("goal_system_").get<DynamicalSystem*>();
+  phase_system = json.at("phase_system_").get<DynamicalSystem*>();
+  gating_system = json.at("gating_system_").get<DynamicalSystem*>();
   
   string forcing_term_scaling = json.at("forcing_term_scaling_");
-  ForcingTermScaling scaling = NO_SCALING;
+  Dmp::ForcingTermScaling scaling = Dmp::NO_SCALING;
   if (forcing_term_scaling==string("G_MINUS_Y0_SCALING")) {
-    scaling = G_MINUS_Y0_SCALING;
+    scaling = Dmp::G_MINUS_Y0_SCALING;
   } else if (forcing_term_scaling==string("AMPLITUDE_SCALING")) {
-    scaling = AMPLITUDE_SCALING;
+    scaling = Dmp::AMPLITUDE_SCALING;
   }
   
   int n_dims = y_attr.size();
@@ -668,10 +662,34 @@ Dmp* Dmp::from_jsonpickle(const nlohmann::json& json) {
     }
   }
           
-  return new Dmp(tau,y_init,y_attr,function_approximators,alpha_spring_damper,
+  obj = new Dmp(tau,y_init,y_attr,function_approximators,alpha_spring_damper,
     goal_system, phase_system, gating_system, scaling);
 }
 
+
+
+
+void Dmp::to_json_helper(nlohmann::json& j) const 
+{
+  to_json_base(j); // Get the json string from the base class
+
+  j["spring_system_"]["damping_coefficient_"] = spring_system_->damping_coefficient();
+  
+  j["goal_system_"] =   goal_system_;
+  j["phase_system_"] =  phase_system_;
+  j["gating_system_"] = gating_system_;
+
+  string scaling = "NO_SCALING";
+  if (forcing_term_scaling_==Dmp::G_MINUS_Y0_SCALING) {
+    scaling = "G_MINUS_Y0_SCALING";
+  } else if (forcing_term_scaling_==Dmp::AMPLITUDE_SCALING) {
+    scaling = "AMPLITUDE_SCALING";
+  }
+  j["forcing_term_scaling_"] = scaling;
+
+  string c("Dmp");
+  j["py/object"] = "dmp."+c+"."+c; // for jsonpickle
+}
 
 string Dmp::toString(void) const
 {

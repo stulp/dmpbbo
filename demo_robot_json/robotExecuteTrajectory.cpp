@@ -24,12 +24,11 @@
 
 #include "runSimulationThrowBall.hpp"
 
-#include "dmp/DmpFactory.hpp"
 #include "dmp/Trajectory.hpp"
 
-#include <nlohmann/json.hpp>
-
 #include "eigenutils/eigen_file_io.hpp"
+
+#include <nlohmann/json.hpp>
 
 #include <boost/filesystem.hpp>
 #include <iostream>

@@ -134,8 +134,6 @@ public:
   /** Destructor. */
   ~Dmp(void);
   
-  static Dmp* from_jsonpickle(const nlohmann::json& json);
-  
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x, Eigen::Ref<Eigen::VectorXd> xd) const;
   
   void differentialEquation(
@@ -306,7 +304,6 @@ public:
     return perturbation_standard_deviation_;
   }
   
-protected:
 
   /** Get a pointer to the function approximator for a certain dimension.
    * \param[in] i_dim Dimension for which to get the function approximator
@@ -318,8 +315,38 @@ protected:
     return function_approximators_[i_dim];
   }
    
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
+  friend void from_json(const nlohmann::json& j, Dmp*& obj);
   
-private:
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  inline friend void to_json(nlohmann::json& j, const Dmp* const & obj) {
+    obj->to_json_helper(j);
+  }
+  
+private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  void to_json_helper(nlohmann::json& j) const;
+  
   /** @name Linear closed loop controller
    *  @{
    */ 
@@ -391,9 +418,6 @@ private:
   static boost::mt19937 rng;
   mutable boost::variate_generator<boost::mt19937&, boost::normal_distribution<> > *analytical_solution_perturber_ = NULL;
   
-protected:
-   Dmp(void) {};
-   
 };
 
 }

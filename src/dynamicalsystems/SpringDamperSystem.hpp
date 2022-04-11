@@ -113,7 +113,38 @@ public:
     mass_=mass; 
   }
 
-private:
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
+  friend void from_json(const nlohmann::json& j, SpringDamperSystem*& obj);
+  
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  inline friend void to_json(nlohmann::json& j, const SpringDamperSystem* const & obj) {
+    obj->to_json_helper(j);
+  }
+  
+private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  void to_json_helper(nlohmann::json& j) const;
+  
   /** Damping coefficient 'c' */
   double damping_coefficient_;
 
@@ -124,19 +155,10 @@ private:
   double mass_;
   
 
-private:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
-   */
-  SpringDamperSystem(void) {};
-  
+    
   /** Pre-allocated memory to avoid allocating it during run-time. To enable real-time execution of the differentialEquation() function. */
-  mutable Eigen::VectorXd y_,z_,yd_,zd_,y_attr_;
+  mutable Eigen::VectorXd y_, z_, yd_, zd_, y_attr_;
   
-public:
-  friend void to_json(nlohmann::json& j, const SpringDamperSystem& p);
-  //friend void from_json(const nlohmann::json& j, SpringDamperSystem& p);
 };
 
 }

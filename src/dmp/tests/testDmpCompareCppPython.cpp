@@ -27,7 +27,6 @@
 #include <nlohmann/json.hpp>
 
 #include "dmp/Dmp.hpp"
-#include "dmp/DmpFactory.hpp"
 #include "dmp/Trajectory.hpp"
 
 #include "eigenutils/eigen_file_io.hpp"
@@ -52,8 +51,7 @@ int main(int n_args, char** args)
   //cout << j << endl;
 
   
-  Dmp* dmp = NULL;
-  from_jsonpickle(j,dmp);
+  Dmp* dmp = j.get<Dmp*>();
   cout << *dmp << endl;
   
   VectorXd ts;

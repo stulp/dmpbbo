@@ -27,9 +27,6 @@
 #include <nlohmann/json.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
-#include "dynamicalsystems/DynamicalSystemFactory.hpp"
-
-
 
 using namespace std;
 using namespace DmpBbo;
@@ -39,20 +36,29 @@ int main(int n_args, char** args)
 {
   
   string directory = "../../../../python/dynamicalsystems/tests/";
-  string filename = "ExponentialSystem_1D.json";  
-  if (n_args>1)
-    filename = string(args[1]);
-  filename = directory + filename;  
+  
+  vector<string> filenames;
+  for (string dim: {"1D","2D"})
+    for (string system: {"Exponential","Sigmoid","SpringDamper"})
+      filenames.push_back(system+"System_"+dim+".json");
+  filenames.push_back("TimeSystem.json");
   
   
-  ifstream file(filename);
-  json j = json::parse(file);
-  cout << j << endl << endl;
-
+  for (string filename: filenames) {
   
-  DynamicalSystem* dyn_sys = NULL;
-  DynamicalSystemFactory::from_jsonpickle(j,dyn_sys);
-  cout << *dyn_sys << endl;
+    filename = directory+filename;
+    cout << "=================================================================" << endl;
+    cout << filename << endl;
+    
+    cout << "===============" << endl;   
+    ifstream file(filename);
+    json j = json::parse(file);
+    cout << j << endl;
+    
+    cout << "===============" << endl;   
+    DynamicalSystem* d = j.get<DynamicalSystem*>();
+    cout << *d << endl;
+  }
   
   return 0;
 }

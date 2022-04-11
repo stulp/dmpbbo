@@ -157,31 +157,26 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixX
   }
 }
 
-SigmoidSystem* SigmoidSystem::from_jsonpickle(const nlohmann::json& json) {
+void from_json(const nlohmann::json& json, SigmoidSystem*& obj)
+{
 
   double tau = from_json_to_double(json.at("tau_"));
   double max_rate = from_json_to_double(json.at("max_rate_"));
   double inflection_point_time = from_json_to_double(json.at("inflection_point_time_"));
   VectorXd y_init = json.at("initial_state_").at("values");
   
-  return new SigmoidSystem(tau,y_init,max_rate,inflection_point_time);
+  obj = new SigmoidSystem(tau,y_init,max_rate,inflection_point_time);
 }
   
-void to_json(nlohmann::json& j, const SigmoidSystem& obj) {
-  obj.DynamicalSystem::to_json_base(j);
-  
-  j["max_rate_"] = obj.max_rate_;
-  j["inflection_point_time_"] = obj.inflection_point_time_;
-  
-  // for jsonpickle
-  j["py/object"] = "dynamicalsystems.SigmoidSystem.SigmoidSystem";
-}
-
-string SigmoidSystem::toString(void) const
+void SigmoidSystem::to_json_helper(nlohmann::json& j) const 
 {
-  nlohmann::json j;
-  to_json(j,*this);
-  return j.dump(4);
+  to_json_base(j); // Get the json string from the base class
+  
+  j["max_rate_"] = max_rate_;
+  j["inflection_point_time_"] = inflection_point_time_;
+
+  string c("SigmoidSystem");
+  j["py/object"] = "dynamicalsystems."+c+"."+c; // for jsonpickle
 }
 
 }

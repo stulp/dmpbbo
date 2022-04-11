@@ -126,29 +126,23 @@ void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, MatrixXd& 
   }
 }
 
-TimeSystem* TimeSystem::from_jsonpickle(const nlohmann::json& json) {
-
+void from_json(const nlohmann::json& json, TimeSystem*& obj)
+{
   double tau = from_json_to_double(json.at("tau_"));
   int count_down_int = json.at("count_down_");
   bool count_down = count_down_int >0;
 
-  return new TimeSystem(tau,count_down);
+  obj = new TimeSystem(tau,count_down);
 }
 
-void to_json(nlohmann::json& j, const TimeSystem& obj) {
-  obj.DynamicalSystem::to_json_base(j);
-  
-  j["count_down_"] = obj.count_down_;
-  
-  // for jsonpickle
-  j["py/object"] = "dynamicalsystems.TimeSystem.TimeSystem";
-}
-
-string TimeSystem::toString(void) const
+void TimeSystem::to_json_helper(nlohmann::json& j) const 
 {
-  nlohmann::json j;
-  to_json(j,*this);
-  return j.dump(4);
+  to_json_base(j); // Get the json string from the base class
+  
+  j["count_down_"] = count_down_;
+  
+  string c("TimeSystem");
+  j["py/object"] = "dynamicalsystems."+c+"."+c; // for jsonpickle
 }
 
 }

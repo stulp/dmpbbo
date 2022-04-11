@@ -23,6 +23,11 @@
  
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
+#include "dynamicalsystems/ExponentialSystem.hpp"
+#include "dynamicalsystems/SigmoidSystem.hpp"
+#include "dynamicalsystems/SpringDamperSystem.hpp"
+#include "dynamicalsystems/TimeSystem.hpp"
+
 #include "eigenutils/eigen_json.hpp"
 
 #include <cmath>
@@ -113,17 +118,51 @@ void DynamicalSystem::integrateStepRungeKutta(double dt, const Ref<const VectorX
   differentialEquation(x_updated,xd_updated); 
 }
 
-void DynamicalSystem::to_json_base(nlohmann::json& j) const {
+void from_json(const nlohmann::json& j, DynamicalSystem*& obj) {
+  string class_name = j.at("py/object").get<string>();
   
+  if (class_name.find("ExponentialSystem") != string::npos) {
+    obj = j.get<ExponentialSystem*>();
+    
+  } else if (class_name.find("SigmoidSystem") != string::npos) {
+    obj = j.get<SigmoidSystem*>();
+    
+  } else if (class_name.find("SpringDamperSystem") != string::npos) {
+    obj = j.get<SpringDamperSystem*>();
+    
+  } else if (class_name.find("TimeSystem") != string::npos) {
+    obj = j.get<TimeSystem*>();
+    
+  } else {
+    cerr << __FILE__ << ":" << __LINE__ << ":";
+    cerr << "Unknown DynamicalSystem: " << class_name << endl;
+    obj = NULL;
+  }
+  
+}
+
+void DynamicalSystem::to_json_base(nlohmann::json& j) const {
   j["dim_"] = dim_;
   j["dim_orig_"] = dim_orig_;
   j["tau_"] = tau_;
   j["initial_state_"] = initial_state_;
   j["attractor_state_"] = attractor_state_;
   // Avoiding NLOHMANN_JSON_SERIALIZE_ENUM
-  j["integration_method_"] = (integration_method_==EULER) ? "EULER" : "RUNGE_KUTTA" ;
-  
+  j["integration_method_"] = (integration_method_==EULER) ? "EULER" : "RUNGE_KUTTA" ;  
+
+  string c("DynamicalSystem");
+  j["py/object"] = "dynamicalsystems."+c+"."+c; // for jsonpickle
 }
+
+std::ostream& operator<<(std::ostream& output, const DynamicalSystem& d) 
+{
+  nlohmann::json j;
+  d.to_json_helper(j);
+  output << j.dump(4);
+  return output;
+}
+
+
 
 
 }

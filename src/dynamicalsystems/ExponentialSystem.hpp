@@ -76,26 +76,45 @@ public:
   
 	std::string toString(void) const;
 
-private:
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
+  friend void from_json(const nlohmann::json& j, ExponentialSystem*& obj);
+  
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  inline friend void to_json(nlohmann::json& j, const ExponentialSystem* const & obj) {
+    obj->to_json_helper(j);
+  }
+  
+private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  void to_json_helper(nlohmann::json& j) const;
   
   /** Decay constant */
   double alpha_;
-  
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. Since this
-   * constructor should not be called by other classes, it is private (boost::serialization is a
-   * friend)
-   */
-  ExponentialSystem(void) {};
 
   /** Preallocated memory to make ExponentialSystem::differentialEquation() realtime. */
   mutable Eigen::VectorXd attractor_state_prealloc_;
   
 
-public:
-  friend void to_json(nlohmann::json& j, const ExponentialSystem& p);
-  //friend void from_json(const nlohmann::json& j, ExponentialSystem& p);
 };
 
 }

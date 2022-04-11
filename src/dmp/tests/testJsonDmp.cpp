@@ -27,8 +27,6 @@
 #include <nlohmann/json.hpp>
 
 #include "dmp/Dmp.hpp"
-#include "dmp/DmpFactory.hpp"
-
 
 using namespace std;
 using namespace DmpBbo;
@@ -47,10 +45,8 @@ int main(int n_args, char** args)
   ifstream file(filename);
   json j = json::parse(file);
   cout << j << endl;
-
   
-  Dmp* dmp = NULL;
-  from_jsonpickle(j,dmp);
+  Dmp* dmp = j.get<Dmp*>();
   cout << *dmp << endl;
   
   return 0;

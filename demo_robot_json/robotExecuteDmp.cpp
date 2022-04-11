@@ -25,7 +25,6 @@
 #include "runSimulationThrowBall.hpp"
 
 #include "dmp/Dmp.hpp"
-#include "dmp/DmpFactory.hpp"
 #include "dmp/Trajectory.hpp"
 
 #include <nlohmann/json.hpp>
@@ -74,8 +73,7 @@ int main(int n_args, char** args)
   ifstream file(dmp_filename);
   json j = json::parse(file);
   
-  Dmp* dmp = NULL;
-  from_jsonpickle(j,dmp);
+  Dmp* dmp = j.get<Dmp*>();
 
   // Integrate DMP longer than the tau with which it was trained
   double integration_time = 1.5*dmp->tau();

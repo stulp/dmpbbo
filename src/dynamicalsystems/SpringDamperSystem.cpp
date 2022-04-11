@@ -172,8 +172,8 @@ void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs, Ma
   }
 }
 
-SpringDamperSystem* SpringDamperSystem::from_jsonpickle(const nlohmann::json& json) {
-
+void from_json(const nlohmann::json& json, SpringDamperSystem*& obj)
+{
   double tau = from_json_to_double(json.at("tau_"));
   double damping_coefficient = from_json_to_double(json.at("damping_coefficient_"));
   double spring_constant = from_json_to_double(json.at("spring_constant_"));
@@ -181,26 +181,22 @@ SpringDamperSystem* SpringDamperSystem::from_jsonpickle(const nlohmann::json& js
   VectorXd y_init = json.at("initial_state_").at("values");
   VectorXd y_attr = json.at("attractor_state_").at("values");
   
-  return new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass);
+  obj = new SpringDamperSystem(tau,y_init,y_attr,damping_coefficient,spring_constant,mass);
 }
 
-void to_json(nlohmann::json& j, const SpringDamperSystem& obj) {
-  obj.DynamicalSystem::to_json_base(j);
-  
-  j["damping_coefficient_"] = obj.damping_coefficient_;
-  j["spring_constant_"] = obj.spring_constant_;
-  j["mass_"] = obj.mass_;
 
-  // for jsonpickle
-  j["py/object"] = "dynamicalsystems.SpringDamperSystem.SpringDamperSystem";
-}
-
-string SpringDamperSystem::toString(void) const
+void SpringDamperSystem::to_json_helper(nlohmann::json& j) const 
 {
-  nlohmann::json j;
-  to_json(j,*this);
-  return j.dump(4);
+  to_json_base(j); // Get the json string from the base class
+  
+  j["damping_coefficient_"] = damping_coefficient_;
+  j["spring_constant_"] = spring_constant_;
+  j["mass_"] = mass_;
+
+  string c("SpringDamperSystem");
+  j["py/object"] = "dynamicalsystems."+c+"."+c; // for jsonpickle
 }
+
 
 
 }

@@ -161,15 +161,7 @@ public:
    *  \remarks Calls pure virtual function toString(), which must be implemented by
    *  all subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */
-  friend std::ostream& operator<<(std::ostream& output, const DynamicalSystem& dyn_sys) {
-    output << dyn_sys.toString();
-    return output;
-  }
-
-  /** Returns a string representation of the object.
-   * \return A string representation of the object.
-   */
-  virtual std::string toString(void) const = 0;
+  friend std::ostream& operator<<(std::ostream& output, const DynamicalSystem& dyn_sys);
 
   /** @} */ 
   
@@ -289,7 +281,40 @@ protected:
 
   /** @} */
   
-private:
+	/** Read an object from json.
+   *  \param[in]  j   json input 
+   *  \param[out] obj The object read from json
+   *
+	 * See also: https://github.com/nlohmann/json/issues/1324
+   */
+  friend void from_json(const nlohmann::json& j, DynamicalSystem*& obj);
+  
+  
+	/** Write an object to json.
+   *  \param[in] obj The object to write to json
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  inline friend void to_json(nlohmann::json& j, const DynamicalSystem* const & obj) {
+    obj->to_json_helper(j);
+  }
+  
+protected:  
+  void to_json_base(nlohmann::json& j) const;
+    
+private:  
+  
+	/** Write this object to json.
+   *  \param[out]  j json output 
+   *
+	 * See also: 
+	 *   https://github.com/nlohmann/json/issues/1324
+	 *   https://github.com/nlohmann/json/issues/716
+   */
+  virtual void to_json_helper(nlohmann::json& j) const = 0;
 
   /**
    * Integrate the system one time step using simple Euler integration
@@ -343,17 +368,6 @@ private:
   /** Which integration method to use. See DynamicalSystem::IntegrationMethod */
   IntegrationMethod integration_method_;
   
-protected:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
-   */
-  DynamicalSystem(void) {};
-   
-public:
-  // // https://github.com/nlohmann/json/issues/1324
-  void to_json_base(nlohmann::json& j) const;
-  //friend void from_json(const nlohmann::json& j, MetaParametersRBFN& p);
   
 };
 
