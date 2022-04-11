@@ -70,13 +70,6 @@ public:
 private:
   std::vector<std::vector<FunctionApproximator*> > policy_parameter_function_;
 
-protected:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
-   */
-   DmpContextualTwoStep(void) {}; 
-
 };
 
 }

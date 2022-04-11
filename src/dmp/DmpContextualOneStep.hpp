@@ -58,13 +58,6 @@ public:
   // Overloads Dmp::train
   void  train(const std::vector<Trajectory>& trajectories, const std::vector<Eigen::MatrixXd>& task_parameters, std::string save_directory="", bool overwrite=false);
   
-protected:
-  /**
-   * Default constructor.
-   * \remarks This default constuctor is required for boost::serialization to work. See \ref sec_boost_serialization_ugliness
-   */
-   DmpContextualOneStep(void) {};
-
 };
 
 }
