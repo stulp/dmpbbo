@@ -69,8 +69,6 @@ public:
 
   void analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs, Eigen::MatrixXd& xds) const;
   
-	std::string toString(void) const;
-  
   /** 
    * Accessor function for damping coefficient.
    * \return Damping coefficient

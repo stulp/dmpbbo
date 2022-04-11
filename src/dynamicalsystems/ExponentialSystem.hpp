@@ -74,8 +74,6 @@ public:
     return alpha_;
   }
   
-	std::string toString(void) const;
-
 	/** Read an object from json.
    *  \param[in]  j   json input 
    *  \param[out] obj The object read from json

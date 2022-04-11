@@ -60,8 +60,6 @@ public:
   void set_tau(double tau);
   void set_initial_state(const Eigen::VectorXd& y_init);
 
-	std::string toString(void) const;
-
 	/** Read an object from json.
    *  \param[in]  j   json input 
    *  \param[out] obj The object read from json

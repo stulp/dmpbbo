@@ -157,9 +157,6 @@ public:
    *  \param[in] output  Output stream to which to write to
    *  \param[in] dyn_sys Dynamical system to write
    *  \return    Output stream
-   *
-   *  \remarks Calls pure virtual function toString(), which must be implemented by
-   *  all subclasses: http://stackoverflow.com/questions/4571611/virtual-operator
    */
   friend std::ostream& operator<<(std::ostream& output, const DynamicalSystem& dyn_sys);
 
