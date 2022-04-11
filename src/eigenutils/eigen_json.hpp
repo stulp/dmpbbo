@@ -33,9 +33,17 @@ namespace Eigen {
 // Below code was adapted from
 // https://gitlab.com/Simox/simox/-/blob/master/SimoxUtility/json/eigen_conversion.h
     
+/** Output a matrix as json.
+ * \param[out] j The json output
+ * \param[in] matrix The matrix 
+ */
 template <typename Derived>
 void to_json(nlohmann::json& j, const MatrixBase<Derived>& matrix);
 
+/** Parse a matrix from json.
+ * \param[in] j The json input
+ * \param[out] matrix The parsed matrix 
+ */
 template <typename Derived>
 void from_json(const nlohmann::json& j, MatrixBase<Derived>& vector);
 
@@ -53,7 +61,6 @@ void to_json(nlohmann::json& j, const MatrixBase<Derived>& matrix)
     }
 }
 
-/// Reads the matrix from list of rows.
 template <typename Derived>
 void from_json(const nlohmann::json& j, Eigen::MatrixBase<Derived>& matrix)
 {
