@@ -30,7 +30,6 @@
 
 #include "eigenutils/eigen_realtime_check.hpp"
 #include "functionapproximators/FunctionApproximator.hpp"
-#include "testTargetFunction.hpp"
 
 using namespace std;
 using namespace Eigen;
