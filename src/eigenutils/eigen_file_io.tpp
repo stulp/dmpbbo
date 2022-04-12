@@ -41,7 +41,6 @@ inline bool loadMatrix(
   std::ifstream input(filename.c_str());
   if (input.fail()) {
     std::cerr << "ERROR. Cannot find file '" << filename << "'." << std::endl;
-    m = Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>(0, 0);
     return false;
   }
   std::string line;
