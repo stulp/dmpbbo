@@ -83,6 +83,16 @@ void DynamicalSystem::integrateStart(Eigen::Ref<Eigen::VectorXd> x,
   x.fill(0);
   x.segment(0, initial_state_.size()) = initial_state_;
 
+  // Pre-allocate memory for Runge-Kutta integration
+  int l = x.size();
+  k1_ = VectorXd(l);
+  k2_ = VectorXd(l);
+  k3_ = VectorXd(l);
+  k4_ = VectorXd(l);
+  input_k2_ = VectorXd(l);
+  input_k3_ = VectorXd(l);
+  input_k4_ = VectorXd(l);
+
   // Return value (rates of change)
   differentialEquation(x, xd);
 }
@@ -118,18 +128,15 @@ void DynamicalSystem::integrateStepRungeKutta(double dt,
 {
   // 4th order Runge-Kutta for a 1st order system
   // http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
+  differentialEquation(x, k1_);
+  input_k2_ = x + dt * 0.5 * k1_;
+  differentialEquation(x + dt * 0.5 * k1_, k2_);
+  input_k3_ = x + dt * 0.5 * k2_;
+  differentialEquation(input_k3_, k3_);
+  input_k4_ = x + dt * k3_;
+  differentialEquation(input_k4_, k4_);
 
-  int l = x.size();
-  VectorXd k1(l), k2(l), k3(l), k4(l);
-  differentialEquation(x, k1);
-  VectorXd input_k2 = x + dt * 0.5 * k1;
-  differentialEquation(input_k2, k2);
-  VectorXd input_k3 = x + dt * 0.5 * k2;
-  differentialEquation(input_k3, k3);
-  VectorXd input_k4 = x + dt * k3;
-  differentialEquation(input_k4, k4);
-
-  x_updated = x + dt * (k1 + 2.0 * (k2 + k3) + k4) / 6.0;
+  x_updated = x + dt * (k1_ + 2.0 * (k2_ + k3_) + k4_) / 6.0;
   differentialEquation(x_updated, xd_updated);
 }
 

@@ -26,9 +26,11 @@
 #include <string>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
+#include "eigenutils/eigen_realtime_check.hpp"
 
 using namespace std;
 using namespace DmpBbo;
+using namespace Eigen;
 using namespace nlohmann;
 
 int main(int n_args, char** args)
@@ -55,6 +57,23 @@ int main(int n_args, char** args)
     cout << "===============" << endl;
     DynamicalSystem* d = j.get<DynamicalSystem*>();
     cout << *d << endl;
+
+    VectorXd x(d->dim(), 1);
+    VectorXd x_updated(d->dim(), 1);
+    VectorXd xd(d->dim(), 1);
+
+    double dt = 0.01;
+    using IM = typename DynamicalSystem::IntegrationMethod;
+    for (IM integration : {IM::EULER, IM::RUNGE_KUTTA}) {
+      d->set_integration_method(integration);
+      d->integrateStart(x, xd);
+      ENTERING_REAL_TIME_CRITICAL_CODE
+      for (int t = 1; t < 10; t++) {
+        d->integrateStep(dt, x, x_updated, xd);
+        // x = x_updated;
+      }
+      EXITING_REAL_TIME_CRITICAL_CODE
+    }
   }
 
   return 0;

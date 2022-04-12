@@ -399,6 +399,9 @@ class DynamicalSystem {
 
   /** Which integration method to use. See DynamicalSystem::IntegrationMethod */
   IntegrationMethod integration_method_;
+
+  /** Members for caching in Runge-Kutta integration. */
+  mutable Eigen::VectorXd k1_, k2_, k3_, k4_, input_k2_, input_k3_, input_k4_;
 };
 
 }  // namespace DmpBbo
