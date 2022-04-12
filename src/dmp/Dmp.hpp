@@ -24,9 +24,6 @@
 #ifndef _DMP_H_
 #define _DMP_H_
 
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <set>
 
@@ -313,27 +310,6 @@ class Dmp : public DynamicalSystem {
       const Eigen::Ref<const Eigen::MatrixXd>& phase_state,
       Eigen::MatrixXd& fa_output) const;
 
-  /** Add a perturbation to the forcing term when computing the analytical
-   * solution. This is only relevant for off-line experiments, i.e. not on a
-   * robot, for testing how the system responds to perturbations. Does not
-   * affect the output of Dmp::differentialEquation(), only of
-   * Dmp::analyticalSolution(). \param[in] perturbation_standard_deviation
-   * Standard deviation of the normal distribution from which perturbations will
-   * be sampled.
-   *
-   */
-  void set_perturbation_analytical_solution(
-      double perturbation_standard_deviation);
-
-  /** Get the perturbation to the forcing term when computing the analytical
-   * solution. \return Standard deviation of the normal distribution from which
-   * perturbations will be sampled.
-   *
-   */
-  double get_perturbation_analytical_solution() const
-  {
-    return perturbation_standard_deviation_;
-  }
 
   /** Get a pointer to the function approximator for a certain dimension.
    * \param[in] i_dim Dimension for which to get the function approximator
@@ -405,9 +381,6 @@ class Dmp : public DynamicalSystem {
    * term.  */
   Eigen::VectorXd trajectory_amplitudes_;
 
-  /** @see Dmp::set_perturbation_analytical_solution() **/
-  double perturbation_standard_deviation_ = 0.0;
-
   /** @} */  // end of group_nonlinear
 
   /** Pre-allocated memory to avoid allocating it during run-time. To enable
@@ -457,11 +430,6 @@ class Dmp : public DynamicalSystem {
   void initFunctionApproximators(
       std::vector<FunctionApproximator*> function_approximators);
 
-  /** Boost's random number generator. Shared by all object instances. */
-  static boost::mt19937 rng;
-  mutable boost::variate_generator<boost::mt19937&,
-                                   boost::normal_distribution<> >*
-      analytical_solution_perturber_ = NULL;
 };
 
 }  // namespace DmpBbo

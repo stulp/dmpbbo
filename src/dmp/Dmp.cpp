@@ -82,8 +82,6 @@ namespace DmpBbo {
  * states.GATINGM(100) */
 #define GATINGM(T) block(0, 3 * dim_orig() + 1, T, 1)
 
-boost::mt19937 Dmp::rng = boost::mt19937(getpid() + time(0));
-
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          std::vector<FunctionApproximator*> function_approximators,
          double alpha_spring_damper, DynamicalSystem* goal_system,
@@ -487,16 +485,6 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   // Add forcing term to the acceleration of the spring state
   xds.SPRINGM_Z(1) = xds.SPRINGM_Z(1) + forcing_terms.row(t0) / tau();
 
-  // Initialize perturber, if necessary
-  if (analytical_solution_perturber_ == NULL &&
-      perturbation_standard_deviation_ > 0.0) {
-    boost::normal_distribution<> normal(0, perturbation_standard_deviation_);
-    analytical_solution_perturber_ =
-        new boost::variate_generator<boost::mt19937&,
-                                     boost::normal_distribution<> >(rng,
-                                                                    normal);
-  }
-
   for (int tt = 1; tt < n_time_steps; tt++) {
     double dt = ts[tt] - ts[tt - 1];
 
@@ -510,16 +498,9 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
     localspring_system_.differentialEquation(xs.row(tt).SPRING, xd_spring);
     xds.row(tt).SPRING = xd_spring;
 
-    // If necessary add a perturbation. May be useful for some off-line tests.
-    RowVectorXd perturbation = RowVectorXd::Constant(dim_orig(), 0.0);
-    if (analytical_solution_perturber_ != NULL)
-      for (int i_dim = 0; i_dim < dim_orig(); i_dim++)
-        // Sample perturbation from a normal Gaussian distribution
-        perturbation(i_dim) = (*analytical_solution_perturber_)();
-
     // Add forcing term to the acceleration of the spring state
     xds.row(tt).SPRING_Z =
-        xds.row(tt).SPRING_Z + forcing_terms.row(tt) / tau() + perturbation;
+        xds.row(tt).SPRING_Z + forcing_terms.row(tt) / tau();
     // Compute y component from z
     xds.row(tt).SPRING_Y = xs.row(tt).SPRING_Z / tau();
   }
@@ -616,13 +597,6 @@ void Dmp::set_attractor_state(const VectorXd& y_attr)
 
   // Do NOT do the following. The attractor state of the spring system is
   // determined by the goal system spring_system_->set_attractor_state(y_attr);
-}
-
-void Dmp::set_perturbation_analytical_solution(
-    double perturbation_standard_deviation)
-{
-  perturbation_standard_deviation_ = perturbation_standard_deviation;
-  analytical_solution_perturber_ = NULL;
 }
 
 void from_json(const nlohmann::json& j, Dmp*& obj)
