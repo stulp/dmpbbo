@@ -41,8 +41,7 @@ using namespace DmpBbo;
 int main(int n_args, char** args)
 {
   string directory = "";
-  if (n_args > 1) 
-    directory = string(args[1]);
+  if (n_args > 1) directory = string(args[1]);
 
   // Test JSON
   string filename_dmp = "../../../../python/dmp/tests/Dmp.json";
@@ -75,16 +74,12 @@ int main(int n_args, char** args)
     }
     EXITING_REAL_TIME_CRITICAL_CODE
   }
-  
-  
-  
+
   bool loading_succesful = false;
   VectorXd ts;
   if (boost::filesystem::exists(directory + "/ts.txt"))
     loading_succesful = loadMatrix(directory + "/ts.txt", ts);
-  if (!loading_succesful)
-    ts = VectorXd::LinSpaced(76, 0, 0.75);
-    
+  if (!loading_succesful) ts = VectorXd::LinSpaced(76, 0, 0.75);
 
   cout << "* Analytical solution." << endl;
   MatrixXd xs_ana, xds_ana, forcing_terms, fa_output;
@@ -92,11 +87,10 @@ int main(int n_args, char** args)
   Trajectory traj_reproduced;
   dmp->statesAsTrajectory(ts, xs_ana, xds_ana, traj_reproduced);
 
-  
   cout << "* Integrating step-by-step." << endl;
-  //VectorXd x(dmp->dim(), 1);
-  //VectorXd xd(dmp->dim(), 1);
-  //VectorXd x_updated(dmp->dim(), 1);
+  // VectorXd x(dmp->dim(), 1);
+  // VectorXd xd(dmp->dim(), 1);
+  // VectorXd x_updated(dmp->dim(), 1);
   dmp->integrateStart(x, xd);
 
   MatrixXd xs_step(ts.size(), x.size());
@@ -105,34 +99,33 @@ int main(int n_args, char** args)
   xds_step.row(0) = xd;
 
   for (int t = 1; t < ts.size(); t++) {
-    double dt = ts[t]-ts[t-1];
+    double dt = ts[t] - ts[t - 1];
     dmp->integrateStep(dt, x, x_updated, xd);
     x = x_updated;
     xs_step.row(t) = x;
     xds_step.row(t) = xd;
   }
-  
+
   if (loading_succesful) {
     cout << "* Saving to directory: " << directory << endl;
-    
+
     MatrixXd output_ana(ts.size(), 1 + xs_ana.cols() + xds_ana.cols());
     output_ana << ts, xs_ana, xds_ana;
     bool overwrite = true;
     saveMatrix(directory, "ts_xs_xds_ana.txt", output_ana, overwrite);
     saveMatrix(directory, "forcing_terms_ana.txt", forcing_terms, overwrite);
     saveMatrix(directory, "fa_output_ana.txt", fa_output, overwrite);
-  
+
     traj_reproduced.saveToFile(directory, "traj_reproduced_ana.txt", overwrite);
-    
+
     MatrixXd output_step(ts.size(), 1 + xs_step.cols() + xds_step.cols());
     output_step << ts, xs_step, xds_step;
     saveMatrix(directory, "ts_xs_xds_step.txt", output_step, overwrite);
 
-    //MatrixXd tau_mat(1, 1);
-    //tau_mat(0, 0) = dmp->tau();
-    //saveMatrix(directory, "tau.txt", tau_mat, overwrite);
+    // MatrixXd tau_mat(1, 1);
+    // tau_mat(0, 0) = dmp->tau();
+    // saveMatrix(directory, "tau.txt", tau_mat, overwrite);
   }
-  
 
   return 0;
 }
