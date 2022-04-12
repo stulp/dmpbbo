@@ -170,7 +170,7 @@ void Dmp::initSubSystems(std::string dmp_type)
     gating_system = new ExponentialSystem(tau(), one_1, one_0, 4);
   } else if (dmp_type == "KULVICIUS_2012_JOINING" ||
              dmp_type == "COUNTDOWN_2013") {
-    goal_system = new ExponentialSystem(tau(), x_init(), y_attr_, 15);
+    goal_system = new ExponentialSystem(tau(), y_init(), y_attr_, 15);
     gating_system = new SigmoidSystem(tau(), one_1, -10, 0.9 * tau());
     bool count_down = (dmp_type == "COUNTDOWN_2013");
     phase_system = new TimeSystem(tau(), count_down);
@@ -428,7 +428,7 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   // Scale the forcing term, if necessary
   if (forcing_term_scaling_ == "G_MINUS_Y0_SCALING") {
     MatrixXd g_minus_y0_rep =
-        (y_attr_ - x_init()).transpose().replicate(n_time_steps, 1);
+        (y_attr_ - y_init()).transpose().replicate(n_time_steps, 1);
     forcing_terms = forcing_terms.array() * g_minus_y0_rep.array();
   } else if (forcing_term_scaling_ == "AMPLITUDE_SCALING") {
     MatrixXd trajectory_amplitudes_rep =
@@ -465,7 +465,7 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
 
   // Reset the dynamical system, and get the first state
   double damping = spring_system_->damping_coefficient();
-  SpringDamperSystem localspring_system_(tau(), x_init(), y_attr_, damping);
+  SpringDamperSystem localspring_system_(tau(), y_init(), y_attr_, damping);
 
   // Set first attractor state
   localspring_system_.set_y_attr(xs_goal.row(0));
@@ -554,7 +554,7 @@ void Dmp::computeFunctionApproximatorInputsAndTargets(
   // Factor out scaling
   if (forcing_term_scaling_ == "G_MINUS_Y0_SCALING") {
     MatrixXd g_minus_y0_rep =
-        (y_attr_ - x_init()).transpose().replicate(n_time_steps, 1);
+        (y_attr_ - y_init()).transpose().replicate(n_time_steps, 1);
     f_target = f_target.array() / g_minus_y0_rep.array();
   } else if (forcing_term_scaling_ == "AMPLITUDE_SCALING") {
     MatrixXd trajectory_amplitudes_rep =
@@ -580,7 +580,7 @@ void Dmp::set_y_init(const VectorXd& y_init)
   DynamicalSystem::set_x_init(y_init);
 
   // Set value in all relevant subsystems also
-  spring_system_->set_x_init(y_init);
+  spring_system_->set_y_init(y_init);
   if (goal_system_ != NULL) goal_system_->set_x_init(y_init);
 }
 
