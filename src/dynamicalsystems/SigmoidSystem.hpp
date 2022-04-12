@@ -24,6 +24,9 @@
 #ifndef _SIGMOID_SYSTEM_H_
 #define _SIGMOID_SYSTEM_H_
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -41,7 +44,7 @@ class SigmoidSystem : public DynamicalSystem {
    *  Initialization constructor for a 1D system.
    *  \param tau              Time constant,                cf.
    * DynamicalSystem::tau() \param x_init           Initial state, cf.
-   * DynamicalSystem::initial_state() \param max_rate         Maximum rate of
+   * DynamicalSystem::x_init() \param max_rate         Maximum rate of
    * change,       cf. SigmoidSystem::max_rate() \param inflection_point_time
    * Time at which maximum rate of change is achieved,  cf.
    * SigmoidSystem::inflection_point_time()
@@ -59,7 +62,7 @@ class SigmoidSystem : public DynamicalSystem {
                           Eigen::MatrixXd& xds) const;
 
   void set_tau(double tau);
-  void set_initial_state(const Eigen::VectorXd& y_init);
+  void set_x_init(const Eigen::VectorXd& x_init);
 
   /** Read an object from json.
    *  \param[in]  j   json input

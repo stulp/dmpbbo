@@ -28,8 +28,6 @@
 
 #include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
-#include <string>
-#include <vector>
 
 namespace DmpBbo {
 
@@ -47,9 +45,9 @@ namespace DmpBbo {
  * system at given times
  *
  * This class provides accesor/mutator methods for some variables typically
- * found in dynamical systems: \li dim() The dimensionality of the system, i.e.
+ * found in dynamical systems: \li dim_ The dimensionality of the system, i.e.
  * the number of variables in the state vector. \li tau() The time constant of
- * the system \li initial_state() The initial state of the system \li
+ * the system \li x_init() The initial state of the system \li
  * attractor_state() The attractor state, i.e. the state to which the system
  * will converge
  *
@@ -71,13 +69,20 @@ class DynamicalSystem {
 
   /**
    * Initialization constructor.
-   * \param order            Order of the system
-   * \param tau              Time constant, see tau()
-   * \param initial_state    Initial state, see initial_state()
-   * \param attractor_state  Attractor state, see attractor_state()
+   * \param order     Order of the system
+   * \param tau       Time constant, see tau()
+   * \param x_init    Initial state, see x_init()
    */
-  DynamicalSystem(int order, double tau, Eigen::VectorXd initial_state,
-                  Eigen::VectorXd attractor_state);
+  DynamicalSystem(int order, double tau, Eigen::VectorXd xy_init);
+
+  /**
+   * Initialization constructor.
+   * \param tau     Time constant, see tau()
+   * \param n_dims  Dimensionality of the state (which may differ from the size
+   * of y_init) \param y_init  Part of the initial state Only works for
+   * first-order systems (order=1)
+   */
+  DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims);
 
   /** Destructor */
   virtual ~DynamicalSystem(void);
@@ -92,10 +97,10 @@ class DynamicalSystem {
    * The differential equation which defines the system.
    * It relates state values to rates of change of those state values
    *
-   * \param[in]  x  current state (column vector of size dim() X 1)
-   * \param[out] xd rate of change in state (column vector of size dim() X 1)
+   * \param[in]  x  current state (column vector of size dim_ X 1)
+   * \param[out] xd rate of change in state (column vector of size dim_ X 1)
    *
-   * \remarks x and xd should be of size dim() X 1. This forces you to
+   * \remarks x and xd should be of size dim_ X 1. This forces you to
    * pre-allocate memory, which speeds things up (and also makes Eigen's Ref
    * functionality easier to deal with).
    */
@@ -108,9 +113,9 @@ class DynamicalSystem {
    * \param[in]  ts  A vector of times for which to compute the analytical
    * solutions \param[out] xs  Sequence of state vectors. T x D or D x T matrix,
    * where T is the number of times (the length of 'ts'), and D the size of the
-   * state (i.e. dim()) \param[out] xds Sequence of state vectors (rates of
+   * state (i.e. dim_) \param[out] xds Sequence of state vectors (rates of
    * change). T x D or D x T matrix, where T is the number of times (the length
-   * of 'ts'), and D the size of the state (i.e. dim())
+   * of 'ts'), and D the size of the state (i.e. dim_)
    *
    * \remarks The output xs and xds will be of size D x T \em only if the matrix
    * x you pass as an argument of size D x T. In all other cases (i.e. including
@@ -127,7 +132,7 @@ class DynamicalSystem {
    * \param[out] xd              - The first vector of rates of change of the
    * state variables
    *
-   * \remarks x and xd should be of size dim() X 1. This forces you to
+   * \remarks x and xd should be of size dim_ X 1. This forces you to
    * pre-allocate memory, which speeds things up (and also makes Eigen's Ref
    * functionality easier to deal with).
    */
@@ -154,15 +159,55 @@ class DynamicalSystem {
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
-   * \remarks x should be of size dim() X 1. This forces you to pre-allocate
+   * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
    * memory, which speeds things up (and also makes Eigen's Ref functionality
    * easier to deal with).
    */
   virtual void integrateStep(double dt,
                              const Eigen::Ref<const Eigen::VectorXd> x,
                              Eigen::Ref<Eigen::VectorXd> x_updated,
-                             Eigen::Ref<Eigen::VectorXd> xd_updated) const;
+                             Eigen::Ref<Eigen::VectorXd> xd_updated) const
+  {
+    integrateStepRungeKutta(dt, x, x_updated, xd_updated);
+  }
 
+  /**
+   * Integrate the system one time step using simple Euler integration
+   *
+   * See http://en.wikipedia.org/wiki/Euler_integration
+   *
+   * \param[in]  dt         Duration of the time step
+   * \param[in]  x          Current state
+   * \param[out] x_updated  Updated state, dt time later.
+   * \param[out] xd_updated Updated rates of change of state, dt time later.
+   *
+   * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
+   * memory, which speeds things up (and also makes Eigen's Ref functionality
+   * easier to deal with).
+   */
+  void integrateStepEuler(double dt, const Eigen::Ref<const Eigen::VectorXd> x,
+                          Eigen::Ref<Eigen::VectorXd> x_updated,
+                          Eigen::Ref<Eigen::VectorXd> xd_updated) const;
+
+  /**
+   * Integrate the system one time step using 4th order Runge-Kutta integration
+   *
+   * See
+   * http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method
+   *
+   * \param[in]  dt         Duration of the time step
+   * \param[in]  x          Current state
+   * \param[out] x_updated  Updated state, dt time later.
+   * \param[out] xd_updated Updated rates of change of state, dt time later.
+   *
+   * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
+   * memory, which speeds things up (and also makes Eigen's Ref functionality
+   * easier to deal with).
+   */
+  void integrateStepRungeKutta(double dt,
+                               const Eigen::Ref<const Eigen::VectorXd> x,
+                               Eigen::Ref<Eigen::VectorXd> x_updated,
+                               Eigen::Ref<Eigen::VectorXd> xd_updated) const;
   /** @} */
 
   /** @name Input/Output
@@ -184,46 +229,11 @@ class DynamicalSystem {
    *  @{
    */
 
-  /** The possible integration methods that can be used.
-   * \li EULER: simple Euler method
-   * (http://en.wikipedia.org/wiki/Euler_integration) \li RUNGE_KUTTA: 4th-order
-   * Runge-Kutta
-   * (http://en.wikipedia.org/wiki/List_of_Runge%E2%80%93Kutta_methods#Classic_fourth-order_method)
-   */
-  enum IntegrationMethod { EULER, RUNGE_KUTTA };
-
-  /** Choose the integration method.
-   *  \param[in] integration_method The integration method, see
-   * DynamicalSystem::IntegrationMethod.
-   */
-  inline void set_integration_method(IntegrationMethod integration_method)
-  {
-    integration_method_ = integration_method;
-  }
-
   /**
    * Get the dimensionality of the dynamical system, i.e. the length of its
    * state vector. \return Dimensionality of the dynamical system
    */
   inline int dim(void) const { return dim_; }
-
-  /**
-   * Get the dimensionality of the dynamical system, i.e. the length of its
-   * output.
-   *
-   * 2nd order systems are represented as 1st order systems with an expanded
-   * state. The SpringDamperSystem for instance is represented as x = [y z], xd
-   * = [yd zd]. DynamicalSystem::dim() returns dim(x) = dim([y z]) = 2*dim(y)
-   * DynamicalSystem::dim_orig() returns dim(y) = dim()/2
-   *
-   * For Dynamical Movement Primitives, dim_orig() may be for instance 3, if the
-   * output of the DMP represents x,y,z coordinates. However, dim() will have a
-   * much larger dimensionality, because it also contains the variables of all
-   * the subsystems (phase system, gating system, etc.)
-   *
-   * \return Original dimensionality of the dynamical system
-   */
-  inline int dim_orig(void) const { return dim_orig_; }
 
   /**
    * Accessor function for the time constant.
@@ -235,70 +245,24 @@ class DynamicalSystem {
    * Mutator function for the time constant.
    * \param[in] tau Time constant
    */
-  inline virtual void set_tau(double tau)
-  {
-    assert(tau > 0.0);
-    tau_ = tau;
-  }
-
-  /**
-   * Accessor function for the initial state of the dynamical system.
-   * \return Initial state of the dynamical system.
-   */
-  inline Eigen::VectorXd initial_state(void) const { return initial_state_; }
+  inline virtual void set_tau(double tau) { tau_ = tau; }
 
   /**
    * Accessor function for the initial state of the dynamical system.
    * \param[out] initial_state Initial state of the dynamical system.
    */
-  inline void initial_state(Eigen::VectorXd& initial_state) const
-  {
-    initial_state = initial_state_;
-  }
+  inline Eigen::VectorXd x_init(void) const { return x_init_; }
+
+  /**
+   * Accessor function for the initial state of the dynamical system.
+   * \param[out] initial_state Initial state of the dynamical system.
+   */
+  inline void get_x_init(Eigen::VectorXd& x_init) const { x_init = x_init_; }
 
   /** Mutator function for the initial state of the dynamical system.
    *  \param[in] initial_state Initial state of the dynamical system.
    */
-  inline virtual void set_initial_state(const Eigen::VectorXd& initial_state)
-  {
-    assert(initial_state.size() == dim_orig_);
-    initial_state_ = initial_state;
-  }
-
-  /**
-   * Accessor function for the attractor state of the dynamical system.
-   * \return Attractor state of the dynamical system.
-   */
-  inline Eigen::VectorXd attractor_state(void) const
-  {
-    return attractor_state_;
-  }
-
-  /**
-   * Accessor function for the attractor state of the dynamical system.
-   * \param[out] attractor_state Attractor state of the dynamical system.
-   */
-  inline void attractor_state(Eigen::VectorXd& attractor_state) const
-  {
-    attractor_state = attractor_state_;
-  }
-
-  /** Mutator function for the attractor state of the dynamical system.
-   *  \param[in] attractor_state Attractor state of the dynamical system.
-   */
-  inline virtual void set_attractor_state(
-      const Eigen::Ref<const Eigen::VectorXd>& attractor_state)
-  {
-    assert(attractor_state.size() == dim_orig_);
-    attractor_state_ = attractor_state;
-  }
-
- protected:
-  /**
-   * Set the dimensionality of the dynamical system, i.e. the length of its
-   * state vector. \param[in] dim Dimensionality of the dynamical system
-   */
-  inline void set_dim(int dim) { dim_ = dim; }
+  virtual void set_x_init(const Eigen::VectorXd& x_init);
 
   /** @} */
 
@@ -342,63 +306,20 @@ class DynamicalSystem {
    */
   virtual void to_json_helper(nlohmann::json& j) const = 0;
 
-  /**
-   * Integrate the system one time step using simple Euler integration
-   *
-   * \param[in]  dt         Duration of the time step
-   * \param[in]  x          Current state
-   * \param[out] x_updated  Updated state, dt time later.
-   * \param[out] xd_updated Updated rates of change of state, dt time later.
-   */
-  void integrateStepEuler(double dt, const Eigen::Ref<const Eigen::VectorXd> x,
-                          Eigen::Ref<Eigen::VectorXd> x_updated,
-                          Eigen::Ref<Eigen::VectorXd> xd_updated) const;
-
-  /**
-   * Integrate the system one time step using 4th order Runge-Kutta integration
-   *
-   * \param[in]  dt         Duration of the time step
-   * \param[in]  x          Current state
-   * \param[out] x_updated  Updated state, dt time later.
-   * \param[out] xd_updated Updated rates of change of state, dt time later.
-   */
-  void integrateStepRungeKutta(double dt,
-                               const Eigen::Ref<const Eigen::VectorXd> x,
-                               Eigen::Ref<Eigen::VectorXd> x_updated,
-                               Eigen::Ref<Eigen::VectorXd> xd_updated) const;
-
   /** Dimensionality of the system.
    *  For instance, if there are 3 state variables, dim_ is 3.
    */
-  int dim_;
+  const int dim_;
 
-  /** The original dimensionality of the system, see DynamicalSystem::dim_orig()
-   */
-  int dim_orig_;
-
-  /** Time constant
-   *  \remarks The reason that tau_ is protected and not private is that it is
-   * usually required by DynamicalSystem::differentialEquation, which should be
-   * as fast as possible (i.e. to avoid function calls).
-   */
+  /** Time constant */
   double tau_;
 
   /** The initial state of the system.
    *  It is a column vector of size dim_orig().
    */
-  Eigen::VectorXd initial_state_;
+  Eigen::VectorXd x_init_;
 
-  /** The attractor state of the system, to which the system will converge.
-   *  It is a column vector of size dim_orig()
-   *  \remarks The reason that attractor_state_ is protected and not private is
-   * that it is usually required by DynamicalSystem::differentialEquation, which
-   * should be as fast as possible (i.e. to avoid function calls and copying of
-   * vectors).
-   */
-  Eigen::VectorXd attractor_state_;
-
-  /** Which integration method to use. See DynamicalSystem::IntegrationMethod */
-  IntegrationMethod integration_method_;
+  void preallocateMemory(int dim);
 
   /** Members for caching in Runge-Kutta integration. */
   mutable Eigen::VectorXd k1_, k2_, k3_, k4_, input_k2_, input_k3_, input_k4_;
@@ -485,7 +406,7 @@ The constructor DynamicalSystem::DynamicalSystem() immediately converts second
 order systems, such as SpringDamperSystem, into first order systems with an
 expanded state.
 
-The function DynamicalSystem::dim() returns the size of the entire state vector
+The function DynamicalSystem::dim_ returns the size of the entire state vector
 \f$ \mathbf{x} = [y~z]\f$, the function DynamicalSystem::dim_orig() return the
 size of only the \f$ y \f$ component. The attractor and initial stateof the
 dynamical system must always have the size returned by

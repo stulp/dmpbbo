@@ -19,6 +19,9 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -26,10 +29,12 @@
 #include <string>
 
 #include "dmp/Dmp.hpp"
+#include "eigenutils/eigen_realtime_check.hpp"
 
 using namespace std;
-using namespace DmpBbo;
+using namespace Eigen;
 using namespace nlohmann;
+using namespace DmpBbo;
 
 int main(int n_args, char** args)
 {
@@ -44,6 +49,29 @@ int main(int n_args, char** args)
 
   Dmp* dmp = j.get<Dmp*>();
   cout << *dmp << endl;
+
+  VectorXd x(dmp->dim(), 1);
+  VectorXd x_updated(dmp->dim(), 1);
+  VectorXd xd(dmp->dim(), 1);
+
+  double dt = 0.01;
+  for (string integration_method : {"Euler", "Runge-Kutta", "Default"}) {
+    cout << "========================================================" << endl;
+    cout << "========================================================" << endl;
+    cout << "Integrating with: " << integration_method << endl;
+    dmp->integrateStart(x, xd);
+
+    ENTERING_REAL_TIME_CRITICAL_CODE
+    if (integration_method == "Euler") {
+      for (int t = 0; t < 3; t++) dmp->integrateStepEuler(dt, x, x_updated, xd);
+    } else if (integration_method == "Runge-Kutta") {
+      for (int t = 0; t < 3; t++)
+        dmp->integrateStepRungeKutta(dt, x, x_updated, xd);
+    } else {
+      for (int t = 0; t < 3; t++) dmp->integrateStep(dt, x, x_updated, xd);
+    }
+    EXITING_REAL_TIME_CRITICAL_CODE
+  }
 
   return 0;
 }

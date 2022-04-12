@@ -38,13 +38,10 @@ using namespace Eigen;
 namespace DmpBbo {
 
 TimeSystem::TimeSystem(double tau, bool count_down)
-    : DynamicalSystem(1, tau, VectorXd::Zero(1), VectorXd::Ones(1)),
+    //                         Count-down goes from 1 to 0, so start at 1.0
+    : DynamicalSystem(1, tau, (count_down ? 1.0 : 0.0) * VectorXd::Ones(1)),
       count_down_(count_down)
 {
-  if (count_down_) {
-    set_initial_state(VectorXd::Ones(1));
-    set_attractor_state(VectorXd::Zero(1));
-  }
 }
 
 TimeSystem::~TimeSystem(void) {}
@@ -72,19 +69,20 @@ void TimeSystem::differentialEquation(
 void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
                                     MatrixXd& xds) const
 {
-  int T = ts.size();
-  assert(T > 0);
+  int n_time_steps = ts.size();
 
-  // Usually, we expect xs and xds to be of size T X dim(), so we resize to
-  // that. However, if the input matrices were of size dim() X T, we return the
-  // matrices of that size by doing a transposeInPlace at the end. That way, the
-  // user can also request dim() X T sized matrices.
-  bool caller_expects_transposed = (xs.rows() == dim() && xs.cols() == T);
+  // Usually, we expect xs and xds to be of size n_time_steps X dim(), so we
+  // resize to that. However, if the input matrices were of size dim() X
+  // n_time_steps, we return the matrices of that size by doing a
+  // transposeInPlace at the end. That way, the user can also request dim() X
+  // n_time_steps sized matrices.
+  bool caller_expects_transposed =
+      (xs.rows() == dim() && xs.cols() == n_time_steps);
 
   // Prepare output arguments to be of right size (Eigen does nothing if already
   // the right size)
-  xs.resize(T, dim());
-  xds.resize(T, dim());
+  xs.resize(n_time_steps, dim());
+  xds.resize(n_time_steps, dim());
 
   // Find first index at which the time is larger than tau. Then velocities
   // should be set to zero.

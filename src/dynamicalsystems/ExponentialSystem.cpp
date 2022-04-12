@@ -23,12 +23,8 @@
 
 #include "dynamicalsystems/ExponentialSystem.hpp"
 
-#include <cmath>
 #include <eigen3/Eigen/Core>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <sstream>
-#include <vector>
 
 #include "eigenutils/eigen_json.hpp"
 #include "eigenutils/eigen_realtime_check.hpp"
@@ -38,11 +34,10 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd y_init,
-                                     Eigen::VectorXd y_attr, double alpha)
-    : DynamicalSystem(1, tau, y_init, y_attr), alpha_(alpha)
+ExponentialSystem::ExponentialSystem(double tau, Eigen::VectorXd x_init,
+                                     Eigen::VectorXd x_attr, double alpha)
+    : DynamicalSystem(1, tau, x_init), x_attr_(x_attr), alpha_(alpha)
 {
-  attractor_state_prealloc_ = VectorXd::Zero(dim_orig());
 }
 
 ExponentialSystem::~ExponentialSystem(void) {}
@@ -52,43 +47,39 @@ void ExponentialSystem::differentialEquation(
     Eigen::Ref<Eigen::VectorXd> xd) const
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
-  // xd = alpha_*(attractor_state()-x)/tau(); // Non-realtime version now
-  // commented out
-
-  attractor_state(attractor_state_prealloc_);
-  xd.noalias() = alpha_ * (attractor_state_prealloc_ - x) / tau();
-
+  xd.noalias() = alpha_ * (x_attr_ - x) / tau();
   EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
                                            MatrixXd& xds) const
 {
-  int T = ts.size();
-  assert(T > 0);
+  int n_time_steps = ts.size();
 
-  // Usually, we expect xs and xds to be of size T X dim(), so we resize to
-  // that. However, if the input matrices were of size dim() X T, we return the
-  // matrices of that size by doing a transposeInPlace at the end. That way, the
-  // user can also request dim() X T sized matrices.
-  bool caller_expects_transposed = (xs.rows() == dim() && xs.cols() == T);
+  // Usually, we expect xs and xds to be of size n_time_steps X dim(), so we
+  // resize to that. However, if the input matrices were of size dim() X
+  // n_time_steps, we return the matrices of that size by doing a
+  // transposeInPlace at the end. That way, the user can also request dim() X
+  // n_time_steps sized matrices.
+  bool caller_expects_transposed =
+      (xs.rows() == dim() && xs.cols() == n_time_steps);
 
   // Prepare output arguments to be of right size (Eigen does nothing if already
   // the right size)
-  xs.resize(T, dim());
-  xds.resize(T, dim());
+  xs.resize(n_time_steps, dim());
+  xds.resize(n_time_steps, dim());
 
-  VectorXd val_range = initial_state() - attractor_state();
+  VectorXd val_range = x_init() - x_attr_;
 
   VectorXd exp_term = -alpha_ * ts / tau();
   exp_term = exp_term.array().exp().transpose();
   VectorXd pos_scale = exp_term;
   VectorXd vel_scale = -(alpha_ / tau()) * exp_term;
 
-  xs = val_range.transpose().replicate(T, 1).array() *
+  xs = val_range.transpose().replicate(n_time_steps, 1).array() *
        pos_scale.replicate(1, dim()).array();
-  xs += attractor_state().transpose().replicate(T, 1);
-  xds = val_range.transpose().replicate(T, 1).array() *
+  xs += x_attr_.transpose().replicate(n_time_steps, 1);
+  xds = val_range.transpose().replicate(n_time_steps, 1).array() *
         vel_scale.replicate(1, dim()).array();
 
   if (caller_expects_transposed) {
@@ -111,6 +102,7 @@ void ExponentialSystem::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
   j["alpha_"] = alpha_;
+  j["attractor_state_"] = x_attr_;
 
   string c("ExponentialSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

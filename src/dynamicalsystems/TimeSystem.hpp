@@ -24,6 +24,9 @@
 #ifndef _TIME_SYSTEM_H_
 #define _TIME_SYSTEM_H_
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -95,6 +98,10 @@ class TimeSystem : public DynamicalSystem {
    */
   void to_json_helper(nlohmann::json& j) const;
 
+  /** Whether to count down
+   * If it is true state goes from 1 -> 0
+   *                          else 0 -> 1
+   */
   bool count_down_;
 };
 

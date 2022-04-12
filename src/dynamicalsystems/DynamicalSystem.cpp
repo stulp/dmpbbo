@@ -23,9 +23,7 @@
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
 
-#include <cmath>
 #include <eigen3/Eigen/Core>
-#include <iostream>
 #include <nlohmann/json.hpp>
 
 #include "dynamicalsystems/ExponentialSystem.hpp"
@@ -33,6 +31,7 @@
 #include "dynamicalsystems/SpringDamperSystem.hpp"
 #include "dynamicalsystems/TimeSystem.hpp"
 #include "eigenutils/eigen_json.hpp"
+#include "eigenutils/eigen_realtime_check.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -40,31 +39,72 @@ using namespace Eigen;
 namespace DmpBbo {
 
 DynamicalSystem::DynamicalSystem(int order, double tau,
-                                 Eigen::VectorXd initial_state,
-                                 Eigen::VectorXd attractor_state)
+                                 Eigen::VectorXd xy_init)
     :  // For 1st order systems, the dimensionality of the state vector 'x' is
        // 'dim' For 2nd order systems, the system is expanded to x = [y z],
        // where 'y' and 'z' are both of dimensionality 'dim'. Therefore dim(x)
        // is 2*dim
-      dim_(initial_state.size() * order),
-      // The dimensionality of the system before a potential rewrite
-      dim_orig_(initial_state.size()),
-      tau_(tau),
-      initial_state_(initial_state),
-      attractor_state_(attractor_state),
-      integration_method_(RUNGE_KUTTA)
+      dim_(xy_init.size() * order),
+      tau_(tau)
 {
   assert(order == 1 || order == 2);
-  assert(initial_state.size() == attractor_state.size());
+
+  if (order == 1) {
+    x_init_ = xy_init;
+  } else {  // order = 2
+    // 2nd order: expand the state, and fill it with zeros.
+    x_init_ = VectorXd::Zero(dim_);
+    x_init_.segment(0, xy_init.size()) = xy_init;
+  }
+
+  preallocateMemory(dim_);
+}
+
+DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims)
+    :  // For 1st order systems, the dimensionality of the state vector 'x' is
+       // 'dim' For 2nd order systems, the system is expanded to x = [y z],
+       // where 'y' and 'z' are both of dimensionality 'dim'. Therefore dim(x)
+       // is 2*dim
+      dim_(n_dims),
+      tau_(tau)
+{
+  x_init_ = VectorXd::Zero(dim_);
+  x_init_.segment(0, y_init.size()) = y_init;
+  preallocateMemory(dim_);
+}
+
+void DynamicalSystem::preallocateMemory(int dim)
+{
+  // Pre-allocate memory for Runge-Kutta integration
+  k1_ = VectorXd(dim);
+  k2_ = VectorXd(dim);
+  k3_ = VectorXd(dim);
+  k4_ = VectorXd(dim);
+
+  input_k2_ = VectorXd(dim);
+  input_k3_ = VectorXd(dim);
+  input_k4_ = VectorXd(dim);
 }
 
 DynamicalSystem::~DynamicalSystem(void) {}
 
-void DynamicalSystem::integrateStart(const Eigen::VectorXd& x_init,
+void DynamicalSystem::set_x_init(const Eigen::VectorXd& xy_init)
+{
+  if (xy_init.size() == dim_) {
+    // Standard 1st order system
+    x_init_ = xy_init;
+  } else {
+    // All other cases: pad with zeros
+    x_init_.fill(0.0);
+    x_init_.segment(0, xy_init.size()) = xy_init;
+  }
+}
+
+void DynamicalSystem::integrateStart(const Eigen::VectorXd& xy_init,
                                      Eigen::Ref<Eigen::VectorXd> x,
                                      Eigen::Ref<Eigen::VectorXd> xd)
 {
-  set_initial_state(x_init);
+  set_x_init(xy_init);
   integrateStart(x, xd);
 }
 
@@ -73,52 +113,24 @@ void DynamicalSystem::integrateStart(Eigen::Ref<Eigen::VectorXd> x,
 {
   // Check size. Leads to faster numerical integration and makes Eigen::Ref
   // easier to deal with
-  assert(x.size() == dim());
-  assert(xd.size() == dim());
+  assert(x.size() == dim_);
+  assert(xd.size() == dim_);
 
-  // Return value for state variables
-  // Pad the end with zeros: Why? In the spring-damper system, the state
-  // consists of x = [y z]. The initial state only applies to y. Therefore, we
-  // set x = [y 0];
-  x.fill(0);
-  x.segment(0, initial_state_.size()) = initial_state_;
-
-  // Pre-allocate memory for Runge-Kutta integration
-  int l = x.size();
-  k1_ = VectorXd(l);
-  k2_ = VectorXd(l);
-  k3_ = VectorXd(l);
-  k4_ = VectorXd(l);
-  input_k2_ = VectorXd(l);
-  input_k3_ = VectorXd(l);
-  input_k4_ = VectorXd(l);
-
-  // Return value (rates of change)
+  x = x_init_;
   differentialEquation(x, xd);
-}
-
-void DynamicalSystem::integrateStep(
-    double dt, const Eigen::Ref<const Eigen::VectorXd> x,
-    Eigen::Ref<Eigen::VectorXd> x_updated,
-    Eigen::Ref<Eigen::VectorXd> xd_updated) const
-{
-  assert(dt > 0.0);
-  // Check size. Leads to faster numerical integration and makes Eigen::Ref
-  // easier to deal with
-  assert(x.size() == dim());
-  if (integration_method_ == RUNGE_KUTTA)
-    integrateStepRungeKutta(dt, x, x_updated, xd_updated);
-  else
-    integrateStepEuler(dt, x, x_updated, xd_updated);
 }
 
 void DynamicalSystem::integrateStepEuler(double dt, const Ref<const VectorXd> x,
                                          Ref<VectorXd> x_updated,
                                          Ref<VectorXd> xd_updated) const
 {
-  // simple Euler integration
+  assert(dt > 0.0);
+  assert(x.size() == dim_);
+
+  ENTERING_REAL_TIME_CRITICAL_CODE
   differentialEquation(x, xd_updated);
-  x_updated = x + dt * xd_updated;
+  x_updated = x + dt * xd_updated;  // Euler integration
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void DynamicalSystem::integrateStepRungeKutta(double dt,
@@ -126,11 +138,16 @@ void DynamicalSystem::integrateStepRungeKutta(double dt,
                                               Ref<VectorXd> x_updated,
                                               Ref<VectorXd> xd_updated) const
 {
+  assert(dt > 0.0);
+  assert(x.size() == dim_);
+
+  ENTERING_REAL_TIME_CRITICAL_CODE
+
   // 4th order Runge-Kutta for a 1st order system
   // http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
   differentialEquation(x, k1_);
   input_k2_ = x + dt * 0.5 * k1_;
-  differentialEquation(x + dt * 0.5 * k1_, k2_);
+  differentialEquation(input_k2_, k2_);
   input_k3_ = x + dt * 0.5 * k2_;
   differentialEquation(input_k3_, k3_);
   input_k4_ = x + dt * k3_;
@@ -138,6 +155,8 @@ void DynamicalSystem::integrateStepRungeKutta(double dt,
 
   x_updated = x + dt * (k1_ + 2.0 * (k2_ + k3_) + k4_) / 6.0;
   differentialEquation(x_updated, xd_updated);
+
+  EXITING_REAL_TIME_CRITICAL_CODE
 }
 
 void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
@@ -166,13 +185,8 @@ void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
 void DynamicalSystem::to_json_base(nlohmann::json& j) const
 {
   j["dim_"] = dim_;
-  j["dim_orig_"] = dim_orig_;
   j["tau_"] = tau_;
-  j["initial_state_"] = initial_state_;
-  j["attractor_state_"] = attractor_state_;
-  // Avoiding NLOHMANN_JSON_SERIALIZE_ENUM
-  j["integration_method_"] =
-      (integration_method_ == EULER) ? "EULER" : "RUNGE_KUTTA";
+  j["initial_state_"] = x_init_;
 
   string c("DynamicalSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

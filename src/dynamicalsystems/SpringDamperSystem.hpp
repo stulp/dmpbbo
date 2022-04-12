@@ -24,6 +24,9 @@
 #ifndef _SPRING_DAMPER_SYSTEM_H_
 #define _SPRING_DAMPER_SYSTEM_H_
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -48,8 +51,8 @@ class SpringDamperSystem : public DynamicalSystem {
    *  Initialization constructor.
    *  \param tau     Time constant,            cf. DynamicalSystem::tau()
    *  \param y_init  Initial state,            cf.
-   * DynamicalSystem::initial_state() \param y_attr  Attractor state, cf.
-   * DynamicalSystem::attractor_state() \param spring_constant  Spring constant,
+   * DynamicalSystem::x_init() \param y_attr  Attractor state, cf.
+   * DynamicalSystem::y_attr() \param spring_constant  Spring constant,
    * cf. SpringDamperSystem::spring_constant() \param damping_coefficient
    * Damping coefficient, cf. SpringDamperSystem::damping_coefficient() \param
    * mass    Mass,                     cf. SpringDamperSystem::mass()
@@ -110,6 +113,40 @@ class SpringDamperSystem : public DynamicalSystem {
    */
   inline void set_mass(double mass) { mass_ = mass; }
 
+  /**
+   * Accessor function for the initial state of the dynamical system.
+   * \param[out] y_init Initial state of the dynamical system.
+   */
+  inline void get_y_init(Eigen::VectorXd& y_init) const
+  {
+    // x = [y z], return only y part
+    y_init = x_init().segment(0, dim() / 2);
+  }
+
+  /** Mutator function for the initial state of the dynamical system.
+   *  \param[in] y_init Initial state of the dynamical system.
+   */
+  inline void set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init)
+  {
+    set_x_init(y_init);
+  }
+
+  /**
+   * Accessor function for the attractor state of the dynamical system.
+   * \param[out] y_attr Attractor state of the dynamical system.
+   */
+  inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = y_attr_; }
+
+  /** Mutator function for the attractor state of the dynamical system.
+   *  \param[in] y_attr Attractor state of the dynamical system.
+   */
+  inline void set_y_attr(const Eigen::Ref<const Eigen::VectorXd>& y_attr)
+  {
+    // Order 2 system: attractor state is half the size of state dimensionality
+    assert(y_attr.size() == dim() / 2);
+    y_attr_ = y_attr;
+  }
+
   /** Read an object from json.
    *  \param[in]  j   json input
    *  \param[out] obj The object read from json
@@ -142,6 +179,9 @@ class SpringDamperSystem : public DynamicalSystem {
    */
   void to_json_helper(nlohmann::json& j) const;
 
+  /** The attractor state of the system, to which the system will converge. */
+  Eigen::VectorXd y_attr_;
+
   /** Damping coefficient 'c' */
   double damping_coefficient_;
 
@@ -153,7 +193,7 @@ class SpringDamperSystem : public DynamicalSystem {
 
   /** Pre-allocated memory to avoid allocating it during run-time. To enable
    * real-time execution of the differentialEquation() function. */
-  mutable Eigen::VectorXd y_, z_, yd_, zd_, y_attr_;
+  mutable Eigen::VectorXd y_, z_, yd_, zd_;
 };
 
 }  // namespace DmpBbo

@@ -24,7 +24,9 @@
 #ifndef _EXPONENTIAL_SYSTEM_H_
 #define _EXPONENTIAL_SYSTEM_H_
 
-#include <iosfwd>
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <nlohmann/json_fwd.hpp>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -45,11 +47,11 @@ class ExponentialSystem : public DynamicalSystem {
   /**
    *  Initialization constructor.
    *  \param tau     Time constant, cf. DynamicalSystem::tau()
-   *  \param y_init  Initial state, cf. DynamicalSystem::initial_state()
-   *  \param y_attr  Attractor state, cf. DynamicalSystem::attractor_state()
+   *  \param x_init  Initial state, cf. DynamicalSystem::x_init()
+   *  \param x_attr  Attractor state, cf. DynamicalSystem::x_attr()
    *  \param alpha   Decay constant, cf. ExponentialSystem::alpha()
    */
-  ExponentialSystem(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
+  ExponentialSystem(double tau, Eigen::VectorXd x_init, Eigen::VectorXd x_attr,
                     double alpha);
 
   /** Destructor. */
@@ -65,6 +67,21 @@ class ExponentialSystem : public DynamicalSystem {
    * \return Decay constant
    */
   double alpha(void) const { return alpha_; }
+
+  /**
+   * Accessor function for the attractor state of the dynamical system.
+   * \param[out] x_attr Attractor state of the dynamical system.
+   */
+  inline void get_x_attr(Eigen::VectorXd& x_attr) const { x_attr = x_attr_; }
+
+  /** Mutator function for the attractor state of the dynamical system.
+   *  \param[in] x_attr Attractor state of the dynamical system.
+   */
+  inline void set_x_attr(const Eigen::Ref<const Eigen::VectorXd>& x_attr)
+  {
+    assert(x_attr.size() == dim());
+    x_attr_ = x_attr;
+  }
 
   /** Read an object from json.
    *  \param[in]  j   json input
@@ -98,12 +115,11 @@ class ExponentialSystem : public DynamicalSystem {
    */
   void to_json_helper(nlohmann::json& j) const;
 
+  /** The attractor state of the system, to which the system will converge. */
+  Eigen::VectorXd x_attr_;
+
   /** Decay constant */
   double alpha_;
-
-  /** Preallocated memory to make ExponentialSystem::differentialEquation()
-   * realtime. */
-  mutable Eigen::VectorXd attractor_state_prealloc_;
 };
 
 }  // namespace DmpBbo

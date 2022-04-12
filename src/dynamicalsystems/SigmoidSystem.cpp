@@ -23,11 +23,8 @@
 
 #include "dynamicalsystems/SigmoidSystem.hpp"
 
-#include <cmath>
 #include <eigen3/Eigen/Core>
-#include <iostream>
 #include <nlohmann/json.hpp>
-#include <vector>
 
 #include "eigenutils/eigen_json.hpp"
 #include "eigenutils/eigen_realtime_check.hpp"
@@ -39,12 +36,11 @@ namespace DmpBbo {
 
 SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init,
                              double max_rate, double inflection_point_time)
-    : DynamicalSystem(1, tau, x_init, VectorXd::Zero(x_init.size())),
+    : DynamicalSystem(1, tau, x_init),
       max_rate_(max_rate),
       inflection_point_time_(inflection_point_time)
 {
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_,
-                                 inflection_point_time_);
+  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time_);
 }
 
 SigmoidSystem::~SigmoidSystem(void) {}
@@ -57,16 +53,14 @@ void SigmoidSystem::set_tau(double new_tau)
 
   inflection_point_time_ =
       new_tau * inflection_point_time_ / prev_tau;  // todo document this
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_,
-                                 inflection_point_time_);
+  Ks_ = SigmoidSystem::computeKs(x_init(), max_rate_, inflection_point_time_);
 }
 
-void SigmoidSystem::set_initial_state(const VectorXd& y_init)
+void SigmoidSystem::set_x_init(const VectorXd& x_init)
 {
-  assert(y_init.size() == dim_orig());
-  DynamicalSystem::set_initial_state(y_init);
-  Ks_ = SigmoidSystem::computeKs(initial_state(), max_rate_,
-                                 inflection_point_time_);
+  assert(x_init.size() == dim());
+  DynamicalSystem::set_x_init(x_init);
+  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time_);
 }
 
 VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r,
@@ -132,33 +126,34 @@ void SigmoidSystem::differentialEquation(
 void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
                                        MatrixXd& xds) const
 {
-  int T = ts.size();
-  assert(T > 0);
+  int n_time_steps = ts.size();
 
-  // Usually, we expect xs and xds to be of size T X dim(), so we resize to
-  // that. However, if the input matrices were of size dim() X T, we return the
-  // matrices of that size by doing a transposeInPlace at the end. That way, the
-  // user can also request dim() X T sized matrices.
-  bool caller_expects_transposed = (xs.rows() == dim() && xs.cols() == T);
+  // Usually, we expect xs and xds to be of size n_time_steps X dim(), so we
+  // resize to that. However, if the input matrices were of size dim() X
+  // n_time_steps, we return the matrices of that size by doing a
+  // transposeInPlace at the end. That way, the user can also request dim() X
+  // n_time_steps sized matrices.
+  bool caller_expects_transposed =
+      (xs.rows() == dim() && xs.cols() == n_time_steps);
 
   // Prepare output arguments to be of right size (Eigen does nothing if already
   // the right size)
-  xs.resize(T, dim());
-  xds.resize(T, dim());
+  xs.resize(n_time_steps, dim());
+  xds.resize(n_time_steps, dim());
 
   // Auxillary variables to improve legibility
   double r = max_rate_;
   VectorXd exp_rt = (-r * ts).array().exp();
 
-  VectorXd y_init = initial_state();
+  VectorXd y_init = x_init();
 
   for (int dd = 0; dd < dim(); dd++) {
     // Auxillary variables to improve legibility
     double K = Ks_[dd];
     double b = (K / y_init[dd]) - 1;
 
-    xs.block(0, dd, T, 1) = K / (1 + b * exp_rt.array());
-    xds.block(0, dd, T, 1) =
+    xs.block(0, dd, n_time_steps, 1) = K / (1 + b * exp_rt.array());
+    xds.block(0, dd, n_time_steps, 1) =
         K * r * b * ((1 + b * exp_rt.array()).square().inverse().array()) *
         exp_rt.array();
   }

@@ -19,10 +19,12 @@
  * along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
+
+#include <eigen3/Eigen/Core>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
-#include <set>
 #include <string>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
@@ -63,14 +65,20 @@ int main(int n_args, char** args)
     VectorXd xd(d->dim(), 1);
 
     double dt = 0.01;
-    using IM = typename DynamicalSystem::IntegrationMethod;
-    for (IM integration : {IM::EULER, IM::RUNGE_KUTTA}) {
-      d->set_integration_method(integration);
+    for (string integration_method : {"Euler", "Runge-Kutta", "Default"}) {
+      cout << "===============" << endl;
+      cout << "Integrating with: " << integration_method << endl;
       d->integrateStart(x, xd);
+
       ENTERING_REAL_TIME_CRITICAL_CODE
-      for (int t = 1; t < 10; t++) {
-        d->integrateStep(dt, x, x_updated, xd);
-        // x = x_updated;
+      if (integration_method == "Euler") {
+        for (int t = 1; t < 10; t++)
+          d->integrateStepEuler(dt, x, x_updated, xd);
+      } else if (integration_method == "Runge-Kutta") {
+        for (int t = 1; t < 10; t++)
+          d->integrateStepRungeKutta(dt, x, x_updated, xd);
+      } else {
+        for (int t = 1; t < 10; t++) d->integrateStep(dt, x, x_updated, xd);
       }
       EXITING_REAL_TIME_CRITICAL_CODE
     }
