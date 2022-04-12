@@ -104,11 +104,13 @@ void from_json(const nlohmann::json& j, FunctionApproximatorRBFN*& obj)
 
 void FunctionApproximatorRBFN::to_json_helper(nlohmann::json& j) const
 {
-  j["centers_"] = centers_;
-  j["widths_"] = widths_;
-  j["weights_"] = weights_;
-  j["py/object"] =
-      "dynamicalsystems.FunctionApproximatorRBFN.FunctionApproximatorRBFN";  // for jsonpickle
+  // The "_model_params" and "values" are necessary for compatibility 
+  // of jsonpickle in python.
+  j["_model_params"]["centers"]["values"] = centers_;
+  j["_model_params"]["widths"]["values"] = widths_;
+  j["_model_params"]["weights"]["values"] = weights_;
+  string c("FunctionApproximatorRBFN");
+  j["py/object"] = "functionapproximators." + c + "." + c;  // for jsonpickle
 }
 
 }  // namespace DmpBbo
