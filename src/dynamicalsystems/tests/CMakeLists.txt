@@ -1,3 +1,2 @@
-add_executable(testJsonDynamicalSystems testJsonDynamicalSystems.cpp)
-target_link_libraries(testJsonDynamicalSystems dynamicalsystems ${Boost_LIBRARIES})
-
+add_executable(testDynamicalSystems testDynamicalSystems.cpp)
+target_link_libraries(testDynamicalSystems dynamicalsystems ${Boost_LIBRARIES})
