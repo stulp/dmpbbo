@@ -499,8 +499,7 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
     xds.row(tt).SPRING = xd_spring;
 
     // Add forcing term to the acceleration of the spring state
-    xds.row(tt).SPRING_Z =
-        xds.row(tt).SPRING_Z + forcing_terms.row(tt) / tau();
+    xds.row(tt).SPRING_Z = xds.row(tt).SPRING_Z + forcing_terms.row(tt) / tau();
     // Compute y component from z
     xds.row(tt).SPRING_Y = xs.row(tt).SPRING_Z / tau();
   }

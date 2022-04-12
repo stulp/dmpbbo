@@ -283,7 +283,7 @@ void from_json(const nlohmann::json& j, FunctionApproximatorLWR*& obj)
 
 void FunctionApproximatorLWR::to_json_helper(nlohmann::json& j) const
 {
-  // The "_model_params" and "values" are necessary for compatibility 
+  // The "_model_params" and "values" are necessary for compatibility
   // of jsonpickle in python.
   j["_model_params"]["centers"]["values"] = centers_;
   j["_model_params"]["widths"]["values"] = widths_;

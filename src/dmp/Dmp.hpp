@@ -310,7 +310,6 @@ class Dmp : public DynamicalSystem {
       const Eigen::Ref<const Eigen::MatrixXd>& phase_state,
       Eigen::MatrixXd& fa_output) const;
 
-
   /** Get a pointer to the function approximator for a certain dimension.
    * \param[in] i_dim Dimension for which to get the function approximator
    * \return Pointer to the function approximator.
@@ -429,7 +428,6 @@ class Dmp : public DynamicalSystem {
 
   void initFunctionApproximators(
       std::vector<FunctionApproximator*> function_approximators);
-
 };
 
 }  // namespace DmpBbo

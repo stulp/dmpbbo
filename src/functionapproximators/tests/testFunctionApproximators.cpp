@@ -26,9 +26,8 @@
 #include <sstream>
 #include <string>
 
-#include "functionapproximators/FunctionApproximator.hpp"
-
 #include "eigenutils/eigen_realtime_check.hpp"
+#include "functionapproximators/FunctionApproximator.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -41,11 +40,12 @@ int main(int n_args, char** args)
 
   for (int n_dims : {1, 2}) {
     for (string fa_name : {"RBFN", "LWR"}) {
-      string filename = directory + fa_name + "_" + to_string(n_dims) + "D.json";
-  
-      cout << "========================================================" << endl;
+      string filename =
+          directory + fa_name + "_" + to_string(n_dims) + "D.json";
+
+      cout << "======================================================" << endl;
       cout << filename << endl;
-  
+
       ifstream file(filename);
       if (file.fail()) {
         cerr << "File not found: " << filename << endl;
@@ -53,24 +53,23 @@ int main(int n_args, char** args)
       }
       json j = json::parse(file);
       cout << j << endl;
-  
+
       cout << "from_json ===============" << endl;
       FunctionApproximator* fa = j.get<FunctionApproximator*>();
-      
+
       cout << "<< ===============" << endl;
       cout << *fa << endl;
-  
+
       cout << "to_json ===============" << endl;
       json j2 = fa;
       cout << j2 << endl;
       FunctionApproximator* fa2 = j2.get<FunctionApproximator*>();
-  
-      
+
       cout << "real-time ===============" << endl;
       // Here, we time the predict function on single inputs, i.e. typical usage
       // in a real-time loop on a robot. We check if memory is allocated with
       // ENTERING_REAL_TIME_CRITICAL_CODE
-      
+
       MatrixXd input = MatrixXd::Ones(1, n_dims);
       MatrixXd output(1, 1);
       ENTERING_REAL_TIME_CRITICAL_CODE
@@ -79,8 +78,8 @@ int main(int n_args, char** args)
         fa2->predict(input, output);
       }
       EXITING_REAL_TIME_CRITICAL_CODE
-      
-     delete fa;
+
+      delete fa;
     }
   }
 
