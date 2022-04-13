@@ -24,8 +24,8 @@
 /** \ingroup FunctionApproximators
  */
 
-#ifndef _BASISFUNCTION_H_
-#define _BASISFUNCTION_H_
+#ifndef _BASIS_FUNCTION_H_
+#define _BASIS_FUNCTION_H_
 
 #define EIGEN_RUNTIME_NO_MALLOC  // Enable runtime tests for allocations
 

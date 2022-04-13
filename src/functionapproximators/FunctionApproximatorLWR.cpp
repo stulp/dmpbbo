@@ -41,15 +41,13 @@ namespace DmpBbo {
 FunctionApproximatorLWR::FunctionApproximatorLWR(
     const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths,
     const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets,
-    bool asymmetric_kernels, bool lines_pivot_at_max_activation)
+    bool asymmetric_kernels)
     : n_basis_functions_(centers.rows()),
       centers_(centers),
       widths_(widths),
       slopes_(slopes),
       offsets_(offsets),
-      asymmetric_kernels_(asymmetric_kernels),
-      lines_pivot_at_max_activation_(lines_pivot_at_max_activation),
-      slopes_as_angles_(false)
+      asymmetric_kernels_(asymmetric_kernels)
 {
 #ifndef NDEBUG  // Variables below are only required for asserts; check for
                 // NDEBUG to avoid warnings.
@@ -109,6 +107,8 @@ void FunctionApproximatorLWR::predict(
   }
 }
 
+
+/*
 void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(
     bool lines_pivot_at_max_activation)
 {
@@ -151,48 +151,6 @@ void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(
 
   lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
 }
-
-void FunctionApproximatorLWR::set_slopes_as_angles(bool slopes_as_angles)
-{
-  slopes_as_angles_ = slopes_as_angles;
-  cerr << __FILE__ << ":" << __LINE__ << ":";
-  cerr << "Not implemented yet!!!" << endl;
-  slopes_as_angles_ = false;
-}
-
-/*
-The code below was previously implemted as follows. Below is the real-time
-version.
-
-
-void FunctionApproximatorLWR::getLines(const Eigen::Ref<const Eigen::MatrixXd>&
-inputs, MatrixXd& lines) const
-{
-  int n_time_steps = inputs.rows();
-
-  //cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  //cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  //cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-  //cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
-
-  // Compute values along lines for each time step
-  // Line representation is "y = ax + b"
-  lines = inputs*slopes_.transpose() +
-offsets_.transpose().replicate(n_time_steps,1);
-
-  if (lines_pivot_at_max_activation_)
-  {
-    // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
-    // Therefore, we still have to subtract "ac"
-    int n_lines = centers_.rows();
-    VectorXd ac(n_lines); // slopes*centers  = ac
-    for (int i_line=0; i_line<n_lines; i_line++)
-      ac[i_line] = slopes_.row(i_line) * centers_.row(i_line).transpose();
-    //cout << "ac = " << ac.rows() << "X" << ac.cols() << endl;
-    lines = lines - ac.transpose().replicate(n_time_steps,1);
-  }
-  //cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
-}
 */
 
 void FunctionApproximatorLWR::getLines(
@@ -200,30 +158,23 @@ void FunctionApproximatorLWR::getLines(
 {
   ENTERING_REAL_TIME_CRITICAL_CODE
 
-  // cout  << endl << "========================" << endl;
-  // cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
-  // cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  // cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  // cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-  // cout << "inputs = " << inputs.rows() << "X" << inputs.cols() << endl;
-
   int n_time_steps = inputs.rows();
   int n_lines = centers_.rows();
   lines.resize(n_time_steps, n_lines);
-  // cout << "lines = " << lines.rows() << "X" << lines.cols() << endl;
 
   // Compute values along lines for each time step
   // Line representation is "y = ax + b"
   for (int i_line = 0; i_line < n_lines; i_line++) {
     lines.col(i_line).noalias() = inputs * slopes_.row(i_line).transpose();
     lines.col(i_line).array() += offsets_(i_line);
-
+    /*
     if (lines_pivot_at_max_activation_) {
       // Line representation is "y = a(x-c) + b", which is  "y = ax - ac + b"
       // Therefore, we still have to subtract "ac"
       double ac = slopes_.row(i_line).dot(centers_.row(i_line));
       lines.col(i_line).array() -= ac;
     }
+    */
   }
 
   EXITING_REAL_TIME_CRITICAL_CODE

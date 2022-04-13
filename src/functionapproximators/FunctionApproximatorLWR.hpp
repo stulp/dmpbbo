@@ -55,8 +55,7 @@ class FunctionApproximatorLWR : public FunctionApproximator {
                           const Eigen::MatrixXd& widths,
                           const Eigen::MatrixXd& slopes,
                           const Eigen::MatrixXd& offsets,
-                          bool asymmetric_kernels = false,
-                          bool lines_pivot_at_max_activation = false);
+                          bool asymmetric_kernels = false);
 
   /** Query the function approximator to make a prediction
    *  \param[in]  inputs   Input values of the query
@@ -122,8 +121,6 @@ class FunctionApproximatorLWR : public FunctionApproximator {
   Eigen::VectorXd offsets_;  // n_centers X 1
 
   bool asymmetric_kernels_;
-  bool lines_pivot_at_max_activation_;
-  bool slopes_as_angles_;
 
   /** Preallocated memory for one time step, required to make the predict()
    * function real-time. */
