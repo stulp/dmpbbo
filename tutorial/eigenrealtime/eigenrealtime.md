@@ -4,6 +4,8 @@ Having C++ code running on robots means the code should be written to meet real-
 
 [Eigen](http://eigen.tuxfamily.org) is a highly optimized matrix library. For many operations Eigen must (dynamically) allocate temporary memory. So using Eigen in the context of real-time code means understanding when it is allocating memory "under the hood", and avoiding those situations.
 
+Note that the problems/solutions described on this page arise especially when using dynamically sized matrices. For fixed size matrices, the compiler can avoid the issues below.
+
 ## Finding and resolving dynamic memory allocations in Eigen
 
 ### When does Eigen allocate memory?
@@ -61,7 +63,7 @@ a += tmp
 ```
 These expression are then turned into a bunch of for loops that loop over the individual entries of the matrices. 
     
-Eigen has a way to determine whether it is necessary, or more efficient to use intermediate temporary matrices. For instance, it will use a tmp, and thus dynamically allocated memory, ["when its cost model shows that the total cost of an operation is reduced if a sub-expression gets evaluated into a temporary"](http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html). So knowing exactly when Eigen will allocated memory requires you to understand the cost function (good luck!), or determine it empirically with EIGEN_RUNTIME_NO_MALLOC (see below).   
+Eigen has a way to determine whether it is necessary, or more efficient to use intermediate temporary matrices. For instance, it will use a tmp, and thus dynamically allocated memory, ["when its cost model shows that the total cost of an operation is reduced if a sub-expression gets evaluated into a temporary"](http://eigen.tuxfamily.org/dox/TopicLazyEvaluation.html). So knowing exactly when Eigen will allocate memory requires you to understand the cost function (good luck!), or determine it empirically with EIGEN_RUNTIME_NO_MALLOC (see below).   
   
 ### How can I find where exactly Eigen allocates memory during run-time?
 
@@ -208,9 +210,6 @@ To automate things and avoid having to write Eigen::internal::set_is_malloc_allo
 ```c++
 #ifdef REALTIME_CHECKS
 
-// If REALTIME_CHECKS is defined, we want to check for dynamic memory allocation.
-// Make Eigen check for dynamic memory allocation
-#define EIGEN_RUNTIME_NO_MALLOC
 // We define ENTERING_REAL_TIME_CRITICAL_CODE and EXITING_REAL_TIME_CRITICAL_CODE to start/stop
 // checking dynamic memory allocation
 #define ENTERING_REAL_TIME_CRITICAL_CODE Eigen::internal::set_is_malloc_allowed(false);
@@ -241,14 +240,18 @@ If I want to check Eigen's dynamic memory allocations, I compile as follows:
 g++ -DREALTIME_CHECKS -ggdb realtime.cpp -o realtime.cpp
 ```
 
+As mentioned before, make sure to do the following before including Eigen header files
+```c++
+#define EIGEN_RUNTIME_NO_MALLOC
+```
+otherwise `Eigen::internal::set_is_malloc_allowed(bool)` will not be defines.
+
 ## Bottom line
 
 Eigen is a great library, which make C++ code for linear algebra look almost as compact as Matlab/octave. But...  when using Eigen in a real-time context, explicitly avoiding dynamic memory allocation requires great care, and can make the code real ugly and obfuscated. 
 
 ## Downloading cpp/hpp files
 
-You can download the demo cpp/hpp files, as well as a Makefile here: https://github.com/stulp/dmpbbo/tree/master/docs/eigenrealtime
+You can download the demo cpp/hpp files, as well as a Makefile here: https://github.com/stulp/dmpbbo/tree/master/tutorial/eigenrealtime
 
-
-TODO: Of course, simpler solution, if possible: use fixed size matrices.
 
