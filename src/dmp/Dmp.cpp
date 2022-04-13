@@ -270,29 +270,6 @@ void Dmp::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const
   differentialEquation(x, xd);
 }
 
-void Dmp::computeFunctionApproximatorOutput(
-    const Ref<const MatrixXd>& phase_state, MatrixXd& fa_output) const
-{
-  int n_time_steps = phase_state.rows();
-  if (n_time_steps == 1) {
-    ENTERING_REAL_TIME_CRITICAL_CODE
-    for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
-      function_approximators_[i_dim]->predict(phase_state,
-                                              fa_output_one_prealloc_);
-      fa_output(0, i_dim) = fa_output_one_prealloc_(0, 0);
-    }
-    EXITING_REAL_TIME_CRITICAL_CODE
-
-  } else {
-    fa_output.resize(n_time_steps, dim_dmp_);
-    MatrixXd fa_output_one_dim(n_time_steps, 1);
-    for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
-      function_approximators_[i_dim]->predict(phase_state, fa_output_one_dim);
-      fa_output.col(i_dim) = fa_output_one_dim;
-    }
-  }
-}
-
 void Dmp::differentialEquation(const Eigen::Ref<const Eigen::VectorXd>& x,
                                Eigen::Ref<Eigen::VectorXd> xd) const
 {
@@ -320,9 +297,12 @@ void Dmp::differentialEquation(const Eigen::Ref<const Eigen::VectorXd>& x,
   phase_system_->differentialEquation(x.PHASE, xd.PHASE);
   gating_system_->differentialEquation(x.GATING, xd.GATING);
 
-  // MatrixXd phase_state(1,1);
-  // phase_state = x.PHASE;
-  computeFunctionApproximatorOutput(x.PHASE, fa_output_prealloc_);
+  // Compute output of the funciton approximators
+  for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
+    function_approximators_[i_dim]->predict(x.PHASE,
+                                            fa_output_one_prealloc_);
+    fa_output_prealloc_(0, i_dim) = fa_output_one_prealloc_(0, 0);
+  }
 
   // Gate the output of the function approximators
   int t0 = 0;
@@ -419,8 +399,13 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   // Compute the output of the function approximator
   fa_outputs.resize(ts.size(), dim_dmp_);
   fa_outputs.fill(0.0);
-  computeFunctionApproximatorOutput(xs_phase, fa_outputs);
-
+  
+  MatrixXd fa_output_one_dim(n_time_steps, 1);
+  for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
+    function_approximators_[i_dim]->predict(xs_phase, fa_output_one_dim);
+    fa_outputs.col(i_dim) = fa_output_one_dim;
+  }
+  
   // Gate the output to get the forcing term
   MatrixXd xs_gating_rep = xs_gating.replicate(1, fa_outputs.cols());
   forcing_terms = fa_outputs.array() * xs_gating_rep.array();
@@ -507,62 +492,6 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   }
 }
 
-void Dmp::computeFunctionApproximatorInputsAndTargets(
-    const Trajectory& trajectory, VectorXd& fa_inputs_phase,
-    MatrixXd& f_target) const
-{
-  int n_time_steps = trajectory.length();
-  double dim_data = trajectory.dim();
-
-  if (dim_dmp_ != dim_data) {
-    cerr << "WARNING: Cannot train " << dim_dmp_ << "-D DMP with " << dim_data
-         << "-D data. Doing nothing." << endl;
-    return;
-  }
-
-  // Integrate analytically to get goal, gating and phase states
-  MatrixXd xs_ana;
-  MatrixXd xds_ana;
-
-  analyticalSolution(trajectory.ts(), xs_ana, xds_ana);
-  MatrixXd xs_goal = xs_ana.GOALM(n_time_steps);
-  MatrixXd xs_gating = xs_ana.GATINGM(n_time_steps);
-  MatrixXd xs_phase = xs_ana.PHASEM(n_time_steps);
-
-  fa_inputs_phase = xs_phase;
-
-  // Get parameters from the spring-dampers system to compute inverse
-  double damping_coefficient = spring_system_->damping_coefficient();
-  double spring_constant = spring_system_->spring_constant();
-  double mass = spring_system_->mass();
-  if (mass != 1.0) {
-    cerr << "WARNING: Usually, spring-damper system of the DMP should have "
-            "mass==1, but it is "
-         << mass << endl;
-  }
-
-  // Compute inverse
-  f_target = tau() * tau() * trajectory.ydds() +
-             (spring_constant * (trajectory.ys() - xs_goal) +
-              damping_coefficient * tau() * trajectory.yds()) /
-                 mass;
-
-  // Factor out gating term
-  for (unsigned int dd = 0; dd < function_approximators_.size(); dd++)
-    f_target.col(dd) = f_target.col(dd).array() / xs_gating.array();
-
-  // Factor out scaling
-  if (forcing_term_scaling_ == "G_MINUS_Y0_SCALING") {
-    MatrixXd g_minus_y0_rep =
-        (y_attr_ - y_init()).transpose().replicate(n_time_steps, 1);
-    f_target = f_target.array() / g_minus_y0_rep.array();
-  } else if (forcing_term_scaling_ == "AMPLITUDE_SCALING") {
-    MatrixXd trajectory_amplitudes_rep =
-        trajectory_amplitudes_.transpose().replicate(n_time_steps, 1);
-    f_target = f_target.array() / trajectory_amplitudes_rep.array();
-  }
-}
-
 void Dmp::set_tau(double tau)
 {
   DynamicalSystem::set_tau(tau);
@@ -574,7 +503,7 @@ void Dmp::set_tau(double tau)
   gating_system_->set_tau(tau);
 }
 
-void Dmp::set_y_init(const VectorXd& y_init)
+void Dmp::set_y_init(const Eigen::VectorXd& y_init)
 {
   assert(y_init.size() == dim_dmp_);
   DynamicalSystem::set_x_init(y_init);

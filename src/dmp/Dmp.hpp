@@ -293,26 +293,6 @@ class Dmp : public DynamicalSystem {
    */
   void set_spring_constant(double spring_constant);
 
-  /** Given a trajectory, compute the inputs and targets for the function
-   * approximators. For a standard Dmp (such as the one in this class) the
-   * inputs will be the phase over time, and the targets will be the forcing
-   * term (with the gating function factored out). \param[in] trajectory
-   * Trajectory, e.g. a demonstration. \param[out] fa_inputs_phase The inputs
-   * for the function approximators (phase signal) \param[out] fa_targets The
-   * targets for the function approximators (forcing term)
-   */
-  void computeFunctionApproximatorInputsAndTargets(
-      const Trajectory& trajectory, Eigen::VectorXd& fa_inputs_phase,
-      Eigen::MatrixXd& fa_targets) const;
-
-  /** Compute the outputs of the function approximators.
-   * \param[in] phase_state The phase states for which the outputs are computed.
-   * \param[out] fa_output The outputs of the function approximators.
-   */
-  virtual void computeFunctionApproximatorOutput(
-      const Eigen::Ref<const Eigen::MatrixXd>& phase_state,
-      Eigen::MatrixXd& fa_output) const;
-
   /** Get a pointer to the function approximator for a certain dimension.
    * \param[in] i_dim Dimension for which to get the function approximator
    * \return Pointer to the function approximator.
