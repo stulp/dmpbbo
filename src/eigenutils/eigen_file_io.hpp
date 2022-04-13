@@ -44,9 +44,11 @@ bool loadMatrix(std::string filename,
                 Eigen::Matrix<Scalar, RowsAtCompileTime, ColsAtCompileTime>& m);
 
 /** Save an Eigen matrix to an ASCII file.
- * \param[in] filename Name of the file to which to save the matrix
- * \param[in] matrix The matrix to save to file
- * \param[in] overwrite Whether to overwrite any existing files
+ *
+ * \param[in] filename Name of the file to which to save the matrix.
+ * \param[in] matrix The matrix to save to file.
+ * \param[in] overwrite Whether to overwrite any existing files.
+ *
  * \return true if saving was successful, false otherwise
  * \todo Make matrix const ref
  */
