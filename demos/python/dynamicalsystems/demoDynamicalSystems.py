@@ -140,7 +140,7 @@ if __name__=='__main__':
     dyn_systems.append(SpringDamperSystem(tau, initial_state, attractor_state, alpha))
 
   
-    # INTEGRATE ALL DYNAMICAL SYSTEMS IN THE ARRA
+    # INTEGRATE ALL DYNAMICAL SYSTEMS IN THE ARRAY
     
     # Loop through all systems, and do numerical integration and compute the analytical solution
     figure_number = 1
