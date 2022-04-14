@@ -58,13 +58,25 @@ class FunctionApproximatorLWR : public FunctionApproximator {
                           bool asymmetric_kernels = false);
 
   /** Query the function approximator to make a prediction
-   *  \param[in]  inputs   Input values of the query
-   *  \param[out] outputs  Predicted output values
+   *  \param[in]  inputs   Input values of the query (n_samples X n_input_dims)
+   *  \param[out] outputs  Predicted output values (n_samples X n_output_dims)
    *
-   * This function is realtime if inputs.rows()==1.
+   * This function does one prediction for each row in inputs. This function
+   * is not real-time, due to memory allocation.
    */
   void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs,
                Eigen::MatrixXd& outputs) const;
+
+  /** Query the function approximator to make a prediction.
+   *
+   *  \param[in]  inputs   Input value of the query (1 x n_input_dims)
+   *  \param[out] outputs  Predicted output values (n_output_dims x 1)
+   *
+   * This function is real-time; there will be no memory allocation. In
+   * constrast to predict(), this function make a prediction for one input only.
+   */
+  void predictRealTime(const Eigen::Ref<const Eigen::RowVectorXd>& input,
+                       Eigen::VectorXd& output) const;
 
   /** Set whether the offsets should be adapted so that the line segments pivot
    * around the mode of the basis function, rather than the intersection with
@@ -129,12 +141,6 @@ class FunctionApproximatorLWR : public FunctionApproximator {
   /** Preallocated memory for one time step, required to make the predict()
    * function real-time. */
   mutable Eigen::MatrixXd activations_one_prealloc_;
-
-  /** Preallocated memory to make things more efficient. */
-  mutable Eigen::MatrixXd lines_prealloc_;
-
-  /** Preallocated memory to make things more efficient. */
-  mutable Eigen::MatrixXd activations_prealloc_;
 
   /** Get the output of each linear model (unweighted) for the given inputs.
    * \param[in] inputs The inputs for which to compute the output of the lines

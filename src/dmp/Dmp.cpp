@@ -205,7 +205,7 @@ void Dmp::initSubSystems(double alpha_spring_damper,
 
   // Pre-allocate memory for real-time execution
   y_init_prealloc_ = VectorXd(dim_dmp_);
-  fa_output_one_prealloc_ = MatrixXd(1, 1);
+  fa_output_one_prealloc_ = VectorXd(1);
   fa_output_prealloc_ = MatrixXd(1, dim_dmp_);
   forcing_term_prealloc_ = VectorXd(dim_dmp_);
   g_minus_y0_prealloc_ = VectorXd(dim_dmp_);
@@ -299,8 +299,8 @@ void Dmp::differentialEquation(const Eigen::Ref<const Eigen::VectorXd>& x,
 
   // Compute output of the funciton approximators
   for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
-    function_approximators_[i_dim]->predict(x.PHASE,
-                                            fa_output_one_prealloc_);
+    function_approximators_[i_dim]->predictRealTime(x.PHASE,
+                                                    fa_output_one_prealloc_);
     fa_output_prealloc_(0, i_dim) = fa_output_one_prealloc_(0, 0);
   }
 
@@ -399,14 +399,14 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   // Compute the output of the function approximator
   fa_outputs.resize(ts.size(), dim_dmp_);
   fa_outputs.fill(0.0);
-  
+
   MatrixXd fa_output_one_dim(n_time_steps, 1);
   for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
     function_approximators_[i_dim]->predict(xs_phase, fa_output_one_dim);
     fa_outputs.col(i_dim) = fa_output_one_dim;
   }
-  
-  // Gate the output to get the forcing term
+
+  // Gate the output to get the forcing ter4m
   MatrixXd xs_gating_rep = xs_gating.replicate(1, fa_outputs.cols());
   forcing_terms = fa_outputs.array() * xs_gating_rep.array();
 

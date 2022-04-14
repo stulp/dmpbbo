@@ -47,13 +47,26 @@ class FunctionApproximator {
   virtual ~FunctionApproximator(void){};
 
   /** Query the function approximator to make a prediction
-   *  \param[in]  inputs   Input values of the query
-   *  \param[out] outputs  Predicted output values
+   *  \param[in]  inputs   Input values of the query (n_samples X n_input_dims)
+   *  \param[out] outputs  Predicted output values (n_samples X n_output_dims)
    *
-   * This function should be realtime if inputs.rows()==1.
+   * This function does one prediction for each row in inputs. This function
+   * is not real-time, due to memory allocation.
    */
   virtual void predict(const Eigen::Ref<const Eigen::MatrixXd>& inputs,
                        Eigen::MatrixXd& outputs) const = 0;
+
+  /** Query the function approximator to make a prediction.
+   *
+   *  \param[in]  inputs   Input value of the query (1 x n_input_dims)
+   *  \param[out] outputs  Predicted output values (n_output_dims x 1)
+   *
+   * This function is real-time; there will be no memory allocation. In
+   * constrast to predict(), this function make a prediction for one input only.
+   */
+  virtual void predictRealTime(
+      const Eigen::Ref<const Eigen::RowVectorXd>& input,
+      Eigen::VectorXd& output) const = 0;
 
   /** Print to output stream.
    *

@@ -54,43 +54,45 @@ FunctionApproximatorRBFN::FunctionApproximatorRBFN(
   activations_one_prealloc_ = MatrixXd(1, n_basis_functions_);
 };
 
+void FunctionApproximatorRBFN::predictRealTime(
+    const Eigen::Ref<const Eigen::RowVectorXd>& input,
+    Eigen::VectorXd& output) const
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+
+  // Get the basis function activations
+  // false, false => normalized_basis_functions, asymmetric_kernels;
+  BasisFunction::Gaussian::activations(centers_, widths_, input,
+                                       activations_one_prealloc_, false, false);
+
+  // Weight the basis function activations
+  for (int b = 0; b < n_basis_functions_; b++)
+    activations_one_prealloc_.col(b).array() *= weights_(b);
+
+  // Sum over weighed basis functions
+  output = activations_one_prealloc_.rowwise().sum();
+
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
 void FunctionApproximatorRBFN::predict(
     const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
+  // The next line is not real-time, as it allocates memory.
   int n_time_steps = inputs.rows();
-  if (n_time_steps == 1)  // Only one sample
-  {
-    ENTERING_REAL_TIME_CRITICAL_CODE
+  MatrixXd activations(n_time_steps, n_basis_functions_);
 
-    // Get the basis function activations
-    // false, false => normalized_basis_functions, asymmetric_kernels;
-    BasisFunction::Gaussian::activations(
-        centers_, widths_, inputs, activations_one_prealloc_, false, false);
+  // Get the basis function activations
+  // false, false => normalized_basis_functions, asymmetric_kernels;
+  BasisFunction::Gaussian::activations(centers_, widths_, inputs, activations,
+                                       false, false);
 
-    // Weight the basis function activations
-    for (int b = 0; b < n_basis_functions_; b++)
-      activations_one_prealloc_.col(b).array() *= weights_(b);
+  // Weight the basis function activations
+  for (int b = 0; b < n_basis_functions_; b++)
+    activations.col(b).array() *= weights_(b);
 
-    // Sum over weighed basis functions
-    outputs = activations_one_prealloc_.rowwise().sum();
-
-    EXITING_REAL_TIME_CRITICAL_CODE
-  } else {
-    // The next line is not be real-time, as it allocates memory.
-    MatrixXd activations(n_time_steps, n_basis_functions_);
-
-    // Get the basis function activations
-    // false, false => normalized_basis_functions, asymmetric_kernels;
-    BasisFunction::Gaussian::activations(centers_, widths_, inputs, activations,
-                                         false, false);
-
-    // Weight the basis function activations
-    for (int b = 0; b < n_basis_functions_; b++)
-      activations.col(b).array() *= weights_(b);
-
-    // Sum over weighed basis functions
-    outputs = activations.rowwise().sum();
-  }
+  // Sum over weighed basis functions
+  outputs = activations.rowwise().sum();
 }
 
 void from_json(const nlohmann::json& j, FunctionApproximatorRBFN*& obj)

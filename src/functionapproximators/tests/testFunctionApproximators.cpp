@@ -40,8 +40,8 @@ int main(int n_args, char** args)
 
   for (int n_dims : {1, 2}) {
     for (string fa_name : {"RBFN", "LWR"}) {
-      string filename =
-          directory + fa_name + "_" + to_string(n_dims) + "D.json";
+      string label = fa_name + "_" + to_string(n_dims) + "D";
+      string filename = directory + label + ".json";
 
       cout << "======================================================" << endl;
       cout << filename << endl;
@@ -54,28 +54,32 @@ int main(int n_args, char** args)
       json j = json::parse(file);
       cout << j << endl;
 
-      cout << "from_json ===============" << endl;
+      cout << "from_json " + label + " ===============" << endl;
       FunctionApproximator* fa = j.get<FunctionApproximator*>();
 
       cout << "<< ===============" << endl;
       cout << *fa << endl;
 
-      cout << "to_json ===============" << endl;
+      cout << "to_json " + label + " ===============" << endl;
       json j2 = fa;
       cout << j2 << endl;
       FunctionApproximator* fa2 = j2.get<FunctionApproximator*>();
 
-      cout << "real-time ===============" << endl;
-      // Here, we time the predict function on single inputs, i.e. typical usage
-      // in a real-time loop on a robot. We check if memory is allocated with
-      // ENTERING_REAL_TIME_CRITICAL_CODE
+      cout << "predict " + label + " ===============" << endl;
 
-      MatrixXd input = MatrixXd::Ones(1, n_dims);
-      MatrixXd output(1, 1);
+      int n_samples = 10;
+      MatrixXd inputs_mat = MatrixXd::Ones(n_samples, n_dims);
+      MatrixXd outputs_mat(n_samples, 1);
+      fa->predict(inputs_mat, outputs_mat);
+      fa2->predict(inputs_mat, outputs_mat);
+
+      cout << "predict real-time " + label + " ===============" << endl;
+      RowVectorXd input_vec = RowVectorXd::Ones(n_dims);
+      VectorXd output_vec(1);
       ENTERING_REAL_TIME_CRITICAL_CODE
       for (int ii = 0; ii < 3; ii++) {
-        fa->predict(input, output);
-        fa2->predict(input, output);
+        fa->predictRealTime(input_vec, output_vec);
+        fa2->predictRealTime(input_vec, output_vec);
       }
       EXITING_REAL_TIME_CRITICAL_CODE
 

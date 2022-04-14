@@ -38,10 +38,11 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-FunctionApproximatorLWR::FunctionApproximatorLWR(
-    const Eigen::MatrixXd& centers, const Eigen::MatrixXd& widths,
-    const Eigen::MatrixXd& slopes, const Eigen::MatrixXd& offsets,
-    bool asymmetric_kernels)
+FunctionApproximatorLWR::FunctionApproximatorLWR(const Eigen::MatrixXd& centers,
+                                                 const Eigen::MatrixXd& widths,
+                                                 const Eigen::MatrixXd& slopes,
+                                                 const Eigen::MatrixXd& offsets,
+                                                 bool asymmetric_kernels)
     : n_basis_functions_(centers.rows()),
       centers_(centers),
       widths_(widths),
@@ -64,49 +65,48 @@ FunctionApproximatorLWR::FunctionApproximatorLWR(
   activations_one_prealloc_ = MatrixXd(1, n_basis_functions_);
 };
 
+void FunctionApproximatorLWR::predictRealTime(
+    const Eigen::Ref<const Eigen::RowVectorXd>& input,
+    Eigen::VectorXd& output) const
+{
+  ENTERING_REAL_TIME_CRITICAL_CODE
+
+  // Only 1 sample, so real-time execution is possible. No need to allocate
+  // memory.
+  getLines(input, lines_one_prealloc_);
+
+  // Weight the values for each line with the normalized basis function
+  // activations
+  bool normalize_activations = true;
+  BasisFunction::Gaussian::activations(
+      centers_, widths_, input, activations_one_prealloc_,
+      normalize_activations, asymmetric_kernels_);
+
+  output = (lines_one_prealloc_.array() * activations_one_prealloc_.array())
+               .rowwise()
+               .sum();
+
+  EXITING_REAL_TIME_CRITICAL_CODE
+}
+
 void FunctionApproximatorLWR::predict(
     const Eigen::Ref<const Eigen::MatrixXd>& inputs, MatrixXd& outputs) const
 {
+  // The next two lines are not real-time, as they allocate memory
   int n_time_steps = inputs.rows();
-  if (n_time_steps == 1)  // Only one sample
-  {
-    ENTERING_REAL_TIME_CRITICAL_CODE
+  MatrixXd lines(n_time_steps, n_basis_functions_);
+  MatrixXd activations(n_time_steps, n_basis_functions_);
 
-    // Only 1 sample, so real-time execution is possible. No need to allocate
-    // memory.
-    getLines(inputs, lines_one_prealloc_);
+  getLines(inputs, lines);
 
-    // Weight the values for each line with the normalized basis function
-    // activations
-    bool normalize_activations = true;
-    BasisFunction::Gaussian::activations(
-        centers_, widths_, inputs, activations_one_prealloc_,
-        normalize_activations, asymmetric_kernels_);
+  // Weight the values for each line with the normalized activations
+  bool normalize_activations = true;
+  BasisFunction::Gaussian::activations(centers_, widths_, inputs, activations,
+                                       normalize_activations,
+                                       asymmetric_kernels_);
 
-    outputs = (lines_one_prealloc_.array() * activations_one_prealloc_.array())
-                  .rowwise()
-                  .sum();
-
-    EXITING_REAL_TIME_CRITICAL_CODE
-
-  } else {
-    // The next two lines are not real-time, as they allocate memory
-    MatrixXd lines(n_time_steps, n_basis_functions_);
-    MatrixXd activations(n_time_steps, n_basis_functions_);
-
-    getLines(inputs, lines);
-
-    // Weight the values for each line with the normalized basis function
-    // activations
-    bool normalize_activations = true;
-    BasisFunction::Gaussian::activations(centers_, widths_, inputs, activations,
-                                         normalize_activations,
-                                         asymmetric_kernels_);
-
-    outputs = (lines.array() * activations.array()).rowwise().sum();
-  }
+  outputs = (lines.array() * activations.array()).rowwise().sum();
 }
-
 
 /*
 void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(

@@ -421,7 +421,7 @@ class Dmp : public DynamicalSystem {
 
   /** Pre-allocated memory to avoid allocating it during run-time. To enable
    * real-time. */
-  mutable Eigen::MatrixXd fa_output_one_prealloc_;
+  mutable Eigen::VectorXd fa_output_one_prealloc_;
 
   /** Pre-allocated memory to avoid allocating it during run-time. To enable
    * real-time. */
