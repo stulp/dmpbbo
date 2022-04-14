@@ -160,7 +160,7 @@ class DynamicalSystem {
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
    * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
-   * memory. As a consequence, if differentialEquation is real-time 
+   * memory. As a consequence, if differentialEquation is real-time
    * in a derived class, integrateStep will be real-time also.
    */
   virtual void integrateStep(double dt,
@@ -182,7 +182,7 @@ class DynamicalSystem {
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
    * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
-   * memory. As a consequence, if differentialEquation is real-time 
+   * memory. As a consequence, if differentialEquation is real-time
    * in a derived class, integrateStep will be real-time also.
    */
   void integrateStepEuler(double dt, const Eigen::Ref<const Eigen::VectorXd> x,
@@ -201,7 +201,7 @@ class DynamicalSystem {
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
    * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
-   * memory. As a consequence, if differentialEquation is real-time 
+   * memory. As a consequence, if differentialEquation is real-time
    * in a derived class, integrateStep will be real-time also.
    */
   void integrateStepRungeKutta(double dt,
