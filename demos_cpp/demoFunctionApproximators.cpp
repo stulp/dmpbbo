@@ -36,7 +36,7 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  string directory = "../../../../python/functionapproximators/tests/";
+  string directory = "../../demos_cpp/json/";
 
   for (int n_dims : {1, 2}) {
     for (string fa_name : {"RBFN", "LWR"}) {
@@ -66,7 +66,6 @@ int main(int n_args, char** args)
       FunctionApproximator* fa2 = j2.get<FunctionApproximator*>();
 
       cout << "predict " + label + " ===============" << endl;
-
       int n_samples = 10;
       MatrixXd inputs_mat = MatrixXd::Ones(n_samples, n_dims);
       MatrixXd outputs_mat(n_samples, 1);

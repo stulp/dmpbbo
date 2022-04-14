@@ -1,2 +1,0 @@
-add_executable(testDynamicalSystems testDynamicalSystems.cpp)
-target_link_libraries(testDynamicalSystems dynamicalsystems ${Boost_LIBRARIES})

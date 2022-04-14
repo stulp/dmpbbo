@@ -1,0 +1,13 @@
+{"alpha_": 6.0,
+ "attractor_state_": {"dtype": "float64",
+                      "py/object": "numpy.ndarray",
+                      "values": [0.8, 0.1]},
+ "dim_": 2,
+ "dim_orig_": 2,
+ "initial_state_": {"dtype": "float64",
+                    "py/object": "numpy.ndarray",
+                    "values": [0.5, 1.0]},
+ "integration_method_": "EULER",
+ "name_": "ExponentialSystem",
+ "py/object": "dynamicalsystems.ExponentialSystem.ExponentialSystem",
+ "tau_": 0.6}

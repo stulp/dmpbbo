@@ -1,7 +1,7 @@
 # States that CMake required version must be greater than 2.6
 cmake_minimum_required(VERSION 2.6)
 # Project name is not mandatory, but you should use it
-project(OO_DMP_BBO)
+project(DMP_BBO)
 ###############################################################################
 # General settings
 
@@ -58,6 +58,7 @@ include_directories ( ${Boost_INCLUDE_DIRS} )
 ###############################################################################
 # Things to compile are in the src/ directory
 add_subdirectory(src)
+add_subdirectory(demos_cpp)
 add_subdirectory(demo_robot_json)
 
 ###############################################################################

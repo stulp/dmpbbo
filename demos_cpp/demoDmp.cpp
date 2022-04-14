@@ -44,7 +44,7 @@ int main(int n_args, char** args)
   if (n_args > 1) directory = string(args[1]);
 
   // Test JSON
-  string filename_dmp = "../../../../python/dmp/tests/Dmp.json";
+  string filename_dmp = "../../demos_cpp/json/Dmp.json";
   cout << "* Reading and parsing: " << filename_dmp << endl;
   ifstream file(filename_dmp);
   json j = json::parse(file);

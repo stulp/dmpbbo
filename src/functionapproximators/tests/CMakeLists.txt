@@ -1,2 +1,0 @@
-add_executable(testFunctionApproximators testFunctionApproximators.cpp)
-target_link_libraries(testFunctionApproximators functionapproximators ${Boost_LIBRARIES})

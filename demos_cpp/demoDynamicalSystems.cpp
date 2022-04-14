@@ -37,7 +37,7 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  string directory = "../../../../python/dynamicalsystems/tests/";
+  string directory = "../../demos_cpp/json/";
 
   vector<string> filenames;
   for (string dim : {"1D", "2D"})

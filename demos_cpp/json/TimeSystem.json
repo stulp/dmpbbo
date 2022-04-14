@@ -1,0 +1,13 @@
+{"attractor_state_": {"dtype": "float64",
+                      "py/object": "numpy.ndarray",
+                      "values": [[1.0]]},
+ "count_down_": 0,
+ "dim_": 1,
+ "dim_orig_": 1,
+ "initial_state_": {"dtype": "float64",
+                    "py/object": "numpy.ndarray",
+                    "values": [[0.0]]},
+ "integration_method_": "EULER",
+ "name_": "TimeSystem",
+ "py/object": "dynamicalsystems.TimeSystem.TimeSystem",
+ "tau_": 0.6}
