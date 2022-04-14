@@ -4,7 +4,6 @@
  * @author Freek Stulp
  */
 
- 
 /** Namespace used for all classes in the project.
  */
 namespace DmpBBO {
@@ -14,40 +13,43 @@ namespace DmpBBO {
 
 \section sec_cui_bono What the doxygen documentation is for
 
-This is the doxygen documentation of the C++ of the dmpbbo library. Its main aim is to
-document the C++ API, describe the implemenation, and provide rationale management (see \ref
-page_design) for developers:
+This is the doxygen documentation of the C++ of the dmpbbo library. Its main aim
+is to document the C++ API, describe the implemenation, and provide rationale
+management (see \ref page_design) for developers:
 
 \li If you want to get started quickly with the C++ implementation only, the <a
 href="https://github.com/stulp/dmpbbo/blob/master/demos_cpp">demos</a> would be
-the right place. 
+the right place.
 
 \li If you are more interested in the theory behind dynamical
 movement primitives and their optimization, the <a
 href="https://github.com/stulp/dmpbbo/blob/master/tutorial">tutorials</a> is the
 place to go for you.
 
-\li If you would like to train function approximators and DMPs, please do so 
-in the Python code, and export the result to json with jsonpickle. This C++ library can read
-those json files and execute the resulting DMPs. See also the page on <a
-href="https://github.com/stulp/dmpbbo/blob/master/tutorial/python_cpp.md">Python and C++</a>.
+\li If you would like to train function approximators and DMPs, please do so
+in the Python code, and export the result to json with jsonpickle. This C++
+library can read those json files and execute the resulting DMPs. See also the
+page on <a
+href="https://github.com/stulp/dmpbbo/blob/master/tutorial/python_cpp.md">Python
+and C++</a>.
 
 
 \section sec_overview_modules Overview of the modules/libraries
 
-This library contains several modules for executing dynamical movement primitives
-(DMPs). Each module has its own dedicated page.
+This library contains several modules for executing dynamical movement
+primitives (DMPs). Each module has its own dedicated page.
 
 \li \ref eigenutils (in eigenutils/) This header-only module provides utilities
-for the Eigen matrix library (file IO, (de)serialization with JSON, and checking whether
-code is real-time). 
+for the Eigen matrix library (file IO, (de)serialization with JSON, and checking
+whether code is real-time).
 
 \li  \ref page_dyn_sys (in dynamicalsystems/) This module provides
 implementations of several basic dynamical systems. DMPs are combinations of
 such systems.
 
 \li \ref page_func_approx (in functionapproximators/) This module provides
-implementations of several function approximators. DMPs use function approximators to learn and reproduce arbitrary smooth movements.
+implementations of several function approximators. DMPs use function
+approximators to learn and reproduce arbitrary smooth movements.
 
 \li \ref page_dmp (in dmp/) This module provides an implementation of several
 types of DMPs.
@@ -69,7 +71,7 @@ use PIMPL; it is not so legible for the uninitiated user.
 \li I learned to use Eigen whilst coding this project (learning-by-doing). So
 especially the parts I coded first might have some convoluted solutions (I
 didn't learn about Eigen::Ref til later...). Any suggestions for making the code
-more legible or efficient are welcome. 
+more legible or efficient are welcome.
 
 \li For the organization of the code (directory structure), I went with this
 suggestion:
@@ -83,8 +85,12 @@ in the derived classes).
 
 \section sec_naming Coding style
 
-Formatting according to the Google style (https://google.github.io/styleguide/cppguide.html) is done automatically with `clang-format'
-The only difference to the Google formatting style is that the opening bracket after a function header is on a newline, as this improves legibility for me. See the `.clang-format` settings file in the root of the repo.
+Formatting according to the Google style
+(https://google.github.io/styleguide/cppguide.html) is done automatically with
+`clang-format' The only difference to the Google formatting style is that the
+opening bracket after a function header is on a newline, as this improves
+legibility for me. See the `.clang-format` settings file in the root of the
+repo.
 
 I mainly follow the following naming style:
 https://google.github.io/styleguide/cppguide.html#Naming
@@ -200,4 +206,3 @@ a list.
 
 
  */
-
