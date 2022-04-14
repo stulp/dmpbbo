@@ -36,7 +36,7 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  string directory = "../../demos_cpp/json/";
+  string directory = "../../../demos//json/";
 
   for (int n_dims : {1, 2}) {
     for (string fa_name : {"RBFN", "LWR"}) {

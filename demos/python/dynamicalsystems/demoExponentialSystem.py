@@ -21,7 +21,7 @@ import numpy as np
 import os, sys
 
 # Include scripts for plotting
-lib_path = os.path.abspath('../../python/')
+lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
 from dynamicalsystems.dynamicalsystems_plotting import * 

@@ -58,7 +58,7 @@ include_directories ( ${Boost_INCLUDE_DIRS} )
 ###############################################################################
 # Things to compile are in the src/ directory
 add_subdirectory(src)
-add_subdirectory(demos_cpp)
+add_subdirectory(demos)
 add_subdirectory(demo_robot_json)
 
 ###############################################################################
