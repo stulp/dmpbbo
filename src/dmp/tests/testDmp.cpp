@@ -87,10 +87,7 @@ int main(int n_args, char** args)
   Trajectory traj_reproduced;
   dmp->statesAsTrajectory(ts, xs_ana, xds_ana, traj_reproduced);
 
-  cout << "* Integrating step-by-step." << endl;
-  // VectorXd x(dmp->dim(), 1);
-  // VectorXd xd(dmp->dim(), 1);
-  // VectorXd x_updated(dmp->dim(), 1);
+  cout << "* Integrating step-by-step (real-time)." << endl;
   dmp->integrateStart(x, xd);
 
   MatrixXd xs_step(ts.size(), x.size());
@@ -98,13 +95,15 @@ int main(int n_args, char** args)
   xs_step.row(0) = x;
   xds_step.row(0) = xd;
 
+  ENTERING_REAL_TIME_CRITICAL_CODE
   for (int t = 1; t < ts.size(); t++) {
-    double dt = ts[t] - ts[t - 1];
+    dt = ts[t] - ts[t - 1];
     dmp->integrateStep(dt, x, x_updated, xd);
     x = x_updated;
     xs_step.row(t) = x;
     xds_step.row(t) = xd;
   }
+  EXITING_REAL_TIME_CRITICAL_CODE
 
   if (loading_succesful) {
     cout << "* Saving to directory: " << directory << endl;
@@ -121,10 +120,6 @@ int main(int n_args, char** args)
     MatrixXd output_step(ts.size(), 1 + xs_step.cols() + xds_step.cols());
     output_step << ts, xs_step, xds_step;
     saveMatrix(directory, "ts_xs_xds_step.txt", output_step, overwrite);
-
-    // MatrixXd tau_mat(1, 1);
-    // tau_mat(0, 0) = dmp->tau();
-    // saveMatrix(directory, "tau.txt", tau_mat, overwrite);
   }
 
   return 0;
