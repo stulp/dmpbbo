@@ -389,7 +389,8 @@ class Dmp : public DynamicalSystem {
    */
   /** Delayed goal system. Also see \ref sec_delayed_goal */
   ExponentialSystem* goal_system_;
-  /** Spring-damper system. Also see \ref page_dmp */
+
+  /** Spring-damper system. Also see \ref page_dyn_sys */
   SpringDamperSystem* spring_system_;
   /** @} */  // end of group_linear
 
@@ -415,35 +416,31 @@ class Dmp : public DynamicalSystem {
 
   /** @} */  // end of group_nonlinear
 
-  /** Pre-allocated memory to avoid allocating it during run-time. To enable
-   * real-time. */
+  /** Pre-allocated memory to avoid allocating run-time (for real-time). */
   mutable Eigen::VectorXd y_init_prealloc_;
 
-  /** Pre-allocated memory to avoid allocating it during run-time. To enable
-   * real-time. */
+  /** Pre-allocated memory to avoid allocating run-time (for real-time). */
   mutable Eigen::VectorXd fa_output_one_prealloc_;
 
-  /** Pre-allocated memory to avoid allocating it during run-time. To enable
-   * real-time. */
+  /** Pre-allocated memory to avoid allocating run-time (for real-time). */
   mutable Eigen::MatrixXd fa_output_prealloc_;
 
-  /** Pre-allocated memory to avoid allocating it during run-time. To enable
-   * real-time. */
+  /** Pre-allocated memory to avoid allocating run-time (for real-time). */
   mutable Eigen::VectorXd forcing_term_prealloc_;
 
-  /** Pre-allocated memory to avoid allocating it during run-time. To enable
-   * real-time. */
+  /** Pre-allocated memory to avoid allocating run-time (for real-time). */
   mutable Eigen::VectorXd g_minus_y0_prealloc_;
 
   /**
    *  Helper function for constructor.
-   *  \param spring_system   Spring-damper system                 cf.
-   * Dmp::spring_system_ \param goal_system     System to compute delayed goal,
-   * cf. Dmp::damping_coefficient_ \param phase_system    System to compute the
-   * phase,         cf. Dmp::phase_system_ \param gating_system   System to
-   * compute the gating term,   cf. Dmp::gating_system_ \param
-   * function_approximators Function approximators for the forcing term, cf.
-   * Dmp::function_approximators_
+   *
+   * \param[in] spring_system  Spring-damper system cf. Dmp::spring_system_
+   * \param[in] goal_system    System to compute delayed goal, cf.
+   * Dmp::damping_coefficient_
+   * \param[in] phase_system    System to compute the phase, cf.
+   * Dmp::phase_system_
+   * \param[in] gating_system   System to compute the gating
+   * term, cf. Dmp::gating_system_
    */
   void initSubSystems(double alpha_spring_system,
                       ExponentialSystem* goal_system,
@@ -452,6 +449,12 @@ class Dmp : public DynamicalSystem {
 
   void initSubSystems(std::string dmp_type);
 
+  /**
+   *  Helper function for constructor.
+   *
+   * \param[in] function_approximators Function
+   * approximators for the forcing term, cf. Dmp::function_approximators_
+   */
   void initFunctionApproximators(
       std::vector<FunctionApproximator*> function_approximators);
 };
@@ -476,8 +479,8 @@ with the DMP literature. In the C++ implementation, the order is rather
 
 Since a Dynamical Movement Primitive is a dynamical system, the Dmp class
 derives from the DynamicalSystem class. It overrides the virtual function
-DynamicalSystem::integrateStart(). Integrating the DMP numerically (Euler or 4th
-order Runge-Kutta) is done with the generic DynamicalSystem::integrateStep()
+DynamicalSystem::integrateStart(). Integrating the DMP numerically is done
+with the generic DynamicalSystem::integrateStep()
 function. It also implements the pure virtual function
 DynamicalSystem::analyticalSolution(). Because a DMP cannot be solved
 analytically (we cannot write it in closed form due to the arbitrary forcing
@@ -485,13 +488,14 @@ term), calling Dmp::analyticalSolution() in fact performs a numerical Euler
 integration (although the linear subsystems (phase, gating, etc.) are
 analytically solved because this is faster computationally).
 
+\em Remark. Dmp inherits the function DynamicalSystem::integrateStep() which
+calls DynamicalSystem::integrateStepRungeKutta(), which performs a 4-th order
+Runge-Kutta integration. To use faster but less accurate Euler integration,
+call DynamicalSystem::integrateStepEuler() explicitly. Euler is faster
+because it requires only 1 call to DynamicalSystem::differentialEquation(),
+instead of 4 for 4-th order Runge-Kutta integration.
 
-\em Remark. Dmp inherits the function DynamicalSystem::integrateStep() from the
-DynamicalSystem class. DynamicalSystem::integrateStep() uses either Euler
-integration, or 4-th order Runge-Kutta.  The latter is more accurate, but
-requires 4 calls of DynamicalSystem::differentialEquation() instead of 1). Which
-one is used can be set with DynamicalSystem::set_integration_method(). To
-numerically integrate a dynamical system, one must carefully choose the
+To numerically integrate a dynamical system, one must carefully choose the
 integration time dt. Choosing it too low leads to inaccurate integration, and
 the numerical integration will diverge from the 'true' solution acquired through
 analytical solution. See http://en.wikipedia.org/wiki/Euler%27s_method for
@@ -500,6 +504,13 @@ parameters of the dynamical system (time constant, decay parameters). For DMPs,
 which are expected to take between 0.5-10 seconds, dt is usually chosen to be in
 the range 0.01-0.001.
 
+The state of a Dmp includes all its subsystems, i.e. the phase_system,
+gating_system, goal_system. If the Dmp has size dim_dmp_=3 (e.g. representing an
+end-effector position), then the state will have a size of 11, i.e. 2*3 (one 2nd
+order spring-damper expanded to two 1st order systems) + 3 (goal sytem) + 1
+(phase system) + gating system (1). For convenience, there are several macros to
+extract different pars of the state, e.g. x.GOAL expands to x.segment(2 *
+dim_dmp_ + 0, dim_dmp_), which extracts the state of the goal system.
 
 */
 

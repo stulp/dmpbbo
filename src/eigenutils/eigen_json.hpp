@@ -57,7 +57,6 @@ void to_json(nlohmann::json& j, const MatrixBase<Derived>& matrix)
 
 #include "eigen_json.tpp"
 
-
 }  // namespace Eigen
 
 #endif  //  #ifndef _EIGEN_JSON_HPP_

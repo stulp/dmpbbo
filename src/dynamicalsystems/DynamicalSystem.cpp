@@ -61,12 +61,7 @@ DynamicalSystem::DynamicalSystem(int order, double tau,
 }
 
 DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims)
-    :  // For 1st order systems, the dimensionality of the state vector 'x' is
-       // 'dim' For 2nd order systems, the system is expanded to x = [y z],
-       // where 'y' and 'z' are both of dimensionality 'dim'. Therefore dim(x)
-       // is 2*dim
-      dim_(n_dims),
-      tau_(tau)
+    : dim_(n_dims), tau_(tau)
 {
   x_init_ = VectorXd::Zero(dim_);
   x_init_.segment(0, y_init.size()) = y_init;

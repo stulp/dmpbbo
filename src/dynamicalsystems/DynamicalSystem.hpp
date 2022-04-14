@@ -40,24 +40,21 @@ namespace DmpBbo {
  * See also the \ref page_dyn_sys page
  *
  * Two pure virtual functions that each DynamicalSystem subclass should
- * implement are \li differentialEquation() : The differential equation that
- * defines the system \li analyticalSolution() : The analytical solution to the
+ * implement are
+ * \li differentialEquation() : The differential equation that
+ * defines the system
+ * \li analyticalSolution() : The analytical solution to the
  * system at given times
  *
  * This class provides accesor/mutator methods for some variables typically
- * found in dynamical systems: \li dim_ The dimensionality of the system, i.e.
- * the number of variables in the state vector. \li tau() The time constant of
- * the system \li x_init() The initial state of the system \li
- * attractor_state() The attractor state, i.e. the state to which the system
+ * found in dynamical systems:
+ * \li dim() The dimensionality of the system, i.e.
+ * the number of variables in the state vector.
+ * \li tau() The time constant of
+ * the system
+ * \li x_init() The initial state of the system
+ * \li attractor_state() The attractor state, i.e. the state to which the system
  * will converge
- *
- * This class also provides functionality for integrating a dynamical system by
- * repeatidly calling it's differentialEquation, and doing simple Euler or
- * 4th-order Runge-Kutta integration. The related functions are: \li
- * set_integration_method(IntegrationMethod), i.e. EULER or RUNGE_KUTTA \li
- * integrateStep() Integrate the system one time step, using the current
- * integration method \li integrateStart() Start integrating the system (does
- * not require the current state to be passed)
  *
  * \ingroup DynamicalSystems
  */
@@ -79,8 +76,9 @@ class DynamicalSystem {
    * Initialization constructor.
    * \param tau     Time constant, see tau()
    * \param n_dims  Dimensionality of the state (which may differ from the size
-   * of y_init) \param y_init  Part of the initial state Only works for
-   * first-order systems (order=1)
+   * of y_init) \param y_init  Part of the initial state.
+   *
+   * Constructs a first-order systems (order=1)
    */
   DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims);
 
@@ -340,14 +338,13 @@ It is assumed you have read about the theory behind dynamical systems in the
 tutorial <a
 href="https://github.com/stulp/dmpbbo/blob/master/tutorial/dynamicalsystems.md">tutorial/dynamicalsystems.md</a>.
 
-\section sec_dyn_sys_analytical_solution Analytical solution of a dynamical
-system
+\section sec_dyn_sys_ana Analytical solution of a dynamical system
 
 In the object-oriented implementation of this module, all dynamical systems
-inherit from the abstract DynamicalSystem class. The analytical solution of a
+inherit from the abstract class DynamicalSystem. The analytical solution of a
 dynamical system is computed with DynamicalSystem::analyticalSolution, which
 takes the times \c ts at which the solution should be computed, and returns the
-evolution of the system as \c xs and \c xds.
+evolution of the system as \c xs and \c xds (of size: n_time_steps X n_dim)
 
 \section sec_dyn_sys_numeric_integration Numeric integration of a dynamical
 system
@@ -360,33 +357,37 @@ used to numerically integrate the system as follows (using the example plotted
 above):
 
 \code
-// Make exponential system that decays from 4 to 0 with decay constant 6, and
-tau=1.0 double alpha = 6.0;                // Decay constant double tau = 1.0;
-// Time constant VectorXd x_init(1); x_init << 4.0; // Initial state (a 1D
-vector with the value 4.0 inside using Eigen comma initializer) VectorXd
-x_attr(1); x_attr << 0.0; // Attractor state DynamicalSystem* dyn_sys = new
-ExponentialSystem(tau, x_init, x_attr, alpha);
+// Make exponential system that decays from 4 to 0 with decay constant 6
+
+double alpha = 6.0; // Decay constant
+double tau = 1.0; // Time constant
+VectorXd x_init(1); x_init << 4.0; // Initial state
+VectorXd x_attr(1); x_attr << 0.0; // Attractor state
+
+DynamicalSystem* dyn_sys = new ExponentialSystem(tau, x_init, x_attr, alpha);
 
 Eigen::VectorXd x, xd;
 dyn_sys->integrateStart(x,xd); // Start the integration
 double dt = 0.01;
-for (double t=0.0; t<1.5; t+=dt)
-{
-  dyn_sys->integrateStep(dt,x,x,xd);          // Takes current state x,
-integrates system, and writes next state in x, xd cout << t << " " << x << " "
-<< xd << endl; // Output current time, state and rate of change
+for (double t=0.0; t<1.5; t+=dt) {
+  dyn_sys->integrateStep(dt,x,x,xd);
+  // Takes current state x, integrates system, and writes next state in x, xd
+  cout << t << " " << x << " " << xd << endl;
 }
 delete dyn_sys;
 \endcode
 
 \em Remark. Both analyticalSolution and differentialEquation functions above are
-const, i.e. they do not change the DynamicalSystem itself.
+const, i.e. they do not change the DynamicalSystem itself. The state of the
+dynamical system is not stored as a member (except for the initial state).
 
-\em Remark. DynamicalSystem::integrateStep() uses either Euler integration, or
-4-th order Runge-Kutta.  Runge-Kutta is much more accurate, but requires 4 calls
-of DynamicalSystem::differentialEquation() instead of only 1 for Euler
-integration. Which one is used can be set with
-DynamicalSystem::set_integration_method(). To numerically integrate a dynamical
+\em Remark. DynamicalSystem::integrateStep() uses either Euler integration
+(DynamicalSystem::integrateStepEuler()), or 4-th order Runge-Kutta
+(DynamicalSystem::integrateStepRungeKutta()).  Runge-Kutta is much more
+accurate, but requires 4 calls of DynamicalSystem::differentialEquation()
+instead of only 1 for Euler integration.
+
+\em \remark To numerically integrate a dynamical
 system, one must carefully choose the integration time dt. Choosing it too low
 leads to inaccurate integration, and the numerical integration will diverge from
 the "true" solution acquired through analytical solution. See
@@ -395,22 +396,29 @@ entirely on the time-scale (seconds vs. years) and parameters of the dynamical
 system (time constant, decay parameters).
 
 
-\section dyn_sys_rewrite_second_first Rewriting one 2nd Order Systems as two 1st
-Order Systems
+\section dyn_sys_second Rewriting one 2nd Order Systems as two 1st Order Systems
 
-For the theory, behind this see
+For the theory behind this see
 <a
 href="../../../tutorial/dynamicalsystems.md#dyn_sys_second_order_systems">tutorial/dynamicalsystems.md</a>.
 
 The constructor DynamicalSystem::DynamicalSystem() immediately converts second
 order systems, such as SpringDamperSystem, into first order systems with an
-expanded state.
+expanded state. The function DynamicalSystem::dim() returns the size of the
+entire state vector dim(x), which for second order systems, is equivalent to
+dim(\f$ [y z]\f$).
 
-The function DynamicalSystem::dim_ returns the size of the entire state vector
-\f$ \mathbf{x} = [y~z]\f$, the function DynamicalSystem::dim_orig() return the
-size of only the \f$ y \f$ component. The attractor and initial stateof the
-dynamical system must always have the size returned by
-DynamicalSystem::dim_orig().
+The function DynamicalSystem::x_init() returns the entire state vector. Second
+order systems have an additional function for accessing only the y part of the
+state SpringDamperSystem::y_init(). For first order system, y is equivalent to
+x.
+
+There is a special constructor
+DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int
+n_dims); which is necessary for dynamical movement primitives. This constructs a
+first order system (which is how DMPs are usually formalized), with the inital
+state y_init. The argument n_dims specifies that room should be made (beyone y)
+for the other systems (gating, phase, etc.)
 
 */
 
