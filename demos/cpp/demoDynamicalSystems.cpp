@@ -40,8 +40,8 @@ int main(int n_args, char** args)
   string directory = "../../../demos//json/";
 
   vector<string> filenames;
-  for (string dim : {"1D", "2D"})
-    for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
+  for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
+    for (string dim : {"1D", "2D"})
       filenames.push_back(system + "System_" + dim + ".json");
   filenames.push_back("TimeSystem.json");
 
