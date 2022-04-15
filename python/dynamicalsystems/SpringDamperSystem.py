@@ -28,9 +28,9 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 class SpringDamperSystem(DynamicalSystem):
     
-    def __init__(self, tau, y_init, y_attr, damping_coefficient, spring_constant="CRITICALLY_DAMPED", mass=1.0, name="SpringDamperSystem"):
-        super().__init__(2, tau, y_init, y_attr, name)
-        
+    def __init__(self, tau, y_init, y_attr, damping_coefficient, spring_constant="CRITICALLY_DAMPED", mass=1.0):
+        super().__init__(2, tau, y_init)
+        self.y_attr_ = y_attr
         self.damping_coefficient_ = damping_coefficient
         self.mass_ = mass
         if spring_constant == "CRITICALLY_DAMPED":
@@ -43,15 +43,15 @@ class SpringDamperSystem(DynamicalSystem):
         # Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
         #After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z; 
         # Get 'y' and 'z' parts of the state in 'x'
-        y = x[0:self.dim_orig_]
-        z = x[self.dim_orig_:]
+        y = x[0:self.dim_y_]
+        z = x[self.dim_y_:]
         
         # Compute yd and zd
         # See  http://en.wikipedia.org/wiki/Damped_spring-mass_system#Example:mass_.E2.80.93spring.E2.80.93damper
         # and equation 2.1 of http://www-clmc.usc.edu/publications/I/ijspeert-NC2013.pdf
         yd = z/self.tau_;
   
-        zd = (-self.spring_constant_*(y-self.attractor_state_) - self.damping_coefficient_*z)/(self.mass_*self.tau_)
+        zd = (-self.spring_constant_*(y-self.y_attr_) - self.damping_coefficient_*z)/(self.mass_*self.tau_)
         
         xd = np.concatenate((yd,zd))
   

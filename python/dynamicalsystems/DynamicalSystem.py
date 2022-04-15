@@ -16,47 +16,50 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 # 
 
+import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import os
+from abc import ABC, abstractmethod
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-class DynamicalSystem:
+class DynamicalSystem(ABC):
 
-    def __init__(self,  order, tau, initial_state, attractor_state, name):
+    def __init__(self,  order, tau, y_init, n_dims_x=None):
         assert(order==1 or order==2)
-        initial_state = np.atleast_1d(initial_state)
-        attractor_state = np.atleast_1d(attractor_state)
-        assert(initial_state.shape==attractor_state.shape)
         
-        # For 1st order systems, the dimensionality of the state vector 'x' is
-        # 'dim'. For 2nd order systems, the system is expanded to x = [y z],
-        # where 'y' and 'z' are both of dimensionality 'dim'. Therefore dim(x)
-        # is 2*dim
-        self.dim_ = initial_state.size*order
-        
-        # The dimensionality of the system before a potential rewrite
-        self.dim_orig_ = initial_state.size
-        
+        self.dim_y_ = len(y_init)
+        self.dim_x_ = n_dims_x*order if n_dims_x else self.dim_y_*order
         self.tau_ = tau
-        self.initial_state_ = initial_state
         
-        self.attractor_state_ = attractor_state
+        self.set_y_init(y_init)
         
-        self.name_ = name
+    def get_x_init(self):
+        return self.x_init_
         
-        self.integration_method_=  "EULER"
+    def set_x_init(self,x_init):        
+        self.x_init_ = np.atleast_1d(x_init)
         
+    def get_y_init(self):
+        # if dim_y_==dim_x_, this returns all of x_init
+        return self.x_init_[:self.dim_y_]
+        
+    def set_y_init(self,y_init):
+        # Pad the end with zeros for x = [y 0]
+        self.x_init_ = np.zeros(self.dim_x_)
+        self.x_init_[:self.dim_y_] = y_init
+    
+    @abstractmethod
     def differentialEquation(self,x):
-        raise NotImplementedError('subclasses must override updateDistribution()!')
+        pass
         
     def analyticalSolution(self,ts):
         # Default implementation: call differentialEquation
         n_time_steps = ts.size
-        xs = np.zeros([n_time_steps,self.dim_])
-        xds = np.zeros([n_time_steps,self.dim_])
+        xs = np.zeros([n_time_steps,self.dim_x_])
+        xds = np.zeros([n_time_steps,self.dim_x_])
     
         (xs[0,:], xds[0,:]) = self.integrateStart()
         for tt in range(1,n_time_steps):
@@ -65,29 +68,18 @@ class DynamicalSystem:
            
         return (xs,xds)
 
-    def integrateStart(self,x_init=None):
-        if x_init is not None:
-            self.set_initial_state(x_init)
-            
-        # Pad the end with zeros: Why? In the spring-damper system, the state
-        # consists of x = [y z]. 
-        # The initial state only applies to y. Therefore, we set x = [y 0] 
-        x = np.zeros(self.dim_)
-        x[0:self.dim_orig_] = self.initial_state_
-        
-        # Return value (rates of change)
+    def integrateStart(self,y_init=None):
+        if y_init:
+            self.set_y_init(y_init)
+        x = self.x_init_
         return (x,self.differentialEquation(x))
         
     def integrateStep(self,dt, x):
-      assert(dt>0.0)
-      assert(x.size==self.dim_)
-      if (self.integration_method_.upper() == "RUNGE_KUTTA" or self.integration_method_.upper() == "RUNGEKUTTA"):
-        return self.integrateStepRungeKutta(dt, x)
-      else:
-        return self.integrateStepEuler(  dt, x)
+      return self.integrateStepRungeKutta(dt, x)
             
     def integrateStepEuler(self, dt, x):
-        # simple Euler integration
+        assert(dt>0.0)
+        assert(x.size==self.dim_x_)
         xd_updated = self.differentialEquation(x)
         x_updated  = x + dt*xd_updated
         return (x_updated,xd_updated)
@@ -95,6 +87,9 @@ class DynamicalSystem:
     def  integrateStepRungeKutta(self, dt, x):
         # 4th order Runge-Kutta for a 1st order system
         # http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
+        
+        assert(dt>0.0)
+        assert(x.size==self.dim_x_)
         
         k1 = self.differentialEquation(x)
         input_k2 = x + dt*0.5*k1
@@ -112,10 +107,43 @@ class DynamicalSystem:
         assert(tau>0.0)
         self.tau_ = tau
         
-    def set_initial_state(self,initial_state):
-        assert(initial_state.size==self.dim_orig_)
-        self.initial_state_ = initial_state
         
-    def set_attractor_state(self,attractor_state):
-        assert(attractor_state.size==self.dim_orig_)
-        self.attractor_state_ = attractor_state
+    def plot(self,ts,xs,xds,axs):
+       
+        # Prepare tex intepretation
+        plt.rc('text', usetex=True)
+        plt.rc('font', family='serif')
+    
+        if (self.dim_x_==self.dim_y_):
+          
+            lines = axs[0].plot(ts,xs)
+            axs[0].set_ylabel(r"$x$")
+            
+            lines[len(lines):] = axs[1].plot(ts,xds)
+            axs[1].set_ylabel(r"$\dot{x}$")
+            
+        else:
+            # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
+            
+            ys = xs[:,0*self.dim_y_:1*self.dim_y_]
+            zs = xs[:,1*self.dim_y_:2*self.dim_y_]
+            yds = xds[:,0*self.dim_y_:1*self.dim_y_]
+            zds = xds[:,1*self.dim_y_:2*self.dim_y_]
+            
+            lines = axs[0].plot(ts,ys)
+            axs[0].set_ylabel(r"$y$")
+            
+            lines[len(lines):] = axs[1].plot(ts,yds)
+            axs[1].set_ylabel(r"$\dot{y} = z/\tau$")
+            
+            lines[len(lines):] = axs[2].plot(ts,zds/self.tau_)
+            axs[2].set_ylabel(r"$\ddot{y} = \dot{z}/\tau$")
+    
+        for ax in axs:
+            ax.set_xlabel(r'time ($s$)')
+            #ax.axis('tight')
+            ax.grid()
+    
+        return lines
+            
+        

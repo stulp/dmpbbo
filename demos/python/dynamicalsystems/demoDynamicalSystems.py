@@ -34,7 +34,7 @@ from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 def runDynamicalSystemTest(dyn_system, demo_label):
   
     # Settings for the integration of the system
-    dt = 0.004 # Integration step duration
+    dt = 0.01 # Integration step duration
     integration_duration = 1.5*dyn_system.tau_ # Integrate for longer than the time constant
     n_time_steps = int(np.ceil(integration_duration/dt))+1 # Number of time steps for the integration
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
@@ -43,18 +43,15 @@ def runDynamicalSystemTest(dyn_system, demo_label):
                                        
     if demo_label == "tau":
         dyn_system.set_tau(0.5*dyn_system.tau_)
-  
-    if demo_label == "euler" or demo_label == "runge_kutta" or demo_label == "rungekutta":
-        dyn_system.integration_method_ = demo_label.upper()
 
     if demo_label == "analytical":
       # ANALYTICAL SOLUTION 
       (xs_ana,xds_ana) = dyn_system.analyticalSolution(ts)
-      return (xs_ana, xds_ana, ts)
+      return (ts, xs_ana, xds_ana)
       
       
     # NUMERICAL INTEGRATION 
-    n_dims = dyn_system.dim_
+    n_dims = dyn_system.dim_x_
     xs_num = np.empty([n_dims,n_time_steps])
     xds_num = np.empty([n_dims,n_time_steps])
     
@@ -70,37 +67,13 @@ def runDynamicalSystemTest(dyn_system, demo_label):
             if ii == int(np.ceil(0.3*n_time_steps)):
                 xs_num[:,ii-1] = xs_num[:,ii-1]-0.2
             
-        (xs_num[:,ii],xds_num[:,ii]) = dyn_system.integrateStep(dt,xs_num[:,ii-1])
+        if demo_label == "euler":
+            (xs_num[:,ii],xds_num[:,ii]) = dyn_system.integrateStepEuler(dt,xs_num[:,ii-1])
+        else:
+            (xs_num[:,ii],xds_num[:,ii]) = dyn_system.integrateStepRungeKutta(dt,xs_num[:,ii-1])
   
-    return (xs_num.T, xds_num.T, ts)
+    return (ts, xs_num.T, xds_num.T)
 
-def usage(available_demo_labels):
-  print('\nUsage: '+sys.argv[0]+' <test1> [test2]\n')
-  print('Available test labels are:')
-  for label, explanation in available_demo_labels.items():    
-    print('   '+label+' - '+explanation)
-  print('')
-  print('If you call with two tests, the results of the two are compared in one plot.\n')
-
-def process_labels(labels,available_demo_labels):
-    if not labels:
-        usage(available_demo_labels)
-        sys.exit()
-        
-    demo_labels = []
-    for label in labels:
-      if label in available_demo_labels:
-        demo_labels.append(str(label))
-      else:
-        print('WARNING: "'+label+'" is an unknown test label, not adding.')
-        
-        
-    if not demo_labels:
-        print('ERROR: No valid test labels provided."')
-        usage(available_demo_labels)
-        sys.exit()
-    
-    return demo_labels
 
 if __name__=='__main__':
     
@@ -112,75 +85,71 @@ if __name__=='__main__':
         'attractor'  :'Change the attractor state during the integration',
         'perturb'    :'Perturb the system during the integration',
     }
-    
-    demo_labels = process_labels(sys.argv[1:],available_demo_labels)   
+
+    if len(sys.argv)>1:
+        demo_labels = sys.argv[1:]
+    else:
+        demo_labels = ['euler']
+        print('\nUsage: '+sys.argv[0]+' <test1> [test2]\n')
+        print('Available test labels are:')
+        for label, explanation in available_demo_labels.items():    
+            print('   '+label+' - '+explanation)
+        print('')
+        print('If you call with two tests, the results of the two are compared in one plot.\n')
+        
+        
         
     
     # ExponentialSystem
     tau = 0.6 # Time constant
-    initial_state = np.array([0.5, 1.0])
-    attractor_state = np.array([0.8, 0.1])
+    x_init = np.array([0.5, 1.0])
+    x_attr = np.array([0.8, 0.1])
     alpha = 6.0 # Decay factor
-    dyn_systems = [ExponentialSystem(tau, initial_state, attractor_state, alpha)]
+    dyn_systems = {"ExponentialSystem": ExponentialSystem(tau, x_init, x_attr, alpha)}
   
     # TimeSystem
-    dyn_systems.append(TimeSystem(tau))
-
+    dyn_systems["TimeSystem"] = TimeSystem(tau)
+    
     # TimeSystem (but counting down instead of up)
     count_down = True
-    dyn_systems.append(TimeSystem(tau,count_down,"TimeSystemCountDown"))
-    
+    dyn_systems["TimeSystemCountDown"] = TimeSystem(tau,count_down)
+        
     # SigmoidSystem
     max_rate = -20
     inflection_point = tau*0.8
-    dyn_systems.append(SigmoidSystem(tau, initial_state, max_rate, inflection_point))
-
+    dyn_systems["SigmoidSystem"] = SigmoidSystem(tau, x_init, max_rate, inflection_point)
+    
     # SpringDamperSystem
     alpha = 12.0
-    dyn_systems.append(SpringDamperSystem(tau, initial_state, attractor_state, alpha))
-
+    dyn_systems["SpringDamperSystem"] = SpringDamperSystem(tau, x_init, x_attr, alpha)
+    
   
     # INTEGRATE ALL DYNAMICAL SYSTEMS IN THE ARRAY
     
     # Loop through all systems, and do numerical integration and compute the analytical solution
     figure_number = 1
-    for dyn_system in dyn_systems:
-        name = dyn_system.name_
+    for name, dyn_system in dyn_systems.items():
         print(name+": \t")
-        all_data = []
-        for demo_label in demo_labels:
-            print(demo_label)
-      
-            # RUN THE CURRENT TEST FOR THE CURRENT SYSTEM
-            (xs,xds,ts) = runDynamicalSystemTest(dyn_system, demo_label)
-            
-            cur_data = np.concatenate((np.atleast_2d(ts).T,xs,xds),axis=1)
-            
-            all_data.append(cur_data)
-            
+        
         # PLOTTING
         fig = plt.figure(figure_number)
         figure_number = figure_number+1
-    
-        if (len(demo_labels)==1):
-            axs = [fig.add_subplot(1,2,1), fig.add_subplot(1,2,2)]
-            plotDynamicalSystem(all_data[0],axs)
-            fig.canvas.set_window_title(name+"  ("+demo_label+")") 
-                
-        else:
-            data = all_data[0]
-            data_compare = all_data[1] 
-            
-            axs      =  [fig.add_subplot(2,2,1), fig.add_subplot(2,2,2)]
-            axs_diff =  [fig.add_subplot(2,2,3), fig.add_subplot(2,2,4)]
-            # Bit of a hack... We happen to know that SpringDamperSystem is only second order system
-            if (name == "SpringDamperSystem"):
-              axs      =  [fig.add_subplot(2,3,1), fig.add_subplot(2,3,2), fig.add_subplot(2,3,3)]
-              axs_diff =  [fig.add_subplot(2,3,4), fig.add_subplot(2,3,5), fig.add_subplot(2,3,6)]
-              
-            plotDynamicalSystemComparison(data,data_compare,demo_labels[0],demo_labels[1],axs,axs_diff)
-            fig.canvas.set_window_title(name+"  ("+demo_labels[0]+" vs "+demo_labels[1]+")") 
-            axs[1].legend()
+        axs = [fig.add_subplot(1,3,1), fig.add_subplot(1,3,2), fig.add_subplot(1,3,3)]
         
+        for demo_label in demo_labels:
+            print("    "+demo_label)
+            (ts,xs,xds) = runDynamicalSystemTest(dyn_system, demo_label)
+            lines = dyn_system.plot(ts,xs,xds,axs)
+            
+            plt.setp(lines,label=demo_label)
+            if demo_label==demo_labels[0]:
+                plt.setp(lines,linestyle='-',  linewidth=4, color=(0.8,0.8,0.8))
+            else:
+                plt.setp(lines,linestyle='--', linewidth=2, color=(0.0,0.0,0.5))
+                
+        for ax in axs:
+            ax.legend()
+        #fig.savefig(f'{name}.png')
+
     plt.show()
 

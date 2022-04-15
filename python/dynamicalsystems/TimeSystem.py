@@ -28,12 +28,14 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem#
 
 class TimeSystem(DynamicalSystem):
     
-    def __init__(self, tau, count_down=False, name="TimeSystem"):
-        super().__init__(1, tau, np.zeros([1,1]), np.ones([1,1]), name)
+    def __init__(self, tau, count_down=False):
+        if count_down:
+            # Count-down from 1 to 0
+            super().__init__(1, tau, np.ones((1,1)))
+        else:
+            # Count-up from 0 to 1
+            super().__init__(1, tau, np.zeros((1,1)))
         self.count_down_ = count_down
-        if (self.count_down_):
-            self.set_initial_state(np.ones([1,1]))
-            self.set_attractor_state(np.zeros([1,1]))
 
     def differentialEquation(self, x):
         xd = np.zeros([1,1])

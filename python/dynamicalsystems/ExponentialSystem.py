@@ -28,12 +28,13 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem#
 
 class ExponentialSystem(DynamicalSystem):
     
-    def __init__(self, tau, y_init, y_attr, alpha, name="ExponentialSystem"):
-        super().__init__(1, tau, y_init, y_attr, name)
+    def __init__(self, tau, x_init, x_attr, alpha):
+        super().__init__(1, tau, x_init)
+        self.x_attr_ = x_attr
         self.alpha_ = alpha
 
     def differentialEquation(self, x):
-        xd = self.alpha_*(self.attractor_state_-x)/self.tau_
+        xd = self.alpha_*(self.x_attr_-x)/self.tau_
         return xd
 
     def analyticalSolution(self, ts):
@@ -43,15 +44,14 @@ class ExponentialSystem(DynamicalSystem):
         pos_scale = exp_term;
         vel_scale = -(self.alpha_/self.tau_) * exp_term;
         
-        val_range = self.initial_state_ - self.attractor_state_;
+        val_range = self.x_init_ - self.x_attr_;
         val_range_repeat = np.repeat(np.atleast_2d(val_range),T,axis=0)
-        pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale),self.dim_,axis=0) 
+        pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale),self.dim_x_,axis=0) 
         xs = np.multiply(val_range_repeat,pos_scale_repeat.T)
         
-        attr_repeat = np.repeat(np.atleast_2d(self.attractor_state_),T,axis=0)
-        xs = xs + attr_repeat
+        xs = xs + np.repeat(np.atleast_2d(self.x_attr_),T,axis=0)
         
-        vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale),self.dim_,axis=0) 
+        vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale),self.dim_x_,axis=0) 
         xds = np.multiply(val_range_repeat,vel_scale_repeat.T)
 
         return (xs, xds)

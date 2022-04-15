@@ -28,14 +28,12 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem#
 
 class SigmoidSystem(DynamicalSystem):
     
-    def __init__(self, tau, y_init, max_rate, inflection_point_time, name="SigmoidSystem"):
-        y_init = np.atleast_1d(y_init)
-        y_attr = np.zeros(y_init.shape)
-        super().__init__(1, tau, y_init, y_attr, name)
+    def __init__(self, tau, x_init, max_rate, inflection_point_time):
+        super().__init__(1, tau, x_init)
         self.max_rate_ = max_rate
         self.inflection_point_time_ = inflection_point_time
         
-        self.Ks_ = self.computeKs(y_init,max_rate,inflection_point_time)
+        self.Ks_ = self.computeKs(x_init,max_rate,inflection_point_time)
         
     def set_tau(self, new_tau):
         # Get previous tau from superclass with tau() and set it with set_tau()  
@@ -43,12 +41,12 @@ class SigmoidSystem(DynamicalSystem):
         super().set_tau(new_tau)
   
         self.inflection_point_time_ = new_tau*self.inflection_point_time_/prev_tau
-        self.Ks_ = self.computeKs(self.initial_state_, self.max_rate_, self.inflection_point_time_)
+        self.Ks_ = self.computeKs(self.x_init_, self.max_rate_, self.inflection_point_time_)
 
-    def set_initial_state(self,y_init):
-        assert(y_init.size()==dim_orig_)
-        super().set_initial_state(y_init)
-        self.Ks_ = self.computeKs(initial_state_, max_rate_, inflection_point_time_)
+    def set_x_init(self,x_init):
+        assert(x_init.size()==dim_x_)
+        super().set_x_init(x_init)
+        self.Ks_ = self.computeKs(x_init_, max_rate_, inflection_point_time_)
 
     def computeKs(self,N_0s, r, inflection_point_time_time):
       # The idea here is that the initial state (called N_0s above), max_rate (r above) and the 
@@ -92,18 +90,24 @@ class SigmoidSystem(DynamicalSystem):
         xd = self.max_rate_*x*(1-(np.divide(x,self.Ks_)))
         return xd
 
-    def analyticalSolution(self, ts):
+    def analyticalSolutionToFix(self, ts):
         # Auxillary variables to improve legibility
         r = self.max_rate_
         exp_rt = np.exp(-r*ts)
       
-        xs = np.empty([ts.size,self.dim_])
-        xds = np.empty([ts.size,self.dim_])
+        xs = np.empty([ts.size,self.dim_x_])
+        xds = np.empty([ts.size,self.dim_x_])
+        
+        print(xs.shape)
+        print(xds.shape)
+        print(exp_rt.shape)
 
-        for dd in range(self.dim_):
+        for dd in range(self.dim_x_):
             # Auxillary variables to improve legibility
             K = self.Ks_[dd]
-            b = (K/self.initial_state_[dd])-1
+            b = (K/self.x_init_[dd])-1
+            print(K.shape)
+            print(b.shape)
         
             xs[:,dd]  = K/(1+b*exp_rt)
             xds[:,dd] = np.multiply( (K*r*b)/np.square(1.0+b*exp_rt), exp_rt)
