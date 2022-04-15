@@ -68,9 +68,9 @@ class DynamicalSystem {
    * Initialization constructor.
    * \param order     Order of the system
    * \param tau       Time constant, see tau()
-   * \param x_init    Initial state, see x_init()
+   * \param y_init    Initial state, see y_init()
    */
-  DynamicalSystem(int order, double tau, Eigen::VectorXd xy_init);
+  DynamicalSystem(int order, double tau, Eigen::VectorXd y_init);
 
   /**
    * Initialization constructor.

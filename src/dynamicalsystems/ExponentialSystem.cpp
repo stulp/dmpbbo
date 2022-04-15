@@ -92,10 +92,10 @@ void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 {
   double tau = from_json_to_double(j.at("tau_"));
   double alpha = from_json_to_double(j.at("alpha_"));
-  VectorXd y_init = j.at("y_init_").at("values");
-  VectorXd y_attr = j.at("y_attr_").at("values");
+  VectorXd x_init = j.at("x_init_").at("values");
+  VectorXd x_attr = j.at("x_attr_").at("values");
 
-  obj = new ExponentialSystem(tau, y_init, y_attr, alpha);
+  obj = new ExponentialSystem(tau, x_init, x_attr, alpha);
 }
 
 void ExponentialSystem::to_json_helper(nlohmann::json& j) const
