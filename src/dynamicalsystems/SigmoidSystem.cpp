@@ -105,8 +105,7 @@ VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r,
     cerr << "In function SigmoidSystem::computeKs(), Ks is too close to N_0s. "
             "This may lead to errors during numerical integration. Recommended "
             "solution: choose a lower magnitude for the maximum rate of change "
-            "(currently it is "
-         << r << ")" << endl;
+            "(currently it is " << r << ")" << endl;
   }
 
   return Ks;
@@ -170,9 +169,9 @@ void from_json(const nlohmann::json& j, SigmoidSystem*& obj)
   double max_rate = from_json_to_double(j.at("max_rate_"));
   double inflection_point_time =
       from_json_to_double(j.at("inflection_point_time_"));
-  VectorXd y_init = j.at("initial_state_").at("values");
+  VectorXd x_init = j.at("y_init_").at("values");
 
-  obj = new SigmoidSystem(tau, y_init, max_rate, inflection_point_time);
+  obj = new SigmoidSystem(tau, x_init, max_rate, inflection_point_time);
 }
 
 void SigmoidSystem::to_json_helper(nlohmann::json& j) const

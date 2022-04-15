@@ -184,8 +184,9 @@ void from_json(const nlohmann::json& j, SpringDamperSystem*& obj)
       from_json_to_double(j.at("damping_coefficient_"));
   double spring_constant = from_json_to_double(j.at("spring_constant_"));
   double mass = from_json_to_double(j.at("mass_"));
-  VectorXd y_init = j.at("initial_state_").at("values");
-  VectorXd y_attr = j.at("attractor_state_").at("values");
+  
+  VectorXd y_attr = j.at("y_attr_").at("values");
+  VectorXd y_init = j.at("y_init_").at("values");
 
   obj = new SpringDamperSystem(tau, y_init, y_attr, damping_coefficient,
                                spring_constant, mass);
@@ -198,7 +199,7 @@ void SpringDamperSystem::to_json_helper(nlohmann::json& j) const
   j["damping_coefficient_"] = damping_coefficient_;
   j["spring_constant_"] = spring_constant_;
   j["mass_"] = mass_;
-  j["attractor_state_"] = y_attr_;
+  j["y_attr_"] = y_attr_;
 
   string c("SpringDamperSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

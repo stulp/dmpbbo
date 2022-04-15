@@ -75,12 +75,12 @@ class DynamicalSystem {
   /**
    * Initialization constructor.
    * \param tau     Time constant, see tau()
-   * \param n_dims  Dimensionality of the state (which may differ from the size
+   * \param n_dims_y  Dimensionality of the state (which may differ from the size
    * of y_init) \param y_init  Part of the initial state.
    *
    * Constructs a first-order systems (order=1)
    */
-  DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims);
+  DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_y);
 
   /** Destructor */
   virtual ~DynamicalSystem(void);
@@ -124,6 +124,18 @@ class DynamicalSystem {
                                   Eigen::MatrixXd& xs,
                                   Eigen::MatrixXd& xds) const = 0;
 
+  /** Start integrating the system with a new initial state
+   *
+   * \param[in]  y_init          - The initial state vector (y part)
+   * \param[out] x               - The first vector of state variable
+   * \param[out] xd              - The first vector of rates of change of the
+   * state variables
+   *
+   */
+  virtual void integrateStart(const Eigen::VectorXd& y_init,
+                      Eigen::Ref<Eigen::VectorXd> x,
+                      Eigen::Ref<Eigen::VectorXd> xd);
+
   /** Start integrating the system
    *
    * \param[out] x               - The first vector of state variables
@@ -136,18 +148,6 @@ class DynamicalSystem {
    */
   virtual void integrateStart(Eigen::Ref<Eigen::VectorXd> x,
                               Eigen::Ref<Eigen::VectorXd> xd) const;
-
-  /** Start integrating the system with a new initial state
-   *
-   * \param[in]  x_init          - The initial state vector
-   * \param[out] x               - The first vector of state variable
-   * \param[out] xd              - The first vector of rates of change of the
-   * state variables
-   *
-   */
-  void integrateStart(const Eigen::VectorXd& x_init,
-                      Eigen::Ref<Eigen::VectorXd> x,
-                      Eigen::Ref<Eigen::VectorXd> xd);
 
   /**
    * Integrate the system one time step.
@@ -231,7 +231,9 @@ class DynamicalSystem {
    * Get the dimensionality of the dynamical system, i.e. the length of its
    * state vector. \return Dimensionality of the dynamical system
    */
-  inline int dim(void) const { return dim_; }
+  inline int dim(void) const { return dim_x_; }
+  inline int dim_x(void) const { return dim_x_; }
+  inline int dim_y(void) const { return dim_y_; }
 
   /**
    * Accessor function for the time constant.
@@ -260,8 +262,24 @@ class DynamicalSystem {
   /** Mutator function for the initial state of the dynamical system.
    *  \param[in] initial_state Initial state of the dynamical system.
    */
-  virtual void set_x_init(const Eigen::VectorXd& x_init);
+  virtual void set_x_init(const Eigen::VectorXd& x_init) { 
+    assert(x_init.size() == dim_x_);
+    x_init_ = x_init; 
+  }
 
+  /**
+   * Accessor function for the y part of the initial state of the dynamical system.
+   *
+   * \param[out] y_init Initial state of the dynamical system.
+   */
+  void get_y_init(Eigen::VectorXd& y_init) const;
+
+  /** Mutator function for the y part of the initial state of the dynamical system.
+   *  \param[in] y_init Initial state of the dynamical system.
+   */
+  virtual void set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init);
+  
+  
   /** @} */
 
   /** Read an object from json.
@@ -304,10 +322,21 @@ class DynamicalSystem {
    */
   virtual void to_json_helper(nlohmann::json& j) const = 0;
 
-  /** Dimensionality of the system.
+  /** Dimensionality of the system state.
+   *
    *  For instance, if there are 3 state variables, dim_ is 3.
+   *
+   * For second order systems, it is dim(x) = dim([y z])
    */
-  const int dim_;
+  const int dim_x_;
+  
+  /** Dimensionality of the y part of the system state.
+   *
+   * For first order systems, it is dim(y) = dim(x) (because y = x)
+   *
+   * For second order systems, it is dim(y), where y is part of x, i.e. x = [y z]
+   */
+  const int dim_y_;
 
   /** Time constant */
   double tau_;
@@ -317,7 +346,7 @@ class DynamicalSystem {
    */
   Eigen::VectorXd x_init_;
 
-  void preallocateMemory(int dim);
+  void preallocateMemory(void);
 
   /** Members for caching in Runge-Kutta integration. */
   mutable Eigen::VectorXd k1_, k2_, k3_, k4_, input_k2_, input_k3_, input_k4_;

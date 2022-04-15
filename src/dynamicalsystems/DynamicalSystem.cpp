@@ -39,78 +39,72 @@ using namespace Eigen;
 namespace DmpBbo {
 
 DynamicalSystem::DynamicalSystem(int order, double tau,
-                                 Eigen::VectorXd xy_init)
-    :  // For 1st order systems, the dimensionality of the state vector 'x' is
-       // 'dim' For 2nd order systems, the system is expanded to x = [y z],
-       // where 'y' and 'z' are both of dimensionality 'dim'. Therefore dim(x)
-       // is 2*dim
-      dim_(xy_init.size() * order),
+                                 Eigen::VectorXd y_init)
+    : dim_x_(y_init.size() * order),
+      dim_y_(y_init.size()),
       tau_(tau)
 {
   assert(order == 1 || order == 2);
-
-  if (order == 1) {
-    x_init_ = xy_init;
-  } else {  // order = 2
-    // 2nd order: expand the state, and fill it with zeros.
-    x_init_ = VectorXd::Zero(dim_);
-    x_init_.segment(0, xy_init.size()) = xy_init;
-  }
-
-  preallocateMemory(dim_);
+  set_y_init(y_init);
+  preallocateMemory();
 }
 
-DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims)
-    : dim_(n_dims), tau_(tau)
+DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_x)
+    : dim_x_(n_dims_x), dim_y_(y_init.size()), tau_(tau)
 {
-  x_init_ = VectorXd::Zero(dim_);
-  x_init_.segment(0, y_init.size()) = y_init;
-  preallocateMemory(dim_);
+  set_y_init(y_init);
+  preallocateMemory();
 }
 
-void DynamicalSystem::preallocateMemory(int dim)
+void DynamicalSystem::preallocateMemory()
 {
   // Pre-allocate memory for Runge-Kutta integration
-  k1_ = VectorXd(dim);
-  k2_ = VectorXd(dim);
-  k3_ = VectorXd(dim);
-  k4_ = VectorXd(dim);
+  k1_ = VectorXd(dim_x_);
+  k2_ = VectorXd(dim_x_);
+  k3_ = VectorXd(dim_x_);
+  k4_ = VectorXd(dim_x_);
 
-  input_k2_ = VectorXd(dim);
-  input_k3_ = VectorXd(dim);
-  input_k4_ = VectorXd(dim);
+  input_k2_ = VectorXd(dim_x_);
+  input_k3_ = VectorXd(dim_x_);
+  input_k4_ = VectorXd(dim_x_);
 }
 
 DynamicalSystem::~DynamicalSystem(void) {}
 
-void DynamicalSystem::set_x_init(const Eigen::VectorXd& xy_init)
+void DynamicalSystem::get_y_init(Eigen::VectorXd& y_init) const
 {
-  if (xy_init.size() == dim_) {
-    // Standard 1st order system
-    x_init_ = xy_init;
+  if (dim_x_==dim_y_)
+    y_init = x_init_;
+  else 
+    // x = [y z], return only y part
+    y_init = x_init_.segment(0, dim_y_);
+    // The upper statement would suffice. The if-then-else makes the semantics clearer.
+}
+
+void DynamicalSystem::set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init)
+{
+  assert(y_init.size() == dim_y_);
+  if (dim_x_ == dim_y_) {
+    x_init_ = y_init;
   } else {
-    // All other cases: pad with zeros
-    x_init_.fill(0.0);
-    x_init_.segment(0, xy_init.size()) = xy_init;
+    // All other cases: x_init_ = [y_init 0 0 ...]
+    x_init_ = VectorXd::Zero(dim_x_);
+    x_init_.segment(0, dim_y_) = y_init;
   }
 }
 
-void DynamicalSystem::integrateStart(const Eigen::VectorXd& xy_init,
+
+void DynamicalSystem::integrateStart(const Eigen::VectorXd& y_init,
                                      Eigen::Ref<Eigen::VectorXd> x,
                                      Eigen::Ref<Eigen::VectorXd> xd)
 {
-  set_x_init(xy_init);
+  set_y_init(y_init);
   integrateStart(x, xd);
 }
 
 void DynamicalSystem::integrateStart(Eigen::Ref<Eigen::VectorXd> x,
                                      Eigen::Ref<Eigen::VectorXd> xd) const
 {
-  // Check size. Leads to faster numerical integration and makes Eigen::Ref
-  // easier to deal with
-  assert(x.size() == dim_);
-  assert(xd.size() == dim_);
-
   x = x_init_;
   differentialEquation(x, xd);
 }
@@ -120,7 +114,7 @@ void DynamicalSystem::integrateStepEuler(double dt, const Ref<const VectorXd> x,
                                          Ref<VectorXd> xd_updated) const
 {
   assert(dt > 0.0);
-  assert(x.size() == dim_);
+  assert(x.size() == dim_x_);
 
   ENTERING_REAL_TIME_CRITICAL_CODE
   differentialEquation(x, xd_updated);
@@ -134,7 +128,7 @@ void DynamicalSystem::integrateStepRungeKutta(double dt,
                                               Ref<VectorXd> xd_updated) const
 {
   assert(dt > 0.0);
-  assert(x.size() == dim_);
+  assert(x.size() == dim_x_);
 
   ENTERING_REAL_TIME_CRITICAL_CODE
 
@@ -179,9 +173,10 @@ void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
 
 void DynamicalSystem::to_json_base(nlohmann::json& j) const
 {
-  j["dim_"] = dim_;
+  j["dim_x_"] = dim_x_;
+  j["dim_y_"] = dim_y_;
   j["tau_"] = tau_;
-  j["initial_state_"] = x_init_;
+  j["y_init_"] = x_init_.segment(0,dim_y_);
 
   string c("DynamicalSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

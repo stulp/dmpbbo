@@ -227,9 +227,9 @@ class Dmp : public DynamicalSystem {
    * which are only stored implicitely in xd_in because second order systems are
    * converted to first order systems with expanded state.
    *
-   * \param[in] x_in  State vector over time (size n_time_steps X dim_)
+   * \param[in] x_in  State vector over time (size n_time_steps X dim())
    * \param[in] xd_in State vector over time (rates of change)
-   * \param[out] y_out  State vector over time (size n_time_steps X dim_dmp_)
+   * \param[out] y_out  State vector over time (size n_time_steps X dim_y())
    * \param[out] yd_out  State vector over time (rates of change)
    * \param[out] ydd_out  State vector over time (rates of change of rates of
    * change)
@@ -310,7 +310,7 @@ class Dmp : public DynamicalSystem {
    * 2nd order systems are represented as 1st order systems with an expanded
    * state. The SpringDamperSystem for instance is represented as x = [y z], xd
    * = [yd zd]. DynamicalSystem::dim_ is dim(x) = dim([y z]) = 2*dim(y)
-   * Dmp::dim_dmp_ instead is dim(y)
+   * Dmp::dim_y() instead is dim(y)
    *
    * For Dynamical Movement Primitives, dim_orig() may be for instance 3, if the
    * output of the DMP represents x,y,z coordinates. However, dim_ will have a
@@ -319,7 +319,7 @@ class Dmp : public DynamicalSystem {
    *
    * \return Dimensionality of the DMP (number of tranformation systems)
    */
-  inline int dim_dmp(void) const { return dim_dmp_; }
+  inline int dim_dmp(void) const { return dim_y(); }
 
   /**
    * Accessor function for the initial state of the dynamical system.
@@ -327,7 +327,7 @@ class Dmp : public DynamicalSystem {
    */
   inline Eigen::VectorXd y_init(void) const
   {
-    return x_init().segment(0, dim_dmp_);
+    return x_init().segment(0, dim_y());
   }
 
   /**
@@ -337,7 +337,7 @@ class Dmp : public DynamicalSystem {
   inline void get_y_init(Eigen::VectorXd& y_init) const
   {
     // x = [y z etc], return only y part
-    y_init = x_init().segment(0, dim_dmp_);
+    y_init = x_init().segment(0, dim_y());
   }
 
   /** Mutator function for the initial state of the dynamical system.
@@ -378,8 +378,6 @@ class Dmp : public DynamicalSystem {
    *   https://github.com/nlohmann/json/issues/716
    */
   void to_json_helper(nlohmann::json& j) const;
-
-  int dim_dmp_;
 
   /** The attractor state of the system, to which the system will converge. */
   Eigen::VectorXd y_attr_;
@@ -505,12 +503,12 @@ which are expected to take between 0.5-10 seconds, dt is usually chosen to be in
 the range 0.01-0.001.
 
 The state of a Dmp includes all its subsystems, i.e. the phase_system,
-gating_system, goal_system. If the Dmp has size dim_dmp_=3 (e.g. representing an
+gating_system, goal_system. If the Dmp has size dim_dmp()=3 (e.g. representing an
 end-effector position), then the state will have a size of 11, i.e. 2*3 (one 2nd
 order spring-damper expanded to two 1st order systems) + 3 (goal sytem) + 1
 (phase system) + gating system (1). For convenience, there are several macros to
 extract different pars of the state, e.g. x.GOAL expands to x.segment(2 *
-dim_dmp_ + 0, dim_dmp_), which extracts the state of the goal system.
+dim_dmp() + 0, dim_dmp()), which extracts the state of the goal system.
 
 */
 

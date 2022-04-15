@@ -48,39 +48,39 @@ namespace DmpBbo {
 
 /** Extracts all variables of the spring-damper system from a state vector, e.g.
  * state.SPRING */
-#define SPRING segment(0 * dim_dmp_ + 0, 2 * dim_dmp_)
+#define SPRING segment(0 * dim_y() + 0, 2 * dim_y())
 /** Extracts first order variables of the spring-damper system from a state
  * vector, e.g. state.SPRINGM_Y */
-#define SPRING_Y segment(0 * dim_dmp_ + 0, dim_dmp_)
+#define SPRING_Y segment(0 * dim_y() + 0, dim_y())
 /** Extracts second order variables of the spring-damper system from a state
  * vector, e.g. state.SPRING_Z */
-#define SPRING_Z segment(1 * dim_dmp_ + 0, dim_dmp_)
+#define SPRING_Z segment(1 * dim_y() + 0, dim_y())
 /** Extracts all variables of the goal from a state vector, e.g. state.GOAL */
-#define GOAL segment(2 * dim_dmp_ + 0, dim_dmp_)
+#define GOAL segment(2 * dim_y() + 0, dim_y())
 /** Extracts the phase variable (1-D) from a state vector, e.g. state.PHASE */
-#define PHASE segment(3 * dim_dmp_ + 0, 1)
+#define PHASE segment(3 * dim_y() + 0, 1)
 /** Extracts all variables of the gating system from a state vector, e.g.
  * state.GATING */
-#define GATING segment(3 * dim_dmp_ + 1, 1)
+#define GATING segment(3 * dim_y() + 1, 1)
 
 /** Extracts first T (time steps) state vectors of the spring-damper system ,
  * e.g. states.SPRING(100) */
-#define SPRINGM(T) block(0, 0 * dim_dmp_ + 0, T, 2 * dim_dmp_)
+#define SPRINGM(T) block(0, 0 * dim_y() + 0, T, 2 * dim_y())
 /** Extracts first T (time steps) state vectors of the spring-damper system ,
  * e.g. states.SPRINGM_Y(100) */
-#define SPRINGM_Y(T) block(0, 0 * dim_dmp_ + 0, T, dim_dmp_)
+#define SPRINGM_Y(T) block(0, 0 * dim_y() + 0, T, dim_y())
 /** Extracts first T (time steps) state vectors of the spring-damper system ,
  * e.g. states.SPRINGM_Z(100) */
-#define SPRINGM_Z(T) block(0, 1 * dim_dmp_ + 0, T, dim_dmp_)
+#define SPRINGM_Z(T) block(0, 1 * dim_y() + 0, T, dim_y())
 /** Extracts first T (time steps) state vectors of the goal system, e.g.
  * states.GOALM(100) */
-#define GOALM(T) block(0, 2 * dim_dmp_ + 0, T, dim_dmp_)
+#define GOALM(T) block(0, 2 * dim_y() + 0, T, dim_y())
 /** Extracts first T (time steps) states of the phase system, e.g.
  * states.PHASEM(100) */
-#define PHASEM(T) block(0, 3 * dim_dmp_ + 0, T, 1)
+#define PHASEM(T) block(0, 3 * dim_y() + 0, T, 1)
 /** Extracts first T (time steps) state vectors of the gating system, e.g.
  * states.GATINGM(100) */
-#define GATINGM(T) block(0, 3 * dim_dmp_ + 1, T, 1)
+#define GATINGM(T) block(0, 3 * dim_y() + 1, T, 1)
 
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          std::vector<FunctionApproximator*> function_approximators,
@@ -88,7 +88,6 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          DynamicalSystem* phase_system, DynamicalSystem* gating_system,
          std::string scaling)
     : DynamicalSystem(tau, y_init, 3 * y_init.size() + 2),
-      dim_dmp_(y_attr.size()),
       y_attr_(y_attr),
       goal_system_(goal_system),
       phase_system_(phase_system),
@@ -105,7 +104,6 @@ Dmp::Dmp(int n_dims_dmp,
          DynamicalSystem* phase_system, DynamicalSystem* gating_system,
          std::string scaling)
     : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp)),
-      dim_dmp_(n_dims_dmp),
       y_attr_(VectorXd::Ones(n_dims_dmp)),
       goal_system_(goal_system),
       phase_system_(phase_system),
@@ -120,7 +118,6 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          std::vector<FunctionApproximator*> function_approximators,
          std::string dmp_type, std::string scaling)
     : DynamicalSystem(1, tau, y_init),
-      dim_dmp_(y_attr.size()),
       y_attr_(y_attr),
       forcing_term_scaling_(scaling)
 {
@@ -187,14 +184,14 @@ void Dmp::initSubSystems(double alpha_spring_damper,
                          DynamicalSystem* gating_system)
 {
   // Make room for the subsystems
-  // dim_ = 3 * dim_dmp_ + 2;
+  // dim_ = 3 * dim_y() + 2;
 
   spring_system_ =
       new SpringDamperSystem(tau(), y_init(), y_attr_, alpha_spring_damper);
 
   goal_system_ = goal_system;
   if (goal_system != NULL) {
-    assert(goal_system->dim() == dim_dmp_);
+    assert(goal_system->dim() == dim_y());
     // Initial state of the goal system is that same as that of the DMP
     goal_system_->set_x_init(y_init());
   }
@@ -204,11 +201,11 @@ void Dmp::initSubSystems(double alpha_spring_damper,
   gating_system_ = gating_system;
 
   // Pre-allocate memory for real-time execution
-  y_init_prealloc_ = VectorXd(dim_dmp_);
+  y_init_prealloc_ = VectorXd(dim_y());
   fa_output_one_prealloc_ = VectorXd(1);
-  fa_output_prealloc_ = MatrixXd(1, dim_dmp_);
-  forcing_term_prealloc_ = VectorXd(dim_dmp_);
-  g_minus_y0_prealloc_ = VectorXd(dim_dmp_);
+  fa_output_prealloc_ = MatrixXd(1, dim_y());
+  forcing_term_prealloc_ = VectorXd(dim_y());
+  g_minus_y0_prealloc_ = VectorXd(dim_y());
 }
 
 void Dmp::set_damping_coefficient(double damping_coefficient)
@@ -225,7 +222,7 @@ void Dmp::initFunctionApproximators(
 {
   if (function_approximators.empty()) return;
 
-  assert(dim_dmp_ == (int)function_approximators.size());
+  assert(dim_y() == (int)function_approximators.size());
 
   function_approximators_ = function_approximators;
 }
@@ -255,14 +252,14 @@ void Dmp::integrateStart(Ref<VectorXd> x, Ref<VectorXd> xd) const
     xd.GOAL.fill(0);
   } else {
     // Goal system exists. Start integrating it.
-    goal_system_->integrateStart(x.GOAL, xd.GOAL);
+    goal_system_->integrateStart(y_init(), x.GOAL, xd.GOAL);
   }
 
   // Set the attractor state of the spring system
   spring_system_->set_y_attr(x.GOAL);
 
   // Start integrating all futher subsystems
-  spring_system_->integrateStart(x.SPRING, xd.SPRING);
+  spring_system_->integrateStart(y_init(), x.SPRING, xd.SPRING);
   phase_system_->integrateStart(x.PHASE, xd.PHASE);
   gating_system_->integrateStart(x.GATING, xd.GATING);
 
@@ -298,7 +295,7 @@ void Dmp::differentialEquation(const Eigen::Ref<const Eigen::VectorXd>& x,
   gating_system_->differentialEquation(x.GATING, xd.GATING);
 
   // Compute output of the funciton approximators
-  for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
+  for (int i_dim = 0; i_dim < dim_y(); i_dim++) {
     function_approximators_[i_dim]->predictRealTime(x.PHASE,
                                                     fa_output_one_prealloc_);
     fa_output_prealloc_(0, i_dim) = fa_output_one_prealloc_(0, 0);
@@ -397,11 +394,11 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
   gating_system_->analyticalSolution(ts, xs_gating, xds_gating);
 
   // Compute the output of the function approximator
-  fa_outputs.resize(ts.size(), dim_dmp_);
+  fa_outputs.resize(ts.size(), dim_y());
   fa_outputs.fill(0.0);
 
   MatrixXd fa_output_one_dim(n_time_steps, 1);
-  for (int i_dim = 0; i_dim < dim_dmp_; i_dim++) {
+  for (int i_dim = 0; i_dim < dim_y(); i_dim++) {
     function_approximators_[i_dim]->predict(xs_phase, fa_output_one_dim);
     fa_outputs.col(i_dim) = fa_output_one_dim;
   }
@@ -428,7 +425,7 @@ void Dmp::analyticalSolution(const Eigen::VectorXd& ts, Eigen::MatrixXd& xs,
     // simply the attractor state
     xs_goal = y_attr_.transpose().replicate(n_time_steps, 1);
     // with zero change
-    xds_goal = MatrixXd::Zero(n_time_steps, dim_dmp_);
+    xds_goal = MatrixXd::Zero(n_time_steps, dim_y());
   } else {
     // Integrate goal system and get current goal state
     goal_system_->analyticalSolution(ts, xs_goal, xds_goal);
@@ -505,8 +502,8 @@ void Dmp::set_tau(double tau)
 
 void Dmp::set_y_init(const Eigen::VectorXd& y_init)
 {
-  assert(y_init.size() == dim_dmp_);
-  DynamicalSystem::set_x_init(y_init);
+  assert(y_init.size() == dim_y());
+  DynamicalSystem::set_y_init(y_init);
 
   // Set value in all relevant subsystems also
   spring_system_->set_y_init(y_init);
@@ -533,8 +530,8 @@ void from_json(const nlohmann::json& j, Dmp*& obj)
 
   VectorXd y_init;
   VectorXd y_attr;
-  from_json(j.at("initial_state_").at("values"), y_init);
-  from_json(j.at("attractor_state_").at("values"), y_attr);
+  from_json(j.at("y_init_").at("values"), y_init);
+  from_json(j.at("y_attr_").at("values"), y_attr);
 
   ExponentialSystem* goal_system;
   DynamicalSystem *phase_system, *gating_system;
