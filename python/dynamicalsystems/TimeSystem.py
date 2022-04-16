@@ -34,16 +34,16 @@ class TimeSystem(DynamicalSystem):
         else:
             # Count-up from 0 to 1
             super().__init__(1, tau, np.zeros((1, 1)))
-        self.count_down_ = count_down
+        self._count_down = count_down
 
     def differentialEquation(self, x):
         xd = np.zeros([1, 1])
-        if self.count_down_:
+        if self._count_down:
             if x > 0:
-                xd[0] = -1.0 / self.tau_
+                xd[0] = -1.0 / self._tau
         else:
             if x < 1.0:
-                xd[0] = 1.0 / self.tau_
+                xd[0] = 1.0 / self._tau
 
         return xd
 

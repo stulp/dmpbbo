@@ -116,7 +116,7 @@ if __name__ == "__main__":
         set_style(lines, "rungekutta")
 
         # Runge-kutta integration with different tau
-        dyn_system.set_tau(1.5 * tau)
+        dyn_system.tau = 1.5 * tau
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
@@ -124,7 +124,7 @@ if __name__ == "__main__":
             )
         lines = dyn_system.plot(ts, xs, xds, axs)
         set_style(lines, "tau")
-        dyn_system.set_tau(tau)
+        dyn_system.tau = tau
 
         # Runge-kutta integration with a perturbation
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
@@ -139,7 +139,7 @@ if __name__ == "__main__":
 
         # Runge-kutta integration with a different attractor
         if name == "ExponentialSystem" or name == "SpringDamperSystem":
-            dyn_system.set_y_attr(x_attr - 0.2)
+            dyn_system.y_attr = x_attr - 0.2
             xs[0, :], xds[0, :] = dyn_system.integrateStart()
             for ii in range(1, n_time_steps):
                 xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
@@ -147,9 +147,11 @@ if __name__ == "__main__":
                 )
             lines = dyn_system.plot(ts, xs, xds, axs)
             set_style(lines, "attractor")
-            dyn_system.set_y_attr(x_attr)
+            dyn_system.y_attr = x_attr
 
         axs[0].legend()
+
+        fig.suptitle(name)
 
         # fig.savefig(f'{name}.png')
 

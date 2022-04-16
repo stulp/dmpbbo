@@ -37,33 +37,40 @@ class SpringDamperSystem(DynamicalSystem):
         mass=1.0,
     ):
         super().__init__(2, tau, y_init)
-        self.y_attr_ = y_attr
-        self.damping_coefficient_ = damping_coefficient
-        self.mass_ = mass
+        self._y_attr = y_attr
+        self._damping_coefficient = damping_coefficient
+        self._mass = mass
         if spring_constant == "CRITICALLY_DAMPED":
-            self.spring_constant_ = damping_coefficient * damping_coefficient / 4
+            self._spring_constant = damping_coefficient * damping_coefficient / 4
         else:
-            self.spring_constant_ = spring_constant
+            self._spring_constant = spring_constant
 
-    def set_y_attr(self, y_attr):
-        y_attr_ = y_attr
+    @property
+    def y_attr(self):
+        return _y_attr
+    
+    @y_attr.setter
+    def y_attr(self, new_y_attr):
+        if new_y_attr.size!=self._dim_y:
+            raise ValueError("y_attr must have size "+self._dim_y)
+        self._y_attr = np.atleast_1d(new_y_attr)
 
     def differentialEquation(self, x):
 
         # Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
         # After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z;
         # Get 'y' and 'z' parts of the state in 'x'
-        y = x[0 : self.dim_y_]
-        z = x[self.dim_y_ :]
+        y = x[0 : self._dim_y]
+        z = x[self._dim_y :]
 
         # Compute yd and zd
         # See  http://en.wikipedia.org/wiki/Damped_spring-mass_system#Example:mass_.E2.80.93spring.E2.80.93damper
         # and equation 2.1 of http://www-clmc.usc.edu/publications/I/ijspeert-NC2013.pdf
-        yd = z / self.tau_
+        yd = z / self._tau
 
         zd = (
-            -self.spring_constant_ * (y - self.y_attr_) - self.damping_coefficient_ * z
-        ) / (self.mass_ * self.tau_)
+            -self._spring_constant * (y - self._y_attr) - self._damping_coefficient * z
+        ) / (self._mass * self._tau)
 
         xd = np.concatenate((yd, zd))
 

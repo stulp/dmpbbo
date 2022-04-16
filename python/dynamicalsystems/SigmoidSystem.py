@@ -29,33 +29,37 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem  #
 class SigmoidSystem(DynamicalSystem):
     def __init__(self, tau, x_init, max_rate, inflection_point_time):
         super().__init__(1, tau, x_init)
-        self.max_rate_ = max_rate
-        self.inflection_point_time_ = inflection_point_time
+        self._max_rate = max_rate
+        self._inflection_point_time = inflection_point_time
+        self._Ks_cached = None
 
-        self.Ks_ = self.computeKs(x_init, max_rate, inflection_point_time)
+    @DynamicalSystem.tau.setter
+    def tau(self, new_tau):
+        if hasattr(self, '_tau'):
+            self._inflection_point_time *= new_tau / self._tau
+        self.tau_ = new_tau
+        self._Ks_cached = None
 
-    def set_tau(self, new_tau):
-        # Get previous tau from superclass with tau() and set it with set_tau()
-        prev_tau = self.tau_
-        super().set_tau(new_tau)
-
-        self.inflection_point_time_ = new_tau * self.inflection_point_time_ / prev_tau
-        self.Ks_ = self.computeKs(
-            self.x_init_, self.max_rate_, self.inflection_point_time_
-        )
-
-    def set_x_init(self, x_init):
-        assert x_init.size() == dim_x_
-        super().set_x_init(x_init)
-        self.Ks_ = self.computeKs(x_init_, max_rate_, inflection_point_time_)
-
-    def computeKs(self, N_0s, r, inflection_point_time_time):
+    @DynamicalSystem.x_init.setter
+    def x_init(self, new_x_init):
+        super().x_init = new_x_init
+        self._Ks_cached = None
+        
+    def _Ks(self):
+        if isinstance(self._Ks_cached,np.ndarray):
+            # Cached variable is available
+            return self._Ks_cached
+        
         # The idea here is that the initial state (called N_0s above), max_rate (r above) and the
         # inflection_point_time are set by the user.
         # The only parameter that we have left to tune is the "carrying capacity" K.
         #   http://en.wikipedia.org/wiki/Logistic_function#In_ecology:_modeling_population_growth
         # In the below, we set K so that the initial state is N_0s for the given r and tau
 
+        N_0s = self._x_init
+        r = self._max_rate 
+        t_infl = self._inflection_point_time
+        
         # Known
         #   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
         #   N(t_inf) = K / 2
@@ -64,9 +68,9 @@ class SigmoidSystem(DynamicalSystem):
         #              (K/N_0 - 1)*exp(-r*t_infl) = 1
         #                             (K/N_0 - 1) = 1/exp(-r*t_infl)
         #                                       K = N_0*(1+(1/exp(-r*t_infl)))
-        Ks = np.empty(N_0s.shape)
-        for dd in range(len(Ks)):
-            Ks[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * inflection_point_time_time)))
+        self._Ks_cached = np.empty(N_0s.shape)
+        for dd in range(len(N_0s)):
+            self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
         # If Ks is too close to N_0===initial_state, then the differential equation will always return 0
         # See differentialEquation below
@@ -80,7 +84,7 @@ class SigmoidSystem(DynamicalSystem):
         #   xd = 0
         # And integration fails, especially for Euler integration.
         # So we now give a warning if this is likely to happen.
-        div = np.divide(N_0s, Ks) - 1.0
+        div = np.divide(N_0s, self._Ks_cached) - 1.0
         if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
             print(
                 "In function SigmoidSystem::computeKs(), Ks is too close to N_0s. This may lead to errors during numerical integration. Recommended solution: choose a lower magnitude for the maximum rate of change (currently it is "
@@ -88,28 +92,28 @@ class SigmoidSystem(DynamicalSystem):
                 + ")"
             )
 
-        return Ks
+        return self._Ks_cached
 
     def differentialEquation(self, x):
-        xd = self.max_rate_ * x * (1 - (np.divide(x, self.Ks_)))
+        xd = self._max_rate * x * (1 - (np.divide(x, self._Ks())))
         return xd
 
     def analyticalSolutionToFix(self, ts):
         # Auxillary variables to improve legibility
-        r = self.max_rate_
+        r = self._max_rate
         exp_rt = np.exp(-r * ts)
 
-        xs = np.empty([ts.size, self.dim_x_])
-        xds = np.empty([ts.size, self.dim_x_])
+        xs = np.empty([ts.size, self._dim_x])
+        xds = np.empty([ts.size, self._dim_x])
 
         print(xs.shape)
         print(xds.shape)
         print(exp_rt.shape)
 
-        for dd in range(self.dim_x_):
+        Ks = self._Ks()
+        for dd in range(self._dim_x):
             # Auxillary variables to improve legibility
-            K = self.Ks_[dd]
-            b = (K / self.x_init_[dd]) - 1
+            b = (Ks[dd] / self._x_init[dd]) - 1
             print(K.shape)
             print(b.shape)
 

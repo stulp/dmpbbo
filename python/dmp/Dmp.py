@@ -67,11 +67,11 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         dim_orig = self.dim_orig_
 
-        self.function_approximators_ = function_approximators
+        self._function_approximators = function_approximators
         
-        self.forcing_term_scaling_ = forcing_term_scaling
+        self._forcing_term_scaling = forcing_term_scaling
  
-        self.spring_system_ = SpringDamperSystem(tau,y_init,y_attr,alpha_spring_damper)
+        self._spring_system = SpringDamperSystem(tau,y_init,y_attr,alpha_spring_damper)
         
         # Set defaults for subsystems if necessary
         if not phase_system:
@@ -82,9 +82,9 @@ class Dmp(DynamicalSystem,Parameterizable):
         if goal_system:
             goal_system  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
             
-        self.phase_system_ = phase_system
-        self.gating_system_ = gating_system
-        self.goal_system_ = goal_system
+        self._phase_system = phase_system
+        self._gating_system = gating_system
+        self._goal_system = goal_system
         
         self.ts_train_ = None
 
@@ -156,14 +156,14 @@ class Dmp(DynamicalSystem,Parameterizable):
         
     def set_tau(self,tau):
         
-        self.tau_ = tau
+        self._tau = tau
 
         # Set value in all relevant subsystems also  
-        self.spring_system_.set_tau(tau)
-        if self.goal_system_:
-            self.goal_system_.set_tau(tau)
-        self.phase_system_ .set_tau(tau)
-        self.gating_system_.set_tau(tau)
+        self._spring_system.set_tau(tau)
+        if self._goal_system:
+            self._goal_system.set_tau(tau)
+        self._phase_system .set_tau(tau)
+        self._gating_system.set_tau(tau)
         
     def integrateStart(self):
         
@@ -171,21 +171,21 @@ class Dmp(DynamicalSystem,Parameterizable):
         xd = np.zeros(self.dim_)
   
         # Start integrating goal system if it exists
-        if self.goal_system_ is None:
+        if self._goal_system is None:
             # No goal system, simply set goal state to attractor state
             x[self.GOAL] = self.attractor_state_
             xd[self.GOAL] = 0.0
         else:
             # Goal system exists. Start integrating it.
-            (x[self.GOAL],xd[self.GOAL]) = self.goal_system_.integrateStart()
+            (x[self.GOAL],xd[self.GOAL]) = self._goal_system.integrateStart()
     
         # Set the attractor state of the spring system
-        self.spring_system_.set_attractor_state(x[self.GOAL])
+        self._spring_system.set_attractor_state(x[self.GOAL])
   
         # Start integrating all futher subsystems
-        (x[self.SPRING],xd[self.SPRING]) = self.spring_system_.integrateStart()
-        (x[self.PHASE ],xd[self.PHASE ]) = self.phase_system_.integrateStart()
-        (x[self.GATING],xd[self.GATING]) = self.gating_system_.integrateStart()
+        (x[self.SPRING],xd[self.SPRING]) = self._spring_system.integrateStart()
+        (x[self.PHASE ],xd[self.PHASE ]) = self._phase_system.integrateStart()
+        (x[self.GATING],xd[self.GATING]) = self._gating_system.integrateStart()
 
         # Add rates of change
         xd = self.differentialEquation(x)
@@ -206,29 +206,29 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         xd = np.zeros(x.shape)
         
-        if self.goal_system_ is None:
+        if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state
-            self.spring_system_.set_attractor_state(self.attractor_state_)
+            self._spring_system.set_attractor_state(self.attractor_state_)
             # with zero change
             xd_goal = np.zeros(n_dims)
         else:
             # Integrate goal system and get current goal state
-            self.goal_system_.set_attractor_state(self.attractor_state_)
+            self._goal_system.set_attractor_state(self.attractor_state_)
             x_goal = x[self.GOAL]
-            xd[self.GOAL] = self.goal_system_.differentialEquation(x_goal)
+            xd[self.GOAL] = self._goal_system.differentialEquation(x_goal)
             # The goal state is the attractor state of the spring-damper system
-            self.spring_system_.set_attractor_state(x_goal)
+            self._spring_system.set_attractor_state(x_goal)
     
   
         # Integrate spring damper system
         #Forcing term is added to spring_state later
-        xd[self.SPRING] = self.spring_system_.differentialEquation(x[self.SPRING])
+        xd[self.SPRING] = self._spring_system.differentialEquation(x[self.SPRING])
 
   
         # Non-linear forcing term phase and gating systems
-        xd[self.PHASE] = self.phase_system_.differentialEquation(x[self.PHASE])
-        xd[self.GATING] = self.gating_system_.differentialEquation(x[self.GATING])
+        xd[self.PHASE] = self._phase_system.differentialEquation(x[self.PHASE])
+        xd[self.GATING] = self._gating_system.differentialEquation(x[self.GATING])
 
         fa_output = self.computeFunctionApproximatorOutput(x[self.PHASE]) 
 
@@ -238,15 +238,15 @@ class Dmp(DynamicalSystem,Parameterizable):
         
   
         # Scale the forcing term, if necessary
-        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+        if (self._forcing_term_scaling=="G_MINUS_Y0_SCALING"):
             g_minus_y0 = (self.attractor_state_-self.initial_state_)
             forcing_term = forcing_term*g_minus_y0
         
-        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+        elif (self._forcing_term_scaling=="AMPLITUDE_SCALING"):
             forcing_term = forcing_term*self.trajectory_amplitudes_
 
         # Add forcing term to the ZD component of the spring state
-        xd[self.SPRING_Z] += np.squeeze(forcing_term)/self.tau_
+        xd[self.SPRING_Z] += np.squeeze(forcing_term)/self._tau
         
         return xd
 
@@ -264,14 +264,14 @@ class Dmp(DynamicalSystem,Parameterizable):
         n_dims = self.dim_orig_
         fa_output = np.zeros([n_time_steps,n_dims])
         
-        if not self.function_approximators_:
+        if not self._function_approximators:
             return fa_output # No function approximators, return zeros
             
         
         for i_fa in range(n_dims):
-            if self.function_approximators_[i_fa]:
-                if self.function_approximators_[i_fa].isTrained():
-                    fa_output[:,i_fa] = self.function_approximators_[i_fa].predict(phase_state)
+            if self._function_approximators[i_fa]:
+                if self._function_approximators[i_fa].isTrained():
+                    fa_output[:,i_fa] = self._function_approximators[i_fa].predict(phase_state)
         return fa_output
         
     def analyticalSolution(self,ts=None):
@@ -301,10 +301,10 @@ class Dmp(DynamicalSystem,Parameterizable):
         # INTEGRATE SYSTEMS ANALYTICALLY AS MUCH AS POSSIBLE
 
         # Integrate phase
-        ( xs_phase, xds_phase) = self.phase_system_.analyticalSolution(ts)
+        ( xs_phase, xds_phase) = self._phase_system.analyticalSolution(ts)
         
         # Compute gating term
-        ( xs_gating, xds_gating ) = self.gating_system_.analyticalSolution(ts)
+        ( xs_gating, xds_gating ) = self._gating_system.analyticalSolution(ts)
         
         # Compute the output of the function approximator
         fa_outputs = self.computeFunctionApproximatorOutput(xs_phase)
@@ -313,18 +313,18 @@ class Dmp(DynamicalSystem,Parameterizable):
         forcing_terms = fa_outputs*xs_gating
   
         # Scale the forcing term, if necessary
-        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+        if (self._forcing_term_scaling=="G_MINUS_Y0_SCALING"):
             g_minus_y0 = (self.attractor_state_-self.initial_state_)
             g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
             forcing_terms *= g_minus_y0_rep
             
-        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+        elif (self._forcing_term_scaling=="AMPLITUDE_SCALING"):
             trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
             forcing_terms *= trajectory_amplitudes_rep
   
   
         # Get current delayed goal
-        if self.goal_system_ is None:
+        if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state               
             xs_goal  = np.tile(self.attractor_state_,(n_time_steps,1))
@@ -332,7 +332,7 @@ class Dmp(DynamicalSystem,Parameterizable):
             xds_goal = np.zeros(xs_goal.shape)
         else:
             # Integrate goal system and get current goal state
-            (xs_goal,xds_goal) = self.goal_system_.analyticalSolution(ts)
+            (xs_goal,xds_goal) = self._goal_system.analyticalSolution(ts)
             
             
         xs = np.zeros([n_time_steps,self.dim_])
@@ -349,8 +349,8 @@ class Dmp(DynamicalSystem,Parameterizable):
         # THE REST CANNOT BE DONE ANALYTICALLY
   
         # Reset the dynamical system, and get the first state
-        damping = self.spring_system_.damping_coefficient_
-        localspring_system = SpringDamperSystem(self.tau_,self.initial_state_,self.attractor_state_,damping)
+        damping = self._spring_system.damping_coefficient_
+        localspring_system = SpringDamperSystem(self._tau,self.initial_state_,self.attractor_state_,damping)
   
         # Set first attractor state
         localspring_system.set_attractor_state(xs_goal[0,:])
@@ -369,7 +369,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         xds[t0,SPRING]  = xd_spring
 
         # Add forcing term to the acceleration of the spring state  
-        xds[0,SPRING_Z] = xds[0,SPRING_Z] + forcing_terms[t0,:]/self.tau_
+        xds[0,SPRING_Z] = xds[0,SPRING_Z] + forcing_terms[t0,:]/self._tau
   
         for tt in range(1,n_time_steps): 
             dt = ts[tt]-ts[tt-1]
@@ -391,9 +391,9 @@ class Dmp(DynamicalSystem,Parameterizable):
             #    perturbation(i_dim) = (*analytical_solution_perturber_)()
       
             # Add forcing term to the acceleration of the spring state
-            xds[tt,SPRING_Z] = xds[tt,SPRING_Z] + forcing_terms[tt,:]/self.tau_ #+ perturbation
+            xds[tt,SPRING_Z] = xds[tt,SPRING_Z] + forcing_terms[tt,:]/self._tau #+ perturbation
             # Compute y component from z
-            xds[tt,SPRING_Y] = xs[tt,SPRING_Z]/self.tau_
+            xds[tt,SPRING_Y] = xs[tt,SPRING_Z]/self._tau
             
         return ( xs, xds, forcing_terms, fa_outputs)
         
@@ -414,12 +414,12 @@ class Dmp(DynamicalSystem,Parameterizable):
         self.trajectory_amplitudes_ = trajectory.getRangePerDim()
   
         # Do not train function approximators if there are none
-        if self.function_approximators_:
+        if self._function_approximators:
             (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
 
             for dd in range(self.dim_orig_):
                 fa_target = f_target[:,dd]
-                self.function_approximators_[dd].train(fa_input_phase,fa_target)
+                self._function_approximators[dd].train(fa_input_phase,fa_target)
         
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call 
@@ -451,14 +451,14 @@ class Dmp(DynamicalSystem,Parameterizable):
         fa_inputs_phase = xs_phase
   
         # Get parameters from the spring-dampers system to compute inverse
-        damping_coefficient = self.spring_system_.damping_coefficient_
-        spring_constant     = self.spring_system_.spring_constant_
-        mass                = self.spring_system_.mass_
+        damping_coefficient = self._spring_system.damping_coefficient_
+        spring_constant     = self._spring_system.spring_constant_
+        mass                = self._spring_system.mass_
         # Usually, spring-damper system of the DMP should have mass==1
         assert(mass==1.0)
 
         #Compute inverse
-        tau = self.tau_
+        tau = self._tau
         f_target = tau*tau*trajectory.ydds_ + (spring_constant*(trajectory.ys_-xs_goal) + damping_coefficient*tau*trajectory.yds_)/mass
   
         # Factor out gating term
@@ -467,19 +467,19 @@ class Dmp(DynamicalSystem,Parameterizable):
   
 
         # Factor out scaling
-        if (self.forcing_term_scaling_=="G_MINUS_Y0_SCALING"):
+        if (self._forcing_term_scaling=="G_MINUS_Y0_SCALING"):
             g_minus_y0 = (self.attractor_state_-self.initial_state_)
             g_minus_y0_rep = np.tile(g_minus_y0,(n_time_steps,1))
             f_target /= g_minus_y0_rep
             
-        elif (self.forcing_term_scaling_=="AMPLITUDE_SCALING"):
+        elif (self._forcing_term_scaling=="AMPLITUDE_SCALING"):
             trajectory_amplitudes_rep = np.tile(self.trajectory_amplitudes_,(n_time_steps,1))
             f_target /= trajectory_amplitudes_rep
  
         return  (fa_inputs_phase, f_target)
 
     def stateAsPosVelAcc(self, x_in, xd_in):
-        return (x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z]/self.tau_)
+        return (x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z]/self._tau)
         
     def statesAsTrajectory(self,ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
@@ -495,32 +495,32 @@ class Dmp(DynamicalSystem,Parameterizable):
             Trajectory representation of the DMP state vector output.
         """
         # Left column is time
-        return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self.tau_)
+        return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self._tau)
   
     def set_initial_state(self,initial_state):
         assert(initial_state.size==self.dim_orig_)
         super(Dmp,self).set_initial_state(initial_state);
         
         # Set value in all relevant subsystems also  
-        self.spring_system_.set_initial_state(initial_state);
-        if self.goal_system_:
-            self.goal_system_.set_initial_state(initial_state);
+        self._spring_system.set_initial_state(initial_state);
+        if self._goal_system:
+            self._goal_system.set_initial_state(initial_state);
         
     def set_attractor_state(self,attractor_state):
         assert(attractor_state.size==self.dim_orig_)
         super(Dmp,self).set_attractor_state(attractor_state);
   
         # Set value in all relevant subsystems also  
-        if self.goal_system_:
-            self.goal_system_.set_attractor_state(attractor_state);
+        if self._goal_system:
+            self._goal_system.set_attractor_state(attractor_state);
         
         # Do NOT do the following. The attractor state of the spring system is determined by the
         # goal system
-        # self.spring_system_.set_attractor_state(attractor_state);
+        # self._spring_system.set_attractor_state(attractor_state);
         
     def getSelectableParameters(self):
         selectable = []
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             selectable.extend(fa.getSelectableParameters())
         selectable.append('goal')
         # Remove duplicates
@@ -529,19 +529,19 @@ class Dmp(DynamicalSystem,Parameterizable):
     def getSelectableParametersRecommended(self):
         """Return the names of the parameters that recommended to be selected.
         """
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             selectable.extend(fa.getSelectableParameters())
         # Remove duplicates
         return list(dict.fromkeys(selectable))
 
     def setSelectedParameters(self,selected_values_labels):
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             fa.setSelectedParameters(selected_values_labels)
         self.goal_selected = "goal" in selected_values_labels
         
     def getParameterVectorSelected(self):
         values = np.empty(0)
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             if fa.isTrained():
                 values = np.append(values,fa.getParameterVectorSelected())
         if self.goal_selected:
@@ -552,7 +552,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         size = self.getParameterVectorSelectedSize()
         assert(len(values)==size)
         offset = 0
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             if fa.isTrained():
                 cur_size = fa.getParameterVectorSelectedSize()
                 cur_values = values[offset:offset+cur_size]
@@ -563,7 +563,7 @@ class Dmp(DynamicalSystem,Parameterizable):
             
     def getParameterVectorSelectedSize(self):
         size = 0
-        for fa in self.function_approximators_:
+        for fa in self._function_approximators:
             if fa.isTrained():
                 size += fa.getParameterVectorSelectedSize()
         if self.goal_selected:

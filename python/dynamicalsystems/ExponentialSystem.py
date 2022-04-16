@@ -29,34 +29,49 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem
 class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):
         super().__init__(1, tau, x_init)
-        self.x_attr_ = x_attr
-        self.alpha_ = alpha
+        self._x_attr = x_attr
+        self._alpha = alpha
 
-    def set_y_attr(self, y_attr):
-        self.x_attr_ = np.atleast_1d(y_attr)
+    @property
+    def y_attr(self):
+        return _x_attr
+    
+    @y_attr.setter
+    def y_attr(self, y):
+        if y.size!=self._dim_y:
+            raise ValueError("y_attr must have size "+self._dim_y)
+        self._x_attr = np.atleast_1d(y)
 
-    def set_x_attr(self, x_attr):
-        self.x_attr_ = np.atleast_1d(x_attr)
+    @property
+    def x_attr(self):
+        return _x_attr
+    
+    @x_attr.setter
+    def x_attr(self, x):
+        if x.size!=self._dim_x:
+            raise ValueError("y_attr must have size "+self._dim_x)
+        self._x_attr = np.atleast_1d(x)
+
 
     def differentialEquation(self, x):
-        xd = self.alpha_ * (self.x_attr_ - x) / self.tau_
+        xd = self._alpha * (self._x_attr - x) / self._tau
         return xd
 
     def analyticalSolution(self, ts):
         T = ts.size
 
-        exp_term = np.exp(-self.alpha_ * ts / self.tau_)
+        exp_term = np.exp(-self._alpha * ts / self._tau)
         pos_scale = exp_term
-        vel_scale = -(self.alpha_ / self.tau_) * exp_term
+        vel_scale = -(self._alpha / self._tau) * exp_term
 
-        val_range = self.x_init_ - self.x_attr_
+        val_range = self._x_init - self._x_attr
         val_range_repeat = np.repeat(np.atleast_2d(val_range), T, axis=0)
-        pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale), self.dim_x_, axis=0)
+        pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale), self._dim_x, axis=0)
         xs = np.multiply(val_range_repeat, pos_scale_repeat.T)
 
-        xs = xs + np.repeat(np.atleast_2d(self.x_attr_), T, axis=0)
+        xs = xs + np.repeat(np.atleast_2d(self._x_attr), T, axis=0)
 
-        vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale), self.dim_x_, axis=0)
+        vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale), self._dim_x, axis=0)
         xds = np.multiply(val_range_repeat, vel_scale_repeat.T)
 
         return (xs, xds)
