@@ -38,6 +38,9 @@ class SpringDamperSystem(DynamicalSystem):
         else:
             self.spring_constant_ = spring_constant
 
+    def set_y_attr(self,y_attr):
+        y_attr_ = y_attr
+        
     def differentialEquation(self, x):
         
         # Spring-damper system was originally 2nd order, i.e. with [x xd xdd]

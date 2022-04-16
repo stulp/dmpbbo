@@ -82,6 +82,21 @@ class ExponentialSystem : public DynamicalSystem {
     assert(x_attr.size() == dim());
     x_attr_ = x_attr;
   }
+  
+  /**
+   * Accessor function for the attractor state of the dynamical system.
+   * \param[out] y_attr Attractor state of the dynamical system.
+   */
+  inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = y_attr_; }
+
+  /** Mutator function for the attractor state of the dynamical system.
+   *  \param[in] y_attr Attractor state of the dynamical system.
+   */
+  inline void set_y_attr(const Eigen::Ref<const Eigen::VectorXd>& y_attr)
+  {
+    assert(y_attr.size() == dim());
+    y_attr_ = y_attr;
+  }
 
   /** Read an object from json.
    *  \param[in]  j   json input

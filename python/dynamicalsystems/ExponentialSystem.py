@@ -33,6 +33,12 @@ class ExponentialSystem(DynamicalSystem):
         self.x_attr_ = x_attr
         self.alpha_ = alpha
 
+    def set_y_attr(self,y_attr):
+        self.x_attr_ = np.atleast_1d(y_attr)
+        
+    def set_x_attr(self,x_attr):
+        self.x_attr_ = np.atleast_1d(x_attr)
+        
     def differentialEquation(self, x):
         xd = self.alpha_*(self.x_attr_-x)/self.tau_
         return xd

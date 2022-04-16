@@ -64,7 +64,7 @@ class DynamicalSystem(ABC):
         (xs[0,:], xds[0,:]) = self.integrateStart()
         for tt in range(1,n_time_steps):
             dt = ts[tt] - ts[tt-1]
-            (xs[tt,:],xds[tt,:]) = self.integrateStep(dt,xs[tt-1,:]) 
+            (xs[tt,:],xds[tt,:]) = self.integrateStepRungeKutta(dt,xs[tt-1,:]) 
            
         return (xs,xds)
 
