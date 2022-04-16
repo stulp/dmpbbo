@@ -69,12 +69,12 @@ class ExponentialSystem : public DynamicalSystem {
   double alpha(void) const { return alpha_; }
 
   /**
-   * Accessor function for the attractor state of the dynamical system.
+   * Get the attractor state of the dynamical system.
    * \param[out] x_attr Attractor state of the dynamical system.
    */
   inline void get_x_attr(Eigen::VectorXd& x_attr) const { x_attr = x_attr_; }
 
-  /** Mutator function for the attractor state of the dynamical system.
+  /** Set the attractor state of the dynamical system.
    *  \param[in] x_attr Attractor state of the dynamical system.
    */
   inline void set_x_attr(const Eigen::Ref<const Eigen::VectorXd>& x_attr)
@@ -84,12 +84,12 @@ class ExponentialSystem : public DynamicalSystem {
   }
   
   /**
-   * Accessor function for the attractor state of the dynamical system.
+   * Get the attractor state of the dynamical system.
    * \param[out] y_attr Attractor state of the dynamical system.
    */
   inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = y_attr_; }
 
-  /** Mutator function for the attractor state of the dynamical system.
+  /** Set the attractor state of the dynamical system.
    *  \param[in] y_attr Attractor state of the dynamical system.
    */
   inline void set_y_attr(const Eigen::Ref<const Eigen::VectorXd>& y_attr)

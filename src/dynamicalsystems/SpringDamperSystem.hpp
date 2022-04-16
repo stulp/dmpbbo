@@ -114,12 +114,12 @@ class SpringDamperSystem : public DynamicalSystem {
   inline void set_mass(double mass) { mass_ = mass; }
 
   /**
-   * Accessor function for the attractor state of the dynamical system.
+   * Get the attractor state of the dynamical system.
    * \param[out] y_attr Attractor state of the dynamical system.
    */
   inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = y_attr_; }
 
-  /** Mutator function for the attractor state of the dynamical system.
+  /** Set the attractor state of the dynamical system.
    *  \param[in] y_attr Attractor state of the dynamical system.
    */
   inline void set_y_attr(const Eigen::Ref<const Eigen::VectorXd>& y_attr)

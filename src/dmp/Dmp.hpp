@@ -262,21 +262,21 @@ class Dmp : public DynamicalSystem {
                                   Trajectory& trajectory) const;
 
   /**
-   * Accessor function for the time constant.
+   * Get the time constant.
    * \param[in] tau Time constant
    * We need to override DynamicalSystem::set_tau, because the DMP must also
    * change the time constant of all of its subsystems.
    */
   virtual void set_tau(double tau);
 
-  /** Accessor function for the initial state of the system.
+  /** Get the initial state of the system.
    *  \param[in] y_init Initial state of the system.
    * We need to override DynamicalSystem::set_initial_state, because the DMP
    * must also change the initial state  of the goal system as well.
    */
   virtual void set_y_init(const Eigen::VectorXd& y_init);
 
-  /** Accessor function for the attractor state of the system.
+  /** Get the attractor state of the system.
    *  \param[in] y_attr Attractor state of the system.
    */
   virtual void set_y_attr(const Eigen::VectorXd& y_attr);
@@ -322,7 +322,7 @@ class Dmp : public DynamicalSystem {
   inline int dim_dmp(void) const { return dim_y(); }
 
   /**
-   * Accessor function for the initial state of the dynamical system.
+   * Get the initial state of the dynamical system.
    * \return y_init Initial state of the dynamical system.
    */
   inline Eigen::VectorXd y_init(void) const
@@ -331,7 +331,7 @@ class Dmp : public DynamicalSystem {
   }
 
   /**
-   * Accessor function for the initial state of the dynamical system.
+   * Get the initial state of the dynamical system.
    * \param[out] y_init Initial state of the dynamical system.
    */
   inline void get_y_init(Eigen::VectorXd& y_init) const
@@ -340,7 +340,7 @@ class Dmp : public DynamicalSystem {
     y_init = x_init().segment(0, dim_y());
   }
 
-  /** Mutator function for the initial state of the dynamical system.
+  /** Set the initial state of the dynamical system.
    *  \param[in] y_init Initial state of the dynamical system.
    */
   inline void set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init)

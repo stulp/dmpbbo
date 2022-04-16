@@ -60,22 +60,22 @@ class Trajectory {
              const Eigen::MatrixXd& yds, const Eigen::MatrixXd& ydds,
              const Eigen::MatrixXd& misc = Eigen::MatrixXd(0, 0));
 
-  /** Accessor function for the times at which measurements were made.
+  /** Get the times at which measurements were made.
    * \return Times at which measurements were made.
    */
   inline const Eigen::VectorXd& ts(void) const { return ts_; }
 
-  /** Accessor function for the positions at different times
+  /** Get the positions at different times
    * \return Positions at different times
    */
   inline const Eigen::MatrixXd& ys(void) const { return ys_; }
 
-  /** Accessor function for the velocities at different times
+  /** Get the velocities at different times
    * \return Velocities at different times
    */
   inline const Eigen::MatrixXd& yds(void) const { return yds_; }
 
-  /** Accessor function for the accelerations at different times
+  /** Get the accelerations at different times
    * \return Accelerations at different times
    */
   inline const Eigen::MatrixXd& ydds(void) const { return ydds_; }

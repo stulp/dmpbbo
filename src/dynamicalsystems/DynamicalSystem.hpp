@@ -65,22 +65,23 @@ class DynamicalSystem {
    */
 
   /**
-   * Initialization constructor.
-   * \param order     Order of the system
-   * \param tau       Time constant, see tau()
-   * \param y_init    Initial state, see y_init()
+   * Initialize a first or second order dynamical system.
+   *
+   * \param[in] order     Order of the system (1 or 2)
+   * \param[in] tau       Time constant
+   * \param[in] y_init    Initial state
    */
   DynamicalSystem(int order, double tau, Eigen::VectorXd y_init);
 
   /**
-   * Initialization constructor.
-   * \param tau     Time constant, see tau()
-   * \param n_dims_y  Dimensionality of the state (which may differ from the size
-   * of y_init) \param y_init  Part of the initial state.
+   * Initialize a first order dynamical system, with extra state variables.
    *
-   * Constructs a first-order systems (order=1)
+   * \param[in] tau      Time constant
+   * \param[in] y_init   Initial state
+   * \param[in] n_dims_x Dimensionality of the state (which may differ from the size
+   * of y_init) 
    */
-  DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_y);
+  DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_x);
 
   /** Destructor */
   virtual ~DynamicalSystem(void);
@@ -157,9 +158,8 @@ class DynamicalSystem {
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
-   * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
-   * memory. As a consequence, if differentialEquation is real-time
-   * in a derived class, integrateStep will be real-time also.
+   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x), then
+   * this function will not allocate memory.
    */
   virtual void integrateStep(double dt,
                              const Eigen::Ref<const Eigen::VectorXd> x,
@@ -179,9 +179,8 @@ class DynamicalSystem {
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
-   * \remarks x should be of size dim_ X 1. This forces you to pre-allocate
-   * memory. As a consequence, if differentialEquation is real-time
-   * in a derived class, integrateStep will be real-time also.
+   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x), then
+   * this function will not allocate memory.
    */
   void integrateStepEuler(double dt, const Eigen::Ref<const Eigen::VectorXd> x,
                           Eigen::Ref<Eigen::VectorXd> x_updated,
@@ -236,30 +235,30 @@ class DynamicalSystem {
   inline int dim_y(void) const { return dim_y_; }
 
   /**
-   * Accessor function for the time constant.
+   * Get the time constant.
    * \return Time constant
    */
   inline double tau(void) const { return tau_; }
 
   /**
-   * Mutator function for the time constant.
+   * Set the time constant.
    * \param[in] tau Time constant
    */
   inline virtual void set_tau(double tau) { tau_ = tau; }
 
   /**
-   * Accessor function for the initial state of the dynamical system.
+   * Get the initial state of the dynamical system.
    * \param[out] initial_state Initial state of the dynamical system.
    */
   inline Eigen::VectorXd x_init(void) const { return x_init_; }
 
   /**
-   * Accessor function for the initial state of the dynamical system.
+   * Get the initial state of the dynamical system.
    * \param[out] initial_state Initial state of the dynamical system.
    */
   inline void get_x_init(Eigen::VectorXd& x_init) const { x_init = x_init_; }
 
-  /** Mutator function for the initial state of the dynamical system.
+  /** Set the initial state of the dynamical system.
    *  \param[in] initial_state Initial state of the dynamical system.
    */
   virtual void set_x_init(const Eigen::VectorXd& x_init) { 
@@ -268,13 +267,13 @@ class DynamicalSystem {
   }
 
   /**
-   * Accessor function for the y part of the initial state of the dynamical system.
+   * Get the y part of the initial state of the dynamical system.
    *
    * \param[out] y_init Initial state of the dynamical system.
    */
   void get_y_init(Eigen::VectorXd& y_init) const;
 
-  /** Mutator function for the y part of the initial state of the dynamical system.
+  /** Set the y part of the initial state of the dynamical system.
    *  \param[in] y_init Initial state of the dynamical system.
    */
   virtual void set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init);
