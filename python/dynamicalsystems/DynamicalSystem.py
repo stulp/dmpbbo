@@ -16,11 +16,12 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+import os
+import sys
+from abc import ABC, abstractmethod
+
 import matplotlib.pyplot as plt
 import numpy as np
-import sys
-import os
-from abc import ABC, abstractmethod
 
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)

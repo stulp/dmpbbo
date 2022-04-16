@@ -16,10 +16,11 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy
 import os
 import sys
+
 import matplotlib.pyplot as plt
+import numpy
 from matplotlib.ticker import ScalarFormatter
 
 

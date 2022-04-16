@@ -16,14 +16,16 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import numpy as np
-import sys
 import os
+import sys
+
+import numpy as np
+
+from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
 class SpringDamperSystem(DynamicalSystem):

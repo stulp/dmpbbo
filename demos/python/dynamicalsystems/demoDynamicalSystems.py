@@ -16,20 +16,23 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os, sys
+
+from dynamicalsystems.dynamicalsystems_plotting import *
+from dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
+from dynamicalsystems.TimeSystem import TimeSystem
 
 # Include scripts for plotting
 lib_path = os.path.abspath("../../../python/")
 sys.path.append(lib_path)
 
-from dynamicalsystems.dynamicalsystems_plotting import *
 
-from dynamicalsystems.ExponentialSystem import ExponentialSystem
-from dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dynamicalsystems.TimeSystem import TimeSystem
-from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
 
 def set_style(lines, label):
