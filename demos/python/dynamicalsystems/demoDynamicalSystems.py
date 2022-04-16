@@ -22,18 +22,15 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Include scripts for plotting
+lib_path = os.path.abspath("../../../python/")
+sys.path.append(lib_path)
+
 from dynamicalsystems.dynamicalsystems_plotting import *
 from dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dynamicalsystems.TimeSystem import TimeSystem
-
-# Include scripts for plotting
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
-
-
-
 
 def set_style(lines, label):
 
@@ -93,7 +90,7 @@ if __name__ == "__main__":
     for name, dyn_system in dyn_systems.items():
 
         n_plots = 3 if name == "SpringDamperSystem" else 2
-        fig = plt.figure(figure_number, figsize=(6 * n_plots, 4))
+        fig = plt.figure(figure_number, figsize=(5 * n_plots, 4))
         figure_number += 1
         axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 

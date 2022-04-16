@@ -21,12 +21,10 @@ import sys
 
 import numpy as np
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem  # 
-
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-
+from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):

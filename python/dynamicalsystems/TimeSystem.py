@@ -21,12 +21,10 @@ import sys
 
 import numpy as np
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem  # 
-
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-
+from dynamicalsystems.DynamicalSystem import DynamicalSystem  # 
 
 class TimeSystem(DynamicalSystem):
     def __init__(self, tau, count_down=False):

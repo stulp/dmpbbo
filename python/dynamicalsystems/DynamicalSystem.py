@@ -23,10 +23,6 @@ from abc import ABC, abstractmethod
 import matplotlib.pyplot as plt
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
-
-
 class DynamicalSystem(ABC):
     def __init__(self, order, tau, y_init, n_dims_x=None):
         assert order == 1 or order == 2
