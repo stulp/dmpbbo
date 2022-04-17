@@ -30,10 +30,11 @@ class TimeSystem(DynamicalSystem):
     def __init__(self, tau, count_down=False):
         if count_down:
             # Count-down from 1 to 0
-            super().__init__(1, tau, np.ones((1, 1)))
+            x_init = np.ones((1, 1))
         else:
             # Count-up from 0 to 1
-            super().__init__(1, tau, np.zeros((1, 1)))
+            x_init = np.zeros((1, 1))
+        super().__init__(1, tau, x_init)
         self._count_down = count_down
 
     def differentialEquation(self, x):
