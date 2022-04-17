@@ -37,18 +37,28 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  string directory = "../../../demos//json/";
+  // ./exec  => read json from default files, do not write output
+  // ./exec <input json 1> .. <input json N>
 
   vector<string> filenames;
-  for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
-    for (string dim : {"1D", "2D"})
-      filenames.push_back(system + "System_" + dim + ".json");
-  filenames.push_back("TimeSystem.json");
+  
+  if (n_args==1) {
+    // No directories and filename provided, add the files from the json directory
+    string input_directory = "../../../demos/json/";
+    for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
+      for (string dim : {"1D", "2D"})
+        filenames.push_back(input_directory + system + "System_" + dim + ".json");
+    filenames.push_back(input_directory+"TimeSystem.json");
+    filenames.push_back(input_directory+"TimeSystemCountDown.json");
+    
+  } else {
+    for (int i_args=1; i_args<n_args; i_args++)
+      filenames.push_back(args[i_args]);
+    
+  }
 
   for (string filename : filenames) {
-    filename = directory + filename;
-    cout << "================================================================="
-         << endl;
+    cout << "========================================================" << endl;
     cout << filename << endl;
 
     cout << "===============" << endl;
@@ -59,7 +69,7 @@ int main(int n_args, char** args)
     cout << "===============" << endl;
     DynamicalSystem* d = j.get<DynamicalSystem*>();
     cout << *d << endl;
-
+    
     VectorXd x(d->dim(), 1);
     VectorXd x_updated(d->dim(), 1);
     VectorXd xd(d->dim(), 1);
@@ -78,7 +88,8 @@ int main(int n_args, char** args)
         for (int t = 1; t < 10; t++)
           d->integrateStepRungeKutta(dt, x, x_updated, xd);
       } else {
-        for (int t = 1; t < 10; t++) d->integrateStep(dt, x, x_updated, xd);
+        for (int t = 1; t < 10; t++) 
+          d->integrateStep(dt, x, x_updated, xd);
       }
       EXITING_REAL_TIME_CRITICAL_CODE
     }
