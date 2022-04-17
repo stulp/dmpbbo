@@ -1,11 +1,11 @@
-{"alpha_": 6.0,
- "y_attr_": {"dtype": "float64",
+{"_alpha": 6.0,
+ "_x_attr": {"dtype": "float64",
                       "py/object": "numpy.ndarray",
                       "values": [0.8]},
- "dim_x_": 1,
- "dim_y_": 1,
- "y_init_": {"dtype": "float64",
+ "_dim_x": 1,
+ "_dim_y": 1,
+ "_x_init": {"dtype": "float64",
                     "py/object": "numpy.ndarray",
                     "values": [0.5]},
  "py/object": "dynamicalsystems.ExponentialSystem.ExponentialSystem",
- "tau_": 0.6}
+ "_tau": 0.6}

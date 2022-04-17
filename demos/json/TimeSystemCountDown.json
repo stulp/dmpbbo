@@ -1,11 +1,11 @@
-{"y_attr_": {"dtype": "float64",
+{"_y_attr": {"dtype": "float64",
                       "py/object": "numpy.ndarray",
                       "values": [[0.0]]},
- "count_down_": 1,
- "dim_x_": 1,
- "dim_y_": 1,
- "y_init_": {"dtype": "float64",
+ "_count_down": 1,
+ "_dim_x": 1,
+ "_dim_y": 1,
+ "_y_init": {"dtype": "float64",
                     "py/object": "numpy.ndarray",
                     "values": [[1.0]]},
  "py/object": "dynamicalsystems.TimeSystem.TimeSystem",
- "tau_": 0.6}
+ "_tau": 0.6}
