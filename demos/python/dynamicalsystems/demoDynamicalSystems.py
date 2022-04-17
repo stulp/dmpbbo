@@ -137,7 +137,7 @@ if __name__ == "__main__":
         set_style(lines, "perturb")
 
         # Runge-kutta integration with a different attractor
-        if name == "ExponentialSystem" or name == "SpringDamperSystem":
+        if name == "Exponential" or name == "SpringDamper":
             dyn_system.y_attr = x_attr - 0.2
             xs[0, :], xds[0, :] = dyn_system.integrateStart()
             for ii in range(1, n_time_steps):
