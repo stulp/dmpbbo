@@ -32,8 +32,8 @@ class DynamicalSystem(ABC):
         self._dim_y = len(y_init)
         self._dim_x = n_dims_x * order if n_dims_x else self._dim_y * order
         
-        self.tau = tau
         self.y_init = y_init
+        self.tau = tau
 
     @property
     def tau(self):

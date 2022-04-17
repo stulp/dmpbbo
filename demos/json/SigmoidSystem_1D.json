@@ -6,7 +6,7 @@
                       "values": [0.0]},
  "dim_x_": 1,
  "dim_y_": 1,
- "inflection_point_time_": 0.48,
+ "inflection_ratio_": 0.8,
  "y_init_": {"dtype": "float64",
                     "py/object": "numpy.ndarray",
                     "values": [0.5]},
