@@ -69,30 +69,27 @@ int main(int n_args, char** args)
     cout << "===============" << endl;
     DynamicalSystem* d = j.get<DynamicalSystem*>();
     cout << *d << endl;
-    
+
+    // Prepare numerical integration
     VectorXd x(d->dim(), 1);
     VectorXd x_updated(d->dim(), 1);
     VectorXd xd(d->dim(), 1);
-
     double dt = 0.01;
-    for (string integration_method : {"Euler", "Runge-Kutta", "Default"}) {
-      cout << "===============" << endl;
-      cout << "Integrating with: " << integration_method << endl;
-      d->integrateStart(x, xd);
-
-      ENTERING_REAL_TIME_CRITICAL_CODE
-      if (integration_method == "Euler") {
-        for (int t = 1; t < 10; t++)
-          d->integrateStepEuler(dt, x, x_updated, xd);
-      } else if (integration_method == "Runge-Kutta") {
-        for (int t = 1; t < 10; t++)
-          d->integrateStepRungeKutta(dt, x, x_updated, xd);
-      } else {
-        for (int t = 1; t < 10; t++) 
-          d->integrateStep(dt, x, x_updated, xd);
-      }
-      EXITING_REAL_TIME_CRITICAL_CODE
-    }
+    
+    cout << "===============" << endl << "Integrating with Euler" << endl;
+    d->integrateStart(x, xd);
+    Eigen::internal::set_is_malloc_allowed(false); // Make sure the following is real-time
+    for (int t = 1; t < 10; t++)
+      d->integrateStepEuler(dt, x, x_updated, xd);
+    Eigen::internal::set_is_malloc_allowed(true);
+    
+    cout << "===============" << endl << "Integrating with Runge-Kutta" << endl;
+    d->integrateStart(x, xd);
+    Eigen::internal::set_is_malloc_allowed(false); // Make sure the following is real-time
+    for (int t = 1; t < 10; t++)
+      d->integrateStepRungeKutta(dt, x, x_updated, xd);
+    Eigen::internal::set_is_malloc_allowed(true);
+    
   }
 
   return 0;
