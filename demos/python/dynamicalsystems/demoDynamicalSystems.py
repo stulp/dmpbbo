@@ -88,7 +88,7 @@ if __name__ == "__main__":
     figure_number = 1
     for name, dyn_system in dyn_systems.items():
 
-        n_plots = 3 if name == "SpringDamperSystem" else 2
+        n_plots = 3 if name == "SpringDamper" else 2
         fig = plt.figure(figure_number, figsize=(5 * n_plots, 4))
         figure_number += 1
         axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
