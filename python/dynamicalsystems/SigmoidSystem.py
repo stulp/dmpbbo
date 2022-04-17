@@ -49,7 +49,7 @@ class SigmoidSystem(DynamicalSystem):
         xd = self._max_rate * x * (1 - (np.divide(x, self._Ks)))
         return xd
 
-    def analyticalSolutionToFix(self, ts):
+    def analyticalSolution(self, ts):
         # Auxillary variables to improve legibility
         r = self._max_rate
         exp_rt = np.exp(-r * ts)
@@ -57,16 +57,11 @@ class SigmoidSystem(DynamicalSystem):
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
-        print(xs.shape)
-        print(xds.shape)
-        print(exp_rt.shape)
 
         for dd in range(self._dim_x):
             # Auxillary variables to improve legibility
-            b = (self._Ks[dd] / self._x_init[dd]) - 1
-            print(K.shape)
-            print(b.shape)
-
+            K = self._Ks[dd]
+            b = (K / self._x_init[dd]) - 1
             xs[:, dd] = K / (1 + b * exp_rt)
             xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
 
