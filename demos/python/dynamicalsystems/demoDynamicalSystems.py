@@ -32,6 +32,7 @@ from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dynamicalsystems.TimeSystem import TimeSystem
 
+
 def set_style(lines, label):
 
     if label == "analytical":
@@ -56,25 +57,23 @@ if __name__ == "__main__":
     x_init = np.array([0.5, 1.0])
     x_attr = np.array([0.8, 0.1])
     alpha = 6.0  # Decay factor
-    dyn_systems = {"ExponentialSystem": ExponentialSystem(tau, x_init, x_attr, alpha)}
+    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}
 
     # TimeSystem
-    dyn_systems["TimeSystem"] = TimeSystem(tau)
+    dyn_systems["Time"] = TimeSystem(tau)
 
     # TimeSystem (but counting down instead of up)
     count_down = True
-    dyn_systems["TimeSystemCountDown"] = TimeSystem(tau, count_down)
+    dyn_systems["TimeCountDown"] = TimeSystem(tau, count_down)
 
     # SigmoidSystem
     max_rate = -10
-    inflection_point = tau * 0.8
-    dyn_systems["SigmoidSystem"] = SigmoidSystem(
-        tau, x_init, max_rate, inflection_point
-    )
+    inflection_ratio = 0.8
+    dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
 
     # SpringDamperSystem
     alpha = 12.0
-    dyn_systems["SpringDamperSystem"] = SpringDamperSystem(tau, x_init, x_attr, alpha)
+    dyn_systems["SpringDamper"] = SpringDamperSystem(tau, x_init, x_attr, alpha)
 
     ###########################################################################
     # Start integration of all systems
