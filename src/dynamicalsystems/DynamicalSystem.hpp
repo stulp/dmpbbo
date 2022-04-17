@@ -94,7 +94,7 @@ class DynamicalSystem {
 
   /**
    * The differential equation which defines the system.
-   * It relates state values to rates of change of those state values
+   * It relates state values to rates of change of those state values.
    *
    * \param[in]  x  current state (column vector of size dim_ X 1)
    * \param[out] xd rate of change in state (column vector of size dim_ X 1)
@@ -107,12 +107,14 @@ class DynamicalSystem {
                                     Eigen::Ref<Eigen::VectorXd> xd) const = 0;
 
   /**
-   * Return analytical solution of the system at certain times
+   * Return analytical solution of the system at certain times.
    *
    * \param[in]  ts  A vector of times for which to compute the analytical
-   * solutions \param[out] xs  Sequence of state vectors. T x D or D x T matrix,
+   * solutions 
+   * \param[out] xs  Sequence of state vectors. T x D or D x T matrix,
    * where T is the number of times (the length of 'ts'), and D the size of the
-   * state (i.e. dim_) \param[out] xds Sequence of state vectors (rates of
+   * state (i.e. dim_) 
+   * \param[out] xds Sequence of state vectors (rates of
    * change). T x D or D x T matrix, where T is the number of times (the length
    * of 'ts'), and D the size of the state (i.e. dim_)
    *
@@ -248,18 +250,18 @@ class DynamicalSystem {
 
   /**
    * Get the initial state of the dynamical system.
-   * \param[out] initial_state Initial state of the dynamical system.
+   * \return Initial state of the dynamical system.
    */
   inline Eigen::VectorXd x_init(void) const { return x_init_; }
 
   /**
    * Get the initial state of the dynamical system.
-   * \param[out] initial_state Initial state of the dynamical system.
+   * \param[out] x_init Initial state of the dynamical system.
    */
   inline void get_x_init(Eigen::VectorXd& x_init) const { x_init = x_init_; }
 
   /** Set the initial state of the dynamical system.
-   *  \param[in] initial_state Initial state of the dynamical system.
+   *  \param[in] x_init Initial state of the dynamical system.
    */
   virtual void set_x_init(const Eigen::VectorXd& x_init) { 
     assert(x_init.size() == dim_x_);

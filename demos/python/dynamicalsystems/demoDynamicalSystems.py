@@ -96,14 +96,14 @@ if __name__ == "__main__":
 
         # Analytical solution
         xs, xds = dyn_system.analyticalSolution(ts)
-        lines = dyn_system.plot(ts, xs, xds, axs)
+        lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "analytical")
 
         # Euler integration
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
-        lines = dyn_system.plot(ts, xs, xds, axs)
+        lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "euler")
 
         # Runge-kutta integration
@@ -112,7 +112,7 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        lines = dyn_system.plot(ts, xs, xds, axs)
+        lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "rungekutta")
 
         # Runge-kutta integration with different tau
@@ -122,7 +122,7 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        lines = dyn_system.plot(ts, xs, xds, axs)
+        lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "tau")
         dyn_system.tau = tau
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        lines = dyn_system.plot(ts, xs, xds, axs)
+        lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "perturb")
 
         # Runge-kutta integration with a different attractor
@@ -145,7 +145,7 @@ if __name__ == "__main__":
                 xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                     dt, xs[ii - 1, :]
                 )
-            lines = dyn_system.plot(ts, xs, xds, axs)
+            lines = dyn_system.plot(ts, xs, xds, axs=axs)
             set_style(lines, "attractor")
             dyn_system.y_attr = x_attr
 
