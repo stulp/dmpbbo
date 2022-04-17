@@ -87,7 +87,7 @@ class ExponentialSystem : public DynamicalSystem {
    * Get the attractor state of the dynamical system.
    * \param[out] y_attr Attractor state of the dynamical system.
    */
-  inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = y_attr_; }
+  inline void get_y_attr(Eigen::VectorXd& y_attr) const { y_attr = x_attr_; }
 
   /** Set the attractor state of the dynamical system.
    *  \param[in] y_attr Attractor state of the dynamical system.
@@ -95,7 +95,7 @@ class ExponentialSystem : public DynamicalSystem {
   inline void set_y_attr(const Eigen::Ref<const Eigen::VectorXd>& y_attr)
   {
     assert(y_attr.size() == dim());
-    y_attr_ = y_attr;
+    x_attr_ = y_attr;
   }
 
   /** Read an object from json.
