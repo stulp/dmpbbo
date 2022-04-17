@@ -24,34 +24,63 @@ import numpy as np
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem  # 
+from dynamicalsystems.DynamicalSystem import DynamicalSystem  #
+
 
 class SigmoidSystem(DynamicalSystem):
     def __init__(self, tau, x_init, max_rate, inflection_ratio):
         self._max_rate = max_rate
         self._inflection_ratio = inflection_ratio
         super().__init__(1, tau, x_init)
-        self._Ks = self._computeKs(x_init, max_rate, tau*inflection_ratio)
+        self._Ks = SigmoidSystem._computeKs(x_init, max_rate, tau * inflection_ratio)
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
         self._tau = new_tau
-        t_infl = self._tau*self._inflection_ratio
-        self._Ks = self._computeKs(self.x_init, self._max_rate, t_infl)
+        t_infl = self._tau * self._inflection_ratio
+        self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
 
     @DynamicalSystem.x_init.setter
     def x_init(self, new_x_init):
         super().x_init = new_x_init
-        self._Ks = self._computeKs(self.x_init, self._max_rate, t_infl)
-        
-    def _computeKs(self, N_0s, r, t_infl):
-        
+        self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
+
+    def differentialEquation(self, x):
+        xd = self._max_rate * x * (1 - (np.divide(x, self._Ks)))
+        return xd
+
+    def analyticalSolutionToFix(self, ts):
+        # Auxillary variables to improve legibility
+        r = self._max_rate
+        exp_rt = np.exp(-r * ts)
+
+        xs = np.empty([ts.size, self._dim_x])
+        xds = np.empty([ts.size, self._dim_x])
+
+        print(xs.shape)
+        print(xds.shape)
+        print(exp_rt.shape)
+
+        for dd in range(self._dim_x):
+            # Auxillary variables to improve legibility
+            b = (self._Ks[dd] / self._x_init[dd]) - 1
+            print(K.shape)
+            print(b.shape)
+
+            xs[:, dd] = K / (1 + b * exp_rt)
+            xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
+
+        return (xs, xds)
+
+    @staticmethod
+    def _computeKs(N_0s, r, t_infl):
+
         # The idea here is that the initial state (called N_0s above), max_rate (r above) and the
         # inflection_ratio are set by the user.
         # The only parameter that we have left to tune is the "carrying capacity" K.
         #   http://en.wikipedia.org/wiki/Logistic_function#In_ecology:_modeling_population_growth
         # In the below, we set K so that the initial state is N_0s for the given r and tau
-        
+
         # Known
         #   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
         #   N(t_inf) = K / 2
@@ -85,30 +114,3 @@ class SigmoidSystem(DynamicalSystem):
             )
 
         return Ks
-
-    def differentialEquation(self, x):
-        xd = self._max_rate * x * (1 - (np.divide(x, self._Ks)))
-        return xd
-
-    def analyticalSolutionToFix(self, ts):
-        # Auxillary variables to improve legibility
-        r = self._max_rate
-        exp_rt = np.exp(-r * ts)
-
-        xs = np.empty([ts.size, self._dim_x])
-        xds = np.empty([ts.size, self._dim_x])
-
-        print(xs.shape)
-        print(xds.shape)
-        print(exp_rt.shape)
-
-        for dd in range(self._dim_x):
-            # Auxillary variables to improve legibility
-            b = (self._Ks[dd] / self._x_init[dd]) - 1
-            print(K.shape)
-            print(b.shape)
-
-            xs[:, dd] = K / (1 + b * exp_rt)
-            xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
-
-        return (xs, xds)
