@@ -108,7 +108,7 @@ void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
   xs.resize(n_time_steps, dim());
   xds.resize(n_time_steps, dim());
 
-  VectorXd y_init = x_init();
+  VectorXd x_ini = x_init();
 
   // Closed form solution to 2nd order canonical system
   // This system behaves like a critically damped spring-damper system
@@ -120,27 +120,11 @@ void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
     cout << "WARNING: Spring-damper system is not critically damped, zeta="
          << zeta << endl;
 
-  // Example
-  //  _______________
-  //    dim = 4
-  //  _______
-  //  y_dim= 2
-  // [y_1 y_2 z_1 z_2 yd_1 yd_2 zd_1 zd_2]
-
-  int y_dim = dim() / 2;
-
   // The loop is slower, but more legible than fudging around with
   // Eigen::replicate().
-  for (int i_dim = 0; i_dim < y_dim; i_dim++) {
-    double y0 = y_init[i_dim] - y_attr_[i_dim];
-    double yd0;
-    if (y_init.size() >= dim()) {
-      // Initial velocities also given
-      yd0 = y_init[y_dim + i_dim];
-    } else {
-      // Initial velocities not given: set to zero
-      yd0 = 0.0;
-    }
+  for (int i_dim = 0; i_dim < dim_y(); i_dim++) {
+    double y0 = x_ini[i_dim] - y_attr_[i_dim];
+    double yd0 = x_ini[dim_y() + i_dim];
 
     double A = y0;
     double B = yd0 + omega_0 * y0;
@@ -150,8 +134,8 @@ void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
     VectorXd exp_term = -omega_0 * ts;
     exp_term = exp_term.array().exp();
 
-    int Y = 0 * y_dim + i_dim;
-    int Z = 1 * y_dim + i_dim;
+    int Y = 0 * dim_y() + i_dim;
+    int Z = 1 * dim_y() + i_dim;
 
     VectorXd ABts = A + B * ts.array();
 
@@ -186,7 +170,8 @@ void from_json(const nlohmann::json& j, SpringDamperSystem*& obj)
   double mass = from_json_to_double(j.at("_mass"));
   
   VectorXd y_attr = j.at("_y_attr").at("values");
-  VectorXd y_init = j.at("_y_init").at("values");
+  VectorXd x_init = j.at("_x_init").at("values");
+  VectorXd y_init = x_init.segment(0,y_attr.size());
 
   obj = new SpringDamperSystem(tau, y_init, y_attr, damping_coefficient,
                                spring_constant, mass);
