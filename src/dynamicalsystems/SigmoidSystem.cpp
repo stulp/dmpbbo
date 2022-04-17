@@ -35,12 +35,13 @@ using namespace Eigen;
 namespace DmpBbo {
 
 SigmoidSystem::SigmoidSystem(double tau, const Eigen::VectorXd& x_init,
-                             double max_rate, double inflection_point_time)
+                             double max_rate, double inflection_ratio)
     : DynamicalSystem(1, tau, x_init),
       max_rate_(max_rate),
-      inflection_point_time_(inflection_point_time)
+      inflection_ratio_(inflection_ratio)
 {
-  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time_);
+  double inflection_point_time = inflection_ratio_ * tau;
+  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time);
 }
 
 SigmoidSystem::~SigmoidSystem(void) {}
@@ -48,19 +49,17 @@ SigmoidSystem::~SigmoidSystem(void) {}
 void SigmoidSystem::set_tau(double new_tau)
 {
   // Get previous tau from superclass with tau() and set it with set_tau()
-  double prev_tau = tau();
   DynamicalSystem::set_tau(new_tau);
-
-  inflection_point_time_ =
-      new_tau * inflection_point_time_ / prev_tau;  // todo document this
-  Ks_ = SigmoidSystem::computeKs(x_init(), max_rate_, inflection_point_time_);
+  double inflection_point_time = inflection_ratio_ * tau();
+  Ks_ = SigmoidSystem::computeKs(x_init(), max_rate_, inflection_point_time);
 }
 
 void SigmoidSystem::set_x_init(const VectorXd& x_init)
 {
   assert(x_init.size() == dim());
   DynamicalSystem::set_x_init(x_init);
-  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time_);
+  double inflection_point_time = inflection_ratio_ * tau();
+  Ks_ = SigmoidSystem::computeKs(x_init, max_rate_, inflection_point_time);
 }
 
 VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r,
@@ -165,11 +164,10 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 
 void from_json(const nlohmann::json& j, SigmoidSystem*& obj)
 {
-  double tau = from_json_to_double(j.at("tau_"));
-  double max_rate = from_json_to_double(j.at("max_rate_"));
-  double inflection_point_time =
-      from_json_to_double(j.at("inflection_point_time_"));
-  VectorXd x_init = j.at("y_init_").at("values");
+  double tau = from_json_to_double(j.at("_tau"));
+  double max_rate = from_json_to_double(j.at("_max_rate"));
+  double inflection_point_time = from_json_to_double(j.at("_inflection_ratio"));
+  VectorXd x_init = j.at("_y_init").at("values");
 
   obj = new SigmoidSystem(tau, x_init, max_rate, inflection_point_time);
 }
@@ -178,8 +176,8 @@ void SigmoidSystem::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
 
-  j["max_rate_"] = max_rate_;
-  j["inflection_point_time_"] = inflection_point_time_;
+  j["_max_rate"] = max_rate_;
+  j["_inflection_ratio"] = inflection_ratio_;
 
   string c("SigmoidSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

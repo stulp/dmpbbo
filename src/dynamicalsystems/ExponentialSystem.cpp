@@ -90,10 +90,10 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 
 void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 {
-  double tau = from_json_to_double(j.at("tau_"));
-  double alpha = from_json_to_double(j.at("alpha_"));
-  VectorXd x_init = j.at("x_init_").at("values");
-  VectorXd x_attr = j.at("x_attr_").at("values");
+  double tau = from_json_to_double(j.at("_tau"));
+  double alpha = from_json_to_double(j.at("_alpha"));
+  VectorXd x_init = j.at("_x_init").at("values");
+  VectorXd x_attr = j.at("_x_attr").at("values");
 
   obj = new ExponentialSystem(tau, x_init, x_attr, alpha);
 }
@@ -101,8 +101,8 @@ void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 void ExponentialSystem::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
-  j["alpha_"] = alpha_;
-  j["y_attr_"] = x_attr_;
+  j["_alpha"] = alpha_;
+  j["_y_attr"] = x_attr_;
 
   string c("ExponentialSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

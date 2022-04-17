@@ -45,12 +45,11 @@ class SigmoidSystem : public DynamicalSystem {
    *  \param tau              Time constant,                cf.
    * DynamicalSystem::tau() \param x_init           Initial state, cf.
    * DynamicalSystem::x_init() \param max_rate         Maximum rate of
-   * change,       cf. SigmoidSystem::max_rate() \param inflection_point_time
-   * Time at which maximum rate of change is achieved,  cf.
-   * SigmoidSystem::inflection_point_time()
+   * change,       cf. SigmoidSystem::max_rate() \param inflection_ratio
+   * Time at which maximum rate of change is achieved,  i.e. at inflection_ratio * tau 
    */
   SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate,
-                double inflection_point_time);
+                double inflection_ratio);
 
   /** Destructor. */
   ~SigmoidSystem(void);
@@ -96,10 +95,10 @@ class SigmoidSystem : public DynamicalSystem {
   void to_json_helper(nlohmann::json& j) const;
 
   static Eigen::VectorXd computeKs(const Eigen::VectorXd& N_0s, double r,
-                                   double inflection_point_time_time);
+                                   double inflection_point_time);
 
   double max_rate_;
-  double inflection_point_time_;
+  double inflection_ratio_;
   Eigen::VectorXd Ks_;
 };
 

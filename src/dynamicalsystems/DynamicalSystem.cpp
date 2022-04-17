@@ -173,10 +173,10 @@ void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
 
 void DynamicalSystem::to_json_base(nlohmann::json& j) const
 {
-  j["dim_x_"] = dim_x_;
-  j["dim_y_"] = dim_y_;
-  j["tau_"] = tau_;
-  j["y_init_"] = x_init_.segment(0,dim_y_);
+  j["_dim_x"] = dim_x_;
+  j["_dim_y"] = dim_y_;
+  j["_tau"] = tau_;
+  j["_y_init"] = x_init_.segment(0,dim_y_);
 
   string c("DynamicalSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle
