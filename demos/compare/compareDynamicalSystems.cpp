@@ -75,7 +75,7 @@ int main(int n_args, char** args)
   // Prepare analytical solution
   MatrixXd xs, xds;
   
-  cout << "===============" << endl << "Analytical solution" << endl;
+  cout << "===============" << endl << "C++ Analytical solution" << endl;
   d->analyticalSolution(ts,xs,xds);
   bool overwrite = true;
   saveMatrix(directory+"/xs_analytical.txt", xs, overwrite);
@@ -87,7 +87,7 @@ int main(int n_args, char** args)
   VectorXd xd(d->dim(), 1);
   double dt = 0.01;
     
-  cout << "===============" << endl << "Integrating with Euler" << endl;
+  cout << "===============" << endl << "C++ Integrating with Euler" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;
@@ -101,7 +101,7 @@ int main(int n_args, char** args)
   saveMatrix(directory+"/xs_euler.txt", xs, overwrite);
   saveMatrix(directory+"/xds_euler.txt", xds, overwrite);
   
-  cout << "===============" << endl << "Integrating with Runge-Kutta" << endl;
+  cout << "===============" << endl << "C++ Integrating with Runge-Kutta" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;
