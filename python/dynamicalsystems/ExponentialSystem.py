@@ -29,35 +29,72 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):
+        """ Initialize an ExponentialSystem.
+        
+        Args:
+            tau    - Time constant
+            x_init - Initial state
+            x_attr - Attractor state
+            alpha - Decay constant
+        """
         super().__init__(1, tau, x_init)
         self._x_attr = x_attr
         self._alpha = alpha
 
     @property
     def y_attr(self):
+        """ Return the y part of the attractor state.
+        
+        Note that for an ExponentialSystem y is equivalent to x.
+        """
         return _x_attr
 
     @y_attr.setter
     def y_attr(self, y):
+        """ Set the y part of the attractor state.
+        
+        Note that for an ExponentialSystem y is equivalent to x.
+        """
         if y.size != self._dim_y:
             raise ValueError("y_attr must have size " + self._dim_y)
         self._x_attr = np.atleast_1d(y)
 
     @property
     def x_attr(self):
+        """ Get the y part of the attractor state.
+        
+        Note that for an ExponentialSystem y is equivalent to x.
+        """
         return _x_attr
 
     @x_attr.setter
     def x_attr(self, x):
+        """ Set the the attractor state.
+        
+        Note that for an ExponentialSystem y is equivalent to x.
+        """
         if x.size != self._dim_x:
             raise ValueError("y_attr must have size " + self._dim_x)
         self._x_attr = np.atleast_1d(x)
 
     def differentialEquation(self, x):
+        """ The differential equation which defines the system.
+        
+        It relates state values to rates of change of those state values.
+        
+        Args: x - current state
+        Returns: xd - rate of change in state
+        """
         xd = self._alpha * (self._x_attr - x) / self._tau
         return xd
 
     def analyticalSolution(self, ts):
+        """
+         Return analytical solution of the system at certain times.
+        
+         Args: ts - A vector of times for which to compute the analytical solutions 
+         Returns: (xs, xds) - Sequence of states and their rates of change.
+        """
         T = ts.size
 
         exp_term = np.exp(-self._alpha * ts / self._tau)

@@ -119,8 +119,8 @@ class DynamicalSystem(ABC):
         """
          Return analytical solution of the system at certain times.
         
-         Args: ts- A vector of times for which to compute the analytical solutions 
-         Returns: (xs, xds)  Sequence of states and their rates of change.
+         Args: ts - A vector of times for which to compute the analytical solutions 
+         Returns: (xs, xds) - Sequence of states and their rates of change.
         """
         pass
 

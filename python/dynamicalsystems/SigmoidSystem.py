@@ -29,6 +29,15 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem  #
 
 class SigmoidSystem(DynamicalSystem):
     def __init__(self, tau, x_init, max_rate, inflection_ratio):
+        """ Initialize a SigmoidSystem.
+        
+        Args:
+            tau    - Time constant
+            x_init - Initial state
+            max_rate - Maximum rate of change
+            inflection_ratio - Time at which maximum rate of change is 
+                               achieved, i.e. at inflection_ratio * tau
+        """
         self._max_rate = max_rate
         self._inflection_ratio = inflection_ratio
         super().__init__(1, tau, x_init)
@@ -36,20 +45,56 @@ class SigmoidSystem(DynamicalSystem):
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
+        """ Set the time constant.
+         
+         Args:
+            new_tau - Time constant
+        """
         self._tau = new_tau
         t_infl = self._tau * self._inflection_ratio
         self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
 
     @DynamicalSystem.x_init.setter
     def x_init(self, new_x_init):
+        """ Set the initial state of the dynamical system.
+        
+         Args:
+            new_x_init Initial state of the dynamical system.
+        """
         super().x_init = new_x_init
         self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
 
+    # @DynamicalSystem.y_init.setter
+    # def y_init(self, new_y_init):
+    #    """ Set the initial state of the dynamical system (y part)
+    #
+    #     Args:
+    #        new_y_init Initial state of the dynamical system. (y part)
+    #
+    #    Note that for an ExponentialSystem y is equivalent to x.
+    #    """
+    #    super().x_init = new_y_init
+    #    self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
+
     def differentialEquation(self, x):
+        """ The differential equation which defines the system.
+        
+        It relates state values to rates of change of those state values.
+        
+        Args: x - current state
+        Returns: xd - rate of change in state
+        """
         xd = self._max_rate * x * (1 - (np.divide(x, self._Ks)))
         return xd
 
     def analyticalSolution(self, ts):
+        """
+         Return analytical solution of the system at certain times.
+        
+         Args: ts - A vector of times for which to compute the analytical solutions 
+         Returns: (xs, xds) - Sequence of states and their rates of change.
+        """
+
         # Auxillary variables to improve legibility
         r = self._max_rate
         exp_rt = np.exp(-r * ts)

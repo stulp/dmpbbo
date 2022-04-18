@@ -29,6 +29,12 @@ from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 class TimeSystem(DynamicalSystem):
     def __init__(self, tau, count_down=False):
+        """ Initialize a TimeSystem
+        
+        Args:        
+            tau - Time constant
+            count_down - Whether timer increases (False) or decreases (True)
+        """
         if count_down:
             # Count-down from 1 to 0
             x_init = np.ones((1, 1))
@@ -39,6 +45,13 @@ class TimeSystem(DynamicalSystem):
         self._count_down = count_down
 
     def differentialEquation(self, x):
+        """ The differential equation which defines the system.
+        
+        It relates state values to rates of change of those state values.
+        
+        Args: x - current state
+        Returns: xd - rate of change in state
+        """
         xd = np.zeros([1, 1])
         if self._count_down:
             if x > 0:
@@ -50,6 +63,13 @@ class TimeSystem(DynamicalSystem):
         return xd
 
     def analyticalSolution(self, ts):
+        """
+         Return analytical solution of the system at certain times.
+        
+         Args: ts - A vector of times for which to compute the analytical solutions 
+         Returns: (xs, xds) - Sequence of states and their rates of change.
+        """
+
         T = ts.size
 
         if self._count_down:
