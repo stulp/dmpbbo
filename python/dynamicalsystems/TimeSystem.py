@@ -26,6 +26,7 @@ sys.path.append(lib_path)
 
 from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
+
 class TimeSystem(DynamicalSystem):
     def __init__(self, tau, count_down=False):
         if count_down:
@@ -48,37 +49,18 @@ class TimeSystem(DynamicalSystem):
 
         return xd
 
+    def analyticalSolution(self, ts):
+        T = ts.size
 
-#    def analyticalSolution(self, ts):
-#        T = ts.size
-#
-#        # Prepare output arguments to be of right size
-#        xs = np.zeros([T,self.dim_]);
-#        xds = np.zeros([T,self.dim_]);
-#
-#        # Find first index at which the time is larger than tau. Then velocities should be set to zero.
-#        velocity_stop_index = -1;
-#  int i=0;
-#  while (velocity_stop_index<0 && i<ts.size())
-#    if (ts[i++]>tau())
-#      velocity_stop_index = i-1;
-#
-#  if (velocity_stop_index<0)
-#    velocity_stop_index = ts.size();
-#
-#  if (count_down_)
-#  {
-#    xs.topRows(velocity_stop_index) = (-ts.segment(0,velocity_stop_index).array()/tau()).array()+1.0;
-#    xs.bottomRows(xs.size()-velocity_stop_index).fill(0.0);
-#
-#    xds.topRows(velocity_stop_index).fill(-1.0/tau());
-#    xds.bottomRows(xds.size()-velocity_stop_index).fill(0.0);
-#  }
-#  else
-#  {
-#    xs.topRows(velocity_stop_index) = ts.segment(0,velocity_stop_index).array()/tau();
-#    xs.bottomRows(xs.size()-velocity_stop_index).fill(1.0);
-#
-#    xds.topRows(velocity_stop_index).fill(1.0/tau());
-#    xds.bottomRows(xds.size()-velocity_stop_index).fill(0.0);
-#  }
+        if self._count_down:
+            xs = 1.0 - np.reshape(ts / self.tau, (T, 1))
+            xds = -np.ones((T, 1)) / self.tau
+            xds[xs < 0.0] = 0.0
+            xs[xs < 0.0] = 0.0
+        else:
+            xs = np.reshape(ts / self.tau, (T, 1))
+            xds = np.ones((T, 1)) / self.tau
+            xds[xs > 1.0] = 0.0
+            xs[xs > 1.0] = 1.0
+
+        return (xs, xds)

@@ -114,6 +114,7 @@ class DynamicalSystem(ABC):
         """
         pass
 
+    @abstractmethod
     def analyticalSolution(self, ts):
         """
          Return analytical solution of the system at certain times.
@@ -121,17 +122,7 @@ class DynamicalSystem(ABC):
          Args: ts- A vector of times for which to compute the analytical solutions 
          Returns: (xs, xds)  Sequence of states and their rates of change.
         """
-        # Default implementation: call differentialEquation
-        n_time_steps = ts.size
-        xs = np.zeros([n_time_steps, self._dim_x])
-        xds = np.zeros([n_time_steps, self._dim_x])
-
-        (xs[0, :], xds[0, :]) = self.integrateStart()
-        for tt in range(1, n_time_steps):
-            dt = ts[tt] - ts[tt - 1]
-            (xs[tt, :], xds[tt, :]) = self.integrateStepRungeKutta(dt, xs[tt - 1, :])
-
-        return (xs, xds)
+        pass
 
     def integrateStart(self, y_init=None):
         """ Start integrating the system with a new initial state.

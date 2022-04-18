@@ -26,6 +26,7 @@ sys.path.append(lib_path)
 
 from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
+
 class SpringDamperSystem(DynamicalSystem):
     def __init__(
         self,
@@ -48,11 +49,11 @@ class SpringDamperSystem(DynamicalSystem):
     @property
     def y_attr(self):
         return _y_attr
-    
+
     @y_attr.setter
     def y_attr(self, new_y_attr):
-        if new_y_attr.size!=self._dim_y:
-            raise ValueError("y_attr must have size "+self._dim_y)
+        if new_y_attr.size != self._dim_y:
+            raise ValueError("y_attr must have size " + self._dim_y)
         self._y_attr = np.atleast_1d(new_y_attr)
 
     def differentialEquation(self, x):
@@ -75,3 +76,60 @@ class SpringDamperSystem(DynamicalSystem):
         xd = np.concatenate((yd, zd))
 
         return xd
+
+    def analyticalSolution(self, ts):
+        """
+         Return analytical solution of the system at certain times.
+        
+         Args: ts- A vector of times for which to compute the analytical solutions 
+         Returns: (xs, xds)  Sequence of states and their rates of change.
+        """
+
+        n_time_steps = ts.size
+        xs = np.zeros((n_time_steps, self._dim_x))
+        xds = np.zeros((n_time_steps, self._dim_x))
+
+        # Closed form solution to 2nd order canonical system
+        # This system behaves like a critically damped spring-damper system
+        # http://en.wikipedia.org/wiki/Damped_spring-mass_system
+        omega_0 = (
+            np.sqrt(self._spring_constant / self._mass) / self._tau
+        )  # natural frequency
+        zeta = self._damping_coefficient / (
+            2 * np.sqrt(self._mass * self._spring_constant)
+        )  # damping ratio
+        if zeta != 1.0:
+            print(
+                f"WARNING: Spring-damper system is not critically damped, zeta={zeta}"
+            )
+
+        for i_dim in range(self._dim_y):
+            y0 = self._x_init[i_dim] - self._y_attr[i_dim]
+            yd0 = self._x_init[self._dim_y + i_dim]
+
+            A = y0
+            B = yd0 + omega_0 * y0
+
+            # Closed form solutions
+            # See http://en.wikipedia.org/wiki/Damped_spring-mass_system
+            exp_term = -omega_0 * ts
+            exp_term = np.exp(exp_term)
+
+            Y = 0 * self._dim_y + i_dim
+            Z = 1 * self._dim_y + i_dim
+
+            ABts = A + B * ts
+
+            xs[:, Y] = self._y_attr[i_dim] + ABts * exp_term  # .array()
+
+            # Derivative of the above (use product rule: (f*g)' = f'*g + f*g'
+            xds[:, Y] = ((B - omega_0 * ABts)) * exp_term  # .array()
+
+            # Derivative of the above (again use product    rule: (f*g)' = f'*g + f*g'
+            ydds = (-omega_0 * (2 * B - omega_0 * ABts)) * exp_term
+
+            # This is how to compute the 'z' terms from the 'y' terms
+            xs[:, Z] = xds[:, Y] * self._tau
+            xds[:, Z] = ydds * self._tau
+
+        return (xs, xds)

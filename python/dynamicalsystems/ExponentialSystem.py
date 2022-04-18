@@ -26,6 +26,7 @@ sys.path.append(lib_path)
 
 from dynamicalsystems.DynamicalSystem import DynamicalSystem
 
+
 class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):
         super().__init__(1, tau, x_init)
@@ -35,23 +36,22 @@ class ExponentialSystem(DynamicalSystem):
     @property
     def y_attr(self):
         return _x_attr
-    
+
     @y_attr.setter
     def y_attr(self, y):
-        if y.size!=self._dim_y:
-            raise ValueError("y_attr must have size "+self._dim_y)
+        if y.size != self._dim_y:
+            raise ValueError("y_attr must have size " + self._dim_y)
         self._x_attr = np.atleast_1d(y)
 
     @property
     def x_attr(self):
         return _x_attr
-    
+
     @x_attr.setter
     def x_attr(self, x):
-        if x.size!=self._dim_x:
-            raise ValueError("y_attr must have size "+self._dim_x)
+        if x.size != self._dim_x:
+            raise ValueError("y_attr must have size " + self._dim_x)
         self._x_attr = np.atleast_1d(x)
-
 
     def differentialEquation(self, x):
         xd = self._alpha * (self._x_attr - x) / self._tau

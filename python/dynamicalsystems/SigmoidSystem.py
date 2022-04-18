@@ -57,7 +57,6 @@ class SigmoidSystem(DynamicalSystem):
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
-
         for dd in range(self._dim_x):
             # Auxillary variables to improve legibility
             K = self._Ks[dd]
