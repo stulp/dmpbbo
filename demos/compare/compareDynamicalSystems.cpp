@@ -28,7 +28,6 @@
 #include <string>
 
 #include "dynamicalsystems/DynamicalSystem.hpp"
-#include "eigenutils/eigen_realtime_check.hpp"
 #include "eigenutils/eigen_file_io.hpp"
 
 using namespace std;
@@ -38,10 +37,6 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  // ./compareDynamicalSystems <input dir> <basename> <output dir> 
-
-  vector<string> filenames;
-  
   if (n_args!=3) {
     cout << "Usage: " << args[0] << " <directory> <basename>" << endl;
     return -1;
