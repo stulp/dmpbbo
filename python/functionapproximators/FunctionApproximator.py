@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys
+from abc import ABC, abstractmethod
 import numpy as np
 import warnings
 
@@ -40,9 +41,11 @@ class FunctionApproximator(Parameterizable):
         self._model_params = None
         self._selected_param_labels = self.getSelectableParametersRecommended()
         
+    @abstractmethod
     def dim_input(self):
-        raise NotImplementedError('subclasses must override dim_input()!')
+        pass
         
+    @abstractmethod
     def train(self,inputs,targets):
         """Train the function approximator with input and target examples.
         
@@ -50,8 +53,9 @@ class FunctionApproximator(Parameterizable):
             inputs (numpy.ndarray): Input values of the training examples.
             targets (numpy.ndarray): Target values of the training examples.
         """
-        raise NotImplementedError('subclasses must override train()!')
-
+        pass
+    
+    @abstractmethod
     def predict(self,inputs):
         """Query the function approximator to make a prediction.
         
@@ -61,15 +65,16 @@ class FunctionApproximator(Parameterizable):
         Returns:
             numpy.ndarray: Predicted output values.
         """
-        raise NotImplementedError('subclasses must override predict()!')
-        
+        pass
+    
+    @abstractmethod
     def isTrained(self):
         """Determine whether the function approximator has already been trained with data or not.
         
         Returns:
             bool: True if the function approximator has already been trained, False otherwise.
         """
-        raise NotImplementedError('subclasses must override isTrained()!')
+        pass
 
     def setSelectedParameters(self,selected_param_labels):
         """Implements abstract function from the Parameterizable abstract class.

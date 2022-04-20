@@ -15,34 +15,39 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-class Parameterizable:
+from abc import ABC, abstractmethod
+
+class Parameterizable(ABC):
     
 
+    @abstractmethod
     def getSelectableParameters(self):
         """Return the names of the parameters that can be selected.
         """
         raise NotImplementedError('subclasses must override getSelectableParameters()!')
 
+    @abstractmethod
     def getSelectableParametersRecommended(self):
         """Return the names of the parameters that recommended to be selected.
         """
-        raise NotImplementedError('subclasses must override getSelectableParametersRecommended()!')
-        
+        pass
+    
+    @abstractmethod
     def setSelectedParameters(selected_values_labels):
         """Set the selected parameters."""
-        raise NotImplementedError('subclasses must override setSelectedParameters()!')
+        pass
   
+    @abstractmethod
     def getParameterVectorSelected(self):
         """Get a vector containing the values of the selected parameters."""
-        raise NotImplementedError('subclasses must override getParameterVectorSelected()!')
+        pass
     
+    @abstractmethod
     def setParameterVectorSelected(self,values):
         """Set a vector containing the values of the selected parameters."""
-        raise NotImplementedError('subclasses must override setParameterVectorSelected()!')
+        pass
         
+    @abstractmethod
     def getParameterVectorSelectedSize(self):
         """Get the size of the vector containing the values of the selected parameters."""
-        raise NotImplementedError('subclasses must override getParameterVectorSelectedSize()!')
-        
-        
-
+        pass
