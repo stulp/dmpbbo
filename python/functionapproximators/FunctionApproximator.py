@@ -36,6 +36,11 @@ class FunctionApproximator(Parameterizable):
         
     @abstractmethod
     def dim_input(self):
+        """ Return the dimensionality of the inputs of the function_approximator
+        
+        Returns:
+            The dimensionality of the inputs of the function_approximator.
+        """
         pass
         
     @abstractmethod
