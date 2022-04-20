@@ -41,7 +41,6 @@ class Dmp(DynamicalSystem,Parameterizable):
         tau, 
         y_init, y_attr,
         function_approximators=None,
-        name='Dmp',
         sigmoid_max_rate=-20,
         forcing_term_scaling='NO_SCALING',
         alpha_spring_damper=20.0, 
@@ -54,7 +53,6 @@ class Dmp(DynamicalSystem,Parameterizable):
             y_init        - Initial state
             y_attr        - Attractor state
             function_approximators - Function approximators for the forcing term
-            name          - name of the Dmp (for debugging and saving)
             forcing_term_scaling - Which method to use for scaling the forcing term
                 ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
             alpha_spring_damper - \f$\alpha\f$ in the spring-damper system of the dmp
@@ -63,7 +61,7 @@ class Dmp(DynamicalSystem,Parameterizable):
             gating_system - Dynamical system to compute the gating term
         """
         
-        super().__init__(1, tau, y_init, y_attr, name)
+        super().__init__(1, tau, y_init, y_attr)
         
         dim_orig = self.dim_orig_
 
@@ -103,7 +101,6 @@ class Dmp(DynamicalSystem,Parameterizable):
     def from_traj(cls,
         trajectory,
         function_approximators,
-        name='Dmp',
         dmp_type='KULVICIUS_2012_JOINING',
         forcing_term_scaling='NO_SCALING'
         ):
@@ -112,7 +109,6 @@ class Dmp(DynamicalSystem,Parameterizable):
         Args:
             trajectory    - the trajectory to train on
             function_approximators - Function approximators for the forcing term
-            name          - name of the Dmp (for debugging and saving)
             dmp_type      - Type of the Dmp
                 ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
             forcing_term_scaling - Which method to use for scaling the forcing term

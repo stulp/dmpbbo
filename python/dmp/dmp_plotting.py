@@ -23,7 +23,8 @@ import matplotlib.pyplot as plt
 # Include scripts for plotting
 lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
-from dynamicalsystems.dynamicalsystems_plotting import * 
+
+from dynamicalsystems.DynamicalSystem import * 
 
 
 def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[],tau=None):
