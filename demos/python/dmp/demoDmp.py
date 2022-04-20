@@ -68,10 +68,10 @@ if __name__=='__main__':
 
     print("Plotting")
     
-    plotDmp(tau,ts,xs_ana,xds_ana,forcing_terms=forcing_terms_ana,fa_output=fa_outputs_ana)
+    Dmp.plotStatic(tau,ts,xs_ana,xds_ana,forcing_terms=forcing_terms_ana,fa_output=fa_outputs_ana)
     plt.gcf().canvas.set_window_title('Analytical integration') 
     
-    plotDmp(tau,ts,xs_step, xds_step)
+    Dmp.plotStatic(tau,ts,xs_step, xds_step)
     plt.gcf().canvas.set_window_title('Step-by-step integration') 
     
     
