@@ -44,8 +44,8 @@ if __name__=='__main__':
     
 
     function_apps = [ FunctionApproximatorRBFN(10,0.7) for i_dim in range(n_dims) ]
-    #dmp_type='IJSPEERT_2002_MOVEMENT'
-    dmp_type='KULVICIUS_2012_JOINING'
+    dmp_type='IJSPEERT_2002_MOVEMENT'
+    #dmp_type='KULVICIUS_2012_JOINING'
     #dmp_type='COUNTDOWN_2013'
     dmp = Dmp.from_traj(traj, function_apps, dmp_type)
 
