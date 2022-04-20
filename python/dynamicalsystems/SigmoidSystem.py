@@ -63,6 +63,7 @@ class SigmoidSystem(DynamicalSystem):
             new_x_init Initial state of the dynamical system.
         """
         super().x_init = new_x_init
+        t_infl = self._tau * self._inflection_ratio
         self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
 
     # @DynamicalSystem.y_init.setter
@@ -75,6 +76,7 @@ class SigmoidSystem(DynamicalSystem):
     #    Note that for an ExponentialSystem y is equivalent to x.
     #    """
     #    super().x_init = new_y_init
+    #    t_infl = self._tau * self._inflection_ratio
     #    self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
 
     def differentialEquation(self, x):
