@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import os, sys
+from mpl_toolkits.mplot3d import Axes3D
 
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
@@ -38,7 +39,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         self._selected_param_labels = self.getSelectableParametersRecommended()
 
     def dim_input(self):
-        if not isTrained():
+        if not self.isTrained():
             raise ValueError("Can only call dim_input on trained function approximator.")
         return self._model_params['centers'].shape[1]
         
@@ -144,3 +145,29 @@ class FunctionApproximatorLWR(FunctionApproximator):
         
         outputs = (lines*activations).sum(axis=1)
         return outputs
+        
+    def plotBasisFunctions(self,inputs_min,inputs_max,**kwargs):
+        ax = kwargs.get('ax') or self._getAxis()
+        
+        if self.dim_input()==1:
+            super().plotBasisFunctions(inputs_min,inputs_max,ax=ax)
+
+        inputs, n_samples_per_dim = FunctionApproximator._getGrid(inputs_min,inputs_max)
+        line_values = self.getLines(inputs)
+        
+        activations = self.getActivations(inputs)
+        
+        # Plot line segment only when basis function is most active
+        values_range = numpy.amax(activations)-numpy.amin(activations)
+        n_basis_functions = activations.shape[1]
+        max_activations = np.max(activations,axis=1)
+        for i_bf in range(n_basis_functions):
+          cur_activations = activations[:,i_bf];
+          smaller = cur_activations < 0.7*max_activations 
+          line_values[smaller,i_bf] = np.nan
+        
+        
+        lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
+        alpha = 1.0 if len(n_samples_per_dim)<2 else 0.5
+        plt.setp(lines, color=[0.7,0.7,0.7], linewidth=1,alpha=alpha)
+

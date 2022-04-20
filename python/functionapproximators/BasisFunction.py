@@ -18,6 +18,7 @@
 import numpy as np
 import numpy.matlib
 from abc import ABC, abstractmethod
+import matplotlib.pyplot as plt                                               
 
 class Gaussian:
     

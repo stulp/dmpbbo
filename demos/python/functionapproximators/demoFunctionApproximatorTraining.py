@@ -25,7 +25,7 @@ import os, sys, subprocess
 lib_path = os.path.abspath('../../../python/')
 sys.path.append(lib_path)
 
-from functionapproximators.functionapproximators_plotting import *
+from functionapproximators.BasisFunction import *
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
 
@@ -81,26 +81,8 @@ def train(fa_name,n_dims):
     # Make predictions for the targets
     outputs = fa.predict(inputs)
     
-    # Make predictions on a grid
-    n_samples_per_dim_grid = 200 if n_dims==1 else [20,20]
-    (inputs_grid, targets_dummy) = targetFunction(n_samples_per_dim_grid)
-    outputs_grid = fa.predict(inputs_grid)
-    if fa_name=="LWR":
-        lines_grid = fa.getLines(inputs_grid)
-    activations_grid = fa.getActivations(inputs_grid)
-    
     # Plotting
-    fig = plt.figure(figsize=(7,7))
-    fig.canvas.set_window_title(fa_name)
-    ax = fig.add_subplot(111) if n_dims==1 else fig.add_subplot(111,projection='3d')
-    ax.set_title(fa_name+" "+str(n_dims)+"D")
-    plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_per_dim_grid)
-    plotDataResiduals(inputs,targets,outputs,ax)
-    plotDataTargets(inputs,targets,ax)
-    if fa_name=="LWR":
-        plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_per_dim_grid,activations_grid)
-    if fa_name=="RBFN":
-        plotBasisFunctions(inputs_grid,activations_grid,ax,n_samples_per_dim_grid)
+    fa.plot(inputs,targets=targets,plot_residuals=True)
             
 if __name__=='__main__':
     """Run some training sessions and plot results."""

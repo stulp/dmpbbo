@@ -26,7 +26,7 @@ from functionapproximators.leastSquares import *
 
 class FunctionApproximatorRBFN(FunctionApproximator):
     
-    def __init__(self,n_bfs_per_dim, intersection_height=0.7, regularization=0.0):
+    def __init__(self, n_bfs_per_dim, intersection_height=0.7, regularization=0.0):
         """Initialiaze an RBNF function approximator.
 
         Args:
@@ -44,7 +44,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         self._selected_param_labels = self.getSelectableParametersRecommended()
 
     def dim_input(self):
-        if not isTrained():
+        if not self.isTrained():
             raise ValueError("Can only call dim_input on trained function approximator.")
         return self._model_params['centers'].shape[1]
         
