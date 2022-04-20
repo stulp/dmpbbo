@@ -61,10 +61,12 @@ class Dmp(DynamicalSystem,Parameterizable):
             gating_system - Dynamical system to compute the gating term
         """
         
-        super().__init__(1, tau, y_init, y_attr)
+        dim_dmp = 3*y_init.size+2
+        super().__init__(1, tau, y_init, dim_dmp)
+        #def __init__(self, order, tau, y_init, n_dims_x=None):
         
-        dim_orig = self.dim_orig_
-
+        self._y_attr = y_attr
+        
         self._function_approximators = function_approximators
         
         self._forcing_term_scaling = forcing_term_scaling
@@ -73,12 +75,12 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         # Set defaults for subsystems if necessary
         if not phase_system:
-            phase_system = TimeSystem(tau,False,'phase')
+            phase_system = TimeSystem(tau,False)
         if not gating_system:
             o = np.ones(1)
-            gating_system = SigmoidSystem(tau,o,sigmoid_max_rate,0.9*tau,'gating') 
+            gating_system = SigmoidSystem(tau,o,sigmoid_max_rate,0.85) 
         if goal_system:
-            goal_system  = ExponentialSystem(tau,y_init,y_attr,15,'goal')
+            goal_system  = ExponentialSystem(tau,y_init,y_attr,15)
             
         self._phase_system = phase_system
         self._gating_system = gating_system
@@ -86,17 +88,19 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         self.ts_train_ = None
 
-        self.dim_ = 3*dim_orig+2
-
         self.goal_selected = False
 
-        self.SPRING    = np.arange(0*dim_orig+0, 0*dim_orig+0 +2*dim_orig)
-        self.SPRING_Y  = np.arange(0*dim_orig+0, 0*dim_orig+0 +dim_orig)
-        self.SPRING_Z  = np.arange(1*dim_orig+0, 1*dim_orig+0 +dim_orig)
-        self.GOAL      = np.arange(2*dim_orig+0, 2*dim_orig+0 +dim_orig)
-        self.PHASE     = np.arange(3*dim_orig+0, 3*dim_orig+0 +       1)
-        self.GATING    = np.arange(3*dim_orig+1, 3*dim_orig+1 +       1)
+        d = self._dim_y
+        self.SPRING    = np.arange(0*d+0, 0*d+0 +2*d)
+        self.SPRING_Y  = np.arange(0*d+0, 0*d+0 +1*d)
+        self.SPRING_Z  = np.arange(1*d+0, 1*d+0 +1*d)
+        self.GOAL      = np.arange(2*d+0, 2*d+0 +1*d)
+        self.PHASE     = np.arange(3*d+0, 3*d+0 +1)
+        self.GATING    = np.arange(3*d+1, 3*d+1 +1)
         
+    def dim_dmp(self):
+        return self._dim_y
+  
     @classmethod
     def from_traj(cls,
         trajectory,
@@ -131,7 +135,8 @@ class Dmp(DynamicalSystem,Parameterizable):
             
         elif dmp_type in ['KULVICIUS_2012_JOINING','COUNTDOWN_2013']:
             goal_system   = ExponentialSystem(tau,y_init,y_attr,15)
-            gating_system = SigmoidSystem(tau,1,-10,0.9*tau)
+            sigmoid_max_rate = -20
+            gating_system = SigmoidSystem(tau,1,sigmoid_max_rate,0.85)
             count_down = dmp_type=='COUNTDOWN_2013'
             phase_system  = TimeSystem(tau,count_down);
 
@@ -140,43 +145,42 @@ class Dmp(DynamicalSystem,Parameterizable):
             tau, 
             y_init, y_attr,
             function_approximators,
-            'Dmp',
             None,
             forcing_term_scaling,
             alpha_spring_damper, 
             phase_system, gating_system, goal_system)
-      
+        
         dmp.train(trajectory)
       
         return dmp
         
-    def set_tau(self,tau):
+    def set_tau(self,new_tau):
         
-        self._tau = tau
+        self._tau = new_tau
 
         # Set value in all relevant subsystems also  
-        self._spring_system.set_tau(tau)
+        self._spring_system.tau = new_tau
         if self._goal_system:
-            self._goal_system.set_tau(tau)
-        self._phase_system .set_tau(tau)
-        self._gating_system.set_tau(tau)
+            self._goal_system.tau = new_tau
+        self._phase_system.tau = new_tau
+        self._gating_system.tau = new_tau
         
     def integrateStart(self):
         
-        x = np.zeros(self.dim_)
-        xd = np.zeros(self.dim_)
+        x = np.zeros(self._dim_x)
+        xd = np.zeros(self._dim_x)
   
         # Start integrating goal system if it exists
         if self._goal_system is None:
             # No goal system, simply set goal state to attractor state
-            x[self.GOAL] = self.attractor_state_
+            x[self.GOAL] = self._y_attr
             xd[self.GOAL] = 0.0
         else:
             # Goal system exists. Start integrating it.
             (x[self.GOAL],xd[self.GOAL]) = self._goal_system.integrateStart()
     
         # Set the attractor state of the spring system
-        self._spring_system.set_attractor_state(x[self.GOAL])
+        self._spring_system.y_attr = x[self.GOAL]
   
         # Start integrating all futher subsystems
         (x[self.SPRING],xd[self.SPRING]) = self._spring_system.integrateStart()
@@ -198,23 +202,22 @@ class Dmp(DynamicalSystem,Parameterizable):
         Returns:
             Rate of change in state (column vector of size dim() X 1)
         """
-        n_dims = self.dim_
         
         xd = np.zeros(x.shape)
         
         if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state
-            self._spring_system.set_attractor_state(self.attractor_state_)
+            self._spring_system.y_attr = self._y_attr
             # with zero change
-            xd_goal = np.zeros(n_dims)
+            xd_goal = np.zeros(self._dim_x)
         else:
             # Integrate goal system and get current goal state
-            self._goal_system.set_attractor_state(self.attractor_state_)
+            self._goal_system.y_attr = self._y_attr
             x_goal = x[self.GOAL]
             xd[self.GOAL] = self._goal_system.differentialEquation(x_goal)
             # The goal state is the attractor state of the spring-damper system
-            self._spring_system.set_attractor_state(x_goal)
+            self._spring_system.y_attr = x_goal
     
   
         # Integrate spring damper system
@@ -257,14 +260,12 @@ class Dmp(DynamicalSystem,Parameterizable):
             The outputs of the function approximators.
         """
         n_time_steps = phase_state.size
-        n_dims = self.dim_orig_
-        fa_output = np.zeros([n_time_steps,n_dims])
+        fa_output = np.zeros([n_time_steps,self.dim_dmp()])
         
         if not self._function_approximators:
             return fa_output # No function approximators, return zeros
             
-        
-        for i_fa in range(n_dims):
+        for i_fa in range(self.dim_dmp()):
             if self._function_approximators[i_fa]:
                 if self._function_approximators[i_fa].isTrained():
                     fa_output[:,i_fa] = self._function_approximators[i_fa].predict(phase_state)
@@ -323,7 +324,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state               
-            xs_goal  = np.tile(self.attractor_state_,(n_time_steps,1))
+            xs_goal  = np.tile(self._y_attr,(n_time_steps,1))
             # with zero change
             xds_goal = np.zeros(xs_goal.shape)
         else:
@@ -331,8 +332,8 @@ class Dmp(DynamicalSystem,Parameterizable):
             (xs_goal,xds_goal) = self._goal_system.analyticalSolution(ts)
             
             
-        xs = np.zeros([n_time_steps,self.dim_])
-        xds = np.zeros([n_time_steps,self.dim_])
+        xs = np.zeros([n_time_steps,self._dim_x])
+        xds = np.zeros([n_time_steps,self._dim_x])
     
         xs[:,self.GOAL] = xs_goal     
         xds[:,self.GOAL] = xds_goal
@@ -345,11 +346,11 @@ class Dmp(DynamicalSystem,Parameterizable):
         # THE REST CANNOT BE DONE ANALYTICALLY
   
         # Reset the dynamical system, and get the first state
-        damping = self._spring_system.damping_coefficient_
-        localspring_system = SpringDamperSystem(self._tau,self.initial_state_,self.attractor_state_,damping)
+        damping = self._spring_system._damping_coefficient
+        localspring_system = SpringDamperSystem(self._tau,self.y_init,self._y_attr,damping)
   
         # Set first attractor state
-        localspring_system.set_attractor_state(xs_goal[0,:])
+        localspring_system.y_attr = xs_goal[0,:]
   
         # Start integrating spring damper system
         (x_spring, xd_spring) = localspring_system.integrateStart()
@@ -374,7 +375,7 @@ class Dmp(DynamicalSystem,Parameterizable):
             xs[tt,SPRING]  = xs[tt-1,SPRING] + dt*xds[tt-1,SPRING]
   
             # Set the attractor state of the spring system
-            localspring_system.set_attractor_state(xs[tt,self.GOAL])
+            localspring_system.y_attr = xs[tt,self.GOAL]
 
             # Integrate spring damper system
             xds[tt,SPRING] = localspring_system.differentialEquation(xs[tt,SPRING])
@@ -413,7 +414,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         if self._function_approximators:
             (fa_input_phase, f_target) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
 
-            for dd in range(self.dim_orig_):
+            for dd in range(self.dim_dmp()):
                 fa_target = f_target[:,dd]
                 self._function_approximators[dd].train(fa_input_phase,fa_target)
         
@@ -437,7 +438,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         n_time_steps = trajectory.ts_.size
         dim_data = trajectory.dim_
-        assert(self.dim_orig_==dim_data)
+        assert(self.dim_dmp()==dim_data)
 
         (xs_ana,xds_ana,forcing_terms, fa_outputs) = self.analyticalSolution(trajectory.ts_)
         xs_goal   = xs_ana[:,self.GOAL]
@@ -447,9 +448,9 @@ class Dmp(DynamicalSystem,Parameterizable):
         fa_inputs_phase = xs_phase
   
         # Get parameters from the spring-dampers system to compute inverse
-        damping_coefficient = self._spring_system.damping_coefficient_
-        spring_constant     = self._spring_system.spring_constant_
-        mass                = self._spring_system.mass_
+        damping_coefficient = self._spring_system._damping_coefficient
+        spring_constant     = self._spring_system._spring_constant
+        mass                = self._spring_system._mass
         # Usually, spring-damper system of the DMP should have mass==1
         assert(mass==1.0)
 
@@ -458,7 +459,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         f_target = tau*tau*trajectory.ydds_ + (spring_constant*(trajectory.ys_-xs_goal) + damping_coefficient*tau*trajectory.yds_)/mass
   
         # Factor out gating term
-        for dd in range(self.dim_orig_):
+        for dd in range(self.dim_dmp()):
             f_target[:,dd] = f_target[:,dd]/np.squeeze(xs_gating)
   
 
@@ -493,26 +494,26 @@ class Dmp(DynamicalSystem,Parameterizable):
         # Left column is time
         return Trajectory(ts,x_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Y], xd_in[:,self.SPRING_Z]/self._tau)
   
-    def set_initial_state(self,initial_state):
-        assert(initial_state.size==self.dim_orig_)
-        super(Dmp,self).set_initial_state(initial_state);
+    def set_initial_state(self,y_init_new):
+        assert(y_init_new.size==self.dim_dmp())
+        self._y_init = y_init_new
         
         # Set value in all relevant subsystems also  
-        self._spring_system.set_initial_state(initial_state);
+        self._spring_system.y_init = y_init_new;
         if self._goal_system:
-            self._goal_system.set_initial_state(initial_state);
+            self._goal_system.y_init = y_init_new
         
-    def set_attractor_state(self,attractor_state):
-        assert(attractor_state.size==self.dim_orig_)
-        super(Dmp,self).set_attractor_state(attractor_state);
+    def set_attractor_state(self,y_attr_new):
+        assert(y_attr_new.size==self.dim_dmp())
+        self._y_attr = y_attr_new
   
         # Set value in all relevant subsystems also  
         if self._goal_system:
-            self._goal_system.set_attractor_state(attractor_state);
+            self._goal_system.y_attr = y_attr_new
         
-        # Do NOT do the following. The attractor state of the spring system is determined by the
-        # goal system
-        # self._spring_system.set_attractor_state(attractor_state);
+        # Do NOT do the following. The attractor state of the spring system is 
+        # determined by the goal system.
+        # self._spring_system.y_attr = y_attr_new
         
     def getSelectableParameters(self):
         selectable = []

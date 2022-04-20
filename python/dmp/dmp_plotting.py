@@ -27,23 +27,12 @@ sys.path.append(lib_path)
 from dynamicalsystems.DynamicalSystem import * 
 
 
-def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[],tau=None):
+def plotDmp(tau,ts,xs,xds,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[]):
 
-    ts  = data[:,0] # First column is time
-    data = data[:,1:] # Remove first column
-    
-    # Here comes a check just for backwards compatibility
-    # Input format for data used to be [ x_1..x_D  xd_1..xd_D  t ]
-    # Input format for data now is     [ t  x_1..x_D  xd_1..xd_D ]
-    checkIfVectorContainsTime(ts)            
-    
-    
-    # Number of columns in the data
-    n_cols = data.shape[1]             
-    # Dimensionality of dynamical system. /2 because both x and xd are stored.
-    n_state_length = n_cols//2      
+    # Dimensionality of dynamical system.
+    dim_x = xs.shape[1]      
     # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
-    n_dims_dmp = (n_state_length-2)//3
+    n_dims_dmp = (dim_x-2)//3
     D = n_dims_dmp  # Abbreviation for convencience
 
     #define SPRING    segment(0*dim_orig()+0,2*dim_orig())
@@ -76,11 +65,14 @@ def plotDmp(data,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[],tau=Non
           axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]+2))
           
         
-        indices_xs = list(system_indices[i_system])
-        indices_xds =[i+n_state_length for i in indices_xs] # +n_state_length because xd is in second half
-      
-        plot_data =  numpy.concatenate((numpy.atleast_2d(ts).T,data[:,indices_xs],data[:,indices_xds]),axis=1)
-        lines = plotDynamicalSystem(plot_data,axs);
+        cur_indices = list(system_indices[i_system])
+        cur_xs = xs[:,cur_indices]
+        cur_xds = xds[:,cur_indices]
+        if (system_order[i_system]==2):
+            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=axs,dim_y=n_dims_dmp);
+        else:
+            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=axs);
+            
         if (system_names[i_system]=='gating'):
           plt.setp(lines,color='m')
           axs[0].set_ylim([0, 1.1])

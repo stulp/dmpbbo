@@ -32,25 +32,23 @@ if __name__=='__main__':
 
     tau = 0.5
     n_dims = 2
+    n_time_steps = 51
+
     y_init = np.linspace(0.0,0.7,n_dims)
     y_attr = np.linspace(0.4,0.5,n_dims)
+    
+    ts = np.linspace(0,tau,n_time_steps)
+    y_yd_ydd_viapoint = np.array([-0.2,0.4, 0.0,0.0, 0,0])
+    viapoint_time = 0.4*ts[-1]
+    traj = Trajectory.generatePolynomialTrajectoryThroughViapoint(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
+    
 
-    function_apps = []
-    for n_basis in [5,6]:
-        
-        fa = FunctionApproximatorRBFN(n_basis)
-        
-        n_samples = 100
-        fa.train(np.linspace(0,1,n_samples),np.zeros(n_samples))
-        
-        fa.setSelectedParameters('weights')
-        random_weights = 10*np.random.normal(0,1,n_basis)
-        fa.setParameterVectorSelected(random_weights)
-        
-        function_apps.append(fa)
+    function_apps = [ FunctionApproximatorRBFN(10,0.7) for i_dim in range(n_dims) ]
+    #dmp_type='IJSPEERT_2002_MOVEMENT'
+    dmp_type='KULVICIUS_2012_JOINING'
+    #dmp_type='COUNTDOWN_2013'
+    dmp = Dmp.from_traj(traj, function_apps, dmp_type)
 
-        
-    dmp = Dmp(tau, y_init, y_attr, function_apps)
 
     tau_exec = 0.7
     n_time_steps = 71
@@ -59,8 +57,8 @@ if __name__=='__main__':
     ( xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana) = dmp.analyticalSolution(ts)
 
     dt = ts[1]
-    xs_step = np.zeros([n_time_steps,dmp.dim_])
-    xds_step = np.zeros([n_time_steps,dmp.dim_])
+    xs_step = np.zeros([n_time_steps,dmp._dim_x])
+    xds_step = np.zeros([n_time_steps,dmp._dim_x])
     
     (x,xd) = dmp.integrateStart()
     xs_step[0,:] = x;
@@ -70,31 +68,12 @@ if __name__=='__main__':
 
     print("Plotting")
     
-    #fig = plt.figure(1)
-    #axs = [ fig.add_subplot(131), fig.add_subplot(132), fig.add_subplot(133) ] 
-    #
-    #lines = plotTrajectoryFromFile(directory+"/demonstration_traj.txt",axs)
-    #plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
-    #
-    #lines = plotTrajectoryFromFile(directory+"/reproduced_traj.txt",axs)
-    #plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
-    #
-    #plt.legend()
-    #fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
-    #
-    ## Read data
-    #xs_xds        = numpy.loadtxt(directory+'/reproduced_xs_xds.txt')
-    #forcing_terms = numpy.loadtxt(directory+'/reproduced_forcing_terms.txt')
-    #fa_output     = numpy.loadtxt(directory+'/reproduced_fa_output.txt')
-    
-    fig = plt.figure(2)
-    ts_xs_xds = np.column_stack((ts,xs_ana,xds_ana))
-    plotDmp(ts_xs_xds,fig,forcing_terms_ana,fa_outputs_ana)
+    fig = plt.figure(1,figsize=(15,9))
+    plotDmp(tau,ts,xs_ana,xds_ana,fig,forcing_terms_ana,fa_outputs_ana)
     fig.canvas.set_window_title('Analytical integration') 
     
-    fig = plt.figure(3)
-    ts_xs_xds = np.column_stack((ts,xs_step,xds_step))
-    plotDmp(ts_xs_xds,fig)
+    fig = plt.figure(2,figsize=(15,9))
+    plotDmp(tau,ts,xs_step, xds_step,fig)
     fig.canvas.set_window_title('Step-by-step integration') 
     
     

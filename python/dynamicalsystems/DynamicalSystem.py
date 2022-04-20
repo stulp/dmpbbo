@@ -197,6 +197,11 @@ class DynamicalSystem(ABC):
         return (x_updated, xd_updated)
 
     def plot(self, ts, xs, xds, **kwargs):
+        kwargs['dim_y'] = self._dim_y
+        return DynamicalSystem.plotStatic(self._tau, ts, xs, xds, **kwargs)
+        
+    @staticmethod
+    def plotStatic(tau, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
         
         Args:
@@ -204,23 +209,27 @@ class DynamicalSystem(ABC):
             xs, xds - System states and its rates of change (shape: n_time_steps X n_dim_x)
             
         Kwargs:
+            dim_y - Dimensionality of y part of state, i.e. x = [y z]. Default: dim_y = dim_x
             axs - Axes on which the plot the output
             fig - Figure on which to plot the output
         """
+        
+        dim_x = xs.shape[1]
+        dim_y = kwargs.pop("dim_y",dim_x)
 
         if "axs" in kwargs:
             axs = kwargs["axs"]
         else:
             # 2 => plot x and xd, 3 => plot y, yd and ydd=zd/tau
             n_plots = 2 if self._dim_x == self._dim_y else 3
-            fig = kwargs.pop("fig", plt.figure(figsize=(5 * n_plots, 4)))
+            fig = kwargs.get("fig") or plt.figure(figsize=(5 * n_plots, 4))
             axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 
         # Prepare tex intepretation
         plt.rc("text", usetex=True)
         plt.rc("font", family="serif")
 
-        if self._dim_x == self._dim_y:
+        if dim_x == dim_y:
 
             lines = axs[0].plot(ts, xs)
             axs[0].set_ylabel(r"$x$")
@@ -232,10 +241,10 @@ class DynamicalSystem(ABC):
         else:
             # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
 
-            ys = xs[:, 0 * self._dim_y : 1 * self._dim_y]
-            zs = xs[:, 1 * self._dim_y : 2 * self._dim_y]
-            yds = xds[:, 0 * self._dim_y : 1 * self._dim_y]
-            zds = xds[:, 1 * self._dim_y : 2 * self._dim_y]
+            ys = xs[:, 0 * dim_y : 1 * dim_y]
+            zs = xs[:, 1 * dim_y : 2 * dim_y]
+            yds = xds[:, 0 * dim_y : 1 * dim_y]
+            zds = xds[:, 1 * dim_y : 2 * dim_y]
 
             lines = axs[0].plot(ts, ys)
             axs[0].set_ylabel(r"$y$")
@@ -245,7 +254,7 @@ class DynamicalSystem(ABC):
                 axs[1].set_ylabel(r"$\dot{y} = z/\tau$")
 
             if len(axs) > 2:
-                lines[len(lines) :] = axs[2].plot(ts, zds / self._tau)
+                lines[len(lines) :] = axs[2].plot(ts, zds / tau)
                 axs[2].set_ylabel(r"$\ddot{y} = \dot{z}/\tau$")
 
         for ax in axs:

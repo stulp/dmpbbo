@@ -26,7 +26,6 @@ import numpy as np
 lib_path = os.path.abspath("../../../python/")
 sys.path.append(lib_path)
 
-from dynamicalsystems.dynamicalsystems_plotting import *
 from dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
