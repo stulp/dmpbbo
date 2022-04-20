@@ -26,8 +26,22 @@ sys.path.append(lib_path)
 
 from dynamicalsystems.DynamicalSystem import * 
 
+def getDmpAxes(has_fa_output=False):
+    n_cols = 5
+    n_rows = 3 if has_fa_output else 2
+    fig = plt.figure(figsize=(3*n_cols,3*n_rows))
+    
+    axs = [ fig.add_subplot(n_rows,5,i+1) for i in range(n_rows*5) ]
+    return axs
 
-def plotDmp(tau,ts,xs,xds,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[]):
+def plotDmp(tau,ts,xs,xds,**kwargs):
+    forcing_terms = kwargs.get('forcing_terms',[]) 
+    fa_output = kwargs.get('fa_output',[]) 
+    ext_dims = kwargs.get('ext_dims',[]) 
+    has_fa_output = len(forcing_terms)>0 or len(fa_output)>0
+    
+    axs = kwargs.get('axs') or getDmpAxes(has_fa_output)
+        
 
     # Dimensionality of dynamical system.
     dim_x = xs.shape[1]      
@@ -58,52 +72,50 @@ def plotDmp(tau,ts,xs,xds,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[
       
         # Plot 'x' for this subsystem (analytical solution and step-by-step integration)
         #fig.suptitle(filename)
-        axs = [];
-        axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]))
-        axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]+1))
+        cur_n_plots = 2
         if (system_order[i_system]==2):
-          axs.append(fig.add_subplot(3,5,subplot_offsets[i_system]+2))
-          
+            cur_n_plots = 3
         
+        cur_axs = axs[subplot_offsets[i_system]-1:subplot_offsets[i_system]-1+cur_n_plots]
         cur_indices = list(system_indices[i_system])
         cur_xs = xs[:,cur_indices]
         cur_xds = xds[:,cur_indices]
         if (system_order[i_system]==2):
-            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=axs,dim_y=n_dims_dmp);
+            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs,dim_y=n_dims_dmp);
         else:
-            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=axs);
+            lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs);
             
         if (system_names[i_system]=='gating'):
           plt.setp(lines,color='m')
-          axs[0].set_ylim([0, 1.1])
+          cur_axs[0].set_ylim([0, 1.1])
         if (system_names[i_system]=='phase'):
-          axs[0].set_ylim([0, 1.1])
+          cur_axs[0].set_ylim([0, 1.1])
           plt.setp(lines,color='c')
           
-        for ii in range(len(axs)):
-          x = numpy.mean(axs[ii].get_xlim())
-          y = numpy.mean(axs[ii].get_ylim())
-          axs[ii].text(x,y,system_names[i_system], horizontalalignment='center');
+        for ii in range(len(cur_axs)):
+          x = numpy.mean(cur_axs[ii].get_xlim())
+          y = numpy.mean(cur_axs[ii].get_ylim())
+          cur_axs[ii].text(x,y,system_names[i_system], horizontalalignment='center');
           if (ii==0):
-              axs[ii].set_ylabel(r'$'+system_varname[i_system]+'$')
+              cur_axs[ii].set_ylabel(r'$'+system_varname[i_system]+'$')
           if (ii==1):
-              axs[ii].set_ylabel(r'$\dot{'+system_varname[i_system]+'}$')
+              cur_axs[ii].set_ylabel(r'$\dot{'+system_varname[i_system]+'}$')
           if (ii==2):
-              axs[ii].set_ylabel(r'$\ddot{'+system_varname[i_system]+'}$')
+              cur_axs[ii].set_ylabel(r'$\ddot{'+system_varname[i_system]+'}$')
         
     # todo Fix this
-    if (len(fa_output_data)>1):
-        ax = fig.add_subplot(3,5,11)
-        ax.plot(ts,fa_output_data)
+    if len(fa_output)>1:
+        ax = axs[11-1]
+        ax.plot(ts,fa_output)
         x = numpy.mean(ax.get_xlim())
         y = numpy.mean(ax.get_ylim())
         ax.text(x,y,'func. approx.', horizontalalignment='center');                                        
         ax.set_xlabel(r'time ($s$)');
         ax.set_ylabel(r'$f_\mathbf{\theta}('+system_varname[0]+')$');
     
-    if (len(forcing_terms_data)>1):
-        ax = fig.add_subplot(3,5,12)
-        ax.plot(ts,forcing_terms_data)
+    if len(forcing_terms)>1:
+        ax = axs[12-1]
+        ax.plot(ts,forcing_terms)
         x = numpy.mean(ax.get_xlim())
         y = numpy.mean(ax.get_ylim())
         ax.text(x,y,'forcing term', horizontalalignment='center');                                        
@@ -111,7 +123,7 @@ def plotDmp(tau,ts,xs,xds,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[
         ax.set_ylabel(r'$v\cdot f_{\mathbf{\theta}}('+system_varname[0]+')$');
     
     if (len(ext_dims)>1):
-        ax = fig.add_subplot(3,5,13)
+        ax = axs[13-1]
         ax.plot(ts,ext_dims)
         x = numpy.mean(ax.get_xlim())
         y = numpy.mean(ax.get_ylim())
@@ -119,11 +131,10 @@ def plotDmp(tau,ts,xs,xds,fig,forcing_terms_data=[],fa_output_data=[],ext_dims=[
         ax.set_xlabel(r'time ($s$)');
         ax.set_ylabel(r'unknown');
 
-    if tau:
-        x_lim = [min(ts),max(ts)]
-        for ax in plt.gcf().get_axes():
-            ax.plot([tau,tau],ax.get_ylim(),'-k')
-            ax.set_xlim(x_lim[0],x_lim[1])
+    x_lim = [min(ts),max(ts)]
+    for ax in plt.gcf().get_axes():
+        ax.plot([tau,tau],ax.get_ylim(),'-k')
+        ax.set_xlim(x_lim[0],x_lim[1])
             
 
 

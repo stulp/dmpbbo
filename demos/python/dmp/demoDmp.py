@@ -68,15 +68,14 @@ if __name__=='__main__':
 
     print("Plotting")
     
-    fig = plt.figure(1,figsize=(15,9))
-    plotDmp(tau,ts,xs_ana,xds_ana,fig,forcing_terms_ana,fa_outputs_ana)
-    fig.canvas.set_window_title('Analytical integration') 
+    plotDmp(tau,ts,xs_ana,xds_ana,forcing_terms=forcing_terms_ana,fa_output=fa_outputs_ana)
+    plt.gcf().canvas.set_window_title('Analytical integration') 
     
-    fig = plt.figure(2,figsize=(15,9))
-    plotDmp(tau,ts,xs_step, xds_step,fig)
-    fig.canvas.set_window_title('Step-by-step integration') 
+    plotDmp(tau,ts,xs_step, xds_step)
+    plt.gcf().canvas.set_window_title('Step-by-step integration') 
     
-    fig = plt.figure(3,figsize=(15,5))
+    
+    fig = plt.figure(figsize=(15,5))
     axs = [ fig.add_subplot(131+i) for i in range(3) ] 
     
     lines = plotTrajectory(traj.asMatrix(),axs)
