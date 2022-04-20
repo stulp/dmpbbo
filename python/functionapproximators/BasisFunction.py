@@ -101,6 +101,11 @@ class Gaussian:
         maxs = np.atleast_1d(maxs) 
         n_dims = len(mins)
         n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
+        if n_bfs_per_dim.size<n_dims:
+            if n_bfs_per_dim.size==1:
+                n_bfs_per_dim = n_bfs_per_dim*np.ones(n_dims).astype(int)
+            else:
+                raise ValueError('n_bfs_per_dim should be of size n_dims = '+str(n_dims))
             
         centers_per_dim_local = []
         widths_per_dim_local = []
