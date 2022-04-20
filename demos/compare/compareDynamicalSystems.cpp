@@ -37,17 +37,16 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  if (n_args!=3) {
+  if (n_args != 3) {
     cout << "Usage: " << args[0] << " <directory> <basename>" << endl;
     return -1;
   }
-    
+
   string directory = args[1];
   string basename = args[2];
-  
-  
+
   cout << "========================================================" << endl;
-  string filename_json = directory+"/"+basename+".json";
+  string filename_json = directory + "/" + basename + ".json";
   cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
@@ -56,12 +55,12 @@ int main(int n_args, char** args)
   }
   json j = json::parse(file);
   DynamicalSystem* d = j.get<DynamicalSystem*>();
-  
+
   cout << j << endl;
   cout << *d << endl;
-  
+
   VectorXd ts;
-  string filename_ts = directory+"/ts.txt";
+  string filename_ts = directory + "/ts.txt";
   if (!loadMatrix(filename_ts, ts)) {
     cerr << "Could not find: " << filename_ts << endl;
     return -1;
@@ -69,45 +68,46 @@ int main(int n_args, char** args)
 
   // Prepare analytical solution
   MatrixXd xs, xds;
-  
+
   cout << "===============" << endl << "C++ Analytical solution" << endl;
-  d->analyticalSolution(ts,xs,xds);
+  d->analyticalSolution(ts, xs, xds);
   bool overwrite = true;
-  saveMatrix(directory+"/xs_analytical.txt", xs, overwrite);
-  saveMatrix(directory+"/xds_analytical.txt", xds, overwrite);
-  
+  saveMatrix(directory + "/xs_analytical.txt", xs, overwrite);
+  saveMatrix(directory + "/xds_analytical.txt", xds, overwrite);
+
   // Numerical integration
   VectorXd x(d->dim(), 1);
   VectorXd x_updated(d->dim(), 1);
   VectorXd xd(d->dim(), 1);
   double dt = 0.01;
-    
+
   cout << "===============" << endl << "C++ Integrating with Euler" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;
   int n_time_steps = ts.size();
   for (int t = 1; t < n_time_steps; t++) {
-    dt = ts[t]-ts[t-1];  
-    d->integrateStepEuler(dt, xs.row(t-1), x, xd);
+    dt = ts[t] - ts[t - 1];
+    d->integrateStepEuler(dt, xs.row(t - 1), x, xd);
     xs.row(t) = x;
     xds.row(t) = xd;
   }
-  saveMatrix(directory+"/xs_euler.txt", xs, overwrite);
-  saveMatrix(directory+"/xds_euler.txt", xds, overwrite);
-  
-  cout << "===============" << endl << "C++ Integrating with Runge-Kutta" << endl;
+  saveMatrix(directory + "/xs_euler.txt", xs, overwrite);
+  saveMatrix(directory + "/xds_euler.txt", xds, overwrite);
+
+  cout << "===============" << endl
+       << "C++ Integrating with Runge-Kutta" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;
   for (int t = 1; t < n_time_steps; t++) {
-    dt = ts[t]-ts[t-1];  
-    d->integrateStepRungeKutta(dt, xs.row(t-1), x, xd);
+    dt = ts[t] - ts[t - 1];
+    d->integrateStepRungeKutta(dt, xs.row(t - 1), x, xd);
     xs.row(t) = x;
     xds.row(t) = xd;
   }
-  saveMatrix(directory+"/xs_rungekutta.txt", xs, overwrite);
-  saveMatrix(directory+"/xds_rungekutta.txt", xds, overwrite);
-  
+  saveMatrix(directory + "/xs_rungekutta.txt", xs, overwrite);
+  saveMatrix(directory + "/xds_rungekutta.txt", xds, overwrite);
+
   return 0;
 }

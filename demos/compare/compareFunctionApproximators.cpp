@@ -26,8 +26,8 @@
 #include <sstream>
 #include <string>
 
-#include "functionapproximators/FunctionApproximator.hpp"
 #include "eigenutils/eigen_file_io.hpp"
+#include "functionapproximators/FunctionApproximator.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -36,19 +36,18 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  if (n_args!=4) {
+  if (n_args != 4) {
     cout << "Usage: " << args[0] << " <directory> <fa_name> <n_dims>" << endl;
     return -1;
   }
-    
+
   string directory = args[1];
   string fa_name = args[2];
   int n_dims = atoi(args[3]);
-  string basename = fa_name+"_"+to_string(n_dims)+"D";
+  string basename = fa_name + "_" + to_string(n_dims) + "D";
 
-  
   cout << "========================================================" << endl;
-  string filename_json = directory+"/"+basename+".json";
+  string filename_json = directory + "/" + basename + ".json";
   cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
@@ -57,23 +56,23 @@ int main(int n_args, char** args)
   }
   json j = json::parse(file);
   FunctionApproximator* fa = j.get<FunctionApproximator*>();
-  
+
   cout << j << endl;
   cout << *fa << endl;
-  
+
   MatrixXd inputs;
-  string filename_inputs = directory + "/"+basename+"_inputs.txt";
+  string filename_inputs = directory + "/" + basename + "_inputs.txt";
   if (!loadMatrix(filename_inputs, inputs)) {
     cerr << "Could not find: " << filename_inputs << endl;
     return -1;
   }
-  
+
   cout << "===============" << endl << "C++ Analytical solution" << endl;
   MatrixXd outputs;
-  fa->predict(inputs,outputs);
+  fa->predict(inputs, outputs);
   bool overwrite = true;
-  saveMatrix(directory+"/"+basename+"_outputs.txt", outputs, overwrite);
-  
+  saveMatrix(directory + "/" + basename + "_outputs.txt", outputs, overwrite);
+
   delete fa;
 
   return 0;

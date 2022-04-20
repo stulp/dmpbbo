@@ -17,20 +17,20 @@
 
 
 import os
-import sys
 import subprocess
+import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Include scripts for plotting
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
-
-from functionapproximators.functionapproximators_plotting import *
+    
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
+from functionapproximators.functionapproximators_plotting import *
 from to_jsonpickle import *
+
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -84,111 +84,112 @@ def plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
 
     pass
 
+
 def targetFunction(n_samples_per_dim):
-    
+
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
-    
-    if n_dims==1:
-        inputs = np.linspace(0.0, 2.0,n_samples_per_dim)
-        targets = 3*np.exp(-inputs)*np.sin(2*np.square(inputs))
-        
+
+    if n_dims == 1:
+        inputs = np.linspace(0.0, 2.0, n_samples_per_dim)
+        targets = 3 * np.exp(-inputs) * np.sin(2 * np.square(inputs))
+
     else:
         n_samples = np.prod(n_samples_per_dim)
         # Here comes naive inefficient implementation...
-        x1s = np.linspace(-2.0, 2.0,n_samples_per_dim[0])
-        x2s = np.linspace(-2.0, 2.0,n_samples_per_dim[1])
-        inputs = np.zeros((n_samples,n_dims))
+        x1s = np.linspace(-2.0, 2.0, n_samples_per_dim[0])
+        x2s = np.linspace(-2.0, 2.0, n_samples_per_dim[1])
+        inputs = np.zeros((n_samples, n_dims))
         targets = np.zeros(n_samples)
         ii = 0
         for x1 in x1s:
             for x2 in x2s:
-                inputs[ii,0] = x1
-                inputs[ii,1] = x2
-                targets[ii] = 2.5*x1*np.exp(-np.square(x1)-np.square(x2))
+                inputs[ii, 0] = x1
+                inputs[ii, 1] = x2
+                targets[ii] = 2.5 * x1 * np.exp(-np.square(x1) - np.square(x2))
                 ii += 1
-    
-    return (inputs,targets)
-    
-    
-def train(fa_name,n_dims):
+
+    return (inputs, targets)
+
+
+def train(fa_name, n_dims):
 
     directory = "/tmp/compareFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
-    # Generate training data 
-    n_samples_per_dim = 30 if n_dims==1 else [10,10]
+    # Generate training data
+    n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
     (inputs, targets) = targetFunction(n_samples_per_dim)
-    
-    
-    n_rfs = 9 if n_dims==1 else [5,5] # Number of basis functions. To be used later.
-    
+
+    n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
+
     # Initialize function approximator
-    if fa_name=="LWR":
+    if fa_name == "LWR":
         # This value for intersection is quite low. But for the demo it is nice
         # because it makes the linear segments quite obvious.
-        intersection = 0.2;
-        fa = FunctionApproximatorLWR(n_rfs,intersection)
+        intersection = 0.2
+        fa = FunctionApproximatorLWR(n_rfs, intersection)
     else:
-        intersection = 0.7;
-        fa = FunctionApproximatorRBFN(n_rfs,intersection)
-    
+        intersection = 0.7
+        fa = FunctionApproximatorRBFN(n_rfs, intersection)
+
     # Train function approximator with data
-    fa.train(inputs,targets)
-    
+    fa.train(inputs, targets)
+
     # Make predictions for the targets
     outputs = fa.predict(inputs)
-    
+
     # Make predictions on a grid
-    n_samples_per_dim_grid = 200 if n_dims==1 else [30,30]
+    n_samples_per_dim_grid = 200 if n_dims == 1 else [30, 30]
     inputs_grid, _ = targetFunction(n_samples_per_dim_grid)
     outputs_grid = fa.predict(inputs_grid)
-    
+
     # Save the dynamical system to a json file
     basename = fa_name + "_" + str(n_dims) + "D"
     filename_json = directory + "/" + basename + ".json"
     with open(filename_json, "w") as out_file:
         out_file.write(to_jsonpickle(fa))
-        
+
     # Save the inputs to a directory
-    np.savetxt(directory + "/"+basename+"_inputs.txt", inputs_grid)
-    
+    np.savetxt(directory + "/" + basename + "_inputs.txt", inputs_grid)
+
     # Call the binary, which does analyticalSolution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
     arguments = directory + " " + fa_name + " " + str(n_dims)
     executeBinary(exec_name, arguments, True)
-    
-    outputs_grid_cpp = np.loadtxt(directory + "/"+basename+"_outputs.txt")
-    
+
+    outputs_grid_cpp = np.loadtxt(directory + "/" + basename + "_outputs.txt")
+
     # Plotting
-    fig = plt.figure(figsize=(7,7))
+    fig = plt.figure(figsize=(7, 7))
     fig.canvas.set_window_title(fa_name)
-    ax = fig.add_subplot(111) if n_dims==1 else fig.add_subplot(111,projection='3d')
-    ax.set_title(fa_name+" "+str(n_dims)+"D")
-    h_pyt = plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_per_dim_grid)
-    h_cpp = plotGridPredictions(inputs_grid,outputs_grid_cpp,ax,n_samples_per_dim_grid)
+    ax = fig.add_subplot(111) if n_dims == 1 else fig.add_subplot(111, projection="3d")
+    ax.set_title(fa_name + " " + str(n_dims) + "D")
+    h_pyt = plotGridPredictions(inputs_grid, outputs_grid, ax, n_samples_per_dim_grid)
+    h_cpp = plotGridPredictions(
+        inputs_grid, outputs_grid_cpp, ax, n_samples_per_dim_grid
+    )
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    
 
-    #lines = plotGridPredictions(inputs_grid_cpp,outputs_grid_cpp,ax,n_samples_per_dim_grid)
-    plotDataResiduals(inputs,targets,outputs,ax)
-    plotDataTargets(inputs,targets,ax)
-    #if fa_name=="LWR":
+    # lines = plotGridPredictions(inputs_grid_cpp,outputs_grid_cpp,ax,n_samples_per_dim_grid)
+    plotDataResiduals(inputs, targets, outputs, ax)
+    plotDataTargets(inputs, targets, ax)
+    # if fa_name=="LWR":
     #    plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_per_dim_grid,activations_grid)
-    #if fa_name=="RBFN":
+    # if fa_name=="RBFN":
     #    plotBasisFunctions(inputs_grid,activations_grid,ax,n_samples_per_dim_grid)
-    
+
     fig.suptitle(basename)
 
     save_me = False
     if save_me:
         fig.savefig(os.path.join(directory, basename + ".png"))
-    
-if __name__=='__main__':
-    
-    for fa_name in ["RBFN","LWR"]:
-        for n_dims in [1,2]:
-            train(fa_name,n_dims)
-        
-    plt.show()
 
+
+if __name__ == "__main__":
+
+    for fa_name in ["RBFN", "LWR"]:
+        for n_dims in [1, 2]:
+            train(fa_name, n_dims)
+
+    plt.show()
