@@ -76,5 +76,18 @@ if __name__=='__main__':
     plotDmp(tau,ts,xs_step, xds_step,fig)
     fig.canvas.set_window_title('Step-by-step integration') 
     
+    fig = plt.figure(3,figsize=(15,5))
+    axs = [ fig.add_subplot(131+i) for i in range(3) ] 
+    
+    lines = plotTrajectory(traj.asMatrix(),axs)
+    plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
+
+    traj_reproduced = dmp.statesAsTrajectory(ts,xs_step,xds_step)
+    lines = plotTrajectory(traj_reproduced.asMatrix(),axs)
+    plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
+    
+    plt.legend()
+    fig.canvas.set_window_title('Comparison between demonstration and reproduced') 
+    
     
     plt.show()
