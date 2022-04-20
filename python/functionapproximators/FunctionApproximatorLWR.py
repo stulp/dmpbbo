@@ -26,18 +26,16 @@ from functionapproximators.leastSquares import *
 
 class FunctionApproximatorLWR(FunctionApproximator):
     
-    def __init__(self,n_basis_functions_per_dim, intersection_height=0.5, regularization=0.0):
+    def __init__(self,n_bfs_per_dim, intersection_height=0.5, regularization=0.0):
         
-        if isinstance(n_basis_functions_per_dim,int):
-            n_basis_functions_per_dim = [n_basis_functions_per_dim]
-        
-        meta_params = {
-            'n_basis_functions_per_dim': n_basis_functions_per_dim,
+        self._meta_params = {
+            'n_basis_functions_per_dim': np.atleast_1d(n_bfs_per_dim),
             'intersection_height': intersection_height,
             'regularization': regularization,
         }
 
-        super().__init__(meta_params)
+        self._model_params = None
+        self._selected_param_labels = self.getSelectableParametersRecommended()
 
     def dim_input(self):
         if not isTrained():
@@ -57,7 +55,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         max_vals = inputs.max(axis=0)
         n_bfs_per_dim = self._meta_params['n_basis_functions_per_dim']
         height = self._meta_params['intersection_height']
-        (centers,widths) = getCentersAndWidths(min_vals, max_vals, n_bfs_per_dim, height)
+        (centers,widths) = Gaussian.getCentersAndWidths(min_vals, max_vals, n_bfs_per_dim, height)
        
         # Get the activations of the basis functions 
         self._model_params = {}

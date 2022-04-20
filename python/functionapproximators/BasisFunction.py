@@ -17,9 +17,11 @@
 
 import numpy as np
 import numpy.matlib
+from abc import ABC, abstractmethod
 
 class Gaussian:
     
+    @staticmethod
     def activations(centers, widths, inputs, normalized_basis_functions=False):
         """Get the activations for given centers, widths and inputs.
         
@@ -80,77 +82,77 @@ class Gaussian:
                     
         return kernel_activations
         
+    @staticmethod
+    def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height=0.7):
+        """Get the centers and widths of basis functions.
         
-def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height=0.7):
-    """Get the centers and widths of basis functions.
-    
-    Args:
-        mins: Minimum values of input data (one value for each dimension).
-        maxs: Maximum values of input data (one value for each dimension).
-        n_bfs_per_dim: Number of basis functions per input dimension.
-        intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
-    
-    Returns:
-        centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
-        widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
-    """
-    mins = np.atleast_1d(mins) 
-    maxs = np.atleast_1d(maxs) 
-    n_dims = len(mins)
-    n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
+        Args:
+            mins: Minimum values of input data (one value for each dimension).
+            maxs: Maximum values of input data (one value for each dimension).
+            n_bfs_per_dim: Number of basis functions per input dimension.
+            intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
         
-    centers_per_dim_local = []
-    widths_per_dim_local = []
-    for i_dim in range(n_dims):
-        n_bfs = n_bfs_per_dim[i_dim]
-        
-        cur_centers = np.linspace(mins[i_dim],maxs[i_dim],n_bfs)
-        
-        # Determine the widths from the centers
-        cur_widths = np.ones((n_bfs))
-        h = intersection_height
-        if n_bfs>1:
-            # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
-            # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
-            # And we want the activation at x to be 'intersection'. So
-            #            y = exp(-0.5(x-c0)^2/w^2)
-            # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
-            # intersection = exp(-0.5((0.5*c1-0.5*c0)^2/w^2))
-            # intersection = exp(-0.5((0.5*(c1-c0))^2/w^2))
-            # intersection = exp(-0.5(0.25*(c1-c0)^2/w^2))
-            # intersection = exp(-0.125((c1-c0)^2/w^2))
-            #            w = sqrt((c1-c0)^2/-8*ln(intersection))
-            for cc in range(n_bfs-1):
-                w = np.sqrt(np.square(cur_centers[cc+1]-cur_centers[cc])/(-8*np.log(h)))
-                cur_widths[cc] = w
+        Returns:
+            centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
+            widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
+        """
+        mins = np.atleast_1d(mins) 
+        maxs = np.atleast_1d(maxs) 
+        n_dims = len(mins)
+        n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
             
-            cur_widths[n_bfs-1] = cur_widths[n_bfs-2]
-
-        centers_per_dim_local.append(cur_centers)
-        widths_per_dim_local.append(cur_widths)
-
-    # We now have the centers and widths for each dimension separately.
-    # This is like meshgrid.flatten, but then for any number of dimensions
-    # I'm sure numpy has better functions for this, but I could not find them, and I already
-    # had the code in C++.
-    digit_max = n_bfs_per_dim
-    n_centers = np.prod(digit_max)
-    digit = [0] * n_dims
-
-    centers = np.zeros((n_centers,n_dims))
-    widths = np.zeros((n_centers,n_dims))
-    i_center=0
-    while (digit[0]<digit_max[0]):
+        centers_per_dim_local = []
+        widths_per_dim_local = []
         for i_dim in range(n_dims):
-            centers[i_center,i_dim] = centers_per_dim_local[i_dim][digit[i_dim]];
-            widths[i_center,i_dim] = widths_per_dim_local[i_dim][digit[i_dim]];
-        i_center+=1;
-  
-        # Increment last digit by one
-        digit[n_dims-1]+=1;
-        for i_dim in range(n_dims-1,0,-1):
-            if digit[i_dim]>=digit_max[i_dim]:
-                digit[i_dim] = 0;
-                digit[i_dim-1]+=1;
+            n_bfs = n_bfs_per_dim[i_dim]
+            
+            cur_centers = np.linspace(mins[i_dim],maxs[i_dim],n_bfs)
+            
+            # Determine the widths from the centers
+            cur_widths = np.ones((n_bfs))
+            h = intersection_height
+            if n_bfs>1:
+                # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
+                # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
+                # And we want the activation at x to be 'intersection'. So
+                #            y = exp(-0.5(x-c0)^2/w^2)
+                # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
+                # intersection = exp(-0.5((0.5*c1-0.5*c0)^2/w^2))
+                # intersection = exp(-0.5((0.5*(c1-c0))^2/w^2))
+                # intersection = exp(-0.5(0.25*(c1-c0)^2/w^2))
+                # intersection = exp(-0.125((c1-c0)^2/w^2))
+                #            w = sqrt((c1-c0)^2/-8*ln(intersection))
+                for cc in range(n_bfs-1):
+                    w = np.sqrt(np.square(cur_centers[cc+1]-cur_centers[cc])/(-8*np.log(h)))
+                    cur_widths[cc] = w
+                
+                cur_widths[n_bfs-1] = cur_widths[n_bfs-2]
     
-    return (centers,widths)
+            centers_per_dim_local.append(cur_centers)
+            widths_per_dim_local.append(cur_widths)
+    
+        # We now have the centers and widths for each dimension separately.
+        # This is like meshgrid.flatten, but then for any number of dimensions
+        # I'm sure numpy has better functions for this, but I could not find them, and I already
+        # had the code in C++.
+        digit_max = n_bfs_per_dim
+        n_centers = np.prod(digit_max)
+        digit = [0] * n_dims
+    
+        centers = np.zeros((n_centers,n_dims))
+        widths = np.zeros((n_centers,n_dims))
+        i_center=0
+        while (digit[0]<digit_max[0]):
+            for i_dim in range(n_dims):
+                centers[i_center,i_dim] = centers_per_dim_local[i_dim][digit[i_dim]];
+                widths[i_center,i_dim] = widths_per_dim_local[i_dim][digit[i_dim]];
+            i_center+=1;
+      
+            # Increment last digit by one
+            digit[n_dims-1]+=1;
+            for i_dim in range(n_dims-1,0,-1):
+                if digit[i_dim]>=digit_max[i_dim]:
+                    digit[i_dim] = 0;
+                    digit[i_dim-1]+=1;
+        
+        return (centers,widths)

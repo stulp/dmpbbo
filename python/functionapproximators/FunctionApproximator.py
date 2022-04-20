@@ -30,16 +30,6 @@ class FunctionApproximator(Parameterizable):
 
     See https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md
     """
-    
-    def __init__(self,meta_params):
-        """Initialize a function approximator with meta- and optionally model-parameters
-        
-        Args:
-           meta_parameters (dict): The meta-parameters for the training algorithm 
-        """
-        self._meta_params = meta_params
-        self._model_params = None
-        self._selected_param_labels = self.getSelectableParametersRecommended()
         
     @abstractmethod
     def dim_input(self):
@@ -77,8 +67,6 @@ class FunctionApproximator(Parameterizable):
         pass
 
     def setSelectedParameters(self,selected_param_labels):
-        """Implements abstract function from the Parameterizable abstract class.
-        """
         selectable_param_labels = self.getSelectableParameters()
         self._selected_param_labels = []
         if isinstance(selected_param_labels,str):
@@ -91,8 +79,6 @@ class FunctionApproximator(Parameterizable):
                 self._selected_param_labels.append(label)
                 
     def getParameterVectorSelected(self):
-        """Implements abstract function from the Parameterizable abstract class.
-        """
         if not self.isTrained():
             raise ValueError('FunctionApproximator is not trained.')
             
@@ -102,8 +88,6 @@ class FunctionApproximator(Parameterizable):
         return np.asarray(values)
             
     def setParameterVectorSelected(self,values):
-        """Implements abstract function from the Parameterizable abstract class.
-        """
         if not self.isTrained():
             raise ValueError('FunctionApproximator is not trained.')
             
@@ -119,8 +103,6 @@ class FunctionApproximator(Parameterizable):
             offset += cur_n_values
             
     def getParameterVectorSelectedSize(self):
-        """Implements abstract function from the Parameterizable abstract class.
-        """
         size = 0
         for label in self._selected_param_labels:
             if label in self._model_params:
