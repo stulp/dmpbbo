@@ -38,6 +38,7 @@ class SigmoidSystem(DynamicalSystem):
             inflection_ratio - Time at which maximum rate of change is 
                                achieved, i.e. at inflection_ratio * tau
         """
+        x_init = np.atleast_1d(x_init)
         self._max_rate = max_rate
         self._inflection_ratio = inflection_ratio
         super().__init__(1, tau, x_init)

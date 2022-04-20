@@ -37,6 +37,8 @@ class DynamicalSystem(ABC):
         if order < 1 or order > 2:
             raise ValueError("order should be 1 or 2")
 
+        y_init = np.atleast_1d(y_init)
+
         # These are set once, and are fixed
         self._dim_y = len(y_init)
         self._dim_x = n_dims_x * order if n_dims_x else self._dim_y * order
