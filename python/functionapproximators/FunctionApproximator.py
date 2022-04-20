@@ -168,7 +168,7 @@ class FunctionApproximator(Parameterizable):
     def plotPredictions(self,inputs,**kwargs):
         targets = kwargs.get('targets', [])
         ax = kwargs.get('ax') or self._getAxis()
-        plot_residuals = kwargs.get('plot_residuals', False)
+        plot_residuals = kwargs.get('plot_residuals', True)
     
         outputs = self.predict(inputs)
         
@@ -208,13 +208,15 @@ class FunctionApproximator(Parameterizable):
     def plot(self,inputs,**kwargs):
         ax = kwargs.get('ax') or self._getAxis()
         targets = kwargs.get('targets', [])
-        plot_residuals = kwargs.get('plot_residuals', False)
-        
+        plot_residuals = kwargs.get('plot_residuals', True)
+        plot_basis_functions = kwargs.get('plot_basis_functions', False)
+ 
         inputs_min = np.min(inputs,axis=0)
         inputs_max = np.max(inputs,axis=0)
-        self.plotBasisFunctions(inputs_min,inputs_max,ax=ax)
-        self.plotPredictionsGrid(inputs_min,inputs_max,ax=ax)
+        if plot_basis_functions:
+            self.plotBasisFunctions(inputs_min,inputs_max,ax=ax)
         self.plotPredictions(inputs,targets=targets,ax=ax,plot_residuals=plot_residuals)
+        return self.plotPredictionsGrid(inputs_min,inputs_max,ax=ax)
         
 
     def setSelectedParameters(self,selected_param_labels):

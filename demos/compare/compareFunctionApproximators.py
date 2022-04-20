@@ -28,7 +28,6 @@ sys.path.append(lib_path)
     
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
-from functionapproximators.functionapproximators_plotting import *
 from to_jsonpickle import *
 
 
@@ -164,20 +163,21 @@ def train(fa_name, n_dims):
     fig.canvas.set_window_title(fa_name)
     ax = fig.add_subplot(111) if n_dims == 1 else fig.add_subplot(111, projection="3d")
     ax.set_title(fa_name + " " + str(n_dims) + "D")
-    h_pyt = plotGridPredictions(inputs_grid, outputs_grid, ax, n_samples_per_dim_grid)
-    h_cpp = plotGridPredictions(
-        inputs_grid, outputs_grid_cpp, ax, n_samples_per_dim_grid
-    )
+    h_pyt = fa.plot(inputs,targets=targets,ax=ax)
+    
+    if (n_dims==1):
+        h_cpp = ax.plot(inputs_grid,outputs_grid_cpp,'-')
+    elif (n_dims==2):
+        inputs_0_on_grid = np.reshape(inputs_grid[:,0],n_samples_per_dim_grid)
+        inputs_1_on_grid = np.reshape(inputs_grid[:,1],n_samples_per_dim_grid)
+        outputs_on_grid = np.reshape(outputs_grid_cpp,n_samples_per_dim_grid)
+        h_cpp = ax.plot_wireframe(inputs_0_on_grid,inputs_1_on_grid,outputs_on_grid,rstride=1, cstride=1)
+    else:
+        print('Cannot plot input data with a dimensionality of '+n_dims+'.')
+
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
 
-    # lines = plotGridPredictions(inputs_grid_cpp,outputs_grid_cpp,ax,n_samples_per_dim_grid)
-    plotDataResiduals(inputs, targets, outputs, ax)
-    plotDataTargets(inputs, targets, ax)
-    # if fa_name=="LWR":
-    #    plotLocallyWeightedLines(inputs_grid,lines_grid,ax,n_samples_per_dim_grid,activations_grid)
-    # if fa_name=="RBFN":
-    #    plotBasisFunctions(inputs_grid,activations_grid,ax,n_samples_per_dim_grid)
 
     fig.suptitle(basename)
 

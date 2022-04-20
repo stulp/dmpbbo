@@ -82,7 +82,9 @@ def train(fa_name,n_dims):
     outputs = fa.predict(inputs)
     
     # Plotting
-    fa.plot(inputs,targets=targets,plot_residuals=True)
+    fa.plot(inputs,targets=targets,plot_residuals=True,plot_basis_functions=True)
+    plt.gca().set_title(fa_name+" "+str(n_dims)+"D")
+    plt.gcf().canvas.set_window_title(fa_name+" "+str(n_dims)+"D")
             
 if __name__=='__main__':
     """Run some training sessions and plot results."""
