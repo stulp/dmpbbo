@@ -40,6 +40,8 @@ class FunctionApproximatorLWR(FunctionApproximator):
         super().__init__(meta_params)
 
     def dim_input(self):
+        if not isTrained():
+            raise ValueError("Can only call dim_input on trained function approximator.")
         return self._model_params['centers'].shape[1]
         
     def getSelectableParameters(self):
