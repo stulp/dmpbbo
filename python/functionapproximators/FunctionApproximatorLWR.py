@@ -39,6 +39,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         super().__init__(meta_params)
 
+    def dim_input(self):
+        return self._model_params['centers'].shape[1]
+        
     def getSelectableParameters(self):
         return ['centers','widths','slopes','offsets']
 

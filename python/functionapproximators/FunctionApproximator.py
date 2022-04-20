@@ -40,6 +40,9 @@ class FunctionApproximator(Parameterizable):
         self._model_params = None
         self._selected_param_labels = self.getSelectableParametersRecommended()
         
+    def dim_input(self):
+        raise NotImplementedError('subclasses must override dim_input()!')
+        
     def train(self,inputs,targets):
         """Train the function approximator with input and target examples.
         
