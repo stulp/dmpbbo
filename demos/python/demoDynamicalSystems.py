@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Include scripts for plotting
-lib_path = os.path.abspath("../../../python/")
+lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
 from dynamicalsystems.ExponentialSystem import ExponentialSystem
