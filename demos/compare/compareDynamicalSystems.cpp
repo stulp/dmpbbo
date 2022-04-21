@@ -77,9 +77,8 @@ int main(int n_args, char** args)
 
   // Numerical integration
   VectorXd x(d->dim(), 1);
-  VectorXd x_updated(d->dim(), 1);
   VectorXd xd(d->dim(), 1);
-  double dt = 0.01;
+  double dt;
 
   cout << "===============" << endl << "C++ Integrating with Euler" << endl;
   d->integrateStart(x, xd);

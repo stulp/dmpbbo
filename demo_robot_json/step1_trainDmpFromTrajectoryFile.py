@@ -89,7 +89,7 @@ if __name__=='__main__':
         ################################################
         # Integrate DMP
     
-        tau_exec = 1.3*traj.duration()
+        tau_exec = 1.3*traj.duration
         dt = 0.01
         n_time_steps = int(tau_exec/dt)
         ts = np.zeros([n_time_steps,1])

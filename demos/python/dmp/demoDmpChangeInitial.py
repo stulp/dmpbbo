@@ -56,13 +56,13 @@ def getDemoTrajectory(ts):
   
         y_yd_ydd_viapoint = np.zeros(3*n_dims)
         y_yd_ydd_viapoint[:n_dims] = viapoint_location
-        return  Trajectory.generatePolynomialTrajectoryThroughViapoint(ts,y_first,y_yd_ydd_viapoint,viapoint_time,y_last) 
+        return  Trajectory.from_viapoint_polynomial(ts,y_first,y_yd_ydd_viapoint,viapoint_time,y_last) 
 
     else:
         n_dims = 2
         y_first = np.linspace(0.0,0.7,n_dims) # Initial state
         y_last  = np.linspace(0.4,0.5,n_dims) # Final state
-        return Trajectory.generateMinJerkTrajectory(ts, y_first, y_last)
+        return Trajectory.from_min_jerk(ts, y_first, y_last)
 
 
 
@@ -73,8 +73,8 @@ if __name__=='__main__':
     n_time_steps = 51
     ts = np.linspace(0,tau,n_time_steps) # Time steps
     trajectory = getDemoTrajectory(ts) # getDemoTrajectory() is implemented below
-    y_init = trajectory.initial_y()
-    y_attr = trajectory.final_y()
+    y_init = trajectory.y_init
+    y_attr = trajectory.y_final
     
     #fig = plt.figure(1)
     #axs1 = [ fig.add_subplot(231), fig.add_subplot(132), fig.add_subplot(133) ] 

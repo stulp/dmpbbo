@@ -22,12 +22,6 @@ import os
 import matplotlib.pyplot as plt
 from scipy.signal import butter, lfilter, filtfilt
 
-lib_path = os.path.abspath('../../python/')
-sys.path.append(lib_path)
-
-from dmp.dmp_plotting import plotTrajectory
-
-
 class Trajectory:
 
     def __init__(self,  ts, ys, yds=None, ydds=None, misc=None):
@@ -60,29 +54,40 @@ class Trajectory:
         self.ydds_ = ydds
         self.misc_ = misc
 
-    def setMisc(self,misc):
-        assert(misc.shape[0]==self.ts_.shape[0])
-        self.misc_ = misc
+    @property
+    def misc(self):
+        return self.misc_
+        
+    @misc.setter
+    def misc(self,new_misc):
+        assert(new_misc.shape[0]==self.ts_.shape[0])
+        self.misc_ = new_misc
 
+    @property
     def length(self):
         return self.ts_.shape[0]
 
+    @property
     def duration(self):
         return self.ts_[-1]-self.ts_[0]
 
+    @property
     def dim(self):
         return self.dim_
             
+    @property
     def dim_misc(self):
         if self.misc_ is None:
             return 0
         else:
             return self.misc_.shape[1]
             
-    def initial_y(self):
+    @property
+    def y_init(self):
         return self.ys_[0]
         
-    def final_y(self):
+    @property
+    def y_final(self):
         return self.ys_[-1]
         
     def startTimeAtZero(self):
@@ -134,8 +139,8 @@ class Trajectory:
             self.misc_ = self.misc_[fro:to,:]
             
         
-            
-    def generatePolynomialTrajectory(ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
+    @classmethod
+    def from_polynomial(cls, ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
         
         a0 = y_from
         a1 = yd_from
@@ -161,9 +166,10 @@ class Trajectory:
         yds /= (ts[n_time_steps - 1] - ts[0])
         ydds /= pow(ts[n_time_steps - 1] - ts[0], 2)
 
-        return Trajectory(ts, ys, yds, ydds)
+        return cls(ts, ys, yds, ydds)
 
-    def generatePolynomialTrajectoryThroughViapoint(ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to):
+    @classmethod
+    def from_viapoint_polynomial(cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to):
         
         n_time_steps = ts.size
         n_dims = y_from.size
@@ -192,16 +198,17 @@ class Trajectory:
         yd_to          = np.zeros(n_dims)
         ydd_to         = np.zeros(n_dims)
 
-        traj1 = Trajectory.generatePolynomialTrajectory(ts[:viapoint_time_step], y_from, yd_from, ydd_from, y_viapoint, yd_viapoint, ydd_viapoint)
+        traj1 = Trajectory.from_polynomial(ts[:viapoint_time_step], y_from, yd_from, ydd_from, y_viapoint, yd_viapoint, ydd_viapoint)
 
-        traj2 = Trajectory.generatePolynomialTrajectory(ts[viapoint_time_step:], y_viapoint, yd_viapoint, ydd_viapoint, y_to, yd_to, ydd_to)
+        traj2 = Trajectory.from_polynomial(ts[viapoint_time_step:], y_viapoint, yd_viapoint, ydd_viapoint, y_to, yd_to, ydd_to)
         
         traj1.append(traj2)
         
         return traj1
 
 
-    def generateMinJerkTrajectory(ts, y_from, y_to):
+    @classmethod
+    def from_min_jerk(cls, ts, y_from, y_to):
         n_time_steps = ts.size
         n_dims = y_from.size
         
@@ -224,7 +231,7 @@ class Trajectory:
     
             ydds[:,i_dim] =         (A[i_dim]/(D*D))*(120*(tss**3) -180*(tss**2) +60*tss       )
 
-        return Trajectory(ts,ys,yds,ydds)
+        return cls(ts,ys,yds,ydds)
         
     def append(self,trajectory):
         self.ts_ = np.concatenate((self.ts_, trajectory.ts_))
@@ -266,25 +273,45 @@ class Trajectory:
         self.yds_  = diffnc(self.ys_,self.dt_mean)
         self.ydds_ = diffnc(self.yds_,self.dt_mean)
 
-    def applyLowPassFilter(self,cutoff,order=3,axs=None):
-        
-        # Plot before filtering
-        if axs is not None:
-            lines = plotTrajectory(self.asMatrix(),axs)
-            plt.setp(lines, linestyle='-',  linewidth=2, color=(0.6,0.6,1.0))
-        
-        
+    def applyLowPassFilter(self,cutoff,order=3):
         # Sample rate and desired cutoff frequencies (in Hz).
         dt_mean = np.mean(np.diff(self.ts_))
         sample_freq = 1.0/dt_mean
         self.ys_  = butter_lowpass_filter(self.ys_, cutoff, sample_freq, order)
         self.recomputeDerivatives()
         
-        if axs is not None:
-            lines = plotTrajectory(self.asMatrix(),axs)
-            plt.setp(lines, linestyle='-',  linewidth=1, color=(0.8,0.2,0.2))
-        
 
+    def plot(self,axs=None):
+        if not axs:
+            fig = plt.figure(figsize=(15,4))
+            axs = [ fig.add_subplot(1,3,i+1) for i in range(3) ]
+       
+        """Plot a trajectory"""
+        all_handles = axs[0].plot(self.ts_,self.ys_, '-')
+        axs[0].set_xlabel('time (s)');
+        axs[0].set_ylabel('y');
+        if (len(axs)>1):
+          h = axs[1].plot(self.ts_,self.yds_, '-')
+          all_handles.extend(h)
+          axs[1].set_xlabel('time (s)');
+          axs[1].set_ylabel('yd');
+        if (len(axs)>2):
+          h = axs[2].plot(self.ts_,self.ydds_, '-')
+          all_handles.extend(h)
+          axs[2].set_xlabel('time (s)');
+          axs[2].set_ylabel('ydd');
+          
+        if self.misc_ and len(axs)>3:
+          h = axs[3].plot(self.ts_,self.misc_, '-')
+          all_handles.extend(h)
+          axs[3].set_xlabel('time (s)');
+          axs[3].set_ylabel('misc');
+          
+        x_lim = [min(self.ts_),max(self.ts_)]
+        for ax in axs:
+            ax.set_xlim(x_lim[0],x_lim[1])
+          
+        return all_handles
 
 def diffnc(X,dt):
     # [X] = diffc(X,dt) does non causal differentiation with time interval

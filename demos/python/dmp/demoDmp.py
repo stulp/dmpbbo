@@ -40,7 +40,7 @@ if __name__=='__main__':
     ts = np.linspace(0,tau,n_time_steps)
     y_yd_ydd_viapoint = np.array([-0.2,0.4, 0.0,0.0, 0,0])
     viapoint_time = 0.4*ts[-1]
-    traj = Trajectory.generatePolynomialTrajectoryThroughViapoint(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
+    traj = Trajectory.from_viapoint_polynomial(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
     
 
     function_apps = [ FunctionApproximatorRBFN(10,0.7) for i_dim in range(n_dims) ]

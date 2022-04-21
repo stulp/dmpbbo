@@ -584,9 +584,10 @@ class Dmp(DynamicalSystem,Parameterizable):
     @staticmethod
     def plotStatic(tau, ts, xs, xds, **kwargs):
         forcing_terms = kwargs.get('forcing_terms',[]) 
-        fa_output = kwargs.get('fa_output',[]) 
+        fa_outputs = kwargs.get('fa_outputs',[]) 
         ext_dims = kwargs.get('ext_dims',[]) 
-        has_fa_output = len(forcing_terms)>0 or len(fa_output)>0
+        plot_tau = kwargs.get('plot_tau',True)
+        has_fa_output = len(forcing_terms)>0 or len(fa_outputs)>0
         
         axs = kwargs.get('axs') or Dmp.getDmpAxes(has_fa_output)
             
@@ -616,6 +617,7 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         # Loop over each of the subsystems of the DMP
         n_systems = len(system_names)
+        all_handles = []
         for i_system in range(n_systems):
           
             # Plot 'x' for this subsystem (analytical solution and step-by-step integration)
@@ -629,32 +631,36 @@ class Dmp(DynamicalSystem,Parameterizable):
             cur_xs = xs[:,cur_indices]
             cur_xds = xds[:,cur_indices]
             if (system_order[i_system]==2):
-                lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs,dim_y=n_dims_dmp);
+                h = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs,dim_y=n_dims_dmp)
             else:
-                lines = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs);
+                h = DynamicalSystem.plotStatic(tau,ts,cur_xs,cur_xds,axs=cur_axs)
+            all_handles.extend(h)
                 
             if (system_names[i_system]=='gating'):
-              plt.setp(lines,color='m')
-              cur_axs[0].set_ylim([0, 1.1])
+                plt.setp(h,color='m')
+                #cur_axs[0].set_ylim([0, 1.1])
             if (system_names[i_system]=='phase'):
-              cur_axs[0].set_ylim([0, 1.1])
-              plt.setp(lines,color='c')
+                plt.setp(h,color='c')
+                #cur_axs[0].set_ylim([0, 1.1])
               
             for ii in range(len(cur_axs)):
-              x = np.mean(cur_axs[ii].get_xlim())
-              y = np.mean(cur_axs[ii].get_ylim())
-              cur_axs[ii].text(x,y,system_names[i_system], horizontalalignment='center');
-              if (ii==0):
-                  cur_axs[ii].set_ylabel(r'$'+system_varname[i_system]+'$')
-              if (ii==1):
-                  cur_axs[ii].set_ylabel(r'$\dot{'+system_varname[i_system]+'}$')
-              if (ii==2):
-                  cur_axs[ii].set_ylabel(r'$\ddot{'+system_varname[i_system]+'}$')
+                x = np.mean(cur_axs[ii].get_xlim())
+                y = np.mean(cur_axs[ii].get_ylim())
+                cur_axs[ii].text(x,y,system_names[i_system], horizontalalignment='center');
+                if plot_tau:
+                    cur_axs[ii].plot([tau,tau],cur_axs[ii].get_ylim(),'-k')
+                if (ii==0):
+                    cur_axs[ii].set_ylabel(r'$'+system_varname[i_system]+'$')
+                if (ii==1):
+                    cur_axs[ii].set_ylabel(r'$\dot{'+system_varname[i_system]+'}$')
+                if (ii==2):
+                    cur_axs[ii].set_ylabel(r'$\ddot{'+system_varname[i_system]+'}$')
+                    
             
-        # todo Fix this
-        if len(fa_output)>1:
+        if len(fa_outputs)>1:
             ax = axs[11-1]
-            ax.plot(ts,fa_output)
+            h = ax.plot(ts,fa_outputs)
+            all_handles.extend(h)
             x = np.mean(ax.get_xlim())
             y = np.mean(ax.get_ylim())
             ax.text(x,y,'func. approx.', horizontalalignment='center');                                        
@@ -663,7 +669,8 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         if len(forcing_terms)>1:
             ax = axs[12-1]
-            ax.plot(ts,forcing_terms)
+            h = ax.plot(ts,forcing_terms)
+            all_handles.extend(h)
             x = np.mean(ax.get_xlim())
             y = np.mean(ax.get_ylim())
             ax.text(x,y,'forcing term', horizontalalignment='center');                                        
@@ -672,14 +679,12 @@ class Dmp(DynamicalSystem,Parameterizable):
         
         if (len(ext_dims)>1):
             ax = axs[13-1]
-            ax.plot(ts,ext_dims)
+            h = ax.plot(ts,ext_dims)
+            all_handles.extend(h)
             x = np.mean(ax.get_xlim())
             y = np.mean(ax.get_ylim())
             ax.text(x,y,'extended dims', horizontalalignment='center');                                        
             ax.set_xlabel(r'time ($s$)');
             ax.set_ylabel(r'unknown');
-    
-        x_lim = [min(ts),max(ts)]
-        for ax in plt.gcf().get_axes():
-            ax.plot([tau,tau],ax.get_ylim(),'-k')
-            ax.set_xlim(x_lim[0],x_lim[1])
+            
+        return all_handles
