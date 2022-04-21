@@ -93,9 +93,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._gating_system = gating_system
         self._goal_system = goal_system
 
-        self.ts_train_ = None
+        self._ts_train = None
 
-        self.goal_selected = False
+        self._goal_selected = False
 
         d = self._dim_y
         self.SPRING = np.arange(0 * d + 0, 0 * d + 0 + 2 * d)
@@ -295,14 +295,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
         """
         if ts is None:
-            if self.ts_train_ is None:
+            if self._ts_train is None:
                 print(
-                    "Neither the argument 'ts' nor the member variable self.ts_train_ was set. Returning None."
+                    "Neither the argument 'ts' nor the member variable self._ts_train was set. Returning None."
                 )
                 return None
             else:
                 # Set the times to the ones the Dmp was trained on.
-                ts = self.ts_train_
+                ts = self._ts_train
 
         n_time_steps = ts.size
 
@@ -436,7 +436,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call
         # analyticalSolution without the "ts" argument.
-        self.ts_train_ = trajectory._ts
+        self._ts_train = trajectory._ts
 
     def computeFunctionApproximatorInputsAndTargets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
@@ -568,14 +568,14 @@ class Dmp(DynamicalSystem, Parameterizable):
     def setSelectedParameters(self, selected_values_labels):
         for fa in self._function_approximators:
             fa.setSelectedParameters(selected_values_labels)
-        self.goal_selected = "goal" in selected_values_labels
+        self._goal_selected = "goal" in selected_values_labels
 
     def getParameterVectorSelected(self):
         values = np.empty(0)
         for fa in self._function_approximators:
             if fa.isTrained():
                 values = np.append(values, fa.getParameterVectorSelected())
-        if self.goal_selected:
+        if self._goal_selected:
             values = np.append(values, self.attractor_state_)
         return values
 
@@ -589,7 +589,7 @@ class Dmp(DynamicalSystem, Parameterizable):
                 cur_values = values[offset : offset + cur_size]
                 fa.setParameterVectorSelected(cur_values)
                 offset += cur_size
-        if self.goal_selected:
+        if self._goal_selected:
             self.set_attractor_state(values[offset : offset + self.dim_orig_])
 
     def getParameterVectorSelectedSize(self):
@@ -597,7 +597,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         for fa in self._function_approximators:
             if fa.isTrained():
                 size += fa.getParameterVectorSelectedSize()
-        if self.goal_selected:
+        if self._goal_selected:
             size += self.dim_orig_
         return size
 

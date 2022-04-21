@@ -55,7 +55,7 @@ if __name__=="__main__":
         json = in_file.read()        
         dmp = from_jsonpickle(json)
     
-    ts = dmp.ts_train_
+    ts = dmp._ts_train
     ( xs, xds, forcing, fa_outputs) = dmp.analyticalSolution(ts)
     traj_mean = dmp.statesAsTrajectory(ts,xs,xds)
     
