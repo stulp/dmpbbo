@@ -50,7 +50,7 @@ if __name__=='__main__':
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
     n_dims =  traj.dim()
-    peak_to_peak = np.ptp(traj._ys,axis=0) # Range of data; used later on
+    peak_to_peak = np.ptp(traj.ys,axis=0) # Range of data; used later on
     
     mean_absolute_errors = []
     n_bfs_list = list(range(3,args.n))
@@ -73,11 +73,11 @@ if __name__=='__main__':
         ################################################
         # Analytical solution to compute difference
         
-        ts = traj._ts
+        ts = traj.ts
         ( xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana) = dmp.analyticalSolution(ts)
         traj_reproduced_ana = dmp.statesAsTrajectory(ts,xs_ana,xds_ana)
     
-        mae = np.mean(abs(traj._ys - traj_reproduced_ana._ys),axis=0)
+        mae = np.mean(abs(traj.ys - traj_reproduced_ana._ys),axis=0)
         mean_absolute_errors.append(mae)
         print()
         print(f'               Number of basis functions: {n_bfs}')

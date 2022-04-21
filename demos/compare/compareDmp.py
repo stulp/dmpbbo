@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # Analytical solution to compute difference
     print("===============\nPython Analytical solution")
 
-    ts = traj._ts
+    ts = traj.ts
     xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana = dmp.analyticalSolution(ts)
 
     ################################################
