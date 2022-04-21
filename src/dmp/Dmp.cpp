@@ -523,27 +523,27 @@ void Dmp::set_y_attr(const VectorXd& y_attr)
 
 void from_json(const nlohmann::json& j, Dmp*& obj)
 {
-  double tau = from_json_to_double(j.at("tau_"));
+  double tau = from_json_to_double(j.at("_tau"));
 
   double alpha_spring_damper =
-      from_json_to_double(j.at("spring_system_").at("damping_coefficient_"));
+      from_json_to_double(j.at("_spring_system").at("_damping_coefficient"));
 
   VectorXd y_init;
   VectorXd y_attr;
-  from_json(j.at("y_init_").at("values"), y_init);
-  from_json(j.at("y_attr_").at("values"), y_attr);
+  from_json(j.at("_y_init").at("values"), y_init);
+  from_json(j.at("_y_attr").at("values"), y_attr);
 
   ExponentialSystem* goal_system;
   DynamicalSystem *phase_system, *gating_system;
-  goal_system = j.at("goal_system_").get<ExponentialSystem*>();
-  phase_system = j.at("phase_system_").get<DynamicalSystem*>();
-  gating_system = j.at("gating_system_").get<DynamicalSystem*>();
+  goal_system = j.at("_goal_system").get<ExponentialSystem*>();
+  phase_system = j.at("_phase_system").get<DynamicalSystem*>();
+  gating_system = j.at("_gating_system").get<DynamicalSystem*>();
 
-  string forcing_term_scaling = j.at("forcing_term_scaling_");
+  string forcing_term_scaling = j.at("_forcing_term_scaling");
 
   int n_dims = y_attr.size();
   vector<FunctionApproximator*> function_approximators;
-  const auto& jrow = j.at("function_approximators_");
+  const auto& jrow = j.at("_function_approximators");
   if (jrow.is_array()) {
     for (int i_dim = 0; i_dim < n_dims; i_dim++) {
       FunctionApproximator* fa = jrow.at(i_dim).get<FunctionApproximator*>();
@@ -560,12 +560,13 @@ void Dmp::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
 
-  j["spring_system_"]["damping_coefficient_"] =
+  j["_spring_system"]["_damping_coefficient"] =
       spring_system_->damping_coefficient();
-  j["goal_system_"] = goal_system_;
-  j["phase_system_"] = phase_system_;
-  j["gating_system_"] = gating_system_;
-  j["forcing_term_scaling_"] = forcing_term_scaling_;
+  j["_goal_system"] = goal_system_;
+  j["_phase_system"] = phase_system_;
+  j["_gating_system"] = gating_system_;
+  j["_forcing_term_scaling"] = forcing_term_scaling_;
+  j["_function_approximators"] = function_approximators_;
 
   string c("Dmp");
   j["py/object"] = "dmp." + c + "." + c;  // for jsonpickle
