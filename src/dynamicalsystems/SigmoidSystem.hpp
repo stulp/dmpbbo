@@ -46,7 +46,8 @@ class SigmoidSystem : public DynamicalSystem {
    * DynamicalSystem::tau() \param x_init           Initial state, cf.
    * DynamicalSystem::x_init() \param max_rate         Maximum rate of
    * change,       cf. SigmoidSystem::max_rate() \param inflection_ratio
-   * Time at which maximum rate of change is achieved,  i.e. at inflection_ratio * tau 
+   * Time at which maximum rate of change is achieved,  i.e. at inflection_ratio
+   * * tau
    */
   SigmoidSystem(double tau, const Eigen::VectorXd& x_init, double max_rate,
                 double inflection_ratio);

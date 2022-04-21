@@ -78,8 +78,8 @@ class DynamicalSystem {
    *
    * \param[in] tau      Time constant
    * \param[in] y_init   Initial state
-   * \param[in] n_dims_x Dimensionality of the state (which may differ from the size
-   * of y_init) 
+   * \param[in] n_dims_x Dimensionality of the state (which may differ from the
+   * size of y_init)
    */
   DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_x);
 
@@ -110,10 +110,10 @@ class DynamicalSystem {
    * Return analytical solution of the system at certain times.
    *
    * \param[in]  ts  A vector of times for which to compute the analytical
-   * solutions 
+   * solutions
    * \param[out] xs  Sequence of state vectors. T x D or D x T matrix,
    * where T is the number of times (the length of 'ts'), and D the size of the
-   * state (i.e. dim_) 
+   * state (i.e. dim_)
    * \param[out] xds Sequence of state vectors (rates of
    * change). T x D or D x T matrix, where T is the number of times (the length
    * of 'ts'), and D the size of the state (i.e. dim_)
@@ -136,8 +136,8 @@ class DynamicalSystem {
    *
    */
   virtual void integrateStart(const Eigen::VectorXd& y_init,
-                      Eigen::Ref<Eigen::VectorXd> x,
-                      Eigen::Ref<Eigen::VectorXd> xd);
+                              Eigen::Ref<Eigen::VectorXd> x,
+                              Eigen::Ref<Eigen::VectorXd> xd);
 
   /** Start integrating the system
    *
@@ -160,8 +160,8 @@ class DynamicalSystem {
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
-   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x), then
-   * this function will not allocate memory.
+   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x),
+   * then this function will not allocate memory.
    */
   virtual void integrateStep(double dt,
                              const Eigen::Ref<const Eigen::VectorXd> x,
@@ -181,8 +181,8 @@ class DynamicalSystem {
    * \param[out] x_updated  Updated state, dt time later.
    * \param[out] xd_updated Updated rates of change of state, dt time later.
    *
-   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x), then
-   * this function will not allocate memory.
+   * \remarks If x_updated and xd_updated are of the correct size (i.e. dim_x),
+   * then this function will not allocate memory.
    */
   void integrateStepEuler(double dt, const Eigen::Ref<const Eigen::VectorXd> x,
                           Eigen::Ref<Eigen::VectorXd> x_updated,
@@ -263,9 +263,10 @@ class DynamicalSystem {
   /** Set the initial state of the dynamical system.
    *  \param[in] x_init Initial state of the dynamical system.
    */
-  virtual void set_x_init(const Eigen::VectorXd& x_init) { 
+  virtual void set_x_init(const Eigen::VectorXd& x_init)
+  {
     assert(x_init.size() == dim_x_);
-    x_init_ = x_init; 
+    x_init_ = x_init;
   }
 
   /**
@@ -279,8 +280,7 @@ class DynamicalSystem {
    *  \param[in] y_init Initial state of the dynamical system.
    */
   virtual void set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init);
-  
-  
+
   /** @} */
 
   /** Read an object from json.
@@ -330,12 +330,13 @@ class DynamicalSystem {
    * For second order systems, it is dim(x) = dim([y z])
    */
   const int dim_x_;
-  
+
   /** Dimensionality of the y part of the system state.
    *
    * For first order systems, it is dim(y) = dim(x) (because y = x)
    *
-   * For second order systems, it is dim(y), where y is part of x, i.e. x = [y z]
+   * For second order systems, it is dim(y), where y is part of x, i.e. x = [y
+   * z]
    */
   const int dim_y_;
 

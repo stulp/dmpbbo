@@ -503,9 +503,9 @@ which are expected to take between 0.5-10 seconds, dt is usually chosen to be in
 the range 0.01-0.001.
 
 The state of a Dmp includes all its subsystems, i.e. the phase_system,
-gating_system, goal_system. If the Dmp has size dim_dmp()=3 (e.g. representing an
-end-effector position), then the state will have a size of 11, i.e. 2*3 (one 2nd
-order spring-damper expanded to two 1st order systems) + 3 (goal sytem) + 1
+gating_system, goal_system. If the Dmp has size dim_dmp()=3 (e.g. representing
+an end-effector position), then the state will have a size of 11, i.e. 2*3 (one
+2nd order spring-damper expanded to two 1st order systems) + 3 (goal sytem) + 1
 (phase system) + gating system (1). For convenience, there are several macros to
 extract different pars of the state, e.g. x.GOAL expands to x.segment(2 *
 dim_dmp() + 0, dim_dmp()), which extracts the state of the goal system.

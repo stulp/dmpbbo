@@ -168,10 +168,10 @@ void from_json(const nlohmann::json& j, SpringDamperSystem*& obj)
       from_json_to_double(j.at("_damping_coefficient"));
   double spring_constant = from_json_to_double(j.at("_spring_constant"));
   double mass = from_json_to_double(j.at("_mass"));
-  
+
   VectorXd y_attr = j.at("_y_attr").at("values");
   VectorXd x_init = j.at("_x_init").at("values");
-  VectorXd y_init = x_init.segment(0,y_attr.size());
+  VectorXd y_init = x_init.segment(0, y_attr.size());
 
   obj = new SpringDamperSystem(tau, y_init, y_attr, damping_coefficient,
                                spring_constant, mass);

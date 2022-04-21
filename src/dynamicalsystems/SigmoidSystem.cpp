@@ -104,7 +104,8 @@ VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r,
     cerr << "In function SigmoidSystem::computeKs(), Ks is too close to N_0s. "
             "This may lead to errors during numerical integration. Recommended "
             "solution: choose a lower magnitude for the maximum rate of change "
-            "(currently it is " << r << ")" << endl;
+            "(currently it is "
+         << r << ")" << endl;
   }
 
   return Ks;

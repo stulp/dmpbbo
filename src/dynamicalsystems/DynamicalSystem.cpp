@@ -38,18 +38,16 @@ using namespace Eigen;
 
 namespace DmpBbo {
 
-DynamicalSystem::DynamicalSystem(int order, double tau,
-                                 Eigen::VectorXd y_init)
-    : dim_x_(y_init.size() * order),
-      dim_y_(y_init.size()),
-      tau_(tau)
+DynamicalSystem::DynamicalSystem(int order, double tau, Eigen::VectorXd y_init)
+    : dim_x_(y_init.size() * order), dim_y_(y_init.size()), tau_(tau)
 {
   assert(order == 1 || order == 2);
   set_y_init(y_init);
   preallocateMemory();
 }
 
-DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init, int n_dims_x)
+DynamicalSystem::DynamicalSystem(double tau, Eigen::VectorXd y_init,
+                                 int n_dims_x)
     : dim_x_(n_dims_x), dim_y_(y_init.size()), tau_(tau)
 {
   set_y_init(y_init);
@@ -73,15 +71,17 @@ DynamicalSystem::~DynamicalSystem(void) {}
 
 void DynamicalSystem::get_y_init(Eigen::VectorXd& y_init) const
 {
-  if (dim_x_==dim_y_)
+  if (dim_x_ == dim_y_)
     y_init = x_init_;
-  else 
+  else
     // x = [y z], return only y part
     y_init = x_init_.segment(0, dim_y_);
-    // The upper statement would suffice. The if-then-else makes the semantics clearer.
+  // The upper statement would suffice. The if-then-else makes the semantics
+  // clearer.
 }
 
-void DynamicalSystem::set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init)
+void DynamicalSystem::set_y_init(
+    const Eigen::Ref<const Eigen::VectorXd>& y_init)
 {
   assert(y_init.size() == dim_y_);
   if (dim_x_ == dim_y_) {
@@ -92,7 +92,6 @@ void DynamicalSystem::set_y_init(const Eigen::Ref<const Eigen::VectorXd>& y_init
     x_init_.segment(0, dim_y_) = y_init;
   }
 }
-
 
 void DynamicalSystem::integrateStart(const Eigen::VectorXd& y_init,
                                      Eigen::Ref<Eigen::VectorXd> x,
@@ -176,7 +175,7 @@ void DynamicalSystem::to_json_base(nlohmann::json& j) const
   j["_dim_x"] = dim_x_;
   j["_dim_y"] = dim_y_;
   j["_tau"] = tau_;
-  j["_y_init"] = x_init_.segment(0,dim_y_);
+  j["_y_init"] = x_init_.segment(0, dim_y_);
 
   string c("DynamicalSystem");
   j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle

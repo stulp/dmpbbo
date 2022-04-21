@@ -82,7 +82,7 @@ class ExponentialSystem : public DynamicalSystem {
     assert(x_attr.size() == dim());
     x_attr_ = x_attr;
   }
-  
+
   /**
    * Get the attractor state of the dynamical system.
    * \param[out] y_attr Attractor state of the dynamical system.

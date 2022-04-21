@@ -41,20 +41,21 @@ int main(int n_args, char** args)
   // ./exec <input json 1> .. <input json N>
 
   vector<string> filenames;
-  
-  if (n_args==1) {
-    // No directories and filename provided, add the files from the json directory
+
+  if (n_args == 1) {
+    // No directories and filename provided, add the files from the json
+    // directory
     string input_directory = "../../../demos/json/";
     for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
       for (string dim : {"1D", "2D"})
-        filenames.push_back(input_directory + system + "System_" + dim + ".json");
-    filenames.push_back(input_directory+"TimeSystem.json");
-    filenames.push_back(input_directory+"TimeSystemCountDown.json");
-    
+        filenames.push_back(input_directory + system + "System_" + dim +
+                            ".json");
+    filenames.push_back(input_directory + "TimeSystem.json");
+    filenames.push_back(input_directory + "TimeSystemCountDown.json");
+
   } else {
-    for (int i_args=1; i_args<n_args; i_args++)
+    for (int i_args = 1; i_args < n_args; i_args++)
       filenames.push_back(args[i_args]);
-    
   }
 
   for (string filename : filenames) {
@@ -75,21 +76,21 @@ int main(int n_args, char** args)
     VectorXd x_updated(d->dim(), 1);
     VectorXd xd(d->dim(), 1);
     double dt = 0.01;
-    
+
     cout << "===============" << endl << "Integrating with Euler" << endl;
     d->integrateStart(x, xd);
-    Eigen::internal::set_is_malloc_allowed(false); // Make sure the following is real-time
-    for (int t = 1; t < 10; t++)
-      d->integrateStepEuler(dt, x, x_updated, xd);
+    Eigen::internal::set_is_malloc_allowed(
+        false);  // Make sure the following is real-time
+    for (int t = 1; t < 10; t++) d->integrateStepEuler(dt, x, x_updated, xd);
     Eigen::internal::set_is_malloc_allowed(true);
-    
+
     cout << "===============" << endl << "Integrating with Runge-Kutta" << endl;
     d->integrateStart(x, xd);
-    Eigen::internal::set_is_malloc_allowed(false); // Make sure the following is real-time
+    Eigen::internal::set_is_malloc_allowed(
+        false);  // Make sure the following is real-time
     for (int t = 1; t < 10; t++)
       d->integrateStepRungeKutta(dt, x, x_updated, xd);
     Eigen::internal::set_is_malloc_allowed(true);
-    
   }
 
   return 0;
