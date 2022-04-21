@@ -112,8 +112,8 @@ if __name__ == "__main__":
         traj_reproduced.saveToFile(directory, basename + "_traj.txt")
 
         dt = ts[1]
-        xs_step = np.zeros([n_time_steps, dmp.dim_])
-        xds_step = np.zeros([n_time_steps, dmp.dim_])
+        xs_step = np.zeros([n_time_steps, dmp._dim_x])
+        xds_step = np.zeros([n_time_steps, dmp._dim_x])
 
         dmp.set_initial_state(y_init_variant)
         (x, xd) = dmp.integrateStart()

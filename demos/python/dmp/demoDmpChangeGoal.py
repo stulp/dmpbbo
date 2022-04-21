@@ -125,8 +125,8 @@ if __name__ == "__main__":
             traj_reproduced.saveToFile(directory_scaling, basename + "_traj.txt")
 
             dt = ts[1]
-            xs_step = np.zeros([n_time_steps, dmp.dim_])
-            xds_step = np.zeros([n_time_steps, dmp.dim_])
+            xs_step = np.zeros([n_time_steps, dmp._dim_x])
+            xds_step = np.zeros([n_time_steps, dmp._dim_x])
 
             dmp.set_attractor_state(y_attr_scaled)
             (x, xd) = dmp.integrateStart()

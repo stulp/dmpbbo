@@ -24,7 +24,6 @@ import os, sys
 lib_path = os.path.abspath("../../../python/")
 sys.path.append(lib_path)
 
-from dmp.dmp_plotting import *
 from dmp.Dmp import *
 from functionapproximators.FunctionApproximatorRBFN import *
 
@@ -81,21 +80,16 @@ if __name__ == "__main__":
     Dmp.plotStatic(tau, ts, xs_step, xds_step)
     plt.gcf().canvas.set_window_title("Step-by-step integration")
 
-    fig = plt.figure(figsize=(15, 5))
-    axs = [fig.add_subplot(131 + i) for i in range(3)]
-
-    lines = plotTrajectory(traj.asMatrix(), axs)
-    plt.setp(
-        lines, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label="demonstration"
-    )
+    lines, axs = traj.plot()
+    plt.setp(lines, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+    plt.setp(lines, label="demonstration")
 
     traj_reproduced = dmp.statesAsTrajectory(ts, xs_step, xds_step)
-    lines = plotTrajectory(traj_reproduced.asMatrix(), axs)
-    plt.setp(
-        lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced"
-    )
+    lines, axs = traj_reproduced.plot(axs)
+    plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
+    plt.setp(lines, label="reproduced")
 
     plt.legend()
-    fig.canvas.set_window_title("Comparison between demonstration and reproduced")
+    plt.gcf().canvas.set_window_title("Comparison between demonstration and reproduced")
 
     plt.show()

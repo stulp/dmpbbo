@@ -87,21 +87,21 @@ if __name__ == "__main__":
     figure_number = 1
     for name, dyn_system in dyn_systems.items():
 
-        n_plots = 3 if name == "SpringDamper" else 2
-        fig = plt.figure(figure_number, figsize=(5 * n_plots, 4))
-        figure_number += 1
-        axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
+        #n_plots = 3 if name == "SpringDamper" else 2
+        #fig = plt.figure(figure_number, figsize=(5 * n_plots, 4))
+        #figure_number += 1
+        #axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 
         # Analytical solution
         xs, xds = dyn_system.analyticalSolution(ts)
-        lines = dyn_system.plot(ts, xs, xds, axs=axs)
+        lines, axs = dyn_system.plot(ts, xs, xds)
         set_style(lines, "analytical")
 
         # Euler integration
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
-        lines = dyn_system.plot(ts, xs, xds, axs=axs)
+        lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "euler")
 
         # Runge-kutta integration
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        lines = dyn_system.plot(ts, xs, xds, axs=axs)
+        lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "rungekutta")
 
         # Runge-kutta integration with different tau
@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
         axs[0].legend()
 
-        fig.suptitle(name)
+        plt.gcf().suptitle(name)
 
         # fig.savefig(f'{name}.png')
 

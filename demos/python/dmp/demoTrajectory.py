@@ -64,18 +64,16 @@ if __name__ == "__main__":
 
     # Do low-pass filtering
     # Make a noisy trajectory
-    y_noisy = traj_minjerk.ys_ + 0.001 * np.random.random_sample(traj_minjerk.ys_.shape)
+    y_noisy = traj_minjerk._ys + 0.001 * np.random.random_sample(traj_minjerk._ys.shape)
     traj = Trajectory(ts, y_noisy)
     # Plot it
-    fig = plt.figure(figsize=(15, 4))
-    axs = [fig.add_subplot(1, 3, i + 1) for i in range(3)]
-    lines = traj.plot(axs)
+    lines, axs = traj.plot()
     plt.setp(lines, linestyle="-", linewidth=1, color=(0.7, 0.7, 1.0))
 
     cutoff = 10.0
     order = 3
     traj.applyLowPassFilter(cutoff, order)
-    lines = traj.plot(axs)
+    lines, _ = traj.plot(axs)
     plt.setp(lines, linestyle="-", linewidth=2, color=(0.2, 0.8, 0.2))
 
     plt.show()

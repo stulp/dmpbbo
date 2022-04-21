@@ -130,9 +130,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
 
         # Relevant variables from trajectory
-        tau = trajectory.ts_[-1]
-        y_init = trajectory.ys_[0, :]
-        y_attr = trajectory.ys_[-1, :]
+        tau = trajectory._ts[-1]
+        y_init = trajectory._ys[0, :]
+        y_attr = trajectory._ys[-1, :]
 
         # Initialize dynamical systems
 
@@ -414,9 +414,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             trajectory - The trajectory with which to train the DMP.
         """
         # Set tau, initial_state and attractor_state from the trajectory
-        self.set_tau(trajectory.ts_[-1])
-        self.set_initial_state(trajectory.ys_[0, :])
-        self.set_attractor_state(trajectory.ys_[-1, :])
+        self.set_tau(trajectory._ts[-1])
+        self.set_initial_state(trajectory._ys[0, :])
+        self.set_attractor_state(trajectory._ys[-1, :])
 
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
@@ -436,7 +436,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call
         # analyticalSolution without the "ts" argument.
-        self.ts_train_ = trajectory.ts_
+        self.ts_train_ = trajectory._ts
 
     def computeFunctionApproximatorInputsAndTargets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
@@ -451,12 +451,12 @@ class Dmp(DynamicalSystem, Parameterizable):
             fa_targets - The targets for the function approximators (forcing term)
         """
 
-        n_time_steps = trajectory.ts_.size
-        dim_data = trajectory.dim_
+        n_time_steps = trajectory._ts.size
+        dim_data = trajectory._dim
         assert self.dim_dmp() == dim_data
 
         (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analyticalSolution(
-            trajectory.ts_
+            trajectory._ts
         )
         xs_goal = xs_ana[:, self.GOAL]
         xs_gating = xs_ana[:, self.GATING]
@@ -474,10 +474,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Compute inverse
         tau = self._tau
         f_target = (
-            tau * tau * trajectory.ydds_
+            tau * tau * trajectory._ydds
             + (
-                spring_constant * (trajectory.ys_ - xs_goal)
-                + damping_coefficient * tau * trajectory.yds_
+                spring_constant * (trajectory._ys - xs_goal)
+                + damping_coefficient * tau * trajectory._yds
             )
             / mass
         )
@@ -672,11 +672,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             cur_xs = xs[:, cur_indices]
             cur_xds = xds[:, cur_indices]
             if system_order[i_system] == 2:
-                h = DynamicalSystem.plotStatic(
+                h, _ = DynamicalSystem.plotStatic(
                     tau, ts, cur_xs, cur_xds, axs=cur_axs, dim_y=n_dims_dmp
                 )
             else:
-                h = DynamicalSystem.plotStatic(tau, ts, cur_xs, cur_xds, axs=cur_axs)
+                h, _ = DynamicalSystem.plotStatic(tau, ts, cur_xs, cur_xds, axs=cur_axs)
             all_handles.extend(h)
 
             if system_names[i_system] == "gating":
@@ -731,4 +731,4 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"unknown")
 
-        return all_handles
+        return (all_handles, axs)

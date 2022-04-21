@@ -221,7 +221,7 @@ class DynamicalSystem(ABC):
             axs = kwargs["axs"]
         else:
             # 2 => plot x and xd, 3 => plot y, yd and ydd=zd/tau
-            n_plots = 2 if self._dim_x == self._dim_y else 3
+            n_plots = 2 if dim_x == dim_y else 3
             fig = kwargs.get("fig") or plt.figure(figsize=(5 * n_plots, 4))
             axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 
@@ -262,4 +262,4 @@ class DynamicalSystem(ABC):
             # ax.axis('tight')
             ax.grid()
 
-        return lines
+        return (lines, axs)

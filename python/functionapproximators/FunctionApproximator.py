@@ -165,6 +165,8 @@ class FunctionApproximator(Parameterizable):
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
         alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.3
         plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
+        
+        return (lines, ax)
 
     def plotPredictionsGrid(self, inputs_min, inputs_max, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()
@@ -196,7 +198,7 @@ class FunctionApproximator(Parameterizable):
 
         plt.setp(h, linewidth=1, color=[0.3, 0.3, 0.9], alpha=0.5)
 
-        return h
+        return (h, ax)
 
     def plotPredictions(self, inputs, **kwargs):
         targets = kwargs.get("targets", [])
@@ -248,6 +250,8 @@ class FunctionApproximator(Parameterizable):
         )
         if len(targets) > 0:
             plt.setp(h_residuals, color=[0.8, 0.3, 0.3], linewidth=2)
+            
+        return (h_outputs, ax)
 
     def plot(self, inputs, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()
