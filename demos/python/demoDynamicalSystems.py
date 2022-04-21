@@ -84,13 +84,7 @@ if __name__ == "__main__":
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
     ts = np.linspace(0.0, integration_duration, n_time_steps)
 
-    figure_number = 1
     for name, dyn_system in dyn_systems.items():
-
-        #n_plots = 3 if name == "SpringDamper" else 2
-        #fig = plt.figure(figure_number, figsize=(5 * n_plots, 4))
-        #figure_number += 1
-        #axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 
         # Analytical solution
         xs, xds = dyn_system.analyticalSolution(ts)
