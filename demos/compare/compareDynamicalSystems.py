@@ -33,7 +33,6 @@ from dynamicalsystems.TimeSystem import TimeSystem
 from to_jsonpickle import *
 
 
-
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):

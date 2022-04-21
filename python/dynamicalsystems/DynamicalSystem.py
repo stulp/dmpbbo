@@ -197,9 +197,9 @@ class DynamicalSystem(ABC):
         return (x_updated, xd_updated)
 
     def plot(self, ts, xs, xds, **kwargs):
-        kwargs['dim_y'] = self._dim_y
+        kwargs["dim_y"] = self._dim_y
         return DynamicalSystem.plotStatic(self._tau, ts, xs, xds, **kwargs)
-        
+
     @staticmethod
     def plotStatic(tau, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
@@ -213,9 +213,9 @@ class DynamicalSystem(ABC):
             axs - Axes on which the plot the output
             fig - Figure on which to plot the output
         """
-        
+
         dim_x = xs.shape[1]
-        dim_y = kwargs.pop("dim_y",dim_x)
+        dim_y = kwargs.pop("dim_y", dim_x)
 
         if "axs" in kwargs:
             axs = kwargs["axs"]
