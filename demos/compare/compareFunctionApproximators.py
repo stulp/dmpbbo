@@ -157,12 +157,7 @@ def train(fa_name, n_dims):
 
     outputs_grid_cpp = np.loadtxt(directory + "/" + basename + "_outputs.txt")
 
-    # Plotting
-    fig = plt.figure(figsize=(7, 7))
-    fig.canvas.set_window_title(fa_name)
-    ax = fig.add_subplot(111) if n_dims == 1 else fig.add_subplot(111, projection="3d")
-    ax.set_title(fa_name + " " + str(n_dims) + "D")
-    h_pyt = fa.plot(inputs, targets=targets, ax=ax)
+    h_pyt, ax = fa.plot(inputs, targets=targets)
 
     if n_dims == 1:
         h_cpp = ax.plot(inputs_grid, outputs_grid_cpp, "-")
@@ -179,7 +174,7 @@ def train(fa_name, n_dims):
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
 
-    fig.suptitle(basename)
+    plt.gcf().suptitle(basename)
 
     save_me = False
     if save_me:
