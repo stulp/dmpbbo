@@ -246,7 +246,6 @@ class FunctionApproximator(Parameterizable):
         
         if "slopes" in self._model_params:         
             # Plot lines also
-            
             line_values = self.getLines(inputs,self._model_params)
 
             # Plot line segment only when basis function is most active
@@ -255,7 +254,7 @@ class FunctionApproximator(Parameterizable):
             max_activations = np.max(activations, axis=1)
             for i_bf in range(n_basis_functions):
                 cur_activations = activations[:, i_bf]
-                smaller = cur_activations < 0.7 * max_activations
+                smaller = cur_activations < 0.2 * max_activations
                 line_values[smaller, i_bf] = np.nan
     
             lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
