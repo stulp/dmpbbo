@@ -80,38 +80,57 @@ def train(fa_name, n_dims):
     # Make predictions for the targets
     outputs = fa.predict(inputs)
 
-    # Plotting
-    inputs_min = np.min(inputs, axis=0)
-    inputs_max = np.max(inputs, axis=0)
-    w = 4 if n_dims==1 else 2
-    a = 1 if n_dims==1 else 0.5
-    
-    h, ax = fa.plotPredictionsGrid(inputs_min, inputs_max)
-    plt.setp(h, color=[0.0, 0.0, 0.6], linewidth=w,alpha=a)
-    if n_dims==1:
-        hb, _ = fa.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
-        plt.setp(hb, color=[0.6, 0.0, 0.0], linewidth=w,alpha=a)
-        
     if fa_name == "LWR":
         fa.setSelectedParamNames(["offsets","widths"])
     else:
         fa.setSelectedParamNames(["weights","widths"])
     values = fa.getParamVector()
     
-    for i_sample in range(5):
+    # Plotting
+    inputs_min = np.min(inputs, axis=0)
+    inputs_max = np.max(inputs, axis=0)
+    w = 4 if n_dims==1 else 2
+    a = 1 if n_dims==1 else 0.5
+    
+    fig = plt.figure(figsize=(10,5))
+    if n_dims==1:
+        axs = [ fig.add_subplot(121+i) for i in range(2) ]
+    else:
+        axs = [ fig.add_subplot(121+i,projection='3d') for i in range(2) ]
+    
+    for noise in ['additive','multiplicative']:
+        ax = axs[0] if noise=='additive' else axs[1]
         
-        rand_vector = 0.8 + 0.4*np.random.random_sample(values.shape)
-        fa.setParamVector(rand_vector*values)
         
+        # Original function
+        fa.setParamVector(values)
+        h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
+        plt.setp(h, color=[0.0, 0.0, 0.6], linewidth=w,alpha=a)
         if n_dims==1:
             hb, _ = fa.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
-            plt.setp(hb, color=[1.0, 0.5, 0.5], linewidth=w/3)
-        h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
-        plt.setp(h,  color=[0.5, 0.5, 1.0], linewidth=w/2)
+            plt.setp(hb, color=[0.6, 0.0, 0.0], linewidth=w,alpha=a)
+            
         
-
-    ax.set_title(fa_name + " " + str(n_dims) + "D")
-    plt.gcf().canvas.set_window_title(fa_name + " " + str(n_dims) + "D")
+        # Perturbed function
+        for i_sample in range(5):
+            
+            if noise=='additive':
+                rand_vector = 0.05*np.random.standard_normal(values.shape)
+                new_values = rand_vector+values
+            else:
+                rand_vector = 1.0 + 0.1*np.random.standard_normal(values.shape)
+                new_values = rand_vector*values
+            fa.setParamVector(new_values)
+            
+            if n_dims==1:
+                hb, _ = fa.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
+                plt.setp(hb, color=[1.0, 0.5, 0.5], linewidth=w/3)
+            h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
+            plt.setp(h,  color=[0.5, 0.5, 1.0], linewidth=w/2)
+            
+    
+        ax.set_title(f"{fa_name} {n_dims}D ({noise} noise)")
+        plt.gcf().canvas.set_window_title(f"{fa_name} {n_dims}D")
 
 
 if __name__ == "__main__":
