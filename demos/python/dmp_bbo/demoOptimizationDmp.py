@@ -62,16 +62,16 @@ if __name__ == "__main__":
             fa = FunctionApproximatorRBFN(n_basis, intersection_height)
             fa.train(np.linspace(0, 1, 100), np.zeros(100))
 
-            fa.setSelectedParameters("weights")
+            fa.setSelectedParamNames("weights")
             random_weights = 0 * np.random.normal(0, 1, n_basis)
-            fa.setParameterVectorSelected(random_weights)
+            fa.setParamVector(random_weights)
 
             function_apps.append(fa)
 
         # Initialize Dmp
         dmp = Dmp(tau, y_init, y_attr, function_apps)
-        dmp.setSelectedParameters("weights")
-        # dmp.setSelectedParameters(['goal','weights'])
+        dmp.setSelectedParamNames("weights")
+        # dmp.setSelectedParamNames(['goal','weights'])
 
         # Make the task
         viapoint = 3 * np.ones(n_dims)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         integrate_dmp_beyond_tau_factor = 1.5
         task_solver = TaskSolverDmp(dmp, dt, integrate_dmp_beyond_tau_factor)
 
-        n_search = dmp.getParameterVectorSelectedSize()
+        n_search = dmp.getParamVectorSize()
 
         covar_update = "cma"
         mean_init = np.full(n_search, 0.0)

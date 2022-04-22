@@ -64,7 +64,7 @@ if __name__=="__main__":
     lines = plotTrajectory(traj_mean.asMatrix(),[ax1])
     plt.setp(lines,linewidth=3)
     
-    parameter_vector = dmp.getParameterVectorSelected()
+    parameter_vector = dmp.getParamVector()
     
     n_samples = args.nsamples
     sigma = args.sigma
@@ -93,7 +93,7 @@ if __name__=="__main__":
 
     for i_sample in range(n_samples):
         
-        dmp.setParameterVectorSelected(samples[i_sample,:])
+        dmp.setParamVector(samples[i_sample,:])
 
         filename = os.path.join(directory,f'dmp_sample_{i_sample}.json')
         print("Saving sampled DMP to: "+filename)

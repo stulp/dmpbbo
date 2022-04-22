@@ -85,7 +85,7 @@ class Gaussian:
         return kernel_activations
 
     @staticmethod
-    def getCentersAndWidths(mins, maxs, n_bfs_per_dim, intersection_height=0.7):
+    def getCentersAndWidths(inputs, n_bfs_per_dim, intersection_height=0.7):
         """Get the centers and widths of basis functions.
         
         Args:
@@ -98,8 +98,10 @@ class Gaussian:
             centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
             widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
         """
-        mins = np.atleast_1d(mins)
-        maxs = np.atleast_1d(maxs)
+        min_vals = inputs.min(axis=0)
+        max_vals = inputs.max(axis=0)
+        mins = np.atleast_1d(min_vals)
+        maxs = np.atleast_1d(max_vals)
         n_dims = len(mins)
         n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
         if n_bfs_per_dim.size < n_dims:

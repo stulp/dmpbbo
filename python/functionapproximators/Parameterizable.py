@@ -20,33 +20,21 @@ from abc import ABC, abstractmethod
 
 class Parameterizable(ABC):
     @abstractmethod
-    def getSelectableParameters(self):
-        """Return the names of the parameters that can be selected.
-        """
-        raise NotImplementedError("subclasses must override getSelectableParameters()!")
-
-    @abstractmethod
-    def getSelectableParametersRecommended(self):
-        """Return the names of the parameters that recommended to be selected.
-        """
-        pass
-
-    @abstractmethod
-    def setSelectedParameters(selected_values_labels):
+    def setSelectedParamNames(selected_values_labels):
         """Set the selected parameters."""
         pass
 
     @abstractmethod
-    def getParameterVectorSelected(self):
+    def getParamVector(self):
         """Get a vector containing the values of the selected parameters."""
         pass
 
     @abstractmethod
-    def setParameterVectorSelected(self, values):
+    def setParamVector(self, values):
         """Set a vector containing the values of the selected parameters."""
         pass
 
     @abstractmethod
-    def getParameterVectorSelectedSize(self):
+    def getParamVectorSize(self):
         """Get the size of the vector containing the values of the selected parameters."""
         pass

@@ -29,77 +29,48 @@ from functionapproximators.leastSquares import *
 class FunctionApproximatorLWR(FunctionApproximator):
     def __init__(self, n_bfs_per_dim, intersection_height=0.5, regularization=0.0):
 
-        self._meta_params = {
+        meta_params = {
             "n_basis_functions_per_dim": np.atleast_1d(n_bfs_per_dim),
             "intersection_height": intersection_height,
             "regularization": regularization,
         }
 
-        self._model_params = None
-        self._selected_param_labels = self.getSelectableParametersRecommended()
+        model_param_names = ["centers", "widths", "slopes", "offsets"]
 
-    def dim_input(self):
-        if not self.isTrained():
-            raise ValueError(
-                "Can only call dim_input on trained function approximator."
-            )
-        return self._model_params["centers"].shape[1]
+        super().__init__(meta_params, model_param_names)
 
-    def getSelectableParameters(self):
-        return ["centers", "widths", "slopes", "offsets"]
-
-    def getSelectableParametersRecommended(self):
-        return ["slopes", "offsets"]
-
-    def train(self, inputs, targets):
+    @staticmethod
+    def _train(inputs, targets, meta_params):
 
         # Determine the centers and widths of the basis functions, given the input data range
-        min_vals = inputs.min(axis=0)
-        max_vals = inputs.max(axis=0)
-        n_bfs_per_dim = self._meta_params["n_basis_functions_per_dim"]
-        height = self._meta_params["intersection_height"]
-        (centers, widths) = Gaussian.getCentersAndWidths(
-            min_vals, max_vals, n_bfs_per_dim, height
-        )
+        n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
+        height = meta_params["intersection_height"]
+        centers, widths = Gaussian.getCentersAndWidths(inputs, n_bfs_per_dim, height)
+        model_params = {"centers": centers, "widths": widths}
 
-        # Get the activations of the basis functions
-        self._model_params = {}
-        self._model_params["widths"] = widths
-        self._model_params["centers"] = centers
-
-        # Parameters for the weighted least squares regressions
-        use_offset = True
-        n_kernels = np.prod(n_bfs_per_dim)
+        # Prepare weighted least squares regressions
+        n_bfs = np.prod(n_bfs_per_dim)
         n_dims = centers.shape[1]
-        n_betas = n_dims
-        if use_offset:
-            n_betas += 1
-        betas = np.ones([n_kernels, n_betas])
+        slopes = np.ones([n_bfs, n_dims])
+        offsets = np.ones([n_bfs, 1])
 
         # Perform one weighted least squares regression for each kernel
-        activations = self.getActivations(inputs)
-        reg = self._meta_params["regularization"]
-        for i_kernel in range(n_kernels):
+        activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
+        reg = meta_params["regularization"]
+        use_offset = True
+        for i_kernel in range(n_bfs):
             weights = activations[:, i_kernel]
             beta = weightedLeastSquares(inputs, targets, weights, use_offset, reg)
-            betas[i_kernel, :] = beta.T
+            slopes[i_kernel, :] = beta[:-1]
+            offsets[i_kernel] = beta[-1]  # Offset is last value
 
-        self._model_params["offsets"] = np.atleast_2d(betas[:, -1]).T
-        self._model_params["slopes"] = np.atleast_2d(betas[:, 0:-1])
+        model_params["offsets"] = offsets
+        model_params["slopes"] = slopes
 
-    def isTrained(self):
-        """Determine whether the function approximator has already been trained with data or not.
-        
-        Returns:
-            bool: True if the function approximator has already been trained, False otherwise.
-        """
-        if not self._model_params:
-            return False
-        if not "offsets" in self._model_params:
-            return False
-        return True
+        return model_params
 
-    def getActivations(self, inputs):
+    @staticmethod
+    def _getActivations(inputs, model_params):
         """Get the activations of the basis functions.
         
         Uses the centers and widths in the model parameters.
@@ -108,18 +79,17 @@ class FunctionApproximatorLWR(FunctionApproximator):
             inputs (numpy.ndarray): Input values of the query.
         """
         normalize = True
-        centers = self._model_params["centers"]
-        widths = self._model_params["widths"]
-        activations = Gaussian.activations(centers, widths, inputs, normalize)
-        return activations
+        centers = model_params["centers"]
+        widths = model_params["widths"]
+        return Gaussian.activations(centers, widths, inputs, normalize)
 
-    def getLines(self, inputs):
-        if inputs.ndim == 1:
-            # Otherwise matrix multiplication below will not work
-            inputs = np.atleast_2d(inputs).T
+    @staticmethod
+    def getLines(inputs, model_params):
+        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        inputs = inputs.reshape(inputs.shape[0], -1)
 
-        slopes = self._model_params["slopes"]
-        offsets = self._model_params["offsets"]
+        slopes = model_params["slopes"]
+        offsets = model_params["offsets"]
 
         # Compute the line segments
         n_lines = offsets.size
@@ -132,24 +102,21 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         return lines
 
-    def predict(self, inputs):
-        if not self.isTrained():
-            raise ValueError("FunctionApproximator is not trained.")
+    @staticmethod
+    def _predict(inputs, model_params):
+        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        inputs = inputs.reshape(inputs.shape[0], -1)
 
-        if inputs.ndim == 1:
-            # Otherwise matrix multiplication below will not work
-            inputs = np.atleast_2d(inputs).T
-
-        lines = self.getLines(inputs)
+        lines = FunctionApproximatorLWR.getLines(inputs, model_params)
 
         # Weight the values for each line with the normalized basis function activations
         # Get the activations of the basis functions
-        activations = self.getActivations(inputs)
+        activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
 
         outputs = (lines * activations).sum(axis=1)
         return outputs
 
-    def plotBasisFunctions(self, inputs_min, inputs_max, **kwargs):
+    def plotBasisFunctionsBla(self, inputs_min, inputs_max, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()
 
         if self.dim_input() == 1:
@@ -158,9 +125,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
         inputs, n_samples_per_dim = FunctionApproximator._getGrid(
             inputs_min, inputs_max
         )
-        line_values = self.getLines(inputs)
-
         activations = self.getActivations(inputs)
+
+        line_values = self.getLines(inputs)
 
         # Plot line segment only when basis function is most active
         values_range = numpy.amax(activations) - numpy.amin(activations)

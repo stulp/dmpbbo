@@ -33,7 +33,7 @@ class TaskSolverDmp(TaskSolver):
         self.n_time_steps_ = int(np.floor(self.integrate_time_/dt)) + 1
     
     def performRollout(self,sample,task_parameters=None):
-        self.dmp_.setParameterVectorSelected(sample)
+        self.dmp_.setParamVector(sample)
         
         ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
         (xs, xds, forcing_terms, fa_outputs) = self.dmp_.analyticalSolution(ts)

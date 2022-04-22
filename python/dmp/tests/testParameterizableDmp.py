@@ -47,10 +47,10 @@ if __name__=='__main__':
 
     function_apps = [ FunctionApproximatorRBFN(12,0.7), FunctionApproximatorRBFN(10,0.7)]
     dmp = Dmp.from_traj(traj, function_apps)
-    print(dmp.getSelectableParameters())
-    dmp.setSelectedParameters('weights')
-    #dmp.setSelectedParameters('goal')
-    #dmp.setSelectedParameters(['weights','goal'])
+    print(dmp.getAllParamNames())
+    dmp.setSelectedParamNames('weights')
+    #dmp.setSelectedParamNames('goal')
+    #dmp.setSelectedParamNames(['weights','goal'])
 
     tau_exec = 0.7
     n_time_steps = 71
@@ -68,14 +68,14 @@ if __name__=='__main__':
     lines = plotTrajectory(traj_ana.asMatrix(),axs)
     plt.setp(lines, linestyle='-',  linewidth=2, color=(0.6,0.6,1.0), label='reproduced')
 
-    values = dmp.getParameterVectorSelected()
+    values = dmp.getParamVector()
     print(values)
     
     for ii in range(5):
         # Generate random vector with values between 0.8-1.2
         rand_vector = 0.8 + 0.4*np.random.random_sample(values.shape)
-        dmp.setParameterVectorSelected(rand_vector*values)
-        values = dmp.getParameterVectorSelected()
+        dmp.setParamVector(rand_vector*values)
+        values = dmp.getParamVector()
         print(values)
         ( xs, xds, forcing_terms, fa_outputs) = dmp.analyticalSolution(ts)
 
@@ -149,12 +149,12 @@ def yo():
         plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
         plotDataTargets(inputs,targets,ax)
         
-        values = fa.getParameterVectorSelected()
+        values = fa.getParamVector()
 
         for ii in range(5):
             # Generate random vector with values between 0.5-1.5
             rand_vector = 0.5 + np.random.random_sample(values.shape)
-            fa.setParameterVectorSelected(rand_vector*values)
+            fa.setParamVector(rand_vector*values)
             outputs_grid = fa.predict(inputs_grid)
             
             line_handles = plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
@@ -165,7 +165,7 @@ def yo():
         for ii in range(5):
             # Generate random vector with values between -0.5-0.5
             rand_vector = -0.5 + np.random.random_sample(values.shape)
-            fa.setParameterVectorSelected(rand_vector)
+            fa.setParamVector(rand_vector)
             outputs_grid = fa.predict(inputs_grid)
             
             line_handles = plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)

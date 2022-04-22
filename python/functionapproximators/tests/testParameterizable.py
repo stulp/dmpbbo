@@ -108,12 +108,12 @@ if __name__=='__main__':
         plotGridPredictions(inputs_grid,outputs_grid,ax,n_samples_grid)
         plotDataTargets(inputs,targets,ax)
         
-        values = fa.getParameterVectorSelected()
+        values = fa.getParamVector()
 
         for ii in range(5):
             # Generate random vector with values between 0.8-1.2
             rand_vector = 0.8 + 0.4*np.random.random_sample(values.shape)
-            fa.setParameterVectorSelected(rand_vector*values)
+            fa.setParamVector(rand_vector*values)
             outputs_grid = fa.predict(inputs_grid)
             
             activations_grid = fa.getActivations(inputs_grid)
@@ -131,7 +131,7 @@ if __name__=='__main__':
         for ii in range(5):
             # Generate random vector with values between -0.5-0.5
             rand_vector = -0.5 + np.random.random_sample(values.shape)
-            fa.setParameterVectorSelected(rand_vector)
+            fa.setParamVector(rand_vector)
             outputs_grid = fa.predict(inputs_grid)
             
             activations_grid = fa.getActivations(inputs_grid)

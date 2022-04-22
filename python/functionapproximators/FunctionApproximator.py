@@ -34,18 +34,48 @@ class FunctionApproximator(Parameterizable):
 
     See https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md
     """
+    
+    def __init__(self, meta_params, model_param_names):
+        self._meta_params = meta_params
+        self._model_params = {name: None for name in model_param_names}
+        self._dim_input = None
 
-    @abstractmethod
+    def train(self, inputs, targets):
+        # Ensure second dimension, i.e. shape = (30,) => (30,1)
+        inputs = inputs.reshape(inputs.shape[0],-1) 
+        self._model_params = self._train(inputs, targets, self._meta_params)
+        self._dim_input = inputs.shape[1]
+        
+    def predict(self, inputs):
+        if not self.isTrained():
+            raise ValueError("Calling predict() on untrained function approx.")
+            
+        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        inputs = inputs.reshape(inputs.shape[0],-1)
+        if inputs.shape[1]!=self._dim_input:
+            raise ValueError("Dimensionality of inputs for predict() must be the same as for train().")
+            
+        return self._predict(inputs, self._model_params)
+    
     def dim_input(self):
         """ Return the dimensionality of the inputs of the function_approximator
         
         Returns:
             The dimensionality of the inputs of the function_approximator.
         """
-        pass
+        return self._dim_input
 
+    def isTrained(self):
+        """Determine whether the function approximator has already been trained with data or not.
+        
+        Returns:
+            bool: True if the function approximator has already been trained, False otherwise.
+        """
+        return isinstance(self._dim_input,int)
+
+    @staticmethod
     @abstractmethod
-    def train(self, inputs, targets):
+    def _train(inputs, targets, meta_params):
         """Train the function approximator with input and target examples.
         
         Args:
@@ -53,9 +83,10 @@ class FunctionApproximator(Parameterizable):
             targets (numpy.ndarray): Target values of the training examples.
         """
         pass
-
+        
+    @staticmethod
     @abstractmethod
-    def predict(self, inputs):
+    def _predict(inputs, model_params):
         """Query the function approximator to make a prediction.
         
         Args:
@@ -66,15 +97,62 @@ class FunctionApproximator(Parameterizable):
         """
         pass
 
+    @staticmethod
     @abstractmethod
-    def isTrained(self):
-        """Determine whether the function approximator has already been trained with data or not.
-        
-        Returns:
-            bool: True if the function approximator has already been trained, False otherwise.
-        """
+    def _getActivations(inputs, model_params):
         pass
 
+    def setSelectedParamNames(self, selected_param_names):
+        
+        self._selected_param_names = []
+        if isinstance(selected_param_names, str):
+            # Make sure it is a list
+            selected_param_names = [selected_param_names]
+            
+        for label in selected_param_names:
+            if not label in self.getAllParamNames():
+                warnings.warn(
+                    label
+                    + " not in ["
+                    + ", ".join(selectable_param_labels)
+                    + "]: Ignoring"
+                )
+            else:
+                self._selected_param_names.append(label)
+
+    def getParamVector(self):
+        if not self.isTrained():
+            raise ValueError("FunctionApproximator is not trained.")
+
+        values = []
+        for label in self._selected_param_names:
+            values.extend(self._model_params[label].flatten())
+        return np.asarray(values)
+
+    def setParamVector(self, values):
+        if not self.isTrained():
+            raise ValueError("FunctionApproximator is not trained.")
+
+        if len(values) != self.getParamVectorSize():
+            raise ValueError(
+                f"values ({len(values)}) should have same size as size of selected parameters vector ({self.getParamVectorSize()})"
+            )
+
+        offset = 0
+        for label in self._selected_param_names:
+            expected_shape = self._model_params[label].shape
+            cur_n_values = np.prod(expected_shape)
+            cur_values = values[offset : offset + cur_n_values]
+            self._model_params[label] = np.reshape(cur_values, expected_shape)
+            offset += cur_n_values
+
+    def getParamVectorSize(self):
+        size = 0
+        for label in self._selected_param_names:
+            if label in self._model_params:
+                size += np.prod(self._model_params[label].shape)
+        return size
+        
     def _getAxis(self, fig=None):
         if not fig:
             fig = plt.figure(figsize=(6, 6))
@@ -160,11 +238,31 @@ class FunctionApproximator(Parameterizable):
         inputs, n_samples_per_dim = FunctionApproximator._getGrid(
             inputs_min, inputs_max
         )
-        activations = self.getActivations(inputs)
+        activations = self._getActivations(inputs,self._model_params)
 
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
         alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.3
         plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
+        
+        if "slopes" in self._model_params:         
+            # Plot lines also
+            
+            line_values = self.getLines(inputs,self._model_params)
+
+            # Plot line segment only when basis function is most active
+            values_range = numpy.amax(activations) - numpy.amin(activations)
+            n_basis_functions = activations.shape[1]
+            max_activations = np.max(activations, axis=1)
+            for i_bf in range(n_basis_functions):
+                cur_activations = activations[:, i_bf]
+                smaller = cur_activations < 0.7 * max_activations
+                line_values[smaller, i_bf] = np.nan
+    
+            lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
+            alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.5
+            w = 4 if len(n_samples_per_dim) < 2 else 1
+            plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
+
         
         return (lines, ax)
 
@@ -268,52 +366,3 @@ class FunctionApproximator(Parameterizable):
         )
         return self.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
 
-    def setSelectedParameters(self, selected_param_labels):
-        selectable_param_labels = self.getSelectableParameters()
-        self._selected_param_labels = []
-        if isinstance(selected_param_labels, str):
-            # Make sure it is a list
-            selected_param_labels = [selected_param_labels]
-        for label in selected_param_labels:
-            if not label in selectable_param_labels:
-                warnings.warn(
-                    label
-                    + " not in ["
-                    + ", ".join(selectable_param_labels)
-                    + "]: Ignoring"
-                )
-            else:
-                self._selected_param_labels.append(label)
-
-    def getParameterVectorSelected(self):
-        if not self.isTrained():
-            raise ValueError("FunctionApproximator is not trained.")
-
-        values = []
-        for label in self._selected_param_labels:
-            values.extend(self._model_params[label].flatten())
-        return np.asarray(values)
-
-    def setParameterVectorSelected(self, values):
-        if not self.isTrained():
-            raise ValueError("FunctionApproximator is not trained.")
-
-        if len(values) != self.getParameterVectorSelectedSize():
-            raise ValueError(
-                f"values ({len(values)}) should have same size as size of selected parameters vector ({self.getParameterVectorSelectedSize()})"
-            )
-
-        offset = 0
-        for label in self._selected_param_labels:
-            expected_shape = self._model_params[label].shape
-            cur_n_values = np.prod(expected_shape)
-            cur_values = values[offset : offset + cur_n_values]
-            self._model_params[label] = np.reshape(cur_values, expected_shape)
-            offset += cur_n_values
-
-    def getParameterVectorSelectedSize(self):
-        size = 0
-        for label in self._selected_param_labels:
-            if label in self._model_params:
-                size += np.prod(self._model_params[label].shape)
-        return size

@@ -27,100 +27,56 @@ from functionapproximators.leastSquares import *
 
 class FunctionApproximatorRBFN(FunctionApproximator):
     def __init__(self, n_bfs_per_dim, intersection_height=0.7, regularization=0.0):
-        """Initialiaze an RBNF function approximator.
+        """Initialize an RBNF function approximator.
 
         Args:
             n_bfs_per_dim Number of basis functions per input dimension.
             intersection_height The relative value at which two neighbouring basis functions will intersect (default=0.7)
             regularization Regularization parameter (default=0.0)
         """
-        self._meta_params = {
+        meta_params = {
             "n_basis_functions_per_dim": np.atleast_1d(n_bfs_per_dim),
             "intersection_height": intersection_height,
             "regularization": regularization,
         }
 
-        self._model_params = None
-        self._selected_param_labels = self.getSelectableParametersRecommended()
+        model_param_names = ["centers", "widths", "weights"]
 
-    def dim_input(self):
-        if not self.isTrained():
-            raise ValueError(
-                "Can only call dim_input on trained function approximator."
-            )
-        return self._model_params["centers"].shape[1]
+        super().__init__(meta_params, model_param_names)
 
-    def getSelectableParameters(self):
-        return ["centers", "widths", "weights"]
-
-    def getSelectableParametersRecommended(self):
-        return ["weights"]
-
-    def train(self, inputs, targets):
+    @staticmethod
+    def _train(inputs, targets, meta_params):
 
         # Determine the centers and widths of the basis functions, given the input data range
-        min_vals = inputs.min(axis=0)
-        max_vals = inputs.max(axis=0)
-        n_bfs_per_dim = self._meta_params["n_basis_functions_per_dim"]
-        height = self._meta_params["intersection_height"]
-        (centers, widths) = Gaussian.getCentersAndWidths(
-            min_vals, max_vals, n_bfs_per_dim, height
-        )
+        n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
+        height = meta_params["intersection_height"]
+        centers, widths = Gaussian.getCentersAndWidths(inputs, n_bfs_per_dim, height)
+        model_params = {"centers": centers, "widths": widths}
 
         # Get the activations of the basis functions
-        self._model_params = {}
-        self._model_params["centers"] = centers
-        self._model_params["widths"] = widths
+        activations = FunctionApproximatorRBFN._getActivations(inputs, model_params)
 
         # Perform one least squares regression
         use_offset = False
-        reg = self._meta_params["regularization"]
-        activations = self.getActivations(inputs)
+        reg = meta_params["regularization"]
         weights = leastSquares(activations, targets, use_offset, reg)
-        self._model_params["weights"] = np.atleast_2d(weights).T
 
-    def isTrained(self):
-        """Determine whether the function approximator has already been trained with data or not.
-        
-        Returns:
-            bool: True if the function approximator has already been trained, False otherwise.
-        """
-        if not self._model_params:
-            return False
-        if not "weights" in self._model_params:
-            return False
-        return True
+        n_bfs = centers.shape[0]
+        model_params["weights"] = weights.reshape(n_bfs, -1)
 
-    def getActivations(self, inputs):
-        """Get the activations of the basis functions.
-        
-        Uses the centers and widths in the model parameters.
-        
-        Args:
-            inputs (numpy.ndarray): Input values of the query.
-        """
+        return model_params
+
+    @staticmethod
+    def _getActivations(inputs, model_params):
         normalize = False
-        centers = self._model_params["centers"]
-        widths = self._model_params["widths"]
-        activations = Gaussian.activations(centers, widths, inputs, normalize)
-        return activations
+        return Gaussian.activations(
+            model_params["centers"], model_params["widths"], inputs, normalize
+        )
 
-    def predict(self, inputs):
-        """Implements abstract function FunctionApproximator
-        """
-        if not self.isTrained():
-            raise ValueError("FunctionApproximator is not trained.")
-
-        if inputs.ndim == 1:
-            # Otherwise matrix multiplication below will not work
-            inputs = np.atleast_2d(inputs).T
-
-        # Get the activations of the basis functions
-        activations = self.getActivations(inputs)
-        n_basis_functions = activations.shape[1]
-
-        outputs = activations
-        for ii in range(n_basis_functions):
-            outputs[:, ii] = outputs[:, ii] * self._model_params["weights"][ii]
-
-        return outputs.sum(axis=1)
+    @staticmethod
+    def _predict(inputs, model_params):
+        acts = FunctionApproximatorRBFN._getActivations(inputs, model_params)
+        weighted_acts = np.zeros(acts.shape)
+        for ii in range(acts.shape[1]):
+            weighted_acts[:, ii] = acts[:, ii] * model_params["weights"][ii]
+        return weighted_acts.sum(axis=1)

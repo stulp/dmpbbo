@@ -60,7 +60,7 @@ if __name__=='__main__':
         dmp = Dmp.from_traj(traj, function_apps, "Dmp", 'KULVICIUS_2012_JOINING')
 
         # These are the parameters that will be optimized.
-        dmp.setSelectedParameters("weights")
+        dmp.setSelectedParamNames("weights")
         
         ################################################
         # Save DMP to file
