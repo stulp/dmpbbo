@@ -110,11 +110,11 @@ class FunctionApproximator(Parameterizable):
             selected_param_names = [selected_param_names]
             
         for label in selected_param_names:
-            if not label in self.getAllParamNames():
+            if not label in self._model_params.keys():
                 warnings.warn(
                     label
                     + " not in ["
-                    + ", ".join(selectable_param_labels)
+                    + ", ".join(self._model_params.keys())
                     + "]: Ignoring"
                 )
             else:
@@ -333,12 +333,13 @@ class FunctionApproximator(Parameterizable):
                 "Cannot plot input data with dim_input() = " + str(self.dim_input())
             )
 
-        plt.setp(
-            h_targets,
-            markeredgecolor=None,
-            markerfacecolor=[0.7, 0.7, 0.7],
-            markersize=8,
-        )
+        if targets:
+            plt.setp(
+                h_targets,
+                markeredgecolor=None,
+                markerfacecolor=[0.7, 0.7, 0.7],
+                markersize=8,
+            )
         plt.setp(
             h_outputs,
             markeredgecolor=None,
