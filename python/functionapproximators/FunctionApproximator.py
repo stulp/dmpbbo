@@ -333,7 +333,7 @@ class FunctionApproximator(Parameterizable):
                 "Cannot plot input data with dim_input() = " + str(self.dim_input())
             )
 
-        if targets:
+        if len(targets)>0:
             plt.setp(
                 h_targets,
                 markeredgecolor=None,
