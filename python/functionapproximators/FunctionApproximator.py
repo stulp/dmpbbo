@@ -102,23 +102,10 @@ class FunctionApproximator(Parameterizable):
     def _getActivations(inputs, model_params):
         pass
 
-    def setSelectedParamNames(self, selected_param_names):
-        
-        self._selected_param_names = []
-        if isinstance(selected_param_names, str):
-            # Make sure it is a list
-            selected_param_names = [selected_param_names]
-            
-        for label in selected_param_names:
-            if not label in self._model_params.keys():
-                warnings.warn(
-                    label
-                    + " not in ["
-                    + ", ".join(self._model_params.keys())
-                    + "]: Ignoring"
-                )
-            else:
-                self._selected_param_names.append(label)
+    def setSelectedParamNames(self, names):
+        if isinstance(names, str):
+            names = [names] # Convert to list
+        self._selected_param_names = names
 
     def getParamVector(self):
         if not self.isTrained():
