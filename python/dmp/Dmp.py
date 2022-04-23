@@ -45,7 +45,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         y_attr,
         function_approximators=None,
         sigmoid_max_rate=-20,
-        forcing_term_scaling="AMPLITUDE_SCALING",
+        forcing_term_scaling="NO_SCALING",
         alpha_spring_damper=20.0,
         phase_system=None,
         gating_system=None,
@@ -59,7 +59,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             y_attr        - Attractor state
             function_approximators - Function approximators for the forcing term
             forcing_term_scaling - Which method to use for scaling the forcing term
-                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+                ( "NO_SCALING", "G_MINUS_Y0_SCALING")
             alpha_spring_damper - \f$\alpha\f$ in the spring-damper system of the dmp
             goal_system   - Dynamical system to compute delayed goal
             phase_system  - Dynamical system to compute the phase
@@ -74,6 +74,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         self._function_approximators = function_approximators
 
+        if forcing_term_scaling=="AMPLITUDE_SCALING":
+            raise ValueError("Cannot use AMPLITUDE_SCALING without a trajectory.")
         self._forcing_term_scaling = forcing_term_scaling
 
         self._spring_system = SpringDamperSystem(
@@ -114,7 +116,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         trajectory,
         function_approximators,
         dmp_type="KULVICIUS_2012_JOINING",
-        forcing_term_scaling="NO_SCALING",
+        forcing_term_scaling="AMPLITUDE_SCALING",
     ):
         """Initialize a DMP by training it from a trajectory. 
         
