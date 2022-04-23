@@ -115,29 +115,3 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         outputs = (lines * activations).sum(axis=1)
         return outputs
-
-    def plotBasisFunctionsBla(self, inputs_min, inputs_max, **kwargs):
-        ax = kwargs.get("ax") or self._getAxis()
-
-        if self.dim_input() == 1:
-            super().plotBasisFunctions(inputs_min, inputs_max, ax=ax)
-
-        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
-            inputs_min, inputs_max
-        )
-        activations = self.getActivations(inputs)
-
-        line_values = self.getLines(inputs)
-
-        # Plot line segment only when basis function is most active
-        values_range = numpy.amax(activations) - numpy.amin(activations)
-        n_basis_functions = activations.shape[1]
-        max_activations = np.max(activations, axis=1)
-        for i_bf in range(n_basis_functions):
-            cur_activations = activations[:, i_bf]
-            smaller = cur_activations < 0.7 * max_activations
-            line_values[smaller, i_bf] = np.nan
-
-        lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
-        alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.5
-        plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
