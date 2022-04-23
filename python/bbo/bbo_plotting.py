@@ -163,68 +163,6 @@ def plotCurveDeprecated(curve,axs,costs_all=[]):
     lines.append(line)
     return lines
 
-def saveLearningCurve(directory,learning_curve):
-    """ Save a learning curve to a file.
-    \param[in] directory The directory to save the file to.
-    \param[in] learning_curve The learning curve.
-    """
-    np.savetxt(directory+'/learning_curve.txt',learning_curve)
-    
-def loadLearningCurve(directory):
-    """ Load a learning curve from a file.
-    \param[in] directory The directory to load the file from.
-    \return The learning curve.
-    """
-    return np.loadtxt(directory+'/learning_curve.txt')
-
-def saveExplorationCurve(directory,exploration_curve):
-    """ Save a exploration curve to a file.
-    \param[in] directory The directory to save the file to.
-    \param[in] exploration_curve The exploration curve.
-    """
-    np.savetxt(directory+'/exploration_curve.txt',exploration_curve)
-    
-def loadExplorationCurve(directory):
-    """ Load a exploration curve from a file.
-    \param[in] directory The directory to load the file from.
-    \return The exploration curve.
-    """
-    return np.loadtxt(directory+'/exploration_curve.txt')
-    
-    
-def saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new):
-    """ Save an optimization update to a directory.
-    \param[in] directory The directory to save the update to.
-    \param[in] i_update How many updates have been done so far
-    \param[in] distribution Gaussian distribution before the update
-    \param[in] cost_eval Cost of the mean of the distribution 
-    \param[in] samples The samples in the search space
-    \param[in] costs The cost of each sample 
-    \param[in] weights The weight of each sample 
-    \param[in] distribution_new Gaussian distribution after the update
-    """
-
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-        
-    cur_dir = '%s/update%05d' % (directory, i_update)
-    if not os.path.exists(cur_dir):
-        os.makedirs(cur_dir)
-    
-    np.savetxt(cur_dir+"/distribution_mean.txt",distribution.mean)
-    np.savetxt(cur_dir+"/distribution_covar.txt",distribution.covar)
-    np.savetxt(cur_dir+"/distribution_new_mean.txt",distribution_new.mean)
-    np.savetxt(cur_dir+"/distribution_new_covar.txt",distribution_new.covar)
-          
-    if cost_eval is not None:
-        np.savetxt(cur_dir+'/cost_eval.txt',np.atleast_1d(cost_eval))
-    if samples is not None:
-        np.savetxt(cur_dir+'/samples.txt',samples)
-    if costs is not None:
-        np.savetxt(cur_dir+'/costs.txt',costs)
-    if weights is not None:
-        np.savetxt(cur_dir+'/weights.txt',weights)
-        
 def plotLearningCurves(all_eval_at_samples,all_costs_eval,ax):
     """ Plot multiple learning curves. Plots the mean+-std of these curves.
     \param[in] all_eval_at_samples The number of updates at which the cost was evaluated. Matrix of size n_learning_curves X n_updates.

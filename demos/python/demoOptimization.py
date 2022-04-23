@@ -55,7 +55,7 @@ if __name__ == "__main__":
     cost_function = DemoCostFunctionDistanceToPoint(minimum)
 
     fig_counter = 0
-    for covar_update in ["none", "decay", "adaptation"]:
+    for covar_update in ["fixed exploration", "covar decay", "covar adaptation"]:
         print(covar_update)
 
         mean_init = np.full(n_dims, 5.0)
@@ -64,9 +64,9 @@ if __name__ == "__main__":
 
         eliteness = 10
         weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-        if covar_update == "none":
+        if covar_update == "fixed exploration":
             updater = UpdaterMean(eliteness, weighting_method)
-        elif covar_update == "decay":
+        elif covar_update == "covar decay":
             covar_decay_factor = 0.8
             updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
         else:
@@ -102,8 +102,7 @@ if __name__ == "__main__":
             updater,
             n_updates,
             n_samples_per_update,
-            fig,
-            cur_directory,
+            fig
         )
 
     plt.show()

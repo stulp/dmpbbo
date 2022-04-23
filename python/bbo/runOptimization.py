@@ -27,7 +27,7 @@ sys.path.append(lib_path)
 from bbo.bbo_plotting import *
 from bbo.DistributionGaussian import DistributionGaussian
 
-def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None,directory=None):
+def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None):
     """ Run an evolutionary optimization process, see \ref page_bbo
     \param[in] cost_function The cost function to optimize
     \param[in] initial_distribution The initial parameter distribution
@@ -35,7 +35,6 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
     \param[in] n_updates The number of updates to perform
     \param[in] n_samples_per_update The number of samples per update
     \param[in] fig Optional figure to plot the optimization.
-    \param[in] directory Optional directory to save to (default: don't save)     
     \return A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
@@ -85,8 +84,6 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         if fig:
             highlight = (i_update==0)
             plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight)
-        if directory:
-            saveUpdate(directory,i_update,distribution,cost_eval,samples,costs,weights,distribution_new)
         
         # Distribution is new distribution
         distribution = distribution_new
@@ -97,10 +94,4 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         plotExplorationCurve(exploration_curve,fig.add_subplot(132))
         plotLearningCurve(learning_curve,fig.add_subplot(133),all_costs)
 
-    # Save learning curve to file, if necessary
-    if directory:
-        saveLearningCurve(directory,learning_curve)
-        saveExplorationCurve(directory,exploration_curve)
-        print('Saved results to "'+directory+'".')
-    
     return learning_curve
