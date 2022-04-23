@@ -19,6 +19,7 @@
 import os
 import sys
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Add relative path, in case PYTHONPATH is not set
 lib_path = os.path.abspath("../../python/")
@@ -46,7 +47,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 if __name__ == "__main__":
 
-    directory = None
+    directory = "/tmp/dmpbbo/demoBbo"
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 
@@ -59,7 +60,7 @@ if __name__ == "__main__":
         print(covar_update)
 
         mean_init = np.full(n_dims, 5.0)
-        covar_init = 4.0 * np.eye(n_dims)
+        covar_init = 1.0 * np.eye(n_dims)
         distribution = DistributionGaussian(mean_init, covar_init)
 
         eliteness = 10
@@ -86,23 +87,19 @@ if __name__ == "__main__":
         n_samples_per_update = 20
         n_updates = 40
 
-        import matplotlib.pyplot as plt
-
-        fig = plt.figure(fig_counter, figsize=(15, 5))
-        fig.canvas.set_window_title("Optimization with covar_update=" + covar_update)
-        fig_counter += 1
-
         cur_directory = directory
         if cur_directory != None:
             cur_directory += "/" + covar_update
 
-        learning_curve = runOptimization(
+        session = runOptimization(
             cost_function,
             distribution,
             updater,
             n_updates,
             n_samples_per_update,
-            fig
+            cur_directory
         )
+        fig = session.plot()
+        fig.canvas.set_window_title("Optimization with covar_update=" + covar_update)
 
     plt.show()

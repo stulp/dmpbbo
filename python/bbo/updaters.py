@@ -20,15 +20,18 @@ import numpy as np
 import sys
 import math
 import os
+from abc import ABC, abstractmethod
 
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from bbo.DistributionGaussian import DistributionGaussian
 
-class Updater:
+class Updater(ABC):
     """ Virtual class for updating a Gaussian distribution with reward-weighted averaging.
     """
+    
+    @abstractmethod
     def updateDistribution(distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         \param[in] distribution Distribution before the update
@@ -36,7 +39,7 @@ class Updater:
         \param[in] costs The cost of each sample.
         \return The updated distribution.
         """
-        raise NotImplementedError('subclasses must override updateDistribution()!')
+        pass
 
 
 class UpdaterMean(Updater):

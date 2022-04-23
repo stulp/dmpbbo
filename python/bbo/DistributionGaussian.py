@@ -22,9 +22,6 @@ import os
 
 class DistributionGaussian:
     """ \brief A class for representing a Gaussian distribution.
-    
-    This is mainly a wrapper around boost functionality
-    The reason to make the wrapper is to provide functionality for serialization/deserialization.
     """
 
     def __init__(self, mean=0.0, covar=1.0):
@@ -53,46 +50,3 @@ class DistributionGaussian:
         \return A string representation of an object of this class.
         """
         return 'N( '+str(self.mean)+', '+str(self.covar)+' )'
-
-    def saveToDirectory(self,directory,basename):
-        """ Save the object to a directory.
-        \param[in] directory The directory to save to.
-        \param[in] basename Basename of the file.
-        """
-        if not os.path.exists(directory):
-              os.makedirs(directory)
-        d = directory
-        np.savetxt(directory+'/'+basename+'_mean.txt',self.mean)
-        np.savetxt(directory+'/'+basename+'_covar.txt',self.covar)
-
-def loadDistributionGaussianFromDirectory(directory,basename):
-    """ Load a DistributionGaussian object from a file.
-    \param[in] directory The directory to load from to.
-    \param[in] basename Basename of the file.
-    \return An object of class DistributionGaussian
-    """
-    mean = np.loadtxt(directory+'/'+basename+'_mean.txt')
-    covar = np.loadtxt(directory+'/'+basename+'_covar.txt')
-    return DistributionGaussian(mean,covar)
-    
-
-def testDistributionGaussian():
-    """ Function to test the DistributionGaussian class.
-    """
-    mu  = np.array([2,4])
-    cov = np.array([[0.1,0.2],[0.2,0.5]])
-    
-    d = DistributionGaussian(mu,cov)
-
-    xs = d.generateSamples(250)
-    print(xs[1:10,:])
-    
-    import matplotlib.pyplot as plt
-    plt.plot(xs[:,0], xs[:,1], '.')
-    plt.plot(d.mean[0], d.mean[1], 'o',color='red')
-    plt.axis('equal')
-    plt.show()
-    
-if __name__ == '__main__':
-    testDistributionGaussian()
-

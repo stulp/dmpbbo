@@ -6,7 +6,3 @@ target_link_libraries(compareFunctionApproximators functionapproximators ${Boost
 
 add_executable(compareDmp compareDmp.cpp)
 target_link_libraries(compareDmp dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES})
-
-#add_executable(demoTrajectory demoTrajectory.cpp)
-#target_link_libraries(demoTrajectory dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES})
-

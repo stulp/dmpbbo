@@ -24,17 +24,17 @@ import sys
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.bbo_plotting import *
 from bbo.DistributionGaussian import DistributionGaussian
+from bbo.LearningSession import LearningSession
 
-def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,fig=None):
+def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,directory=None):
     """ Run an evolutionary optimization process, see \ref page_bbo
     \param[in] cost_function The cost function to optimize
     \param[in] initial_distribution The initial parameter distribution
     \param[in] updater The Updater used to update the parameters
     \param[in] n_updates The number of updates to perform
     \param[in] n_samples_per_update The number of samples per update
-    \param[in] fig Optional figure to plot the optimization.
+    \param[in] directory Optional directory to save to (default: don't save)     
     \return A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
@@ -42,14 +42,9 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         column 2...: Individual cost components (column 1 is their sum)
     """
     
+    session = LearningSession(initial_distribution,n_samples_per_update,directory)
+    
     distribution = initial_distribution
-    
-    all_costs = []
-    learning_curve = []
-    exploration_curve = []
-    
-    if fig:
-        ax = fig.add_subplot(131)
     
     # Optimization loop
     for i_update in range(n_updates): 
@@ -57,41 +52,25 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         # 0. Get cost of current distribution mean
         cost_eval = cost_function.evaluate(distribution.mean)
         
+        # Bookkeeping
+        if directory:
+            session.save(distribution,"distribution",i_update)
+            session.save(cost_eval,"cost_eval",i_update)
+            
         # 1. Sample from distribution
         samples = distribution.generateSamples(n_samples_per_update)
-    
+            
         # 2. Evaluate the samples
-        costs = []
-        for i_sample in range(n_samples_per_update):
-            costs.append(cost_function.evaluate(samples[i_sample,:]))
+        costs = [cost_function.evaluate(sample) for sample in samples]
       
-        # 3. Update parameters
-        distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
+        # 3. Update the distribution
+        distribution, weights = updater.updateDistribution(distribution, samples, costs)
         
-        # Bookkeeping and plotting
-        # All the costs so far
-        all_costs.extend(costs)
-        # Update exploration curve
-        cur_samples = i_update*n_samples_per_update
-        cur_exploration = np.sqrt(distribution.maxEigenValue())
-        exploration_curve.append([cur_samples,cur_exploration])
-        # Update learning curve
-        learning_curve.append([cur_samples])
-        learning_curve[-1].extend(cost_eval)
-        
-        
-        # Plot summary of this update
-        if fig:
-            highlight = (i_update==0)
-            plotUpdate(distribution,cost_eval,samples,costs,weights,distribution_new,ax,highlight)
-        
-        # Distribution is new distribution
-        distribution = distribution_new
-        
-        
-    # Plot learning curve
-    if fig:
-        plotExplorationCurve(exploration_curve,fig.add_subplot(132))
-        plotLearningCurve(learning_curve,fig.add_subplot(133),all_costs)
-
-    return learning_curve
+        # Bookkeeping
+        if directory:
+            session.save(samples,'samples',i_update)
+            session.save(costs,'costs',i_update)
+            session.save(weights,'weights',i_update)
+            session.save(distribution,'distribution_new',i_update)
+    
+    return session
