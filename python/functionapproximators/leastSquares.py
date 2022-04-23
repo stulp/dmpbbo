@@ -160,9 +160,7 @@ def linearPrediction(inputs, betas):
         Predicted output values. Size n_samples X n_ouput_dims
     """
 
-    if inputs.ndim == 1:
-        # Otherwise matrix multiplication below will not work
-        inputs = np.atleast_2d(inputs).T
+    inputs = inputs.reshape(inputs.shape[0], -1)
     n_input_dims = inputs.shape[1]
 
     n_beta = betas.size
