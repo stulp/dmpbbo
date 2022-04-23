@@ -29,7 +29,7 @@ class TaskSolverDmp(TaskSolver):
 
     def __init__(self,dmp, dt, integrate_dmp_beyond_tau_factor):
         self.dmp_ = dmp
-        self.integrate_time_ = dmp.tau_ * integrate_dmp_beyond_tau_factor
+        self.integrate_time_ = dmp.tau * integrate_dmp_beyond_tau_factor
         self.n_time_steps_ = int(np.floor(self.integrate_time_/dt)) + 1
     
     def performRollout(self,sample,task_parameters=None):
@@ -38,7 +38,7 @@ class TaskSolverDmp(TaskSolver):
         ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
         (xs, xds, forcing_terms, fa_outputs) = self.dmp_.analyticalSolution(ts)
         traj = self.dmp_.statesAsTrajectory(ts,xs,xds)
-        traj.setMisc(forcing_terms)
+        traj.misc = forcing_terms
         cost_vars = traj.asMatrix()
         return cost_vars
         
