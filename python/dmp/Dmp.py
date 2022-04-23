@@ -45,7 +45,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         y_attr,
         function_approximators=None,
         sigmoid_max_rate=-20,
-        forcing_term_scaling="NO_SCALING",
+        forcing_term_scaling="AMPLITUDE_SCALING",
         alpha_spring_damper=20.0,
         phase_system=None,
         gating_system=None,
@@ -95,7 +95,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         self._ts_train = None
 
-        self._goal_selected = False
+        self._selected_param_names = []
 
         d = self._dim_y
         self.SPRING = np.arange(0 * d + 0, 0 * d + 0 + 2 * d)
@@ -247,7 +247,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Scale the forcing term, if necessary
         if self._forcing_term_scaling == "G_MINUS_Y0_SCALING":
-            g_minus_y0 = self.attractor_state_ - self.initial_state_
+            g_minus_y0 = self._y_attr - self._y_init
             forcing_term = forcing_term * g_minus_y0
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
@@ -322,7 +322,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Scale the forcing term, if necessary
         if self._forcing_term_scaling == "G_MINUS_Y0_SCALING":
-            g_minus_y0 = self.attractor_state_ - self.initial_state_
+            g_minus_y0 = self._y_attr - self._y_init
             g_minus_y0_rep = np.tile(g_minus_y0, (n_time_steps, 1))
             forcing_terms *= g_minus_y0_rep
 
@@ -488,7 +488,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Factor out scaling
         if self._forcing_term_scaling == "G_MINUS_Y0_SCALING":
-            g_minus_y0 = self.attractor_state_ - self.initial_state_
+            g_minus_y0 = self._y_attr - self._y_init
             g_minus_y0_rep = np.tile(g_minus_y0, (n_time_steps, 1))
             f_target /= g_minus_y0_rep
 
@@ -549,34 +549,26 @@ class Dmp(DynamicalSystem, Parameterizable):
         # determined by the goal system.
         # self._spring_system.y_attr = y_attr_new
 
-    def getAllParamNames(self):
-        selectable = []
+    def setSelectedParamNames(self, names):
+        if isinstance(names, str):
+            names = [names] # Convert to list
+        
+        if "goal" in names:
+            self._selected_param_names = ["goal"]
+            # No need to bother function approximators with it: remove all occurences
+            names = [n for n in names if n!="goal"]
+        
+        # Any remaining names are passed to all function approximators
         for fa in self._function_approximators:
-            selectable.extend(fa.getAllParamNames())
-        selectable.append("goal")
-        # Remove duplicates
-        return list(dict.fromkeys(selectable))
-
-    def getRecommendedParamNames(self):
-        """Return the names of the parameters that recommended to be selected.
-        """
-        for fa in self._function_approximators:
-            selectable.extend(fa.getAllParamNames())
-        # Remove duplicates
-        return list(dict.fromkeys(selectable))
-
-    def setSelectedParamNames(self, selected_values_labels):
-        for fa in self._function_approximators:
-            fa.setSelectedParamNames(selected_values_labels)
-        self._goal_selected = "goal" in selected_values_labels
+            fa.setSelectedParamNames(names)
 
     def getParamVector(self):
         values = np.empty(0)
         for fa in self._function_approximators:
             if fa.isTrained():
                 values = np.append(values, fa.getParamVector())
-        if self._goal_selected:
-            values = np.append(values, self.attractor_state_)
+        if "goal" in self._selected_param_names:
+            values = np.append(values, self._y_attr)
         return values
 
     def setParamVector(self, values):
@@ -589,16 +581,16 @@ class Dmp(DynamicalSystem, Parameterizable):
                 cur_values = values[offset : offset + cur_size]
                 fa.setParamVector(cur_values)
                 offset += cur_size
-        if self._goal_selected:
-            self.set_attractor_state(values[offset : offset + self.dim_orig_])
+        if "goal" in self._selected_param_names:
+            self.set_attractor_state(values[offset : offset + self.dim_dmp()])
 
     def getParamVectorSize(self):
         size = 0
         for fa in self._function_approximators:
             if fa.isTrained():
                 size += fa.getParamVectorSize()
-        if self._goal_selected:
-            size += self.dim_orig_
+        if "goal" in self._selected_param_names:
+            size += self.dim_dmp()
         return size
 
     def __str__(self):
