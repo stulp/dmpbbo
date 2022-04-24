@@ -60,23 +60,20 @@ if __name__ == "__main__":
     eliteness = 10
     weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
     updaters["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
-    
+
     covar_decay_factor = 0.8
-    updaters["covar_decay"] = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
+    updaters["covar_decay"] = UpdaterCovarDecay(
+        eliteness, weighting_method, covar_decay_factor
+    )
 
     min_level = 0.000001
     max_level = None
     diag_only = False
     learning_rate = 0.75
     updaters["covar_adaptation"] = UpdaterCovarAdaptation(
-        eliteness,
-        weighting_method,
-        max_level,
-        min_level,
-        diag_only,
-        learning_rate,
+        eliteness, weighting_method, max_level, min_level, diag_only, learning_rate
     )
-    
+
     for name, updater in updaters.items():
         print(name)
 
@@ -86,10 +83,10 @@ if __name__ == "__main__":
 
         n_samples_per_update = 20
         n_updates = 40
-        
+
         cur_directory = None
         if directory:
-            cur_directory = os.path.join(directory,name)
+            cur_directory = os.path.join(directory, name)
 
         session = runOptimization(
             cost_function,
@@ -97,7 +94,7 @@ if __name__ == "__main__":
             updater,
             n_updates,
             n_samples_per_update,
-            cur_directory
+            cur_directory,
         )
         fig = session.plot()
         fig.canvas.set_window_title("Optimization with covar_update=" + name)
