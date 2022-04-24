@@ -31,10 +31,13 @@ class Task(ABC):
         \param[in] sample The sample from which the rollout was generated. Passing this to the cost function is useful when performing regularization on the sample. For further information see the section on \ref sec_bbo_task_and_task_solver
          \return costs The scalar cost components for the sample. The first item costs[0] should contain the total cost.
         """
-        raise NotImplementedError("subclasses must override evaluateRollout()!")
-
-    def plotRollout(self, cost_vars, ax):
         pass
+
+    def plotRollout(self, cost_vars, ax=None):
+        if not ax:
+            ax = plt.axes()
+        h = plot(cost_vars,'-')
+        return (h, ax)
 
     def costLabels(self):
         """Labels for the different cost components.

@@ -26,8 +26,6 @@ from collections import OrderedDict
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-
-from dmp_bbo.Rollout import Rollout
 from dmp_bbo.LearningSessionTask import *
 
 
@@ -42,7 +40,7 @@ def runOptimizationTask(
 ):
 
     session = LearningSessionTask(
-        n_samples_per_update, directory, task=task, updater=updater
+        n_samples_per_update, directory, task=task, task_solver=task_solver, updater=updater
     )
 
     distribution = initial_distribution

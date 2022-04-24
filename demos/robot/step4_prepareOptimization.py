@@ -32,7 +32,7 @@ from to_jsonpickle import *
 
 from bbo.updaters import *
 from bbo.DistributionGaussian import DistributionGaussian
-from dmp_bbo.run_one_update_json import *
+from dmp_bbo.run_one_update import *
 
 if __name__=="__main__":
     

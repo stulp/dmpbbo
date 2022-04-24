@@ -1,6 +1,6 @@
 # This file is part of DmpBbo, a set of libraries and programs for the
 # black-box optimization of dynamical movement primitives.
-# Copyright (C) 2014 Freek Stulp, ENSTA-ParisTech
+# Copyright (C) 2022 Freek Stulp, ENSTA-ParisTech
 #
 # DmpBbo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -22,181 +22,106 @@ import os
 import sys
 import pickle
 import inspect
+import jsonpickle
+from glob import glob
+from to_jsonpickle import *
+
 
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-from dmp_bbo.Rollout import *
-from dmp_bbo.dmp_bbo_plotting import saveUpdateRollouts
-from bbo.DistributionGaussian import *
 from dmp_bbo.Task import Task
+from dmp_bbo.LearningSessionTask import *
+
+from bbo.DistributionGaussian import *
+
+def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_update):
+
+    samples = distribution.generateSamples(n_samples)
+
+    # Save some things to file
+    session.tell(distribution, "distribution", i_update)
+    session.tell(samples, "samples", i_update)
+
+    dmp = session.ask(
+        "dmp_initial"
+    )  # Load the initial DMP, and then set its perturbed parameters
+
+    sample_labels = list(range(n_samples))
+    sample_labels.append("eval")
+    filenames = []
+    for i_sample in sample_labels:
+
+        if i_sample == "eval":
+            # Evaluation rollout: no perturbation
+            dmp.setParamVector(distribution.mean)
+        else:
+            dmp.setParamVector(samples[i_sample, :])
+
+        f = session.tell(dmp, "dmp", i_update, i_sample)
+        filenames.append(f)
+
+    print("ROLLOUTS NOW REQUIRED ON FOLLOWING FILES:")
+    print("  " + "\n  ".join(filenames))
 
 
-def prepareOptimization(
-    directory, task, initial_distribution, updater, n_samples_per_update
-):
+def runOptimizationTaskPrepare(directory, task, task_solver, distribution_initial, n_samples_per_update, updater, dmp_initial=None):
 
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    args = {"task":task, "task_solver": task_solver}
+    args.update({"distribution_initial": distribution_initial})
+    args.update({"updater": updater})
+    if dmp_initial:
+        args.update({"dmp_initial": dmp_initial})
+    session = LearningSessionTask(n_samples_per_update, directory, **args)
 
-    print('  * Saving task to "' + directory + '/"')
-    # Save the source code of the task for future reference
-    src_task = inspect.getsourcelines(task.__class__)
-    src_task = " ".join(src_task[0])
-    src_task = src_task.replace("(Task)", "")
-    filename = directory + "/the_task.py"
-    task_file = open(filename, "w")
-    task_file.write(src_task)
-    task_file.close()
-
-    # Save the task instance itself
-    filename = directory + "/task.p"
-    pickle.dump(task, open(filename, "wb"))
-
-    print('  * Saving updater to "' + directory + '/"')
-    filename = directory + "/updater.p"
-    pickle.dump(updater, open(filename, "wb"))
-
-    filename = directory + "/n_samples_per_update.txt"
-    np.savetxt(filename, [n_samples_per_update])
-
-    print('  * Saving initial distribution to "' + directory + '/"')
-    initial_distribution.saveToDirectory(directory, "distribution_initial")
+    # Generate first batch of samples
+    i_update = 0
+    _runOptimizationTaskGenerateSamples(session, distribution_initial, n_samples_per_update, i_update)
+    
+    return session
 
 
-def runOptimizationTaskOneUpdate(
-    directory, task, initial_distribution, updater, n_samples_per_update, i_update=None
-):
-
-    if not i_update:
-        i_update = -1
-        dir_exists = True
-        while dir_exists:
-            i_update += 1
-            cur_directory = "%s/update%05d/rollout001" % (directory, i_update)
-            dir_exists = os.path.isdir(cur_directory)
-        i_update -= 1
-
-    if i_update >= 0:
-        update_dir = "%s/update%05d" % (directory, i_update)
-        if not os.path.isdir(update_dir):
-            os.makedirs(update_dir)
+def runOptimizationTaskOneUpdate(session, i_update):
 
     print("======================================================")
     print("i_update = " + str(i_update))
-    if i_update == -1:
-        print("NO UPDATES YET: PREPARE OPTIMIZATION")
 
-        prepareOptimization(
-            directory, task, initial_distribution, updater, n_samples_per_update
-        )
+    print("EVALUATING ROLLOUTS")
+    costs_per_sample = []
 
-        # First update: distribution is initial distribution
-        distribution_new = initial_distribution
+    
+    n_samples = session.ask("n_samples_per_update")
+    task = session.ask("task")
+    
+    sample_labels = list(range(n_samples))
+    sample_labels.append("eval")
+    for i_sample in sample_labels:
 
-    else:
+        cost_vars = session.ask("cost_vars", i_update, i_sample)
+        dmp = session.ask("dmp", i_update, i_sample)
+        sample = dmp.getParamVector()
 
-        print("EVALUATING ROLLOUTS")
+        costs = task.evaluateRollout(cost_vars, sample)
 
-        print("  * Loading rollouts")
-        rollout_eval = loadRolloutFromDirectory(update_dir + "/rollout_eval")
-        rollouts = loadRolloutsFromDirectory(update_dir)
-        n_samples = len(rollouts)
+        session.tell(costs, "costs", i_update, i_sample)
 
-        print("  * Evaluating costs")
-        sample = rollout_eval.policy_parameters
-        cost_eval = task.evaluateRollout(rollout_eval.cost_vars, sample)
-        rollout_eval.cost = cost_eval
+        if i_sample != "eval":  # Do not include evaluation rollout
+            costs_per_sample.append(costs[0])  # Sum over cost components only
 
-        costs = []
-        for i_rollout in range(n_samples):
+    # 3. Update parameters
+    print("UPDATING DISTRIBUTION")
+    distribution_prev = session.ask("distribution", i_update)
+    samples = session.ask("samples", i_update)
+    updater = session.ask("updater")
 
-            # 2B. Evaluate the samples
-            cost_vars = rollouts[i_rollout].cost_vars
-            sample = rollouts[i_rollout].policy_parameters
-            cur_costs = task.evaluateRollout(cost_vars, sample)
-            rollouts[i_rollout].cost = cur_costs
-            costs.append(cur_costs)
-
-        # 3. Update parameters
-        print("UPDATING DISTRIBUTION")
-        print(
-            '  * Loading previous distribution and samples from  "' + update_dir + '/"'
-        )
-        name = "distribution"
-        distribution = loadDistributionGaussianFromDirectory(update_dir, name)
-
-        samples = np.loadtxt(update_dir + "/samples.txt")
-
-        print("  * Loading updater")
-        updater = pickle.load(open(directory + "/updater.p", "rb"))
-
-        print("  * Updating parameters")
-        distribution_new, weights = updater.updateDistribution(
-            distribution, samples, costs
-        )
-
-        # Save this update to file
-        print('  * Saving update to  "' + update_dir + '/"')
-        saveUpdateRollouts(
-            directory,
-            i_update,
-            distribution,
-            rollout_eval,
-            rollouts,
-            weights,
-            distribution_new,
-        )
-
-        print('  * Saving distribution to "' + update_dir + '/"')
-        np.savetxt(update_dir + "/distribution_new_mean.txt", distribution_new.mean)
-        np.savetxt(update_dir + "/distribution_new_covar.txt", distribution_new.covar)
-
-    # Update done! Increment counter, and save distribution to new dir.
-    i_update += 1
-    update_dir = "%s/update%05d" % (directory, i_update)
-    # If directory doesnt exist
-    if not os.path.isdir(update_dir):
-        os.makedirs(update_dir)
-    print('  * Saving distribution to "' + update_dir + '/"')
-    np.savetxt(update_dir + "/distribution_mean.txt", distribution_new.mean)
-    np.savetxt(update_dir + "/distribution_covar.txt", distribution_new.covar)
-
-    # 1. Sample from distribution (for next epoch of rollouts)
-    print("SAMPLING FROM UPDATED DISTRIBUTION")
-    samples = distribution_new.generateSamples(n_samples_per_update)
-    print('  * Save samples to "' + update_dir + '/samples.txt"')
-    np.savetxt(update_dir + "/samples.txt", samples)
-    for i_sample in range(n_samples_per_update + 1):
-
-        if i_sample == 0:
-            # Evaluation rollout: no perturbation
-            rollout_dir = "%s/rollout_eval" % (update_dir)
-            cur_sample = distribution_new.mean
-        else:
-            rollout_dir = "%s/rollout%03d" % (update_dir, i_sample)
-            cur_sample = samples[i_sample - 1, :]
-
-        sample_filename = rollout_dir + "/policy_parameters.txt"
-        print('  * Save sample to "' + sample_filename + '"')
-        if not os.path.isdir(rollout_dir):
-            os.makedirs(rollout_dir)
-        np.savetxt(sample_filename, cur_sample)
-
-    print("ROLLOUTS NOW REQUIRED")
-    print(
-        "  * Info: "
-        + str(n_samples_per_update)
-        + ' samples have been save in "'
-        + update_dir
-        + '/samples.txt".'
-    )
-    print(
-        "    Please run "
-        + str(n_samples_per_update)
-        + ' rollouts on the robot and write cost-relevant variables in "'
-        + update_dir
-        + '/cost_vars.txt"'
+    distribution_new, weights = updater.updateDistribution(
+        distribution_prev, samples, costs_per_sample
     )
 
-    return i_update
+    session.tell(weights, "weights", i_update)
+    session.tell(distribution_new, "distribution_new", i_update)
+
+    # Update done: generate new samples
+    print("GENERATE NEW SAMPLES")
+    i_update += 1  # Next batch of samples are for the next update.
+    _runOptimizationTaskGenerateSamples(session, distribution_new, n_samples, i_update)

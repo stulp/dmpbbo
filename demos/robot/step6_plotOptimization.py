@@ -27,7 +27,7 @@ sys.path.append(lib_path)
 
 from dmp_bbo.Task import Task
 from dmp_bbo.dmp_bbo_plotting import *
-from dmp_bbo.run_one_update_json import *
+from dmp_bbo.run_one_update import *
 
 if __name__=="__main__":
 

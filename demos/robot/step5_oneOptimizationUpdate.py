@@ -23,7 +23,7 @@ import argparse
 lib_path = os.path.abspath('../python')
 sys.path.append(lib_path)
 
-from dmp_bbo.run_one_update_json import runOptimizationTaskOneUpdate
+from dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
 
 if __name__=="__main__":
 

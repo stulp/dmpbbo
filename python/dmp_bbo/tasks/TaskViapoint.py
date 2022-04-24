@@ -105,7 +105,10 @@ class TaskViapoint(Task):
         costs[0] = np.sum(costs[1:])
         return costs
         
-    def plotRollout(self,cost_vars,ax):
+    def plotRollout(self,cost_vars,ax=None):
+        if not ax:
+            ax = plt.axes()
+            
         """Simple script to plot y of DMP trajectory"""
         n_dims = self.viapoint_.shape[0]
         t = cost_vars[:,0]
@@ -137,7 +140,7 @@ class TaskViapoint(Task):
         else:
             line_handles = []
             
-        return line_handles
+        return (line_handles, ax)
         
     def saveToFile(self,directory,filename):
         if not os.path.exists(directory):

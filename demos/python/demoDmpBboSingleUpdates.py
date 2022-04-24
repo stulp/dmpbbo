@@ -36,7 +36,7 @@ from dmp.Dmp import Dmp
 from dmp_bbo.Task import Task
 from dmp_bbo.TaskSolver import TaskSolver
 from dmp_bbo.TaskSolverDmp import TaskSolverDmp
-from dmp_bbo.runOptimizationTask import runOptimizationTask
+from dmp_bbo.run_one_update import *
 
 from dmp_bbo.tasks.TaskViapoint import TaskViapoint
 
@@ -102,46 +102,40 @@ def runDemo(directory, n_dims):
     covar_init = 1000.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    covar_update = "cma"
     eliteness = 10
-    weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-    if covar_update == "none":
-        updater = UpdaterMean(eliteness, weighting_method)
-    elif covar_update == "decay":
-        covar_decay_factor = 0.9
-        updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
-    else:
-        min_level = 0.000001
-        max_level = None
-        diag_only = False
-        learning_rate = 0.5
-        updater = UpdaterCovarAdaptation(
-            eliteness, weighting_method, max_level, min_level, diag_only, learning_rate
-        )
+    weighting_method = 'PI-BB'
+    covar_decay_factor = 0.9
+    updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
 
     n_samples_per_update = 10
-    n_updates = 40
+    n_updates = 20
+    
+    
+    session = runOptimizationTaskPrepare(directory, task, task_solver, distribution, n_samples_per_update, updater, dmp)
 
-    session = runOptimizationTask(
-        task,
-        task_solver,
-        distribution,
-        updater,
-        n_updates,
-        n_samples_per_update,
-        directory,
-    )
+    for i_update in range(n_updates):
+        dmp_eval = session.ask('dmp',i_update,'eval')
+        cost_vars_eval = task_solver.performRolloutDmp(dmp_eval)
+        session.tell(cost_vars_eval,'cost_vars',i_update,'eval')
+        
+        for i_sample in range(n_samples_per_update):
+            dmp_sample = session.ask('dmp',i_update,i_sample)
+            cost_vars = task_solver.performRolloutDmp(dmp_sample)
+            session.tell(cost_vars,'cost_vars',i_update,i_sample)
+        
+        runOptimizationTaskOneUpdate(session, i_update)
+        
+
     fig = session.plot()
-    fig.canvas.set_window_title("Optimization with covar_update=" + covar_update)
 
 
 if __name__ == "__main__":
 
-    directory = None
+    directory = "/tmp/demoDmpBboSingleUpdates"
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 
-    for n_dims in [1,2]:
+    for n_dims in [1]:
         runDemo(directory, n_dims)
 
     plt.show()
