@@ -15,19 +15,14 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
+from abc import ABC, abstractmethod
 
-class Task:
+class Task(ABC):
     """Interface for cost functions, which define a task.
     For further information see the section on \ref sec_bbo_task_and_task_solver
     """
-    
-    def costLabels(self):
-        """Labels for the different cost components.
-        
-        The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function returns labels for the individual cost components.
-        """
-        return []
 
+    @abstractmethod
     def evaluateRollout(self,cost_vars,sample):
         """The cost function which defines the task.
        
@@ -37,15 +32,13 @@ class Task:
         """
         raise NotImplementedError('subclasses must override evaluateRollout()!')
         
-    #def setRegularization(self,regularization):
-    #    self.regularization = regularization
-    #    
-    #def regularizationCost(self,sample):
-    #    # case 1: regularization is float
-    #    # case 2: regularization is vector
-    #    # case 3: regularization is matrix
-    #    self.regularization = regularization
-        
     def plotRollout(self,cost_vars,ax):
-        #print("plotRollout not implemented.")
         pass
+
+    
+    def costLabels(self):
+        """Labels for the different cost components.
+        
+        The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function returns labels for the individual cost components.
+        """
+        return []

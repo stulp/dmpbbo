@@ -36,7 +36,7 @@ class TaskSolverDmp(TaskSolver):
         self.dmp_.setParamVector(sample)
         
         ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
-        (xs, xds, forcing_terms, fa_outputs) = self.dmp_.analyticalSolution(ts)
+        xs, xds, forcing_terms, fa_outputs = self.dmp_.analyticalSolution(ts)
         traj = self.dmp_.statesAsTrajectory(ts,xs,xds)
         traj.misc = forcing_terms
         cost_vars = traj.asMatrix()

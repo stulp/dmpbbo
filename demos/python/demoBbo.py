@@ -47,7 +47,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 if __name__ == "__main__":
 
-    directory = "/tmp/dmpbbo/demoBbo"
+    directory = None
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 
@@ -55,41 +55,41 @@ if __name__ == "__main__":
     minimum = np.full(n_dims, 2.0)
     cost_function = DemoCostFunctionDistanceToPoint(minimum)
 
-    fig_counter = 0
-    for covar_update in ["fixed exploration", "covar decay", "covar adaptation"]:
-        print(covar_update)
+    updaters = {}
+
+    eliteness = 10
+    weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
+    updaters["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
+    
+    covar_decay_factor = 0.8
+    updaters["covar_decay"] = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
+
+    min_level = 0.000001
+    max_level = None
+    diag_only = False
+    learning_rate = 0.75
+    updaters["covar_adaptation"] = UpdaterCovarAdaptation(
+        eliteness,
+        weighting_method,
+        max_level,
+        min_level,
+        diag_only,
+        learning_rate,
+    )
+    
+    for name, updater in updaters.items():
+        print(name)
 
         mean_init = np.full(n_dims, 5.0)
         covar_init = 1.0 * np.eye(n_dims)
         distribution = DistributionGaussian(mean_init, covar_init)
 
-        eliteness = 10
-        weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-        if covar_update == "fixed exploration":
-            updater = UpdaterMean(eliteness, weighting_method)
-        elif covar_update == "covar decay":
-            covar_decay_factor = 0.8
-            updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
-        else:
-            min_level = 0.000001
-            max_level = None
-            diag_only = False
-            learning_rate = 0.75
-            updater = UpdaterCovarAdaptation(
-                eliteness,
-                weighting_method,
-                max_level,
-                min_level,
-                diag_only,
-                learning_rate,
-            )
-
         n_samples_per_update = 20
         n_updates = 40
-
-        cur_directory = directory
-        if cur_directory != None:
-            cur_directory += "/" + covar_update
+        
+        cur_directory = None
+        if directory:
+            cur_directory = os.path.join(directory,name)
 
         session = runOptimization(
             cost_function,
@@ -100,6 +100,6 @@ if __name__ == "__main__":
             cur_directory
         )
         fig = session.plot()
-        fig.canvas.set_window_title("Optimization with covar_update=" + covar_update)
+        fig.canvas.set_window_title("Optimization with covar_update=" + name)
 
     plt.show()

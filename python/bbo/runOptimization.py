@@ -24,7 +24,6 @@ import sys
 lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from bbo.DistributionGaussian import DistributionGaussian
 from bbo.LearningSession import LearningSession
 
 def runOptimization(cost_function, initial_distribution, updater, n_updates, n_samples_per_update,directory=None):
@@ -42,7 +41,8 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         column 2...: Individual cost components (column 1 is their sum)
     """
     
-    session = LearningSession(initial_distribution,n_samples_per_update,directory)
+    session = LearningSession(n_samples_per_update,directory,
+        cost_function=cost_function, updater=updater)
     
     distribution = initial_distribution
     
@@ -52,10 +52,6 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         # 0. Get cost of current distribution mean
         cost_eval = cost_function.evaluate(distribution.mean)
         
-        # Bookkeeping
-        session.save(distribution,"distribution",i_update)
-        session.save(cost_eval,"cost_eval",i_update)
-            
         # 1. Sample from distribution
         samples = distribution.generateSamples(n_samples_per_update)
             
@@ -63,12 +59,12 @@ def runOptimization(cost_function, initial_distribution, updater, n_updates, n_s
         costs = [cost_function.evaluate(sample) for sample in samples]
       
         # 3. Update the distribution
-        distribution, weights = updater.updateDistribution(distribution, samples, costs)
+        distribution_new, weights = updater.updateDistribution(distribution, samples, costs)
         
         # Bookkeeping
-        session.save(samples,'samples',i_update)
-        session.save(costs,'costs',i_update)
-        session.save(weights,'weights',i_update)
-        session.save(distribution,'distribution_new',i_update)
+        session.addEval(i_update,distribution.mean,cost_eval)
+        session.addUpdate(i_update,distribution,samples,costs,weights,distribution_new)
+        
+        distribution = distribution_new
     
     return session
