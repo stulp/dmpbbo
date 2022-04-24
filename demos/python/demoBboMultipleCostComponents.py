@@ -48,6 +48,10 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         regularization = self.regularization_weight * np.linalg.norm(sample)
         return [dist + regularization, dist, regularization]
 
+    def costLabels(self):
+        return ["dist", "regularization"]
+
+
 if __name__ == "__main__":
 
     directory = "/tmp/dmpbbo/demoBboMultipleCostComponents"
@@ -72,12 +76,7 @@ if __name__ == "__main__":
     n_updates = 40
 
     session = runOptimization(
-        cost_function,
-        distribution,
-        updater,
-        n_updates,
-        n_samples_per_update,
-        directory,
+        cost_function, distribution, updater, n_updates, n_samples_per_update, directory
     )
 
     session.plot()

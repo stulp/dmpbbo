@@ -37,4 +37,4 @@ class CostFunction(ABC):
         
         The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function optionally returns labels for the individual cost components.
         """
-        return []
+        return None

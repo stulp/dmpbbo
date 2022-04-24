@@ -62,7 +62,7 @@ def runOptimizationTask(
         samples = distribution.generateSamples(n_samples_per_update)
 
         # 2. Evaluate the samples
-        costs = np.zeros((n_samples_per_update))
+        costs = []
         for i_sample, sample in enumerate(samples):
 
             # 2A. Perform the rollouts
@@ -70,7 +70,7 @@ def runOptimizationTask(
 
             # 2B. Evaluate the rollouts
             cur_cost = task.evaluateRollout(cost_vars, sample)
-            costs[i_sample] = cur_cost[0]
+            costs.append(cur_cost)
 
             # Bookkeeping
             session.addRollout(i_update, i_sample, sample, cost_vars, cur_cost)
