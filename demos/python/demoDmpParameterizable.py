@@ -55,25 +55,26 @@ if __name__ == "__main__":
     ts = np.linspace(0, tau_exec, n_time_steps)
     xs, xds, forcing, fas = dmp.analyticalSolution(ts)
 
-    dmp.setSelectedParamNames(["weights","goal"])
+    dmp.setSelectedParamNames(["weights", "goal"])
     values = dmp.getParamVector()
-    
+
     # Plotting
-    
+
     # Original Dmp
-    h, axs = dmp.plotStatic(tau,ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
+    h, axs = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
     plt.setp(h, color=[0.7, 0.7, 1.0], linewidth=6)
-    
+
     # Perturbed Dmps
     for i_sample in range(5):
-        
-        rand_vector = 1.0 + 0.2*np.random.standard_normal(values.shape)
-        new_values = rand_vector*values
+
+        rand_vector = 1.0 + 0.2 * np.random.standard_normal(values.shape)
+        new_values = rand_vector * values
         dmp.setParamVector(new_values)
-        
+
         xs, xds, forcing, fas = dmp.analyticalSolution(ts)
-        h, _ = dmp.plotStatic(tau,ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs)
-        plt.setp(h,  color=[0.6, 0.0, 0.0], linewidth=1)
-            
-        
+        h, _ = dmp.plotStatic(
+            tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs
+        )
+        plt.setp(h, color=[0.6, 0.0, 0.0], linewidth=1)
+
     plt.show()
