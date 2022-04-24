@@ -38,7 +38,7 @@ from dmp_bbo.TaskSolver import TaskSolver
 from dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmp_bbo.runOptimizationTask import runOptimizationTask
 
-from dmp_bbo.tasks.TaskViapoint import TaskViapoint
+from TaskViapoint import TaskViapoint
 
 
 def runDemo(directory, n_dims):
