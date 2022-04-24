@@ -141,39 +141,3 @@ class TaskViapoint(Task):
             line_handles = []
             
         return (line_handles, ax)
-        
-    def saveToFile(self,directory,filename):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-            
-        my_file = open(directory+"/"+filename, 'w')
-        for x in self.viapoint_:
-            my_file.write(str(x)+" ")
-        if self.viapoint_time_:
-            my_file.write(str(self.viapoint_time_)+" ")
-        else:
-            my_file.write(str(-1.0)+" ")
-        my_file.write(str(self.viapoint_radius_)+" ")
-        
-        for x in self.goal_:
-            my_file.write(str(x)+" ")
-        if self.goal_time_:
-            my_file.write(str(self.goal_time_)+" ")
-        else:
-            my_file.write(str(-1.0)+" ")
-            
-        my_file.write(str(self.viapoint_weight_)+" ")
-        my_file.write(str(self.acceleration_weight_)+" ")
-        my_file.write(str(self.goal_weight_)+" ")
-        my_file.close()
-
-if __name__=='__main__':
-    counter = 0
-    for n_dims in [1,2,5]:
-        for viapoint_time in [0.5, None]:
-            viapoint = np.linspace(0.0,1.0,n_dims)
-            task = TaskViapoint(viapoint, viapoint_time)
-            task.saveToFile("/tmp/demoTaskViapoint/","viapoint"+str(counter)+".txt")
-            counter += 1
-        
-        

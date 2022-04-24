@@ -25,6 +25,7 @@ from glob import glob
 import matplotlib.pyplot as plt
 from pylab import mean
 from matplotlib.patches import Ellipse
+import inspect
 
 
 lib_path = os.path.abspath("../../python/")
@@ -39,6 +40,14 @@ class LearningSessionTask(LearningSession):
         super().__init__(n_samples_per_update, directory, **kwargs)
         self.task_ = kwargs.get("task", None)
         self.task_solver_ = kwargs.get("task_solver", None)
+        
+        if directory:
+            src = inspect.getsourcelines(self.task_.__class__)
+            src = " ".join(src[0])
+            src = src.replace("(Task)", "")
+            filename = os.path.join(directory, "task.py")
+            with open(filename, "w") as f:
+                f.write(src)
 
     def addRollout(self, i_update, i_sample, sample, cost_vars, cost):
         self.tell(sample, "sample", i_update, i_sample)
