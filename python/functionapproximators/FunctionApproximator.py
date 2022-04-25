@@ -40,10 +40,10 @@ class FunctionApproximator(Parameterizable):
         self._model_params = {name: None for name in model_param_names}
         self._dim_input = None
 
-    def train(self, inputs, targets):
+    def train(self, inputs, targets, **kwargs):
         # Ensure second dimension, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
-        self._model_params = self._train(inputs, targets, self._meta_params)
+        self._model_params = self._train(inputs, targets, self._meta_params, **kwargs)
         self._dim_input = inputs.shape[1]
 
     def predict(self, inputs):
@@ -222,12 +222,15 @@ class FunctionApproximator(Parameterizable):
         return lines
 
     def plotBasisFunctions(self, inputs_min, inputs_max, **kwargs):
-        ax = kwargs.get("ax") or self._getAxis()
 
         inputs, n_samples_per_dim = FunctionApproximator._getGrid(
             inputs_min, inputs_max
         )
         activations = self._getActivations(inputs, self._model_params)
+        if activations is None:
+            return None
+            
+        ax = kwargs.get("ax") or self._getAxis()
 
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
         alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.3

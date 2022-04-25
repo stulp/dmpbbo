@@ -22,8 +22,8 @@ lib_path = os.path.abspath("../../../python/")
 sys.path.append(lib_path)
 
 from functionapproximators.FunctionApproximator import FunctionApproximator
+from functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
 from functionapproximators.BasisFunction import *
-from functionapproximators.leastSquares import *
 
 
 class FunctionApproximatorLWR(FunctionApproximator):
@@ -54,16 +54,22 @@ class FunctionApproximatorLWR(FunctionApproximator):
         slopes = np.ones([n_bfs, n_dims])
         offsets = np.ones([n_bfs, 1])
 
+        # Prepare the weighted-least squares function approximator
+        reg = meta_params["regularization"]
+        wls_meta_params = {"regularization": reg, "use_offset": True}
+        fa_lws = FunctionApproximatorWLS(wls_meta_params)
+        
         # Perform one weighted least squares regression for each kernel
         activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
-        reg = meta_params["regularization"]
-        use_offset = True
         for i_kernel in range(n_bfs):
-            weights = activations[:, i_kernel]
-            beta = weightedLeastSquares(inputs, targets, weights, use_offset, reg)
-            slopes[i_kernel, :] = beta[:-1]
-            offsets[i_kernel] = beta[-1]  # Offset is last value
 
+            # Do one weighted least-squares with the current weights 
+            weights = activations[:, i_kernel]
+            wls_model_params = fa_lws._train(inputs,targets,wls_meta_params,weights=weights)
+            
+            slopes[i_kernel, :] = wls_model_params['slope']
+            offsets[i_kernel] = wls_model_params['offset']
+            
         model_params["offsets"] = offsets
         model_params["slopes"] = slopes
 

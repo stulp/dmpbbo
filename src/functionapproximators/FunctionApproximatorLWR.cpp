@@ -115,14 +115,6 @@ void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(
   // If no change, just return
   if (lines_pivot_at_max_activation_ == lines_pivot_at_max_activation) return;
 
-  // cout << "________________" << endl;
-  // cout << centers_.transpose() << endl;
-  // cout << slopes_.transpose() << endl;
-  // cout << offsets_.transpose() << endl;
-  // cout << "centers_ = " << centers_.rows() << "X" << centers_.cols() << endl;
-  // cout << "slopes_ = " << slopes_.rows() << "X" << slopes_.cols() << endl;
-  // cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
-
   // If you pivot lines around the point when the basis function has maximum
   // activation (i.e. at the center of the Gaussian), you must compute the new
   // offset corresponding to this slope, and vice versa
@@ -145,9 +137,6 @@ void FunctionApproximatorLWR::set_lines_pivot_at_max_activation(
   }
   // Remark, the above could have been done as a one-liner, but I prefer the
   // more legible version.
-
-  // cout << offsets_.transpose() << endl;
-  // cout << "offsets_ = " << offsets_.rows() << "X" << offsets_.cols() << endl;
 
   lines_pivot_at_max_activation_ = lines_pivot_at_max_activation;
 }
@@ -234,14 +223,11 @@ void from_json(const nlohmann::json& j, FunctionApproximatorLWR*& obj)
 
 void FunctionApproximatorLWR::to_json_helper(nlohmann::json& j) const
 {
-  // The "_model_params" and "values" are necessary for compatibility
-  // of jsonpickle in python.
-  j["_model_params"]["centers"]["values"] = centers_;
-  j["_model_params"]["widths"]["values"] = widths_;
-  j["_model_params"]["offsets"]["values"] = offsets_;
-  j["_model_params"]["slopes"]["values"] = slopes_;
-  string c("FunctionApproximatorLWR");
-  j["py/object"] = "functionapproximators." + c + "." + c;  // for jsonpickle
+  j["_model_params"]["centers"] = centers_;
+  j["_model_params"]["widths"] = widths_;
+  j["_model_params"]["offsets"] = offsets_;
+  j["_model_params"]["slopes"] = slopes_;
+  j["class"] = "FunctionApproximatorLWR";
 }
 
 }  // namespace DmpBbo

@@ -46,7 +46,7 @@ int main(int n_args, char** args)
   string dmp_name = args[2];
 
   cout << "========================================================" << endl;
-  string filename_json = directory + "/" + dmp_name + ".json";
+  string filename_json = directory + "/" + dmp_name + "_for_cpp.json";
   cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {

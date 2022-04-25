@@ -46,7 +46,7 @@ int main(int n_args, char** args)
   string basename = args[2];
 
   cout << "========================================================" << endl;
-  string filename_json = directory + "/" + basename + ".json";
+  string filename_json = directory + "/" + basename + "_for_cpp.json";
   cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {

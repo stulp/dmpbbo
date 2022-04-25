@@ -35,6 +35,6 @@ if __name__ == "__main__":
     parser.add_argument("directory", type=str, help="directory to read results from")
     args = parser.parse_args()
 
-    session = LearningSession.from_dir(args.directory)
+    session = LearningSessionTask.from_dir(args.directory)
     session.plot()
     plt.show()

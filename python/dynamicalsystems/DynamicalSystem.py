@@ -37,16 +37,17 @@ class DynamicalSystem(ABC):
         if order < 1 or order > 2:
             raise ValueError("order should be 1 or 2")
 
+        self.tau = tau
+        
         y_init = np.atleast_1d(y_init)
-
+        
         # These are set once, and are fixed
-        self._dim_y = len(y_init)
+        self._dim_y = y_init.size
         self._dim_x = n_dims_x * order if n_dims_x else self._dim_y * order
 
         self.y_init = y_init
-        self.tau = tau
 
-    @property
+    @property # Needs to be a property, so that subclasses can override setter method
     def tau(self):
         """ Get the time constant.
          
@@ -61,8 +62,6 @@ class DynamicalSystem(ABC):
          Args:
             new_tau - Time constant
         """
-        if new_tau <= 0.0:
-            raise ValueError("tau should be larger than 0.0")
         self._tau = new_tau
 
     @property
@@ -102,8 +101,9 @@ class DynamicalSystem(ABC):
         if y_init_new.size != self._dim_y:
             raise ValueError("y_init_new must have size " + self._dim_y)
         # Pad the end with zeros for x = [y 0]
-        self._x_init = np.zeros(self._dim_x)
-        self._x_init[: self._dim_y] = y_init_new
+        x_init_new = np.zeros(self._dim_x)
+        x_init_new[:self._dim_y] = y_init_new
+        self.x_init = x_init_new
 
     @abstractmethod
     def differentialEquation(self, x):

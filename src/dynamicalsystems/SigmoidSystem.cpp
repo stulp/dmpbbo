@@ -97,7 +97,6 @@ VectorXd SigmoidSystem::computeKs(const VectorXd& N_0s, double r,
   // And integration fails, especially for Euler integration.
   // So we now give a warning if this is likely to happen.
   VectorXd div = N_0s.array() / Ks.array() - 1;
-  // cout << setprecision(20) <<  div << endl;
   if ((div.array().abs() < 10e-9).any())  // 10e-9 determined empirically
   {
     cerr << endl << __FILE__ << ":" << __LINE__ << ":";
@@ -179,9 +178,7 @@ void SigmoidSystem::to_json_helper(nlohmann::json& j) const
 
   j["_max_rate"] = max_rate_;
   j["_inflection_ratio"] = inflection_ratio_;
-
-  string c("SigmoidSystem");
-  j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle
+  j["class"] = "SigmoidSystem";
 }
 
 }  // namespace DmpBbo

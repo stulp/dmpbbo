@@ -184,9 +184,7 @@ void SpringDamperSystem::to_json_helper(nlohmann::json& j) const
   j["_spring_constant"] = spring_constant_;
   j["_mass"] = mass_;
   j["_y_attr"] = y_attr_;
-
-  string c("SpringDamperSystem");
-  j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle
+  j["class"] = "SpringDamperSystem";
 }
 
 }  // namespace DmpBbo

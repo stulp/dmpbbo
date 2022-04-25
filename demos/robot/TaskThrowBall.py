@@ -81,4 +81,4 @@ class TaskThrowBall(Task):
         ax.set_xlim([-0.9, 0.3])
         ax.set_ylim([-0.4, 0.3])
 
-        return line_handles
+        return (line_handles, ax)

@@ -47,9 +47,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 if __name__ == "__main__":
 
-    directory = None
-    if len(sys.argv) > 1:
-        directory = sys.argv[1]
+    directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     n_dims = 2
     minimum = np.full(n_dims, 2.0)

@@ -47,7 +47,7 @@ int main(int n_args, char** args)
   string basename = fa_name + "_" + to_string(n_dims) + "D";
 
   cout << "========================================================" << endl;
-  string filename_json = directory + "/" + basename + ".json";
+  string filename_json = directory + "/" + basename + "_for_cpp.json";
   cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {

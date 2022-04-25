@@ -103,9 +103,7 @@ void ExponentialSystem::to_json_helper(nlohmann::json& j) const
   to_json_base(j);  // Get the json string from the base class
   j["_alpha"] = alpha_;
   j["_y_attr"] = x_attr_;
-
-  string c("ExponentialSystem");
-  j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle
+  j["class"] = "ExponentialSystem";
 }
 
 }  // namespace DmpBbo

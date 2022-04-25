@@ -134,7 +134,7 @@ if __name__ == "__main__":
 
         # Save the dynamical system to a json file
         filename_json = directory + "/" + name + ".json"
-        saveToJSON(dyn_system, filename_json)
+        saveToJSON(dyn_system, filename_json, save_for_cpp_also=True)
 
         # Call the binary, which does analyticalSolution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"

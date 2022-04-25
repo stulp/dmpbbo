@@ -26,6 +26,7 @@ lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
 from functionapproximators.BasisFunction import *
+from functionapproximators.FunctionApproximatorWLS import *
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
 
@@ -65,7 +66,11 @@ def train(fa_name, n_dims):
     n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
 
     # Initialize function approximator
-    if fa_name == "LWR":
+    if fa_name == "WLS":
+        use_offset = True
+        regularization = 0.1
+        fa = FunctionApproximatorWLS(use_offset, regularization)
+    elif fa_name == "LWR":
         # This value for intersection is quite low. But for the demo it is nice
         # because it makes the linear segments quite obvious.
         intersection = 0.2
@@ -91,7 +96,7 @@ def train(fa_name, n_dims):
 if __name__ == "__main__":
     """Run some training sessions and plot results."""
 
-    for fa_name in ["RBFN", "LWR"]:
+    for fa_name in ["WLS", "RBFN", "LWR"]:
         for n_dims in [1, 2]:
             train(fa_name, n_dims)
 

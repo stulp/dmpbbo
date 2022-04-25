@@ -92,8 +92,7 @@ if __name__ == "__main__":
 
         filename = os.path.join(directory, f"dmp_sample_{i_sample}.json")
         print("Saving sampled DMP to: " + filename)
-        save_to_json_for_cpp_also = True
-        saveToJSON(dmp, filename, save_to_json_for_cpp_also)
+        saveToJSON(dmp, filename, save_for_cpp_also=True)
 
         (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution()
         traj_sample = dmp.statesAsTrajectory(ts, xs, xds)

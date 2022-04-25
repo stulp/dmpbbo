@@ -176,9 +176,7 @@ void DynamicalSystem::to_json_base(nlohmann::json& j) const
   j["_dim_y"] = dim_y_;
   j["_tau"] = tau_;
   j["_y_init"] = x_init_.segment(0, dim_y_);
-
-  string c("DynamicalSystem");
-  j["py/object"] = "dynamicalsystems." + c + "." + c;  // for jsonpickle
+  j["class"] = "DynamicalSystem";
 }
 
 std::ostream& operator<<(std::ostream& output, const DynamicalSystem& d)

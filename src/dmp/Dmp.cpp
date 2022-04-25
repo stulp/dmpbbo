@@ -579,9 +579,7 @@ void Dmp::to_json_helper(nlohmann::json& j) const
   j["_gating_system"] = gating_system_;
   j["_forcing_term_scaling"] = forcing_term_scaling_;
   j["_function_approximators"] = function_approximators_;
-
-  string c("Dmp");
-  j["py/object"] = "dmp." + c + "." + c;  // for jsonpickle
+  j["class"] = "Dmp";
 }
 
 }  // namespace DmpBbo

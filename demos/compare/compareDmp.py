@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     # Save the dynamical system to a json file
     filename_json = directory + "/dmp.json"
-    saveToJSON(dmp, filename_json)
+    saveToJSON(dmp, filename_json, save_for_cpp_also=True)
 
     np.savetxt(directory + "/ts.txt", ts)
 

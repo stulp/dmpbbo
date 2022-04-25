@@ -257,6 +257,7 @@ class LearningSession:
         self._last_update_added = None
 
         self.tell(n_samples_per_update, "n_samples_per_update")
+        
         for name, value in kwargs.items():
             self.tell(value, name)
 

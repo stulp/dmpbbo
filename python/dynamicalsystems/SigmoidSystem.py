@@ -38,11 +38,10 @@ class SigmoidSystem(DynamicalSystem):
             inflection_ratio - Time at which maximum rate of change is 
                                achieved, i.e. at inflection_ratio * tau
         """
-        x_init = np.atleast_1d(x_init)
+        super().__init__(1, tau, x_init)
         self._max_rate = max_rate
         self._inflection_ratio = inflection_ratio
-        super().__init__(1, tau, x_init)
-        self._Ks = SigmoidSystem._computeKs(x_init, max_rate, tau * inflection_ratio)
+        self._Ks_cached = None
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
@@ -52,8 +51,7 @@ class SigmoidSystem(DynamicalSystem):
             new_tau - Time constant
         """
         self._tau = new_tau
-        t_infl = self._tau * self._inflection_ratio
-        self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
+        self._Ks_cached = None # Forces recomputing Ks
 
     @DynamicalSystem.x_init.setter
     def x_init(self, new_x_init):
@@ -62,22 +60,22 @@ class SigmoidSystem(DynamicalSystem):
          Args:
             new_x_init Initial state of the dynamical system.
         """
-        super().x_init = new_x_init
-        t_infl = self._tau * self._inflection_ratio
-        self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
+        if new_x_init.size != self._dim_x:
+            raise ValueError("x_init must have size " + self._dim_x)
+        self._x_init = new_x_init
+        self._Ks_cached = None # Forces recomputing Ks
 
-    # @DynamicalSystem.y_init.setter
-    # def y_init(self, new_y_init):
-    #    """ Set the initial state of the dynamical system (y part)
-    #
-    #     Args:
-    #        new_y_init Initial state of the dynamical system. (y part)
-    #
-    #    Note that for an ExponentialSystem y is equivalent to x.
-    #    """
-    #    super().x_init = new_y_init
-    #    t_infl = self._tau * self._inflection_ratio
-    #    self._Ks = SigmoidSystem._computeKs(self.x_init, self._max_rate, t_infl)
+    @DynamicalSystem.y_init.setter
+    def y_init(self, new_y_init):
+        """ Set the initial state of the dynamical system (y part)
+     
+         Args:
+            new_y_init Initial state of the dynamical system. (y part)
+     
+        Note that for an ExponentialSystem y is equivalent to x.
+        """
+        self.x_init = new_y_init
+        self._Ks_cached = None # Forces recomputing Ks
 
     def differentialEquation(self, x):
         """ The differential equation which defines the system.
@@ -87,7 +85,8 @@ class SigmoidSystem(DynamicalSystem):
         Args: x - current state
         Returns: xd - rate of change in state
         """
-        xd = self._max_rate * x * (1 - (np.divide(x, self._Ks)))
+        Ks = self._getKs()
+        xd = self._max_rate * x * (1 - (np.divide(x, Ks)))
         return xd
 
     def analyticalSolution(self, ts):
@@ -105,17 +104,26 @@ class SigmoidSystem(DynamicalSystem):
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
+        Ks = self._getKs()
+
         for dd in range(self._dim_x):
             # Auxillary variables to improve legibility
-            K = self._Ks[dd]
+            K = Ks[dd]
             b = (K / self._x_init[dd]) - 1
             xs[:, dd] = K / (1 + b * exp_rt)
             xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
 
         return (xs, xds)
 
-    @staticmethod
-    def _computeKs(N_0s, r, t_infl):
+    def _getKs(self):
+        if self._Ks_cached is not None:
+            # Cache available; simply return it.
+            return self._Ks_cached
+
+        # Variable rename so that it is the same as on the Wikipedia page
+        N_0s = self.x_init
+        r = self._max_rate
+        t_infl = self.tau * self._inflection_ratio
 
         # The idea here is that the initial state (called N_0s above), max_rate (r above) and the
         # inflection_ratio are set by the user.
@@ -131,9 +139,9 @@ class SigmoidSystem(DynamicalSystem):
         #              (K/N_0 - 1)*exp(-r*t_infl) = 1
         #                             (K/N_0 - 1) = 1/exp(-r*t_infl)
         #                                       K = N_0*(1+(1/exp(-r*t_infl)))
-        Ks = np.empty(N_0s.shape)
+        self._Ks_cached = np.empty(N_0s.shape)
         for dd in range(len(N_0s)):
-            Ks[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
+            self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
         # If Ks is too close to N_0===initial_state, then the differential equation will always return 0
         # See differentialEquation below
@@ -147,12 +155,12 @@ class SigmoidSystem(DynamicalSystem):
         #   xd = 0
         # And integration fails, especially for Euler integration.
         # So we now give a warning if this is likely to happen.
-        div = np.divide(N_0s, Ks) - 1.0
+        div = np.divide(N_0s, self._Ks_cached) - 1.0
         if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
             print(
-                "In function SigmoidSystem::computeKs(), Ks is too close to N_0s. This may lead to errors during numerical integration. Recommended solution: choose a lower magnitude for the maximum rate of change (currently it is "
+                "In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors during numerical integration. Recommended solution: choose a lower magnitude for the maximum rate of change (currently it is "
                 + str(r)
                 + ")"
             )
 
-        return Ks
+        return self._Ks_cached

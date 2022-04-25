@@ -55,8 +55,7 @@ class LearningSessionTask(LearningSession):
                 basename = self.getBaseName(name, i_update, i_sample)
                 abs_basename = os.path.join(self._root_dir, basename)
                 filename = abs_basename + ".json"
-                save_to_json_for_cpp_also = True
-                saveToJSON(obj, filename, save_to_json_for_cpp_also)
+                saveToJSON(obj, filename, save_for_cpp_also = True)
 
         filename = super().tell(obj, name, i_update, i_sample)
         return filename
@@ -88,21 +87,24 @@ class LearningSessionTask(LearningSession):
         if not ax:
             ax = plt.axes()
 
+        task = self.ask("task")
         lines_eval = []
         if plot_eval and self.exists("cost_vars", i_update, "eval"):
             cost_vars = self.ask("cost_vars", i_update, "eval")
-            if self.task_:
-                lines_eval, _ = self.task_.plotRollout(cost_vars, ax)
+            if task:
+                lines_eval, _ = task.plotRollout(cost_vars, ax)
             else:
                 lines_eval = ax.plot(cost_vars)
+                if not isinstance(lines_eval,list):
+                    lines_eval = [lines_eval]
             plt.setp(lines_eval, color="#3333ff", linewidth=3)
 
         if plot_samples:
             n_samples = self.ask("n_samples_per_update")
             for i_sample in range(n_samples):
                 cost_vars = self.ask("cost_vars", i_update, i_sample)
-                if self.task_:
-                    lines, _ = self.task_.plotRollout(cost_vars, ax)
+                if task:
+                    lines, _ = task.plotRollout(cost_vars, ax)
                 else:
                     lines = ax.plot(cost_vars)
                 plt.setp(lines, color="#999999", alpha=0.5)
