@@ -36,7 +36,7 @@ class Task(ABC):
     def plotRollout(self, cost_vars, ax=None):
         if not ax:
             ax = plt.axes()
-        h = plot(cost_vars,'-')
+        h = plot(cost_vars, "-")
         return (h, ax)
 
     def costLabels(self):

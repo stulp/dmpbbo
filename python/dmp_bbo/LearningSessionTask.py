@@ -39,7 +39,7 @@ class LearningSessionTask(LearningSession):
         super().__init__(n_samples_per_update, directory, **kwargs)
         self.task_ = kwargs.get("task", None)
         self.task_solver_ = kwargs.get("task_solver", None)
-        
+
         if directory and self.task_:
             src = inspect.getsourcelines(self.task_.__class__)
             src = " ".join(src[0])
@@ -47,20 +47,19 @@ class LearningSessionTask(LearningSession):
             filename = os.path.join(directory, "task.py")
             with open(filename, "w") as f:
                 f.write(src)
-                
+
     def tell(self, obj, name, i_update=None, i_sample=None):
-        # If it's a Dmp, save it in a C++-readable format also 
+        # If it's a Dmp, save it in a C++-readable format also
         if "dmp" in name:
             if self._root_dir:
                 basename = self.getBaseName(name, i_update, i_sample)
                 abs_basename = os.path.join(self._root_dir, basename)
                 filename = abs_basename + ".json"
-                save_to_json_for_cpp_also=True
-                saveToJSON(obj,filename,save_to_json_for_cpp_also)
-                
-        filename = super().tell(obj,name,i_update,i_sample)
+                save_to_json_for_cpp_also = True
+                saveToJSON(obj, filename, save_to_json_for_cpp_also)
+
+        filename = super().tell(obj, name, i_update, i_sample)
         return filename
-                
 
     def addRollout(self, i_update, i_sample, sample, cost_vars, cost):
         self.tell(sample, "sample", i_update, i_sample)

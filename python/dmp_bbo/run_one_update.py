@@ -33,9 +33,18 @@ from dmp_bbo.Task import Task
 from dmp_bbo.LearningSessionTask import *
 from bbo.DistributionGaussian import *
 
-def runOptimizationTaskPrepare(directory, task, task_solver, distribution_initial, n_samples_per_update, updater, dmp_initial=None):
 
-    args = {"task":task, "task_solver": task_solver}
+def runOptimizationTaskPrepare(
+    directory,
+    task,
+    task_solver,
+    distribution_initial,
+    n_samples_per_update,
+    updater,
+    dmp_initial=None,
+):
+
+    args = {"task": task, "task_solver": task_solver}
     args.update({"distribution_initial": distribution_initial})
     args.update({"updater": updater})
     if dmp_initial:
@@ -44,8 +53,10 @@ def runOptimizationTaskPrepare(directory, task, task_solver, distribution_initia
 
     # Generate first batch of samples
     i_update = 0
-    _runOptimizationTaskGenerateSamples(session, distribution_initial, n_samples_per_update, i_update)
-    
+    _runOptimizationTaskGenerateSamples(
+        session, distribution_initial, n_samples_per_update, i_update
+    )
+
     return session
 
 
@@ -58,7 +69,7 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
     session.tell(samples, "samples", i_update)
 
     # Load the initial DMP, and then set its perturbed parameters
-    dmp = session.ask("dmp_initial")  
+    dmp = session.ask("dmp_initial")
 
     sample_labels = list(range(n_samples))
     sample_labels.append("eval")
@@ -78,7 +89,6 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
     print("  " + "\n  ".join(filenames))
 
 
-
 def runOptimizationTaskOneUpdate(session, i_update):
 
     print("======================================================")
@@ -87,10 +97,9 @@ def runOptimizationTaskOneUpdate(session, i_update):
     print("EVALUATING ROLLOUTS")
     costs_per_sample = []
 
-    
     n_samples = session.ask("n_samples_per_update")
     task = session.ask("task")
-    
+
     sample_labels = list(range(n_samples))
     sample_labels.append("eval")
     for i_sample in sample_labels:

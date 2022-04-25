@@ -148,9 +148,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             gating_system = SigmoidSystem(tau, 1, sigmoid_max_rate, 0.85)
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system = TimeSystem(tau, count_down)
-            
+
         else:
-            raise ValueError("Unknown dmp_type: "+dmp_type)
+            raise ValueError("Unknown dmp_type: " + dmp_type)
 
         alpha_spring_damper = 20.0
         dmp = cls(
@@ -256,7 +256,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
             if self._scaling_amplitudes is None:
-                raise ValueError("Cannot do AMPLITUDE_SCALING if not trained with trajectory.")
+                raise ValueError(
+                    "Cannot do AMPLITUDE_SCALING if not trained with trajectory."
+                )
             forcing_term = forcing_term * self._scaling_amplitudes
 
         # Add forcing term to the ZD component of the spring state
@@ -557,13 +559,13 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def setSelectedParamNames(self, names):
         if isinstance(names, str):
-            names = [names] # Convert to list
-        
+            names = [names]  # Convert to list
+
         if "goal" in names:
             self._selected_param_names = ["goal"]
             # No need to bother function approximators with it: remove all occurences
-            names = [n for n in names if n!="goal"]
-        
+            names = [n for n in names if n != "goal"]
+
         # Any remaining names are passed to all function approximators
         for fa in self._function_approximators:
             fa.setSelectedParamNames(names)
@@ -600,7 +602,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return size
 
     def __str__(self):
-        return json.dumps(self,cls=DmpBboJSONEncoder,indent=2)
+        return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
 
     @staticmethod
     def getDmpAxes(has_fa_output=False):

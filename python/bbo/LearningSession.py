@@ -38,6 +38,7 @@ sys.path.append(lib_path)
 from DmpBboJSONEncoder import *
 from bbo.DistributionGaussian import DistributionGaussian
 
+
 def plotUpdateLines(n_samples_per_update, ax):
     """ Plot vertical lines when an parameter update occured during the optimization.
     \param[in] n_samples_per_update Vector specifying how many samples were used between updates.
@@ -55,7 +56,7 @@ def plotUpdateLines(n_samples_per_update, ax):
     n = n_samples_per_update
     h = ax.plot([n, n], y_limits)
     plt.setp(h, color="#bbbbbb", linewidth=0.5, zorder=0)
-        
+
     for ii in range(len(n_samples_per_update) - 1):
         y = y_limits[0] + 0.9 * (y_limits[1] - y_limits[0])
         ax.text(
@@ -155,13 +156,8 @@ def setColor(handle, i_update, n_updates):
 
 
 def plotUpdate(
-    distribution,
-    cost_eval,
-    samples,
-    costs,
-    weights,
-    distribution_new,
-    **kwargs):
+    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
+):
     """ Save an optimization update to a directory.
     \param[in] distribution Gaussian distribution before the update
     \param[in] cost_eval Cost of the mean of the distribution 
@@ -174,15 +170,17 @@ def plotUpdate(
     \param[in] plot_samples Whether to plot the individual samples (default=False)
     """
     ax = kwargs.get("ax") or plt.axes()
-    highlight = kwargs.get("highlight",False)
-    plot_samples = kwargs.get("plot_samples",False)
+    highlight = kwargs.get("highlight", False)
+    plot_samples = kwargs.get("plot_samples", False)
 
     if samples is None:
         plot_samples = False
 
     n_dims = len(distribution.mean)
     if n_dims == 1:
-        raise ValueError("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
+        raise ValueError(
+            "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
+        )
 
     # ZZZ Take into consideration block_covar_sizes to plot sub blocks in
     # different subplots
@@ -226,8 +224,8 @@ def plotUpdate(
         )
         patch, _ = distribution.plot(ax)
         patch_new, _ = distribution_new.plot(ax)
-        #patch = plot_error_ellipse(distr_mean, distr_covar, ax)
-        #patch_new = plot_error_ellipse(distr_new_mean, distr_new_covar, ax)
+        # patch = plot_error_ellipse(distr_mean, distr_covar, ax)
+        # patch_new = plot_error_ellipse(distr_new_mean, distr_new_covar, ax)
         if highlight:
             plt.setp(mean_handle, color="red")
             plt.setp(mean_handle_new, color="blue")
@@ -252,8 +250,7 @@ def plotUpdate(
 
 class LearningSession:
     def __init__(self, n_samples_per_update, root_directory=None, **kwargs):
-        
-        
+
         self._n_samples_per_update = n_samples_per_update
         self._root_dir = root_directory
         self._cache = {}
@@ -262,16 +259,16 @@ class LearningSession:
         self.tell(n_samples_per_update, "n_samples_per_update")
         for name, value in kwargs.items():
             self.tell(value, name)
-            
-        if root_directory and 'cost_function' in kwargs:
-            cost_function = kwargs['cost_function']
+
+        if root_directory and "cost_function" in kwargs:
+            cost_function = kwargs["cost_function"]
             src = inspect.getsourcelines(cost_function.__class__)
             src = " ".join(src[0])
             src = src.replace("(CostFunction)", "")
             filename = os.path.join(root_directory, "cost_function.py")
             with open(filename, "w") as f:
                 f.write(src)
-                
+
     @classmethod
     def from_dir(cls, directory):
         filename = os.path.join(directory, "n_samples_per_update.txt")
@@ -375,7 +372,7 @@ class LearningSession:
                 np.savetxt(filename, obj)
             else:
                 filename = abs_basename + ".json"
-                saveToJSON(obj,filename)
+                saveToJSON(obj, filename)
 
             return filename
 
@@ -411,12 +408,12 @@ class LearningSession:
             learning_curve.append(np.concatenate(([i_sample], costs_eval)))
 
         cost_labels = []
-        if self.exists('cost_function'):
-            cost_function = self.ask('cost_function')
-            cost_labels = cost_function.costLabels();
-        elif self.exists('task'):
-            cost_function = self.ask('task')
-            cost_labels = cost_function.costLabels();
+        if self.exists("cost_function"):
+            cost_function = self.ask("cost_function")
+            cost_labels = cost_function.costLabels()
+        elif self.exists("task"):
+            cost_function = self.ask("task")
+            cost_labels = cost_function.costLabels()
 
         return (learning_curve, cost_labels)
 
@@ -433,7 +430,7 @@ class LearningSession:
         costs = []
         for i_update in range(self.getNUpdates()):
             sample_costs = self.getSampleCosts(i_update)
-            costs.extend([c[0] for c in sample_costs]) # Only include sum
+            costs.extend([c[0] for c in sample_costs])  # Only include sum
         ax.plot(costs, ".", color="gray")
 
         # Plot learning curve itself
@@ -461,13 +458,13 @@ class LearningSession:
         for i_update in range(n_updates):
             highlight = i_update == 0
             self.plotDistributionUpdate(i_update, ax, highlight=highlight)
-        return ax # zzz
+        return ax  # zzz
 
     def plotDistributionUpdate(self, i_update, ax=None, **kwargs):
-        #ax = kwargs.get("ax") or plt.axes()
-        highlight = kwargs.get("highlight",False)
-        plot_samples = kwargs.get("plot_samples",False)
-        
+        # ax = kwargs.get("ax") or plt.axes()
+        highlight = kwargs.get("highlight", False)
+        plot_samples = kwargs.get("plot_samples", False)
+
         distribution = self.ask("distribution", i_update)
         costs_eval = self.getEvalCosts(i_update)
         costs = self.getSampleCosts(i_update)
@@ -477,7 +474,7 @@ class LearningSession:
 
         if not ax:
             ax = plt.axes()
-            
+
         return plotUpdate(
             distribution,
             costs_eval,

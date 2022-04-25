@@ -66,7 +66,7 @@ From https://github.com/dfm/dfmplot/blob/master/dfmplot/ellipse.py
         ax = plt.gca()
     lines = ax.add_patch(ellipsePlot)
     return lines, ax
-    
+
 
 class DistributionGaussian:
     """ \brief A class for representing a Gaussian distribution.
@@ -99,7 +99,7 @@ class DistributionGaussian:
         """
         return "N( " + str(self.mean) + ", " + str(self.covar) + " )"
 
-    def plot(self,ax=None):
+    def plot(self, ax=None):
         if not ax:
             ax = plt.axes()
-        return plot_error_ellipse(self.mean[:2],self.covar[:2,:2],ax)
+        return plot_error_ellipse(self.mean[:2], self.covar[:2, :2], ax)

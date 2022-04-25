@@ -40,7 +40,11 @@ def runOptimizationTask(
 ):
 
     session = LearningSessionTask(
-        n_samples_per_update, directory, task=task, task_solver=task_solver, updater=updater
+        n_samples_per_update,
+        directory,
+        task=task,
+        task_solver=task_solver,
+        updater=updater,
     )
 
     distribution = initial_distribution

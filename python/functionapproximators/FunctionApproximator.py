@@ -34,7 +34,7 @@ class FunctionApproximator(Parameterizable):
 
     See https://github.com/stulp/dmpbbo/blob/master/tutorial/functionapproximators.md
     """
-    
+
     def __init__(self, meta_params, model_param_names):
         self._meta_params = meta_params
         self._model_params = {name: None for name in model_param_names}
@@ -42,21 +42,23 @@ class FunctionApproximator(Parameterizable):
 
     def train(self, inputs, targets):
         # Ensure second dimension, i.e. shape = (30,) => (30,1)
-        inputs = inputs.reshape(inputs.shape[0],-1) 
+        inputs = inputs.reshape(inputs.shape[0], -1)
         self._model_params = self._train(inputs, targets, self._meta_params)
         self._dim_input = inputs.shape[1]
-        
+
     def predict(self, inputs):
         if not self.isTrained():
             raise ValueError("Calling predict() on untrained function approx.")
-            
+
         # Ensure ndims=2, i.e. shape = (30,) => (30,1)
-        inputs = inputs.reshape(inputs.shape[0],-1)
-        if inputs.shape[1]!=self._dim_input:
-            raise ValueError("Dimensionality of inputs for predict() must be the same as for train().")
-            
+        inputs = inputs.reshape(inputs.shape[0], -1)
+        if inputs.shape[1] != self._dim_input:
+            raise ValueError(
+                "Dimensionality of inputs for predict() must be the same as for train()."
+            )
+
         return self._predict(inputs, self._model_params)
-    
+
     def dim_input(self):
         """ Return the dimensionality of the inputs of the function_approximator
         
@@ -71,7 +73,7 @@ class FunctionApproximator(Parameterizable):
         Returns:
             bool: True if the function approximator has already been trained, False otherwise.
         """
-        return isinstance(self._dim_input,int)
+        return isinstance(self._dim_input, int)
 
     @staticmethod
     @abstractmethod
@@ -83,7 +85,7 @@ class FunctionApproximator(Parameterizable):
             targets (numpy.ndarray): Target values of the training examples.
         """
         pass
-        
+
     @staticmethod
     @abstractmethod
     def _predict(inputs, model_params):
@@ -104,7 +106,7 @@ class FunctionApproximator(Parameterizable):
 
     def setSelectedParamNames(self, names):
         if isinstance(names, str):
-            names = [names] # Convert to list
+            names = [names]  # Convert to list
         self._selected_param_names = names
 
     def getParamVector(self):
@@ -139,7 +141,7 @@ class FunctionApproximator(Parameterizable):
             if label in self._model_params:
                 size += np.prod(self._model_params[label].shape)
         return size
-        
+
     def _getAxis(self, fig=None):
         if not fig:
             fig = plt.figure(figsize=(6, 6))
@@ -225,15 +227,15 @@ class FunctionApproximator(Parameterizable):
         inputs, n_samples_per_dim = FunctionApproximator._getGrid(
             inputs_min, inputs_max
         )
-        activations = self._getActivations(inputs,self._model_params)
+        activations = self._getActivations(inputs, self._model_params)
 
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
         alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.3
         plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
-        
-        if "slopes" in self._model_params:         
+
+        if "slopes" in self._model_params:
             # Plot lines also
-            line_values = self.getLines(inputs,self._model_params)
+            line_values = self.getLines(inputs, self._model_params)
 
             # Plot line segment only when basis function is most active
             values_range = numpy.amax(activations) - numpy.amin(activations)
@@ -243,13 +245,12 @@ class FunctionApproximator(Parameterizable):
                 cur_activations = activations[:, i_bf]
                 smaller = cur_activations < 0.2 * max_activations
                 line_values[smaller, i_bf] = np.nan
-    
+
             lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
             alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.5
             w = 4 if len(n_samples_per_dim) < 2 else 1
             plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
 
-        
         return (lines, ax)
 
     def plotPredictionsGrid(self, inputs_min, inputs_max, **kwargs):
@@ -320,7 +321,7 @@ class FunctionApproximator(Parameterizable):
                 "Cannot plot input data with dim_input() = " + str(self.dim_input())
             )
 
-        if len(targets)>0:
+        if len(targets) > 0:
             plt.setp(
                 h_targets,
                 markeredgecolor=None,
@@ -335,7 +336,7 @@ class FunctionApproximator(Parameterizable):
         )
         if len(targets) > 0:
             plt.setp(h_residuals, color=[0.8, 0.3, 0.3], linewidth=2)
-            
+
         return (h_outputs, ax)
 
     def plot(self, inputs, **kwargs):
@@ -352,4 +353,3 @@ class FunctionApproximator(Parameterizable):
             inputs, targets=targets, ax=ax, plot_residuals=plot_residuals
         )
         return self.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
-

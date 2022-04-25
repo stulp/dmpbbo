@@ -57,19 +57,19 @@ class Trajectory:
     @property
     def ts(self):
         return self._ts
-        
+
     @property
     def ys(self):
         return self._ys
-        
+
     @property
     def yds(self):
         return self._yds
-        
+
     @property
     def ydds(self):
         return self._ydds
-        
+
     @property
     def misc(self):
         return self._misc
