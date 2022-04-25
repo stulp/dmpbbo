@@ -149,7 +149,6 @@ void DynamicalSystem::integrateStepRungeKutta(double dt,
 
 void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
 {
-  cout << j << endl;
   string class_name = j.at("class").get<string>();
 
   if (class_name=="ExponentialSystem") {

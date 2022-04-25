@@ -532,14 +532,15 @@ void Dmp::set_y_attr(const VectorXd& y_attr)
 
 void from_json(const nlohmann::json& j, Dmp*& obj)
 {
+  
   double tau = j.at("_tau");
 
   double alpha_spring_damper = j.at("_spring_system").at("_damping_coefficient");
 
-  VectorXd y_init;
-  VectorXd y_attr;
-  from_json(j.at("_y_init"), y_init);
-  from_json(j.at("_y_attr"), y_attr);
+  VectorXd y_init = j.at("_y_init");
+  VectorXd y_attr = j.at("_y_attr");
+  //from_json(j.at("_y_init"), y_init);
+  //from_json(j.at("_y_attr"), y_attr);
 
   ExponentialSystem* goal_system;
   DynamicalSystem *phase_system, *gating_system;
