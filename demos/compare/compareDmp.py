@@ -19,6 +19,7 @@
 import os
 import subprocess
 import sys
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -126,22 +127,21 @@ if __name__ == "__main__":
     # Call the binary, which does analyticalSolution and numerical integration in C++
 
     # Save the dynamical system to a json file
-    filename_json = directory + "/dmp.json"
+    filename_json = Path(directory, "dmp.json")
     saveToJSON(dmp, filename_json, save_for_cpp_also=True)
-
-    np.savetxt(directory + "/ts.txt", ts)
+    np.savetxt(Path(directory, "ts.txt"), ts)
 
     exec_name = "../../build_dir_realtime/demos/compare/compareDmp"
-    arguments = directory + " dmp"
-    executeBinary(exec_name, arguments, True)
+    executeBinary(exec_name, f"{directory} dmp", True)
 
     print("===============\nPython reading output from C++")
-    xs_ana_cpp = np.loadtxt(directory + "/xs_ana.txt")
-    xds_ana_cpp = np.loadtxt(directory + "/xds_ana.txt")
-    forcing_terms_ana_cpp = np.loadtxt(directory + "/forcing_terms_ana.txt")
-    fa_outputs_ana_cpp = np.loadtxt(directory + "/fa_outputs_ana.txt")
-    xs_step_cpp = np.loadtxt(directory + "/xs_step.txt")
-    xds_step_cpp = np.loadtxt(directory + "/xds_step.txt")
+    d = directory
+    xs_ana_cpp = np.loadtxt(Path(d, "xs_ana.txt"))
+    xds_ana_cpp = np.loadtxt(Path(d, "xds_ana.txt"))
+    forcing_terms_ana_cpp = np.loadtxt(Path(d, "forcing_terms_ana.txt"))
+    fa_outputs_ana_cpp = np.loadtxt(Path(d, "fa_outputs_ana.txt"))
+    xs_step_cpp = np.loadtxt(Path(d, "xs_step.txt"))
+    xds_step_cpp = np.loadtxt(Path(d, "xds_step.txt"))
 
     # Plotting
 
@@ -169,7 +169,7 @@ if __name__ == "__main__":
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
     plt.gcf().suptitle("Analytical solution")
     if save_png:
-        plt.gcf().savefig(os.path.join(directory, "analytical.png"))
+        plt.gcf().savefig(Path(directory, "analytical.png"))
 
     h_diff, axs1d = Dmp.plotStatic(
         dmp.tau,
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
     plt.gcf().suptitle("Analytical solution (diff)")
     if save_png:
-        plt.gcf().savefig(os.path.join(directory, "analytical_diff.png"))
+        plt.gcf().savefig(Path(directory, "analytical_diff.png"))
 
     h_pyt, axs2 = Dmp.plotStatic(dmp.tau, ts, xs_step, xds_step)
     h_cpp, _ = Dmp.plotStatic(dmp.tau, ts, xs_step_cpp, xds_step_cpp, axs=axs2)
@@ -191,7 +191,7 @@ if __name__ == "__main__":
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
     plt.gcf().suptitle("Numerical integration")
     if save_png:
-        plt.gcf().savefig(os.path.join(directory, "numerical.png"))
+        plt.gcf().savefig(Path(directory, "numerical.png"))
 
     h_diff, axs2d = Dmp.plotStatic(
         dmp.tau, ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False
@@ -199,6 +199,6 @@ if __name__ == "__main__":
     plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
     plt.gcf().suptitle("Numerical integration (diff)")
     if save_png:
-        plt.gcf().savefig(os.path.join(directory, "numerical_diff.png"))
+        plt.gcf().savefig(Path(directory, "numerical_diff.png"))
 
     plt.show()

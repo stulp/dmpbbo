@@ -152,7 +152,7 @@ if __name__ == "__main__":
         axs1 = [fig.add_subplot(231), fig.add_subplot(232), fig.add_subplot(233)]
         axs2 = [fig.add_subplot(234), fig.add_subplot(235), fig.add_subplot(236)]
 
-        trajectory = numpy.loadtxt(directory + "/demonstration_traj.txt")
+        trajectory = numpy.loadtxt(os.path.join(directory, "demonstration_traj.txt"))
         traj_dim0 = trajectory[:, [0, 1, 3, 5]]
         traj_dim1 = trajectory[:, [0, 2, 4, 6]]
         lines = plotTrajectory(traj_dim0, axs1)

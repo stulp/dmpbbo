@@ -125,7 +125,7 @@ if __name__ == "__main__":
     n_time_steps = int(np.ceil(integration_duration / dt)) + 1
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
     ts = np.linspace(0.0, integration_duration, n_time_steps)
-    np.savetxt(directory + "/ts.txt", ts)
+    np.savetxt(os.path.join(directory, "ts.txt"), ts)
 
     fig_count = 1
     for name in dyn_systems.keys():
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         dyn_system = dyn_systems[name]
 
         # Save the dynamical system to a json file
-        filename_json = directory + "/" + name + ".json"
+        filename_json = os.path.join(directory,name + ".json")
         saveToJSON(dyn_system, filename_json, save_for_cpp_also=True)
 
         # Call the binary, which does analyticalSolution and integration in C++
@@ -144,8 +144,8 @@ if __name__ == "__main__":
         print("===============")
         print("Python Analytical solution")
         xs, xds = dyn_system.analyticalSolution(ts)
-        xs_cpp = np.loadtxt(directory + "/xs_analytical.txt")
-        xds_cpp = np.loadtxt(directory + "/xds_analytical.txt")
+        xs_cpp = np.loadtxt(os.path.join(directory, "xs_analytical.txt"))
+        xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
         fig1 = plt.figure(fig_count, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
         fig1.suptitle(name + "System - Analytical")
@@ -155,8 +155,8 @@ if __name__ == "__main__":
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
-        xs_cpp = np.loadtxt(directory + "/xs_euler.txt")
-        xds_cpp = np.loadtxt(directory + "/xds_euler.txt")
+        xs_cpp = np.loadtxt(os.path.join(directory, "xs_euler.txt"))
+        xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
         fig2 = plt.figure(fig_count + 1, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
         fig2.suptitle(name + "System - Euler")
@@ -168,8 +168,8 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        xs_cpp = np.loadtxt(directory + "/xs_rungekutta.txt")
-        xds_cpp = np.loadtxt(directory + "/xds_rungekutta.txt")
+        xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
+        xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
         fig3 = plt.figure(fig_count + 2, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
         fig3.suptitle(name + "System - Runge-Kutta")

@@ -53,6 +53,7 @@ def saveToJSON(obj, filename, **kwargs):
 
     # Save a simple JSON version that can be read by the C++ code.
     if save_for_cpp:
+        filename = str(filename) # In case it is path
         filename_dmpbbo = filename.replace(".json", "_for_cpp.json")
         j = json.dumps(obj, cls=DmpBboJSONEncoder, indent=2)
         with open(filename_dmpbbo, "w") as out_file:
