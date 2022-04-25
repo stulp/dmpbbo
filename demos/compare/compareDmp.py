@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
     # Save the dynamical system to a json file
     filename_json = directory + "/dmp.json"
-    saveToJSON(dmp,filename_json)
+    saveToJSON(dmp, filename_json)
 
     np.savetxt(directory + "/ts.txt", ts)
 
@@ -194,16 +194,11 @@ if __name__ == "__main__":
         plt.gcf().savefig(os.path.join(directory, "numerical.png"))
 
     h_diff, axs2d = Dmp.plotStatic(
-        dmp.tau,
-        ts,
-        xs_step - xs_step_cpp,
-        xds_step - xds_step_cpp,
-        plot_tau=False,
+        dmp.tau, ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False
     )
     plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
     plt.gcf().suptitle("Numerical integration (diff)")
     if save_png:
         plt.gcf().savefig(os.path.join(directory, "numerical_diff.png"))
-
 
     plt.show()

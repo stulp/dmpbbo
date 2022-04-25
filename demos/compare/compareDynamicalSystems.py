@@ -134,13 +134,13 @@ if __name__ == "__main__":
 
         # Save the dynamical system to a json file
         filename_json = directory + "/" + name + ".json"
-        saveToJSON(dyn_system,filename_json)
+        saveToJSON(dyn_system, filename_json)
 
         # Call the binary, which does analyticalSolution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"
         arguments = directory + " " + name
         executeBinary(exec_name, arguments, True)
-        
+
         print("===============")
         print("Python Analytical solution")
         xs, xds = dyn_system.analyticalSolution(ts)

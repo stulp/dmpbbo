@@ -141,7 +141,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 
-    for n_dims in [1,2]:
+    for n_dims in [1, 2]:
         runDemo(directory, n_dims)
 
     plt.show()

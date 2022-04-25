@@ -103,28 +103,28 @@ def runDemo(directory, n_dims):
     distribution = DistributionGaussian(mean_init, covar_init)
 
     eliteness = 10
-    weighting_method = 'PI-BB'
+    weighting_method = "PI-BB"
     covar_decay_factor = 0.9
     updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
 
     n_samples_per_update = 10
     n_updates = 20
-    
-    
-    session = runOptimizationTaskPrepare(directory, task, task_solver, distribution, n_samples_per_update, updater, dmp)
+
+    session = runOptimizationTaskPrepare(
+        directory, task, task_solver, distribution, n_samples_per_update, updater, dmp
+    )
 
     for i_update in range(n_updates):
-        dmp_eval = session.ask('dmp',i_update,'eval')
+        dmp_eval = session.ask("dmp", i_update, "eval")
         cost_vars_eval = task_solver.performRolloutDmp(dmp_eval)
-        session.tell(cost_vars_eval,'cost_vars',i_update,'eval')
-        
+        session.tell(cost_vars_eval, "cost_vars", i_update, "eval")
+
         for i_sample in range(n_samples_per_update):
-            dmp_sample = session.ask('dmp',i_update,i_sample)
+            dmp_sample = session.ask("dmp", i_update, i_sample)
             cost_vars = task_solver.performRolloutDmp(dmp_sample)
-            session.tell(cost_vars,'cost_vars',i_update,i_sample)
-        
+            session.tell(cost_vars, "cost_vars", i_update, i_sample)
+
         runOptimizationTaskOneUpdate(session, i_update)
-        
 
     fig = session.plot()
 

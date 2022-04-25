@@ -144,7 +144,7 @@ def train(fa_name, n_dims):
     # Save the dynamical system to a json file
     basename = fa_name + "_" + str(n_dims) + "D"
     filename_json = directory + "/" + basename + ".json"
-    saveToJSON(fa,filename_json)
+    saveToJSON(fa, filename_json)
 
     # Save the inputs to a directory
     np.savetxt(directory + "/" + basename + "_inputs.txt", inputs_grid)
