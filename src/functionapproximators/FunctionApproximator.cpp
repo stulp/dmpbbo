@@ -36,12 +36,12 @@ namespace DmpBbo {
 
 void from_json(const nlohmann::json& j, FunctionApproximator*& obj)
 {
-  string class_name = j.at("py/object").get<string>();
+  string class_name = j.at("class").get<string>();
 
-  if (class_name.find("FunctionApproximatorRBFN") != string::npos) {
+  if (class_name=="FunctionApproximatorRBFN") {
     obj = j.get<FunctionApproximatorRBFN*>();
 
-  } else if (class_name.find("FunctionApproximatorLWR") != string::npos) {
+  } else if (class_name=="FunctionApproximatorLWR") {
     obj = j.get<FunctionApproximatorLWR*>();
 
   } else {

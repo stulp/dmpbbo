@@ -90,10 +90,10 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 
 void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 {
-  double tau = from_json_to_double(j.at("_tau"));
-  double alpha = from_json_to_double(j.at("_alpha"));
-  VectorXd x_init = j.at("_x_init").at("values");
-  VectorXd x_attr = j.at("_x_attr").at("values");
+  double tau = j.at("_tau");
+  double alpha = j.at("_alpha");
+  VectorXd x_init = j.at("_x_init");
+  VectorXd x_attr = j.at("_x_attr");
 
   obj = new ExponentialSystem(tau, x_init, x_attr, alpha);
 }

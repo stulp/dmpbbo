@@ -65,7 +65,7 @@ class Dmp : public DynamicalSystem {
       std::vector<FunctionApproximator*> function_approximators,
       double alpha_spring_damper, ExponentialSystem* goal_system,
       DynamicalSystem* phase_system, DynamicalSystem* gating_system,
-      std::string scaling = "NO_SCALING");
+      std::string scaling = "NO_SCALING", Eigen::VectorXd scaling_amplitudes=Eigen::VectorXd::Zero(0));
 
   /**
    *  Initialization constructor for Dmps of known dimensionality, but with
@@ -81,7 +81,7 @@ class Dmp : public DynamicalSystem {
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
       double alpha_spring_damper, ExponentialSystem* goal_system,
       DynamicalSystem* phase_system, DynamicalSystem* gating_system,
-      std::string scaling = "NO_SCALING");
+      std::string scaling = "NO_SCALING", Eigen::VectorXd scaling_amplitudes=Eigen::VectorXd::Zero(0));
 
   /**
    *  Constructor that initializes the DMP with default dynamical systems.
@@ -97,7 +97,8 @@ class Dmp : public DynamicalSystem {
   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
       std::vector<FunctionApproximator*> function_approximators,
       std::string dmp_type = "KULVICIUS_2012_JOINING",
-      std::string scaling = "NO_SCALING");
+      std::string scaling = "NO_SCALING", 
+      Eigen::VectorXd scaling_amplitudes=Eigen::VectorXd::Zero(0));
 
   /**
    *  Initialization constructor for Dmps of known dimensionality, but with
@@ -111,7 +112,7 @@ class Dmp : public DynamicalSystem {
    */
   Dmp(int n_dims_dmp, std::vector<FunctionApproximator*> function_approximators,
       std::string dmp_type = "KULVICIUS_2012_JOINING",
-      std::string scaling = "NO_SCALING");
+      std::string scaling = "NO_SCALING", Eigen::VectorXd scaling_amplitudes=Eigen::VectorXd::Zero(0));
 
   /**
    *  Initialization constructor for Dmps without a forcing term.
@@ -410,7 +411,7 @@ class Dmp : public DynamicalSystem {
 
   /** Ranges of the trajectory (per dimension) for (optional) scaling of forcing
    * term.  */
-  Eigen::VectorXd trajectory_amplitudes_;
+  Eigen::VectorXd scaling_amplitudes_;
 
   /** @} */  // end of group_nonlinear
 

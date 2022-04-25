@@ -165,10 +165,10 @@ void SigmoidSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 
 void from_json(const nlohmann::json& j, SigmoidSystem*& obj)
 {
-  double tau = from_json_to_double(j.at("_tau"));
-  double max_rate = from_json_to_double(j.at("_max_rate"));
-  double inflection_point_time = from_json_to_double(j.at("_inflection_ratio"));
-  VectorXd x_init = j.at("_x_init").at("values");
+  double tau = j.at("_tau");
+  double max_rate = j.at("_max_rate");
+  double inflection_point_time = j.at("_inflection_ratio");
+  VectorXd x_init = j.at("_x_init");
 
   obj = new SigmoidSystem(tau, x_init, max_rate, inflection_point_time);
 }

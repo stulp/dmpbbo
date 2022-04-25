@@ -225,10 +225,10 @@ exp(-0.5*pow(inputs.col(i_dim).array()-center[i_dim],2)/(width[i_dim]*width[i_di
 void from_json(const nlohmann::json& j, FunctionApproximatorLWR*& obj)
 {
   nlohmann::json jm = j.at("_model_params");
-  MatrixXd centers = jm.at("centers").at("values");
-  MatrixXd widths = jm.at("widths").at("values");
-  MatrixXd slopes = jm.at("slopes").at("values");
-  MatrixXd offsets = jm.at("offsets").at("values");
+  MatrixXd centers = jm.at("centers");
+  MatrixXd widths = jm.at("widths");
+  MatrixXd slopes = jm.at("slopes");
+  MatrixXd offsets = jm.at("offsets");
   obj = new FunctionApproximatorLWR(centers, widths, slopes, offsets);
 }
 

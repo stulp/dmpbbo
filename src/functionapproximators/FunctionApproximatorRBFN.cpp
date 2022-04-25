@@ -98,9 +98,9 @@ void FunctionApproximatorRBFN::predict(
 void from_json(const nlohmann::json& j, FunctionApproximatorRBFN*& obj)
 {
   nlohmann::json jm = j.at("_model_params");
-  MatrixXd centers = jm.at("centers").at("values");
-  MatrixXd widths = jm.at("widths").at("values");
-  MatrixXd weights = jm.at("weights").at("values");
+  MatrixXd centers = jm.at("centers");
+  MatrixXd widths = jm.at("widths");
+  MatrixXd weights = jm.at("weights");
   obj = new FunctionApproximatorRBFN(centers, widths, weights);
 }
 

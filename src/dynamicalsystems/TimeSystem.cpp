@@ -117,7 +117,7 @@ void TimeSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 
 void from_json(const nlohmann::json& j, TimeSystem*& obj)
 {
-  double tau = from_json_to_double(j.at("_tau"));
+  double tau = j.at("_tau");
   int count_down_int = j.at("_count_down");
   bool count_down = count_down_int > 0;
 
