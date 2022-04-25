@@ -20,6 +20,53 @@ import numpy as np
 import math
 import os
 
+import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+
+
+def plot_error_ellipse(mu, cov, ax=None, **kwargs):
+    """
+Plot the error ellipse at a point given it's covariance matrix
+
+Parameters
+----------
+mu : array (2,)
+The center of the ellipse
+
+cov : array (2,2)
+The covariance matrix for the point
+
+ax : matplotlib.Axes, optional
+The axis to overplot on
+
+**kwargs : dict
+These keywords are passed to matplotlib.patches.Ellipse
+
+From https://github.com/dfm/dfmplot/blob/master/dfmplot/ellipse.py
+
+"""
+    # some sane defaults
+    facecolor = kwargs.pop("facecolor", "none")
+    edgecolor = kwargs.pop("edgecolor", "k")
+
+    x, y = mu
+    U, S, V = np.linalg.svd(cov)
+    theta = np.degrees(np.arctan2(U[1, 0], U[0, 0]))
+    ellipsePlot = Ellipse(
+        xy=[x, y],
+        width=2 * np.sqrt(S[0]),
+        height=2 * np.sqrt(S[1]),
+        angle=theta,
+        facecolor=facecolor,
+        edgecolor=edgecolor,
+        **kwargs,
+    )
+
+    if not ax:
+        ax = plt.gca()
+    lines = ax.add_patch(ellipsePlot)
+    return lines, ax
+    
 
 class DistributionGaussian:
     """ \brief A class for representing a Gaussian distribution.
@@ -51,3 +98,8 @@ class DistributionGaussian:
         \return A string representation of an object of this class.
         """
         return "N( " + str(self.mean) + ", " + str(self.covar) + " )"
+
+    def plot(self,ax=None):
+        if not ax:
+            ax = plt.axes()
+        return plot_error_ellipse(self.mean[:2],self.covar[:2,:2],ax)

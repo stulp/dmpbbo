@@ -26,7 +26,6 @@ import inspect
 from glob import glob
 import matplotlib.pyplot as plt
 from pylab import mean
-from matplotlib.patches import Ellipse
 import warnings
 
 # Avoid warnings when plotting very narrow covariance matrices
@@ -36,53 +35,8 @@ warnings.simplefilter("ignore", np.ComplexWarning)
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 from bbo.DistributionGaussian import DistributionGaussian
-
-
-def plot_error_ellipse(mu, cov, ax=None, **kwargs):
-    """
-Plot the error ellipse at a point given it's covariance matrix
-
-Parameters
-----------
-mu : array (2,)
-The center of the ellipse
-
-cov : array (2,2)
-The covariance matrix for the point
-
-ax : matplotlib.Axes, optional
-The axis to overplot on
-
-**kwargs : dict
-These keywords are passed to matplotlib.patches.Ellipse
-
-From https://github.com/dfm/dfmplot/blob/master/dfmplot/ellipse.py
-
-"""
-    # some sane defaults
-    facecolor = kwargs.pop("facecolor", "none")
-    edgecolor = kwargs.pop("edgecolor", "k")
-
-    x, y = mu
-    U, S, V = np.linalg.svd(cov)
-    theta = np.degrees(np.arctan2(U[1, 0], U[0, 0]))
-    ellipsePlot = Ellipse(
-        xy=[x, y],
-        width=2 * np.sqrt(S[0]),
-        height=2 * np.sqrt(S[1]),
-        angle=theta,
-        facecolor=facecolor,
-        edgecolor=edgecolor,
-        **kwargs,
-    )
-
-    if not ax:
-        ax = plt.gca()
-    lines = ax.add_patch(ellipsePlot)
-    return lines
-
 
 def plotUpdateLines(n_samples_per_update, ax):
     """ Plot vertical lines when an parameter update occured during the optimization.
@@ -270,8 +224,10 @@ def plotUpdate(
         mean_handle_link = ax.plot(
             [distr_mean[0], distr_new_mean[0]], [distr_mean[1], distr_new_mean[1]], "-"
         )
-        patch = plot_error_ellipse(distr_mean, distr_covar, ax)
-        patch_new = plot_error_ellipse(distr_new_mean, distr_new_covar, ax)
+        patch, _ = distribution.plot(ax)
+        patch_new, _ = distribution_new.plot(ax)
+        #patch = plot_error_ellipse(distr_mean, distr_covar, ax)
+        #patch_new = plot_error_ellipse(distr_new_mean, distr_new_covar, ax)
         if highlight:
             plt.setp(mean_handle, color="red")
             plt.setp(mean_handle_new, color="blue")
@@ -296,6 +252,8 @@ def plotUpdate(
 
 class LearningSession:
     def __init__(self, n_samples_per_update, root_directory=None, **kwargs):
+        
+        
         self._n_samples_per_update = n_samples_per_update
         self._root_dir = root_directory
         self._cache = {}
@@ -417,8 +375,7 @@ class LearningSession:
                 np.savetxt(filename, obj)
             else:
                 filename = abs_basename + ".json"
-                with open(filename, "w") as out_file:
-                    out_file.write(to_jsonpickle(obj))
+                saveToJSON(obj,filename)
 
             return filename
 
