@@ -28,7 +28,7 @@ sys.path.append(lib_path)
 
 from functionapproximators.FunctionApproximatorLWR import *
 from functionapproximators.FunctionApproximatorRBFN import *
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -144,8 +144,7 @@ def train(fa_name, n_dims):
     # Save the dynamical system to a json file
     basename = fa_name + "_" + str(n_dims) + "D"
     filename_json = directory + "/" + basename + ".json"
-    with open(filename_json, "w") as out_file:
-        out_file.write(to_jsonpickle(fa))
+    saveToJSON(fa,filename_json)
 
     # Save the inputs to a directory
     np.savetxt(directory + "/" + basename + "_inputs.txt", inputs_grid)

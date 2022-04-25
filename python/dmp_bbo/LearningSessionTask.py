@@ -20,17 +20,16 @@ import numpy as np
 import math
 import os
 import sys
-from to_jsonpickle import *
 from glob import glob
 import matplotlib.pyplot as plt
 from pylab import mean
-from matplotlib.patches import Ellipse
 import inspect
 
 
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
+from DmpBboJSONEncoder import *
 from bbo.DistributionGaussian import DistributionGaussian
 from bbo.LearningSession import *
 
@@ -41,13 +40,27 @@ class LearningSessionTask(LearningSession):
         self.task_ = kwargs.get("task", None)
         self.task_solver_ = kwargs.get("task_solver", None)
         
-        if directory:
+        if directory and self.task_:
             src = inspect.getsourcelines(self.task_.__class__)
             src = " ".join(src[0])
             src = src.replace("(Task)", "")
             filename = os.path.join(directory, "task.py")
             with open(filename, "w") as f:
                 f.write(src)
+                
+    def tell(self, obj, name, i_update=None, i_sample=None):
+        # If it's a Dmp, save it in a C++-readable format also 
+        if "dmp" in name:
+            if self._root_dir:
+                basename = self.getBaseName(name, i_update, i_sample)
+                abs_basename = os.path.join(self._root_dir, basename)
+                filename = abs_basename + ".json"
+                save_to_json_for_cpp_also=True
+                saveToJSON(obj,filename,save_to_json_for_cpp_also)
+                
+        filename = super().tell(obj,name,i_update,i_sample)
+        return filename
+                
 
     def addRollout(self, i_update, i_sample, sample, cost_vars, cost):
         self.tell(sample, "sample", i_update, i_sample)

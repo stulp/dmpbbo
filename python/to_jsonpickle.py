@@ -21,19 +21,8 @@ import os, sys
 import pprint
 
 import json
+from json import JSONEncoder
 
-import jsonpickle
-
-from jsonpickle import handlers
-from jsonpickle import Pickler
-from jsonpickle import Unpickler
-
-import jsonpickle.ext.numpy as jsonpickle_numpy
-jsonpickle_numpy.register_handlers()
-handler = jsonpickle.ext.numpy.NumpyNDArrayHandlerView(size_threshold=None)
-handlers.registry.unregister(np.ndarray)
-handlers.registry.register(np.ndarray, handler, base=True)
-    
 from collections import MutableMapping
 from contextlib import suppress
 
@@ -53,17 +42,37 @@ def delete_keys_from_dict(dictionary, keys):
             delete_keys_from_dict(value, keys)
             
 
-def from_jsonpickle(json_string):
+def from_jsonpickle_deprecated(json_string):
     j = json.loads(json_string)
     unpickler = Unpickler()
     return unpickler._restore(j)
-    
-def to_jsonpickle(obj):
+
+
+def to_jsonpickle_deprecated(obj):    
+    s = ""
+    if isinstance(obj,int):
+        return f"{obj}"
+    elif np.isscalar(obj):
+        return f"{obj}"
+    elif isinstance(obj,np.ndarray):
+        return f"{obj}"
+    elif isinstance(obj,list):
+        s += '['+', '.join(obj)+']' 
+    elif hasattr(obj, '__dict__'):
+        for key, val in obj.__dict__.items():
+            s += f'"{key}": '+to_jsonpickle(val)+"\n"
+    else:
+        print("UNKNOWN: "+str(obj))
+    return s
+
+def to_jsonpickle_old(obj):
     
     pickler = Pickler()
     # jsonpickle.encode or picker.flatten have issues with refs
     # Calling the underscore function _flatten_obj works however
-    json_dict = pickler._flatten_obj(obj)
+    json_dict = pickler.flatten(obj,reset=True)
+    
+    #json_dict = jsonpickle.encode(obj,make_refs=False)
     
     # Delete some keys that are not necessary for unpickling
     # This leads to smaller files, and avoids py\id issues and parse 

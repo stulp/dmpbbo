@@ -23,12 +23,12 @@ import argparse
 import inspect
 
 
-lib_path = os.path.abspath('../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
 from TaskThrowBall import TaskThrowBall
 
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 from bbo.updaters import *
 from bbo.DistributionGaussian import DistributionGaussian
@@ -48,8 +48,12 @@ if __name__=="__main__":
     with open(filename, 'r') as f:
         distribution_init = jsonpickle.decode(f.read())    
     
+    filename = os.path.join(args.directory,'dmp_initial.json')
+    with open(filename, 'r') as f:
+        dmp = jsonpickle.decode(f.read())    
     
-    n_samples = 5
+    
+    n_samples_per_update = 5
 
     eliteness = 10
     weighting = 'PI-BB'
@@ -65,8 +69,7 @@ if __name__=="__main__":
     learning_rate=0.5
     updater_cma = UpdaterCovarAdaptation(eliteness, weighting, max_level, min_level, diag_only, learning_rate)
     
-    
     updater = updater_decay
-    params = OptimizationParameters(task, distribution_init, n_samples, updater)
     
-    runOptimizationTaskPrepare(args.directory, params)
+    task_solver = None
+    session = runOptimizationTaskPrepare(args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp)

@@ -20,10 +20,11 @@ import os
 import sys
 import argparse
 
-lib_path = os.path.abspath('../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
 from dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
+from dmp_bbo.LearningSessionTask import *
 
 if __name__=="__main__":
 
@@ -32,6 +33,7 @@ if __name__=="__main__":
     parser.add_argument("update", type=int, help="update number")
     args = parser.parse_args()
 
+    session = LearningSessionTask.from_dir(args.directory)
     
-    runOptimizationTaskOneUpdate(args.directory,args.update)
+    runOptimizationTaskOneUpdate(session,args.update)
     

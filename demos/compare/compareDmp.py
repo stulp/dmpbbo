@@ -27,9 +27,9 @@ import numpy as np
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
+from DmpBboJSONEncoder import *
 from dmp.Dmp import *
 from functionapproximators.FunctionApproximatorRBFN import *
-from to_jsonpickle import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -127,8 +127,7 @@ if __name__ == "__main__":
 
     # Save the dynamical system to a json file
     filename_json = directory + "/dmp.json"
-    with open(filename_json, "w") as out_file:
-        out_file.write(to_jsonpickle(dmp))
+    saveToJSON(dmp,filename_json)
 
     np.savetxt(directory + "/ts.txt", ts)
 

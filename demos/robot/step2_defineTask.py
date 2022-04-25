@@ -23,10 +23,10 @@ import argparse
 import inspect
 
 
-lib_path = os.path.abspath('../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 from TaskThrowBall import TaskThrowBall
 

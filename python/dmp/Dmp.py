@@ -34,7 +34,7 @@ from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.TimeSystem import TimeSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 
 class Dmp(DynamicalSystem, Parameterizable):
@@ -44,7 +44,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         y_init,
         y_attr,
         function_approximators=None,
-        sigmoid_max_rate=-20,
+        sigmoid_max_rate=-15,
         forcing_term_scaling="NO_SCALING",
         alpha_spring_damper=20.0,
         phase_system=None,
@@ -74,9 +74,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         self._function_approximators = function_approximators
 
-        if forcing_term_scaling=="AMPLITUDE_SCALING":
-            raise ValueError("Cannot use AMPLITUDE_SCALING without a trajectory.")
         self._forcing_term_scaling = forcing_term_scaling
+        self._scaling_amplitudes = None
 
         self._spring_system = SpringDamperSystem(
             tau, y_init, y_attr, alpha_spring_damper
@@ -145,10 +144,13 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
             goal_system = ExponentialSystem(tau, y_init, y_attr, 15)
-            sigmoid_max_rate = -20
+            sigmoid_max_rate = -15
             gating_system = SigmoidSystem(tau, 1, sigmoid_max_rate, 0.85)
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system = TimeSystem(tau, count_down)
+            
+        else:
+            raise ValueError("Unknown dmp_type: "+dmp_type)
 
         alpha_spring_damper = 20.0
         dmp = cls(
@@ -253,7 +255,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             forcing_term = forcing_term * g_minus_y0
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            forcing_term = forcing_term * self.trajectory_amplitudes_
+            if self._scaling_amplitudes is None:
+                raise ValueError("Cannot do AMPLITUDE_SCALING if not trained with trajectory.")
+            forcing_term = forcing_term * self._scaling_amplitudes
 
         # Add forcing term to the ZD component of the spring state
         xd[self.SPRING_Z] += np.squeeze(forcing_term) / self._tau
@@ -329,10 +333,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             forcing_terms *= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            trajectory_amplitudes_rep = np.tile(
-                self.trajectory_amplitudes_, (n_time_steps, 1)
+            _scaling_amplitudesrep = np.tile(
+                self._scaling_amplitudes, (n_time_steps, 1)
             )
-            forcing_terms *= trajectory_amplitudes_rep
+            forcing_terms *= _scaling_amplitudesrep
 
         # Get current delayed goal
         if self._goal_system is None:
@@ -343,7 +347,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             xds_goal = np.zeros(xs_goal.shape)
         else:
             # Integrate goal system and get current goal state
-            (xs_goal, xds_goal) = self._goal_system.analyticalSolution(ts)
+            xs_goal, xds_goal = self._goal_system.analyticalSolution(ts)
 
         xs = np.zeros([n_time_steps, self._dim_x])
         xds = np.zeros([n_time_steps, self._dim_x])
@@ -422,7 +426,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
-        self.trajectory_amplitudes_ = trajectory.getRangePerDim()
+        self._scaling_amplitudes = trajectory.getRangePerDim()
 
         # Do not train function approximators if there are none
         if self._function_approximators:
@@ -495,10 +499,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             f_target /= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            trajectory_amplitudes_rep = np.tile(
-                self.trajectory_amplitudes_, (n_time_steps, 1)
+            _scaling_amplitudesrep = np.tile(
+                self._scaling_amplitudes, (n_time_steps, 1)
             )
-            f_target /= trajectory_amplitudes_rep
+            f_target /= _scaling_amplitudesrep
 
         return (fa_inputs_phase, f_target)
 
@@ -596,7 +600,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return size
 
     def __str__(self):
-        return to_jsonpickle(self)
+        return json.dumps(self,cls=DmpBboJSONEncoder,indent=2)
 
     @staticmethod
     def getDmpAxes(has_fa_output=False):

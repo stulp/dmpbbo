@@ -30,7 +30,7 @@ from dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dynamicalsystems.TimeSystem import TimeSystem
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -134,14 +134,13 @@ if __name__ == "__main__":
 
         # Save the dynamical system to a json file
         filename_json = directory + "/" + name + ".json"
-        with open(filename_json, "w") as out_file:
-            out_file.write(to_jsonpickle(dyn_system))
+        saveToJSON(dyn_system,filename_json)
 
         # Call the binary, which does analyticalSolution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"
         arguments = directory + " " + name
         executeBinary(exec_name, arguments, True)
-
+        
         print("===============")
         print("Python Analytical solution")
         xs, xds = dyn_system.analyticalSolution(ts)

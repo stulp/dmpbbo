@@ -22,19 +22,15 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath('../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
 from performRollouts import *
 from TaskThrowBall import *
 
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 from bbo.DistributionGaussian import DistributionGaussian
-
-from dmp.dmp_plotting import *
-from bbo.bbo_plotting import *
-
 
 if __name__=="__main__":
 
@@ -51,17 +47,15 @@ if __name__=="__main__":
 
     filename = args.dmp
     print("Loading DMP from: "+filename)
-    with open(filename, 'r') as in_file:
-        json = in_file.read()        
-        dmp = from_jsonpickle(json)
+    dmp = loadFromJSON(filename)
     
     ts = dmp._ts_train
-    ( xs, xds, forcing, fa_outputs) = dmp.analyticalSolution(ts)
+    xs, xds, _, _ = dmp.analyticalSolution(ts)
     traj_mean = dmp.statesAsTrajectory(ts,xs,xds)
     
     fig = plt.figure(1)
     ax1 = fig.add_subplot(131)
-    lines = plotTrajectory(traj_mean.asMatrix(),[ax1])
+    lines, _ = traj_mean.plot([ax1])
     plt.setp(lines,linewidth=3)
     
     parameter_vector = dmp.getParamVector()
@@ -74,13 +68,12 @@ if __name__=="__main__":
     filename = os.path.join(directory,f'distribution.json')
     print("Saving sampling distribution to: "+filename)
     os.makedirs(directory,exist_ok=True)
-    with open(filename, 'w') as out_file:
-        out_file.write(to_jsonpickle(distribution))
+    saveToJSON(distribution,filename)
     
     samples = distribution.generateSamples(n_samples)
 
     ax2 = fig.add_subplot(132)
-    patch = plot_error_ellipse(distribution.mean[:2],distribution.covar[:2,:2],ax2)
+    distribution.plot(ax2)
     ax2.plot(samples[:,0],samples[:,1],'o',color='#999999')
 
     ax3 = fig.add_subplot(133)
@@ -97,12 +90,12 @@ if __name__=="__main__":
 
         filename = os.path.join(directory,f'dmp_sample_{i_sample}.json')
         print("Saving sampled DMP to: "+filename)
-        with open(filename, 'w') as out_file:
-            out_file.write(to_jsonpickle(dmp))
+        save_to_json_for_cpp_also=True
+        saveToJSON(dmp,filename,save_to_json_for_cpp_also)
 
         ( xs, xds, forcing, fa_outputs) = dmp.analyticalSolution()
         traj_sample = dmp.statesAsTrajectory(ts,xs,xds)
-        lines = plotTrajectory(traj_sample.asMatrix(),[ax1])
+        lines, _ = traj_sample.plot([ax1])
         plt.setp(lines,color='#999999',alpha=0.5)
 
         cost_vars = performRollouts(dmp,'python_simulation',directory)

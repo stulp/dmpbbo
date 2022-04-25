@@ -17,6 +17,7 @@
 
 import os
 import sys
+import copy
 import numpy as np
 
 lib_path = os.path.abspath("../../python/")
@@ -27,7 +28,7 @@ from dmp_bbo.TaskSolver import TaskSolver
 
 class TaskSolverDmp(TaskSolver):
     def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor):
-        self.dmp_ = dmp
+        self.dmp_ = copy.deepcopy(dmp)
         self.integrate_time_ = dmp.tau * integrate_dmp_beyond_tau_factor
         self.n_time_steps_ = int(np.floor(self.integrate_time_ / dt)) + 1
 
@@ -35,7 +36,7 @@ class TaskSolverDmp(TaskSolver):
         ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
         xs, xds, forcing_terms, fa_outputs = dmp.analyticalSolution(ts)
         traj = dmp.statesAsTrajectory(ts, xs, xds)
-        traj.misc = forcing_terms
+        #traj.misc = forcing_terms
         cost_vars = traj.asMatrix()
         return cost_vars
         

@@ -24,16 +24,30 @@ import pickle
 import inspect
 import jsonpickle
 from glob import glob
-from to_jsonpickle import *
-
 
 lib_path = os.path.abspath("../../python/")
 sys.path.append(lib_path)
 
+from DmpBboJSONEncoder import *
 from dmp_bbo.Task import Task
 from dmp_bbo.LearningSessionTask import *
-
 from bbo.DistributionGaussian import *
+
+def runOptimizationTaskPrepare(directory, task, task_solver, distribution_initial, n_samples_per_update, updater, dmp_initial=None):
+
+    args = {"task":task, "task_solver": task_solver}
+    args.update({"distribution_initial": distribution_initial})
+    args.update({"updater": updater})
+    if dmp_initial:
+        args.update({"dmp_initial": dmp_initial})
+    session = LearningSessionTask(n_samples_per_update, directory, **args)
+
+    # Generate first batch of samples
+    i_update = 0
+    _runOptimizationTaskGenerateSamples(session, distribution_initial, n_samples_per_update, i_update)
+    
+    return session
+
 
 def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_update):
 
@@ -43,9 +57,8 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
     session.tell(distribution, "distribution", i_update)
     session.tell(samples, "samples", i_update)
 
-    dmp = session.ask(
-        "dmp_initial"
-    )  # Load the initial DMP, and then set its perturbed parameters
+    # Load the initial DMP, and then set its perturbed parameters
+    dmp = session.ask("dmp_initial")  
 
     sample_labels = list(range(n_samples))
     sample_labels.append("eval")
@@ -64,21 +77,6 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
     print("ROLLOUTS NOW REQUIRED ON FOLLOWING FILES:")
     print("  " + "\n  ".join(filenames))
 
-
-def runOptimizationTaskPrepare(directory, task, task_solver, distribution_initial, n_samples_per_update, updater, dmp_initial=None):
-
-    args = {"task":task, "task_solver": task_solver}
-    args.update({"distribution_initial": distribution_initial})
-    args.update({"updater": updater})
-    if dmp_initial:
-        args.update({"dmp_initial": dmp_initial})
-    session = LearningSessionTask(n_samples_per_update, directory, **args)
-
-    # Generate first batch of samples
-    i_update = 0
-    _runOptimizationTaskGenerateSamples(session, distribution_initial, n_samples_per_update, i_update)
-    
-    return session
 
 
 def runOptimizationTaskOneUpdate(session, i_update):

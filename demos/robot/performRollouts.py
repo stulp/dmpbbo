@@ -19,10 +19,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os, sys, subprocess
 
-lib_path = os.path.abspath('../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from dmp.dmp_plotting import *
 from dmp.Dmp import *
 
 y_floor = -0.3
@@ -50,9 +49,8 @@ def performRollouts(dmp,mode='python_simulation',directory='.'):
     elif mode=='robot_executes_dmp':
         filename_dmp = os.path.join(directory,f'dmp_rollout.json')
         print("Saving trained DMP to: "+filename_dmp)
-        with open(filename_dmp, 'w') as out_file:
-            out_file.write(to_jsonpickle(dmp))
-
+        save_to_json_for_cpp_also=True
+        saveToJSON(dmp,filename_dmp,save_to_json_for_cpp_also)
         
         filename_cost_vars = os.path.join(directory,'cost_vars.txt')
         arguments = f'{filename_dmp} {filename_cost_vars}'
@@ -81,7 +79,7 @@ def performRollouts(dmp,mode='python_simulation',directory='.'):
 def run_python_simulation(dmp,y_floor=-0.3):
     
     dt = 0.01
-    ts = np.arange(0, 1.5*dmp.tau_, dt)
+    ts = np.arange(0, 1.5*dmp.tau, dt)
     n_time_steps = len(ts)
     
     (x,xd) = dmp.integrateStart()
@@ -90,11 +88,11 @@ def run_python_simulation(dmp,y_floor=-0.3):
     # y = cost_vars[:,1:1+n_dims] 
     # ydd = cost_vars[:,1+n_dims*2:1+n_dims*3]
     # ball = cost_vars[:,-2:]
-    n_dims = dmp.dim_orig_
-    ys = np.zeros([n_time_steps,n_dims])
-    yds = np.zeros([n_time_steps,n_dims])
-    ydds = np.zeros([n_time_steps,n_dims])
-    ys_ball = np.zeros([n_time_steps,n_dims])
+    n_dims_y = dmp.dim_dmp()
+    ys = np.zeros([n_time_steps,n_dims_y])
+    yds = np.zeros([n_time_steps,n_dims_y])
+    ydds = np.zeros([n_time_steps,n_dims_y])
+    ys_ball = np.zeros([n_time_steps,n_dims_y])
     
     (ys[0,:],yds[0,:],ydds[0,:]) = dmp.stateAsPosVelAcc(x,xd)
     ys_ball[0,:] = ys[0,:]

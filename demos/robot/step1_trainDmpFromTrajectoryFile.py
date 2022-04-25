@@ -22,15 +22,14 @@ from mpl_toolkits.mplot3d import Axes3D
 import os, sys
 import argparse
 
-lib_path = os.path.abspath('../python/')
+lib_path = os.path.abspath('../../python/')
 sys.path.append(lib_path)
 
-from dmp.dmp_plotting import *
 from dmp.Dmp import *
 from dmp.Trajectory import *
 from functionapproximators.FunctionApproximatorRBFN import *
 from functionapproximators.FunctionApproximatorLWR import *
-from to_jsonpickle import *
+from DmpBboJSONEncoder import *
 
 if __name__=='__main__':
 
@@ -49,7 +48,7 @@ if __name__=='__main__':
 
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
-    n_dims =  traj.dim()
+    n_dims =  traj.dim
     peak_to_peak = np.ptp(traj.ys,axis=0) # Range of data; used later on
     
     mean_absolute_errors = []
@@ -57,8 +56,8 @@ if __name__=='__main__':
     for n_bfs in n_bfs_list:
         
         function_apps = [FunctionApproximatorRBFN(n_bfs,0.7) for i_dim in range(n_dims)]
-        dmp = Dmp.from_traj(traj, function_apps, "Dmp", 'KULVICIUS_2012_JOINING')
-
+        dmp = Dmp.from_traj(traj, function_apps, 'KULVICIUS_2012_JOINING')
+        
         # These are the parameters that will be optimized.
         dmp.setSelectedParamNames("weights")
         
@@ -67,17 +66,17 @@ if __name__=='__main__':
         
         filename = os.path.join(args.output_directory,f'dmp_trained_{n_bfs}.json')
         print("Saving trained DMP to: "+filename)
-        with open(filename, 'w') as out_file:
-            out_file.write(to_jsonpickle(dmp))
-    
+        save_to_json_for_cpp_also=True
+        saveToJSON(dmp,filename,save_to_json_for_cpp_also)
+        
         ################################################
         # Analytical solution to compute difference
         
         ts = traj.ts
-        ( xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana) = dmp.analyticalSolution(ts)
+        xs_ana, xds_ana, _, _ = dmp.analyticalSolution(ts)
         traj_reproduced_ana = dmp.statesAsTrajectory(ts,xs_ana,xds_ana)
     
-        mae = np.mean(abs(traj.ys - traj_reproduced_ana._ys),axis=0)
+        mae = np.mean(abs(traj.ys - traj_reproduced_ana._ys))
         mean_absolute_errors.append(mae)
         print()
         print(f'               Number of basis functions: {n_bfs}')
@@ -96,51 +95,39 @@ if __name__=='__main__':
         xs_step = np.zeros([n_time_steps,dmp._dim_x])
         xds_step = np.zeros([n_time_steps,dmp._dim_x])
         
-        (x,xd) = dmp.integrateStart()
+        x,xd = dmp.integrateStart()
         xs_step[0,:] = x;
         xds_step[0,:] = xd;
         for tt in range(1,n_time_steps):
             ts[tt] = dt*tt
-            (xs_step[tt,:],xds_step[tt,:]) = dmp.integrateStep(dt,xs_step[tt-1,:]);
+            xs_step[tt,:],xds_step[tt,:] = dmp.integrateStep(dt,xs_step[tt-1,:]);
     
         traj_reproduced = dmp.statesAsTrajectory(ts,xs_step,xds_step)
     
         ################################################
         # Plot results
         
-        fig1 = plt.figure(1)
-        fig1.clf()
-        ts_xs_xds = np.column_stack((ts,xs_step,xds_step))
-        plotDmp(ts_xs_xds,fig1)
-        fig1.canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})') 
+        #h, axs = Dmp.plotStatic(dmp.tau,ts,xs_step,xds_step)
+        #plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})') 
+        #plt.gcf().savefig(os.path.join(args.output_directory,f'dmp_trained_{n_bfs}.png'))
         
-        fig2 = plt.figure(2)
-        fig2.clf()
-        axs = [ fig2.add_subplot(n) for n in [131,132,133]] 
-        
-        lines = plotTrajectory(traj.asMatrix(),axs)
-        plt.setp(lines, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
-    
-        lines = plotTrajectory(traj_reproduced.asMatrix(),axs)
-        plt.setp(lines, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
-        
+        h_demo, axs = traj.plot()
+        h_repr, _ = traj_reproduced.plot(axs)
+        plt.setp(h_demo, linestyle='-',  linewidth=4, color=(0.8,0.8,0.8), label='demonstration')
+        plt.setp(h_repr, linestyle='--', linewidth=2, color=(0.0,0.0,0.5), label='reproduced')
+        plt.gcf().canvas.set_window_title(f'Comparison demonstration/reproduced  (n_bfs={n_bfs})') 
+        plt.gcf().savefig(os.path.join(args.output_directory,f'trajectory_comparison_{n_bfs}.png'))
         plt.legend()
-        fig2.canvas.set_window_title(f'Comparison between demonstration and reproduced  (n_bfs={n_bfs})') 
         
-        filename = f'dmp_trained_{n_bfs}.png'
-        fig1.savefig(os.path.join(args.output_directory,filename))
-        filename = f'trajectory_comparison_{n_bfs}.png'
-        fig2.savefig(os.path.join(args.output_directory,filename))
-        
-            
-    # Plot the mean absolute error
-    fig3 = plt.figure(3)
-    ax = fig3.add_subplot(111)
-    ax.plot(n_bfs_list,mean_absolute_errors)
-    ax.set_xlabel('number of basis functions')
-    ax.set_ylabel('mean absolute error between demonstration and reproduced')
-    filename = 'mean_absolute_errors.png'
-    fig3.savefig(os.path.join(args.output_directory,filename))
+    
+    if len(n_bfs_list)>1:
+        # Plot the mean absolute error
+        ax = plt.figure().add_subplot(111)
+        ax.plot(n_bfs_list,mean_absolute_errors)
+        ax.set_xlabel('number of basis functions')
+        ax.set_ylabel('mean absolute error between demonstration and reproduced')
+        filename = 'mean_absolute_errors.png'
+        plt.gcf().savefig(os.path.join(args.output_directory,filename))
                 
     if args.show:
         plt.show()

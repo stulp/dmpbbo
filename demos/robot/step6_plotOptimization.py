@@ -22,12 +22,12 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath('../python')
+lib_path = os.path.abspath('../../python')
 sys.path.append(lib_path)
 
 from dmp_bbo.Task import Task
-from dmp_bbo.dmp_bbo_plotting import *
 from dmp_bbo.run_one_update import *
+from dmp_bbo.LearningSessionTask import *
 
 if __name__=="__main__":
 
@@ -35,14 +35,7 @@ if __name__=="__main__":
     parser.add_argument("directory", type=str, help="directory to read results from")
     args = parser.parse_args()
 
-    session = LearningSession(args.directory)
-    n_subplots = 4
-    fig = plt.figure(3,figsize=(n_subplots*3,3))
-    axs = [fig.add_subplot(1,n_subplots,1+i) for i in range(n_subplots)]
-    session.plotDistributionUpdates(axs[0])
-    session.plotRollouts(axs[1])
-    session.plotExplorationCurve(axs[2])
-    session.plotLearningCurve(axs[3])
-    
+    session = LearningSession.from_dir(args.directory)
+    session.plot()
     plt.show()
 
