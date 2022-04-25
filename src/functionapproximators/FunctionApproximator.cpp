@@ -38,10 +38,10 @@ void from_json(const nlohmann::json& j, FunctionApproximator*& obj)
 {
   string class_name = j.at("class").get<string>();
 
-  if (class_name=="FunctionApproximatorRBFN") {
+  if (class_name == "FunctionApproximatorRBFN") {
     obj = j.get<FunctionApproximatorRBFN*>();
 
-  } else if (class_name=="FunctionApproximatorLWR") {
+  } else if (class_name == "FunctionApproximatorLWR") {
     obj = j.get<FunctionApproximatorLWR*>();
 
   } else {

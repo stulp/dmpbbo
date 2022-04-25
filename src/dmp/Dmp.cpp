@@ -118,7 +118,8 @@ Dmp::Dmp(int n_dims_dmp,
 
 Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
          std::vector<FunctionApproximator*> function_approximators,
-         std::string dmp_type, std::string scaling, Eigen::VectorXd scaling_amplitudes)
+         std::string dmp_type, std::string scaling,
+         Eigen::VectorXd scaling_amplitudes)
     : DynamicalSystem(1, tau, y_init),
       y_attr_(y_attr),
       forcing_term_scaling_(scaling),
@@ -130,7 +131,8 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
 
 Dmp::Dmp(int n_dims_dmp,
          std::vector<FunctionApproximator*> function_approximators,
-         std::string dmp_type, std::string scaling, Eigen::VectorXd scaling_amplitudes)
+         std::string dmp_type, std::string scaling,
+         Eigen::VectorXd scaling_amplitudes)
     : DynamicalSystem(1, 1.0, VectorXd::Zero(n_dims_dmp)),
       y_attr_(VectorXd::Ones(n_dims_dmp)),
       forcing_term_scaling_(scaling),
@@ -146,7 +148,7 @@ Dmp::Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,
       y_attr_(y_attr),
       forcing_term_scaling_("NO_SCALING"),
       scaling_amplitudes_(VectorXd::Zero(0))
-{ 
+{
   VectorXd one_1 = VectorXd::Ones(1);
   VectorXd one_0 = VectorXd::Zero(1);
   DynamicalSystem* phase_system = new ExponentialSystem(tau, one_1, one_0, 4);
@@ -204,9 +206,9 @@ void Dmp::initSubSystems(double alpha_spring_damper,
   phase_system_ = phase_system;
 
   gating_system_ = gating_system;
-  
-  if (forcing_term_scaling_=="AMPLITUDE_SCALING") {
-    assert(scaling_amplitudes_.size()==dim_dmp());
+
+  if (forcing_term_scaling_ == "AMPLITUDE_SCALING") {
+    assert(scaling_amplitudes_.size() == dim_dmp());
   }
 
   // Pre-allocate memory for real-time execution
@@ -532,15 +534,15 @@ void Dmp::set_y_attr(const VectorXd& y_attr)
 
 void from_json(const nlohmann::json& j, Dmp*& obj)
 {
-  
   double tau = j.at("_tau");
 
-  double alpha_spring_damper = j.at("_spring_system").at("_damping_coefficient");
+  double alpha_spring_damper =
+      j.at("_spring_system").at("_damping_coefficient");
 
   VectorXd y_init = j.at("_y_init");
   VectorXd y_attr = j.at("_y_attr");
-  //from_json(j.at("_y_init"), y_init);
-  //from_json(j.at("_y_attr"), y_attr);
+  // from_json(j.at("_y_init"), y_init);
+  // from_json(j.at("_y_attr"), y_attr);
 
   ExponentialSystem* goal_system;
   DynamicalSystem *phase_system, *gating_system;
@@ -560,11 +562,10 @@ void from_json(const nlohmann::json& j, Dmp*& obj)
       function_approximators.push_back(fa);
     }
   }
-  
 
-  obj =
-      new Dmp(tau, y_init, y_attr, function_approximators, alpha_spring_damper,
-              goal_system, phase_system, gating_system, forcing_term_scaling, scaling_amplitudes);
+  obj = new Dmp(tau, y_init, y_attr, function_approximators,
+                alpha_spring_damper, goal_system, phase_system, gating_system,
+                forcing_term_scaling, scaling_amplitudes);
 }
 
 void Dmp::to_json_helper(nlohmann::json& j) const

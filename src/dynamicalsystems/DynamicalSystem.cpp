@@ -151,16 +151,16 @@ void from_json(const nlohmann::json& j, DynamicalSystem*& obj)
 {
   string class_name = j.at("class").get<string>();
 
-  if (class_name=="ExponentialSystem") {
+  if (class_name == "ExponentialSystem") {
     obj = j.get<ExponentialSystem*>();
 
-  } else if (class_name=="SigmoidSystem") {
+  } else if (class_name == "SigmoidSystem") {
     obj = j.get<SigmoidSystem*>();
 
-  } else if (class_name=="SpringDamperSystem") {
+  } else if (class_name == "SpringDamperSystem") {
     obj = j.get<SpringDamperSystem*>();
 
-  } else if (class_name=="TimeSystem") {
+  } else if (class_name == "TimeSystem") {
     obj = j.get<TimeSystem*>();
 
   } else {
