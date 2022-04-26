@@ -17,16 +17,10 @@
 
 
 import argparse
-import os
-import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
-
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.DmpBboJSONEncoder import *
-from performRollouts import *
 from TaskThrowBall import *
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from performRollouts import *
 
 if __name__ == "__main__":
 
@@ -41,10 +35,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     sigma_dir = "sigma_%1.3f" % args.sigma
-    directory = os.path.join(args.output_directory, sigma_dir)
+    directory = Path(args.output_directory, sigma_dir)
 
     filename = args.dmp
-    print("Loading DMP from: " + filename)
+    print(f"Loading DMP from: {filename}")
     dmp = loadFromJSON(filename)
 
     ts = dmp._ts_train
@@ -63,8 +57,8 @@ if __name__ == "__main__":
     covar_init = sigma * sigma * np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
 
-    filename = os.path.join(directory, f"distribution.json")
-    print("Saving sampling distribution to: " + filename)
+    filename = Path(directory, f"distribution.json")
+    print(f"Saving sampling distribution to: {filename}")
     os.makedirs(directory, exist_ok=True)
     saveToJSON(distribution, filename)
 
@@ -86,8 +80,8 @@ if __name__ == "__main__":
 
         dmp.setParamVector(samples[i_sample, :])
 
-        filename = os.path.join(directory, f"dmp_sample_{i_sample}.json")
-        print("Saving sampled DMP to: " + filename)
+        filename = Path(directory, f"dmp_sample_{i_sample}.json")
+        print(f"Saving sampled DMP to: {filename}")
         saveToJSON(dmp, filename, save_for_cpp_also=True)
 
         (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution()
@@ -100,7 +94,7 @@ if __name__ == "__main__":
         task.plotRollout(cost_vars, ax3)
 
     filename = "exploration.png"
-    fig.savefig(os.path.join(directory, filename))
+    fig.savefig(Path(directory, filename))
 
     if args.show:
         plt.show()

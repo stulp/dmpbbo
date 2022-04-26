@@ -29,7 +29,7 @@ class LearningSessionTask(LearningSession):
             src = inspect.getsourcelines(self.task_.__class__)
             src = " ".join(src[0])
             src = src.replace("(Task)", "")
-            filename = os.path.join(directory, "task.py")
+            filename = Path(directory, "task.py")
             with open(filename, "w") as f:
                 f.write(src)
 
@@ -38,7 +38,7 @@ class LearningSessionTask(LearningSession):
         if "dmp" in name:
             if self._root_dir:
                 basename = self.getBaseName(name, i_update, i_sample)
-                abs_basename = os.path.join(self._root_dir, basename)
+                abs_basename = Path(self._root_dir, basename)
                 filename = f"{abs_basename}.json"
                 saveToJSON(obj, filename, save_for_cpp_also=True)
 

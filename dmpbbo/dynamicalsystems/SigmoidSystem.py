@@ -56,7 +56,7 @@ class SigmoidSystem(DynamicalSystem):
             new_x_init Initial state of the dynamical system.
         """
         if new_x_init.size != self._dim_x:
-            raise ValueError("x_init must have size " + self._dim_x)
+            raise ValueError(f"x_init must have size {self._dim_x}")
         self._x_init = new_x_init
         self._Ks_cached = None  # Forces recomputing Ks
 

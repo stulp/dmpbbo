@@ -1,7 +1,3 @@
-import os
-import sys
-
-import matplotlib.pyplot as plt
 import numpy as np
 
 from dmpbbo.bbo_for_dmps.Task import Task

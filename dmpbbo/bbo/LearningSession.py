@@ -22,6 +22,7 @@ import inspect
 import os
 import warnings
 from glob import glob
+from pathlib import Path
 
 import jsonpickle
 import matplotlib.pyplot as plt
@@ -277,13 +278,13 @@ class LearningSession:
             src = inspect.getsourcelines(cost_function.__class__)
             src = " ".join(src[0])
             src = src.replace("(CostFunction)", "")
-            filename = os.path.join(root_directory, "cost_function.py")
+            filename = Path(root_directory, "cost_function.py")
             with open(filename, "w") as f:
                 f.write(src)
 
     @classmethod
     def from_dir(cls, directory):
-        filename = os.path.join(directory, "n_samples_per_update.txt")
+        filename = str(Path(directory, "n_samples_per_update.txt"))
         n_samples_per_update = np.atleast_1d(np.loadtxt(filename))
         n_samples_per_update = int(n_samples_per_update[0])
         return cls(n_samples_per_update, directory)
@@ -307,7 +308,7 @@ class LearningSession:
         if not self._root_dir:
             return self._last_update_added
         else:
-            update_dirs = sorted(glob(os.path.join(self._root_dir, "update*/")))
+            update_dirs = sorted(glob(str(Path(self._root_dir, "update*/"))))
             last_dir = update_dirs[-1]
             last_dir = last_dir.replace("update", "")
             last_dir = last_dir.replace(self._root_dir, "")
@@ -326,7 +327,7 @@ class LearningSession:
 
         if isinstance(i_update, int):
             # e.g. "update00023/000_name"
-            basename = os.path.join(f"update{i_update:05d}", basename)
+            basename = Path(f"update{i_update:05d}", basename)
 
         return basename
 
@@ -346,10 +347,10 @@ class LearningSession:
 
         if not self._root_dir:
             # Not in cache, and no directory given: Error
-            raise KeyError("Could not find basename in cache: " + basename)
+            raise KeyError(f"Could not find basename in cache: {basename}")
 
         else:
-            abs_basename = os.path.join(self._root_dir, basename)
+            abs_basename = Path(self._root_dir, basename)
             if os.path.isfile(f"{abs_basename}.json"):
                 with open(f"{abs_basename}.json", "r") as f:
                     obj = jsonpickle.decode(f.read())
@@ -358,7 +359,7 @@ class LearningSession:
                 obj = np.loadtxt(f"{abs_basename}.txt")
 
             else:
-                raise IOError("Could not find file with basename: " + abs_basename)
+                raise IOError(f"Could not find file with basename: {abs_basename}")
 
             self._cache[basename] = obj
 
@@ -371,7 +372,7 @@ class LearningSession:
         self._cache[basename] = copy.deepcopy(obj)
 
         if self._root_dir:
-            abs_basename = os.path.join(self._root_dir, basename)
+            abs_basename = Path(self._root_dir, basename)
 
             # Make sure directory exists
             os.makedirs(os.path.dirname(abs_basename), exist_ok=True)

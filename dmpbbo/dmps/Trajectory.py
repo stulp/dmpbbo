@@ -17,6 +17,7 @@
 #
 
 import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -27,7 +28,7 @@ class Trajectory:
     def __init__(self, ts, ys, yds=None, ydds=None, misc=None):
 
         n_time_steps = ts.size
-        if n_time_steps != ys.shape[0]
+        if n_time_steps != ys.shape[0]:
             raise ValueError("ys.shape[0] must have size {n_time_steps}")
         _dt_mean = np.mean(np.diff(ts))
 
@@ -40,11 +41,11 @@ class Trajectory:
         if ydds is None:
             ydds = diffnc(yds, _dt_mean)
         else:
-            if ys.shape != ydds.shape
+            if ys.shape != ydds.shape:
                 raise ValueError("ydds must have same shape as ys {ys.shape}")
 
         if misc is not None:
-            if n_time_steps != misc.shape[0]
+            if n_time_steps != misc.shape[0]:
                 raise ValueError("misc.shape[0] must have size {n_time_steps}")
 
         self._dim = 1
@@ -80,7 +81,7 @@ class Trajectory:
 
     @misc.setter
     def misc(self, new_misc):
-        if new_misc.shape[0] != self.length
+        if new_misc.shape[0] != self.length:
             raise ValueError("new_misc.shape[0] must have size {self.length}")
         self._misc = new_misc
 
@@ -318,7 +319,7 @@ class Trajectory:
     def saveToFile(self, directory, filename):
         if not os.path.exists(directory):
             os.makedirs(directory)
-        np.savetxt(directory + "/" + filename, self.asMatrix(), fmt="%1.7f")
+        np.savetxt(Path(directory,filename), self.asMatrix(), fmt="%1.7f")
 
     @staticmethod
     def readFromFile(filename, n_dims_misc=0):

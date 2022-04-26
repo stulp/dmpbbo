@@ -77,7 +77,7 @@ class DynamicalSystem(ABC):
             new_x_init Initial state of the dynamical system.
         """
         if new_x_init.size != self._dim_x:
-            raise ValueError("x_init must have size " + self._dim_x)
+            raise ValueError(f"x_init must have size {self._dim_x}")
         self._x_init = np.atleast_1d(new_x_init)
 
     @property
@@ -98,7 +98,7 @@ class DynamicalSystem(ABC):
             y_init_new Initial state of the dynamical system.
         """
         if y_init_new.size != self._dim_y:
-            raise ValueError("y_init_new must have size " + self._dim_y)
+            raise ValueError(f"y_init_new must have size {self._dim_y}")
         # Pad the end with zeros for x = [y 0]
         x_init_new = np.zeros(self._dim_x)
         x_init_new[: self._dim_y] = y_init_new

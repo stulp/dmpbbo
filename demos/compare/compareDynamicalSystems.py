@@ -33,13 +33,9 @@ from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        print("")
-        print("ERROR: Executable '" + executable + "' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1)
+        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
 
-    command = executable_name + " " + arguments
+    command = f"{executable_name} {arguments}"
     if print_command:
         print(command)
 
@@ -122,7 +118,7 @@ if __name__ == "__main__":
     n_time_steps = int(np.ceil(integration_duration / dt)) + 1
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
     ts = np.linspace(0.0, integration_duration, n_time_steps)
-    np.savetxt(os.path.join(directory, "ts.txt"), ts)
+    np.savetxt(Path(directory, "ts.txt"), ts)
 
     fig_count = 1
     for name in dyn_systems.keys():
@@ -130,33 +126,33 @@ if __name__ == "__main__":
         dyn_system = dyn_systems[name]
 
         # Save the dynamical system to a json file
-        filename_json = os.path.join(directory, name + ".json")
+        filename_json = Path(directory, name + ".json")
         saveToJSON(dyn_system, filename_json, save_for_cpp_also=True)
 
         # Call the binary, which does analyticalSolution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"
-        arguments = directory + " " + name
+        arguments = f"{directory} {name}"
         executeBinary(exec_name, arguments, True)
 
         print("===============")
         print("Python Analytical solution")
         xs, xds = dyn_system.analyticalSolution(ts)
-        xs_cpp = np.loadtxt(os.path.join(directory, "xs_analytical.txt"))
-        xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
+        xs_cpp = np.loadtxt(Path(directory, "xs_analytical.txt"))
+        xds_cpp = np.loadtxt(Path(directory, "xds_analytical.txt"))
         fig1 = plt.figure(fig_count, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
-        fig1.suptitle(name + "System - Analytical")
+        fig1.suptitle(f"{name}System - Analytical")
 
         print("===============")
         print("Python Integrating with Euler")
         xs[0, :], xds[0, :] = dyn_system.integrateStart()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
-        xs_cpp = np.loadtxt(os.path.join(directory, "xs_euler.txt"))
-        xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
+        xs_cpp = np.loadtxt(Path(directory, "xs_euler.txt"))
+        xds_cpp = np.loadtxt(Path(directory, "xds_euler.txt"))
         fig2 = plt.figure(fig_count + 1, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
-        fig2.suptitle(name + "System - Euler")
+        fig2.suptitle(f"{name}System - Euler")
 
         print("===============")
         print("Python Integrating with Runge-Kutta")
@@ -165,17 +161,17 @@ if __name__ == "__main__":
             xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
                 dt, xs[ii - 1, :]
             )
-        xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
-        xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
+        xs_cpp = np.loadtxt(Path(directory, "xs_rungekutta.txt"))
+        xds_cpp = np.loadtxt(Path(directory, "xds_rungekutta.txt"))
         fig3 = plt.figure(fig_count + 2, figsize=(10, 10))
         plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
-        fig3.suptitle(name + "System - Runge-Kutta")
+        fig3.suptitle(f"{name}System - Runge-Kutta")
 
         save_me = False
         if save_me:
-            fig1.savefig(os.path.join(directory, name + "System_analytical.png"))
-            fig2.savefig(os.path.join(directory, name + "System_euler.png"))
-            fig2.savefig(os.path.join(directory, name + "System_rungekutta.png"))
+            fig1.savefig(Path(directory, f"{name}System_analytical.png"))
+            fig2.savefig(Path(directory, f"{name}System_euler.png"))
+            fig2.savefig(Path(directory, f"{name}System_rungekutta.png"))
         fig_count += 3
 
     plt.show()

@@ -17,17 +17,10 @@
 
 
 import argparse
-import os
-import sys
 
-import matplotlib.pyplot as plt
-import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-
+from dmpbbo.DmpBboJSONEncoder import saveToJSON
 from dmpbbo.dmps.Dmp import *
 from dmpbbo.dmps.Trajectory import *
-from dmpbbo.DmpBboJSONEncoder import *
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__ == "__main__":
@@ -51,7 +44,7 @@ if __name__ == "__main__":
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
     traj.saveToFile(args.output_directory, "trajectory.txt")
-    # saveToJSON(traj,os.path.join(args.output_directory,'trajectory.json'))
+    # saveToJSON(traj,Path(args.output_directory,'trajectory.json'))
     n_dims = traj.dim
     peak_to_peak = np.ptp(traj.ys, axis=0)  # Range of data; used later on
 
@@ -70,8 +63,8 @@ if __name__ == "__main__":
         ################################################
         # Save DMP to file
 
-        filename = os.path.join(args.output_directory, f"dmp_trained_{n_bfs}.json")
-        print("Saving trained DMP to: " + filename)
+        filename = Path(args.output_directory, f"dmp_trained_{n_bfs}.json")
+        print(f"Saving trained DMP to: {filename}")
         saveToJSON(dmp, filename, save_for_cpp_also=True)
 
         ################################################
@@ -113,7 +106,7 @@ if __name__ == "__main__":
 
         # h, axs = Dmp.plotStatic(dmp.tau,ts,xs_step,xds_step)
         # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
-        # plt.gcf().savefig(os.path.join(args.output_directory,f'dmp_trained_{n_bfs}.png'))
+        # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
 
         h_demo, axs = traj.plot()
         h_repr, _ = traj_reproduced.plot(axs)
@@ -135,7 +128,7 @@ if __name__ == "__main__":
             f"Comparison demonstration/reproduced  (n_bfs={n_bfs})"
         )
         plt.gcf().savefig(
-            os.path.join(args.output_directory, f"trajectory_comparison_{n_bfs}.png")
+            Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png")
         )
         plt.legend()
 
@@ -146,7 +139,7 @@ if __name__ == "__main__":
         ax.set_xlabel("number of basis functions")
         ax.set_ylabel("mean absolute error between demonstration and reproduced")
         filename = "mean_absolute_errors.png"
-        plt.gcf().savefig(os.path.join(args.output_directory, filename))
+        plt.gcf().savefig(Path(args.output_directory, filename))
 
     if args.show:
         plt.show()

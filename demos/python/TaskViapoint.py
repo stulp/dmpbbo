@@ -15,9 +15,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -37,7 +34,7 @@ class TaskViapoint(Task):
         goal_weight=0.0,  # fff kwargs
     ):
         if goal is not None:
-            if goal.shape != viapoint.shape
+            if goal.shape != viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
 
         self.viapoint_ = viapoint
@@ -155,4 +152,4 @@ class TaskViapoint(Task):
         else:
             line_handles = []
 
-        return (line_handles, ax)
+        return line_handles, ax

@@ -17,10 +17,7 @@
 
 import os
 import subprocess
-import sys
-
-import matplotlib.pyplot as plt
-import numpy as np
+from pathlib import Path
 
 from dmpbbo.dmps.Dmp import *
 
@@ -30,13 +27,10 @@ y_floor = -0.3
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        print("")
-        print("ERROR: Executable '" + executable + "' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1)
+        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build "
+                         f"directory first.")
 
-    command = executable_name + " " + arguments
+    command = f"{executable_name} {arguments}"
     if print_command:
         print(command)
 
@@ -49,11 +43,11 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
         return run_python_simulation(dmp)
 
     elif mode == "robot_executes_dmp":
-        filename_dmp = os.path.join(directory, f"dmp_rollout.json")
-        print("Saving trained DMP to: " + filename_dmp)
+        filename_dmp = Path(directory, f"dmp_rollout.json")
+        print(f"Saving trained DMP to: {filename_dmp}")
         saveToJSON(dmp, filename_dmp, save_for_cpp_also=True)
 
-        filename_cost_vars = os.path.join(directory, "cost_vars.txt")
+        filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_dmp} {filename_cost_vars}"
         executeBinary("./robotExecuteDmp", arguments)
 
@@ -67,10 +61,10 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
         (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution(ts)
         traj = dmp.statesAsTrajectory(ts, xs, xds)
 
-        filename_traj = os.path.join(directory, "robot_trajectory.txt")
+        filename_traj = Path(directory, "robot_trajectory.txt")
         traj.saveToFile(".", filename_traj)
 
-        filename_cost_vars = os.path.join(directory, "cost_vars.txt")
+        filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_traj} {filename_cost_vars}"
         executeBinary("./robotExecuteTrajectory", arguments)
 

@@ -16,11 +16,8 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import os
-import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
 
 from dmpbbo.DmpBboJSONEncoder import *
 
@@ -44,7 +41,7 @@ if __name__ == "__main__":
     task.plotRollout(cost_vars, ax)
 
     filename = "plotRollout.png"
-    print("Saving to file: " + filename)
+    print(f"Saving to file: {filename}")
     fig.savefig(filename)
 
     plt.show()

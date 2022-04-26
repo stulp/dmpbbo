@@ -16,8 +16,8 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
 import sys
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
         cur_directory = None
         if directory:
-            cur_directory = os.path.join(directory, name)
+            cur_directory = Path(directory, name)
 
         session = runOptimization(
             cost_function,
@@ -92,6 +92,6 @@ if __name__ == "__main__":
             cur_directory,
         )
         fig = session.plot()
-        fig.canvas.set_window_title("Optimization with covar_update=" + name)
+        fig.canvas.set_window_title(f"Optimization with covar_update={name}")
 
     plt.show()

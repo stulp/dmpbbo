@@ -143,9 +143,7 @@ class FunctionApproximator(Parameterizable):
         elif self.dim_input() == 2:
             return fig.add_subplot(111, projection=Axes3D.name)
         else:
-            raise ValueError(
-                f"Cannot create axis with dim_input() = {self.dim_input()}" + "."
-            )
+            raise ValueError(f"Cannot create axis with dim_input = {self.dim_input()}")
 
     @staticmethod
     def _getGrid(inputs_min, inputs_max, n_samples_per_dim=None):

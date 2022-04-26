@@ -50,7 +50,7 @@ class ExponentialSystem(DynamicalSystem):
         Note that for an ExponentialSystem y is equivalent to x.
         """
         if y.size != self._dim_y:
-            raise ValueError("y_attr must have size " + self._dim_y)
+            raise ValueError(f"y_attr must have size {self._dim_y}")
         self._x_attr = np.atleast_1d(y)
 
     @property
@@ -68,7 +68,7 @@ class ExponentialSystem(DynamicalSystem):
         Note that for an ExponentialSystem y is equivalent to x.
         """
         if x.size != self._dim_x:
-            raise ValueError("y_attr must have size " + self._dim_x)
+            raise ValueError(f"y_attr must have size {self._dim_x}")
         self._x_attr = np.atleast_1d(x)
 
     def differentialEquation(self, x):

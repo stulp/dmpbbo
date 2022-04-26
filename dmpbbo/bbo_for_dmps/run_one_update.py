@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from dmpbbo.bbo_for_dmpsLearningSessionTask import *
+from dmpbbo.bbo_for_dmps.LearningSessionTask import *
 
 
 def runOptimizationTaskPrepare(
@@ -77,7 +77,7 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
 def runOptimizationTaskOneUpdate(session, i_update):
 
     print("======================================================")
-    print(f"i_update = {i_update)}"
+    print(f"i_update = {i_update}")
 
     print("EVALUATING ROLLOUTS")
     costs_per_sample = []

@@ -34,15 +34,15 @@ if __name__ == "__main__":
     parser.add_argument("directory", help="directory to write results to")
     args = parser.parse_args()
 
-    filename = os.path.join(args.directory, "task.json")
+    filename = Path(args.directory, "task.json")
     with open(filename, "r") as f:
         task = jsonpickle.decode(f.read())
 
-    filename = os.path.join(args.directory, "distribution_initial.json")
+    filename = Path(args.directory, "distribution_initial.json")
     with open(filename, "r") as f:
         distribution_init = jsonpickle.decode(f.read())
 
-    filename = os.path.join(args.directory, "dmp_initial.json")
+    filename = Path(args.directory, "dmp_initial.json")
     with open(filename, "r") as f:
         dmp = jsonpickle.decode(f.read())
 

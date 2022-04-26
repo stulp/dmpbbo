@@ -100,7 +100,7 @@ class DistributionGaussian:
         Returns:
             A string representation of an object of this class.
         """
-        return f"N( {self.mean}, {self.covar}" + " )"
+        return f"N( {self.mean}, {self.covar})"
 
     def plot(self, ax=None):
         if not ax:

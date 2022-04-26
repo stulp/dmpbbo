@@ -141,7 +141,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system = TimeSystem(tau, count_down)
 
         else:
-            raise ValueError("Unknown dmp_type: " + dmp_type)
+            raise ValueError(f"Unknown dmp_type: {dmp_type}")
 
         alpha_spring_damper = 20.0
         dmp = cls(
@@ -450,7 +450,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         n_time_steps = trajectory.ts.size
         dim_data = trajectory.dim
-        if self.dim_dmp() != dim_data
+        if self.dim_dmp() != dim_data:
             raise ValueError("dims of trajectory data and dmp must be the same")
 
         (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analyticalSolution(
@@ -528,7 +528,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         )
 
     def set_initial_state(self, y_init_new):
-        if y_init_new.size != self.dim_dmp()
+        if y_init_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
         self._y_init = y_init_new
 

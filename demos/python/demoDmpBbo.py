@@ -18,14 +18,12 @@
 
 import sys
 
-import matplotlib.pyplot as plt
-
-from dmpbbo.bbo.updaters import *
-from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.bbo_for_dmps.runOptimizationTask import runOptimizationTask
-from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 from TaskViapoint import TaskViapoint
+from dmpbbo.bbo.updaters import *
+from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.bbo_for_dmps.runOptimizationTask import runOptimizationTask
+from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
 def runDemo(directory, n_dims):
@@ -119,7 +117,7 @@ def runDemo(directory, n_dims):
         directory,
     )
     fig = session.plot()
-    fig.canvas.set_window_title("Optimization with covar_update=" + covar_update)
+    fig.canvas.set_window_title(f"Optimization with covar_update={covar_update}")
 
 
 if __name__ == "__main__":

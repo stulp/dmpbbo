@@ -31,13 +31,9 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        print("")
-        print("ERROR: Executable '" + executable + "' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1)
+        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
 
-    command = executable_name + " " + arguments
+    command = f"{executable_name} {arguments}"
     if print_command:
         print(command)
 
@@ -140,19 +136,19 @@ def train(fa_name, n_dims):
 
     # Save the dynamical system to a json file
     basename = f"{fa_name}_{n_dims}D"
-    filename_json = directory + "/" + f"{basename}.json"
+    filename_json = Path(directory,f"{basename}.json")
     save_for_cpp = True
     saveToJSON(fa, filename_json, save_for_cpp_also=True)
 
     # Save the inputs to a directory
-    np.savetxt(directory + "/" + f"{basename}_inputs.txt", inputs_grid)
+    np.savetxt(Path(directory,f"{basename}_inputs.txt", inputs_grid))
 
     # Call the binary, which does analyticalSolution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     executeBinary(exec_name, arguments, True)
 
-    outputs_grid_cpp = np.loadtxt(directory + "/" + f"{basename}_outputs.txt")
+    outputs_grid_cpp = np.loadtxt(Path(directory,f"{basename}_outputs.txt"))
 
     h_pyt, ax = fa.plot(inputs, targets=targets)
 
@@ -166,7 +162,7 @@ def train(fa_name, n_dims):
             inputs_0_on_grid, inputs_1_on_grid, outputs_on_grid, rstride=1, cstride=1
         )
     else:
-        print("Cannot plot input data with a dimensionality of " + n_dims + ".")
+        print(f"Cannot plot input data with a dimensionality of {n_dims}")
 
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
@@ -175,7 +171,7 @@ def train(fa_name, n_dims):
 
     save_me = False
     if save_me:
-        fig.savefig(os.path.join(directory, f"{basename}.png"))
+        fig.savefig(Path(directory, f"{basename}.png"))
 
 
 if __name__ == "__main__":

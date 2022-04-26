@@ -16,14 +16,11 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import inspect
 import os
-import sys
+from pathlib import Path
 
-import jsonpickle
-
-from dmpbbo.DmpBboJSONEncoder import *
 from TaskThrowBall import TaskThrowBall
+from dmpbbo.DmpBboJSONEncoder import *
 
 if __name__ == "__main__":
 
@@ -40,8 +37,8 @@ if __name__ == "__main__":
 
     # Save the task instance itself
     os.makedirs(args.directory, exist_ok=True)
-    filename = os.path.join(args.directory, args.filename)
-    print('  * Saving task to file "' + filename + "'")
+    filename = Path(args.directory, args.filename)
+    print(f"  * Saving task to file {filename}")
     json = jsonpickle.encode(task)
     with open(filename, "w") as text_file:
         text_file.write(json)

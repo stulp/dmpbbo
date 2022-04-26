@@ -32,13 +32,9 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        print("")
-        print("ERROR: Executable '" + executable + "' does not exist.")
-        print("Please call 'make install' in the build directory first.")
-        print("")
-        sys.exit(-1)
+        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
 
-    command = executable_name + " " + arguments
+    command = f"{executable_name} {arguments}"
     if print_command:
         print(command)
 

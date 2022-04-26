@@ -61,7 +61,7 @@ class SpringDamperSystem(DynamicalSystem):
         """ Set the y part of the attractor state, where x = [y z]
         """
         if new_y_attr.size != self._dim_y:
-            raise ValueError("y_attr must have size " + self._dim_y)
+            raise ValueError(f"y_attr must have size {self._dim_y}")
         self._y_attr = np.atleast_1d(new_y_attr)
 
     def differentialEquation(self, x):

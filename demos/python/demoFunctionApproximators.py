@@ -16,8 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import matplotlib.pyplot as plt
-
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
