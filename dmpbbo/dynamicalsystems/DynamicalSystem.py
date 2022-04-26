@@ -160,8 +160,8 @@ class DynamicalSystem(ABC):
         Returns:    
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
-        assert dt > 0.0
-        assert x.size == self._dim_x
+        if x.size != self._dim_x:
+            raise ValueError("x must have size {self._dim_x}")
         xd_updated = self.differentialEquation(x)
         x_updated = x + dt * xd_updated
         return x_updated, xd_updated
@@ -180,8 +180,8 @@ class DynamicalSystem(ABC):
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
 
-        assert dt > 0.0
-        assert x.size == self._dim_x
+        if x.size != self._dim_x:
+            raise ValueError("x must have size {self._dim_x}")
 
         k1 = self.differentialEquation(x)
         input_k2 = x + dt * 0.5 * k1

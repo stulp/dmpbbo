@@ -450,7 +450,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         n_time_steps = trajectory.ts.size
         dim_data = trajectory.dim
-        assert self.dim_dmp() == dim_data
+        if self.dim_dmp() != dim_data
+            raise ValueError("dims of trajectory data and dmp must be the same")
 
         (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analyticalSolution(
             trajectory.ts
@@ -465,8 +466,6 @@ class Dmp(DynamicalSystem, Parameterizable):
         damping_coefficient = self._spring_system._damping_coefficient
         spring_constant = self._spring_system._spring_constant
         mass = self._spring_system._mass
-        # Usually, spring-damper system of the DMP should have mass==1
-        assert mass == 1.0
 
         # Compute inverse
         tau = self._tau
@@ -529,7 +528,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         )
 
     def set_initial_state(self, y_init_new):
-        assert y_init_new.size == self.dim_dmp()
+        if y_init_new.size != self.dim_dmp()
+            raise ValueError("y_init must have same size {self.dim_dmp()}")
         self._y_init = y_init_new
 
         # Set value in all relevant subsystems also
@@ -538,7 +538,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             self._goal_system.y_init = y_init_new
 
     def set_attractor_state(self, y_attr_new):
-        assert y_attr_new.size == self.dim_dmp()
+        if y_attr_new.size != self.dim_dmp():
+            raise ValueError("y_init must have same size {self.dim_dmp()}")
+        
         self._y_attr = y_attr_new
 
         # Set value in all relevant subsystems also
@@ -573,7 +575,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def setParamVector(self, values):
         size = self.getParamVectorSize()
-        assert len(values) == size
+        if len(values) != size:
+            raise ValueError("values must have size {size}")
         offset = 0
         for fa in self._function_approximators:
             if fa.isTrained():

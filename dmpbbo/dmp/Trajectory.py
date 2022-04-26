@@ -27,21 +27,25 @@ class Trajectory:
     def __init__(self, ts, ys, yds=None, ydds=None, misc=None):
 
         n_time_steps = ts.size
-        assert n_time_steps == ys.shape[0]
+        if n_time_steps != ys.shape[0]
+            raise ValueError("ys.shape[0] must have size {n_time_steps}")
         _dt_mean = np.mean(np.diff(ts))
 
         if yds is None:
             yds = diffnc(ys, _dt_mean)
         else:
-            assert ys.shape == yds.shape
+            if ys.shape != yds.shape:
+                raise ValueError("yds must have same shape as ys {ys.shape}")
 
         if ydds is None:
             ydds = diffnc(yds, _dt_mean)
         else:
-            assert ys.shape == ydds.shape
+            if ys.shape != ydds.shape
+                raise ValueError("ydds must have same shape as ys {ys.shape}")
 
         if misc is not None:
-            assert n_time_steps == misc.shape[0]
+            if n_time_steps != misc.shape[0]
+                raise ValueError("misc.shape[0] must have size {n_time_steps}")
 
         self._dim = 1
         if ys.ndim == 2:
@@ -76,7 +80,8 @@ class Trajectory:
 
     @misc.setter
     def misc(self, new_misc):
-        assert new_misc.shape[0] == self._ts.shape[0]
+        if new_misc.shape[0] != self.length
+            raise ValueError("new_misc.shape[0] must have size {self.length}")
         self._misc = new_misc
 
     @property
@@ -121,7 +126,8 @@ class Trajectory:
         if self._ts.size == 0:
             return
 
-        assert fro < to
+        if fro >= to:
+            raise ValueError("fro >= to does not hold (not {fro} >= {to})")
 
         if as_times:
             if fro > self._ts[-1]:

@@ -37,7 +37,8 @@ class TaskViapoint(Task):
         goal_weight=0.0,  # fff kwargs
     ):
         if goal is not None:
-            assert goal.shape == viapoint.shape
+            if goal.shape != viapoint.shape
+                raise ValueError("goal and viapoint must have the same shape")
 
         self.viapoint_ = viapoint
         self.viapoint_time_ = viapoint_time
