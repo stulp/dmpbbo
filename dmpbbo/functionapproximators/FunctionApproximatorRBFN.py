@@ -17,12 +17,10 @@
 
 import os, sys
 
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.FunctionApproximator import FunctionApproximator
-from functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
-from functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
+from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
+from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximatorRBFN(FunctionApproximator):
@@ -50,7 +48,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         # Determine the centers and widths of the basis functions, given the input data range
         n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
         n_bfs = np.prod(n_bfs_per_dim)
-        
+
         height = meta_params["intersection_height"]
         centers, widths = Gaussian.getCentersAndWidths(inputs, n_bfs_per_dim, height)
         model_params = {"centers": centers, "widths": widths}
@@ -64,7 +62,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         fa_lws = FunctionApproximatorWLS(wls_meta_params)
         wls_model_params = fa_lws._train(activations, targets, wls_meta_params)
 
-        model_params["weights"] = wls_model_params['slope'].reshape(n_bfs, -1)
+        model_params["weights"] = wls_model_params["slope"].reshape(n_bfs, -1)
 
         return model_params
 

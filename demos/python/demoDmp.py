@@ -21,11 +21,9 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp.Dmp import *
-from functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.dmp.Dmp import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__ == "__main__":
 

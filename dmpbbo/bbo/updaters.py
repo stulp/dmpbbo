@@ -22,10 +22,8 @@ import math
 import os
 from abc import ABC, abstractmethod
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 
 
 class Updater(ABC):

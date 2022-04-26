@@ -22,14 +22,9 @@ import matplotlib.pyplot as plt
 import os, sys
 import argparse
 
-lib_path = os.path.abspath("../")
-sys.path.append(lib_path)
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
-
-from functionapproximators.functionapproximators_plotting import *
-from functionapproximators.leastSquares import *
+from dmpbbo.functionapproximators.functionapproximators_plotting import *
+from dmpbbo.functionapproximators.leastSquares import *
 
 
 def runLeastSquaresDemo(n_dims, use_offset, regularization, directory, figure_number):

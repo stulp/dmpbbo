@@ -28,17 +28,12 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os, sys
 
-lib_path = os.path.abspath("../")
-sys.path.append(lib_path)
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 
-from functionapproximators.FunctionApproximatorLWR import *
-
-from dmp.Dmp import *
-from dmp.Trajectory import *
-from dmp.dmp_plotting import *
+from dmpbbo.dmp.Dmp import *
+from dmpbbo.dmp.Trajectory import *
+from dmpbbo.dmp.dmp_plotting import *
 
 
 def getDemoTrajectory(ts):

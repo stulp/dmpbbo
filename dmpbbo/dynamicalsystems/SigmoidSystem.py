@@ -21,10 +21,8 @@ import sys
 
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem  #
+from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem  #
 
 
 class SigmoidSystem(DynamicalSystem):
@@ -51,7 +49,7 @@ class SigmoidSystem(DynamicalSystem):
             new_tau - Time constant
         """
         self._tau = new_tau
-        self._Ks_cached = None # Forces recomputing Ks
+        self._Ks_cached = None  # Forces recomputing Ks
 
     @DynamicalSystem.x_init.setter
     def x_init(self, new_x_init):
@@ -63,7 +61,7 @@ class SigmoidSystem(DynamicalSystem):
         if new_x_init.size != self._dim_x:
             raise ValueError("x_init must have size " + self._dim_x)
         self._x_init = new_x_init
-        self._Ks_cached = None # Forces recomputing Ks
+        self._Ks_cached = None  # Forces recomputing Ks
 
     @DynamicalSystem.y_init.setter
     def y_init(self, new_y_init):
@@ -75,7 +73,7 @@ class SigmoidSystem(DynamicalSystem):
         Note that for an ExponentialSystem y is equivalent to x.
         """
         self.x_init = new_y_init
-        self._Ks_cached = None # Forces recomputing Ks
+        self._Ks_cached = None  # Forces recomputing Ks
 
     def differentialEquation(self, x):
         """ The differential equation which defines the system.

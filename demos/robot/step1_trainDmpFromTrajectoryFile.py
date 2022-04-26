@@ -22,14 +22,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import os, sys
 import argparse
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp.Dmp import *
-from dmp.Trajectory import *
-from functionapproximators.FunctionApproximatorRBFN import *
-from functionapproximators.FunctionApproximatorLWR import *
-from DmpBboJSONEncoder import *
+from dmpbbo.dmp.Dmp import *
+from dmpbbo.dmp.Trajectory import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+from dmpbbo.DmpBboJSONEncoder import *
 
 if __name__ == "__main__":
 
@@ -51,8 +49,8 @@ if __name__ == "__main__":
 
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
-    traj.saveToFile(args.output_directory,'trajectory.txt')
-    #saveToJSON(traj,os.path.join(args.output_directory,'trajectory.json'))
+    traj.saveToFile(args.output_directory, "trajectory.txt")
+    # saveToJSON(traj,os.path.join(args.output_directory,'trajectory.json'))
     n_dims = traj.dim
     peak_to_peak = np.ptp(traj.ys, axis=0)  # Range of data; used later on
 

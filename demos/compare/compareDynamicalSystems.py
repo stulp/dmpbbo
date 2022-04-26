@@ -23,14 +23,12 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dynamicalsystems.ExponentialSystem import ExponentialSystem
-from dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
-from dynamicalsystems.TimeSystem import TimeSystem
-from DmpBboJSONEncoder import *
+from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
+from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
+from dmpbbo.DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -133,7 +131,7 @@ if __name__ == "__main__":
         dyn_system = dyn_systems[name]
 
         # Save the dynamical system to a json file
-        filename_json = os.path.join(directory,name + ".json")
+        filename_json = os.path.join(directory, name + ".json")
         saveToJSON(dyn_system, filename_json, save_for_cpp_also=True)
 
         # Call the binary, which does analyticalSolution and integration in C++

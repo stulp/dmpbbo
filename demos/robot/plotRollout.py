@@ -23,10 +23,7 @@ import argparse
 import matplotlib.pyplot as plt
 
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
-
-from DmpBboJSONEncoder import *
+from dmpbbo.DmpBboJSONEncoder import *
 
 if __name__ == "__main__":
 

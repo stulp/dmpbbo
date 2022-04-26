@@ -21,10 +21,8 @@ import sys
 
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem
+from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
 class ExponentialSystem(DynamicalSystem):

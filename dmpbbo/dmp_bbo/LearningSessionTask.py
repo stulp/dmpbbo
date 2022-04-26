@@ -26,12 +26,9 @@ from pylab import mean
 import inspect
 
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
-
-from DmpBboJSONEncoder import *
-from bbo.DistributionGaussian import DistributionGaussian
-from bbo.LearningSession import *
+from dmpbbo.DmpBboJSONEncoder import *
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.LearningSession import *
 
 
 class LearningSessionTask(LearningSession):
@@ -55,7 +52,7 @@ class LearningSessionTask(LearningSession):
                 basename = self.getBaseName(name, i_update, i_sample)
                 abs_basename = os.path.join(self._root_dir, basename)
                 filename = abs_basename + ".json"
-                saveToJSON(obj, filename, save_for_cpp_also = True)
+                saveToJSON(obj, filename, save_for_cpp_also=True)
 
         filename = super().tell(obj, name, i_update, i_sample)
         return filename
@@ -95,7 +92,7 @@ class LearningSessionTask(LearningSession):
                 lines_eval, _ = task.plotRollout(cost_vars, ax)
             else:
                 lines_eval = ax.plot(cost_vars)
-                if not isinstance(lines_eval,list):
+                if not isinstance(lines_eval, list):
                     lines_eval = [lines_eval]
             plt.setp(lines_eval, color="#3333ff", linewidth=3)
 

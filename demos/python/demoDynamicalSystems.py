@@ -23,13 +23,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Include scripts for plotting
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dynamicalsystems.ExponentialSystem import ExponentialSystem
-from dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
-from dynamicalsystems.TimeSystem import TimeSystem
+from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
+from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
 def set_style(lines, label):

@@ -20,10 +20,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
 
-from dmp_bbo.Task import Task
+from dmpbbo.dmp_bbo.Task import Task
 
 
 class TaskViapoint(Task):
@@ -36,7 +34,7 @@ class TaskViapoint(Task):
         goal_time=None,
         viapoint_weight=1.0,
         acceleration_weight=0.0001,
-        goal_weight=0.0, # fff kwargs
+        goal_weight=0.0,  # fff kwargs
     ):
         if goal is not None:
             assert goal.shape == viapoint.shape

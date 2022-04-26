@@ -20,10 +20,8 @@ import sys
 import copy
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp_bbo.TaskSolver import TaskSolver
+from dmpbbo.dmp_bbo.TaskSolver import TaskSolver
 
 
 class TaskSolverDmp(TaskSolver):

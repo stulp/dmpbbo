@@ -21,22 +21,19 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add relative path, in case PYTHONPATH is not set
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.FunctionApproximatorLWR import *
-from functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
-from bbo.DistributionGaussian import DistributionGaussian
-from bbo.updaters import *
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.updaters import *
 
-from dmp.Dmp import Dmp
+from dmpbbo.dmp.Dmp import Dmp
 
-from dmp_bbo.Task import Task
-from dmp_bbo.TaskSolver import TaskSolver
-from dmp_bbo.TaskSolverDmp import TaskSolverDmp
-from dmp_bbo.run_one_update import *
+from dmpbbo.dmp_bbo.Task import Task
+from dmpbbo.dmp_bbo.TaskSolver import TaskSolver
+from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.dmp_bbo.run_one_update import *
 
 from TaskViapoint import TaskViapoint
 

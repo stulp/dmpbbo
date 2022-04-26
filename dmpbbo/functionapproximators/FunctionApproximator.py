@@ -22,11 +22,9 @@ import warnings
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.Parameterizable import Parameterizable
-from functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.Parameterizable import Parameterizable
+from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximator(Parameterizable):
@@ -229,7 +227,7 @@ class FunctionApproximator(Parameterizable):
         activations = self._getActivations(inputs, self._model_params)
         if activations is None:
             return None
-            
+
         ax = kwargs.get("ax") or self._getAxis()
 
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)

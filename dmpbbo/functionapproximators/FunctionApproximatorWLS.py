@@ -17,11 +17,9 @@
 
 import os, sys
 
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.FunctionApproximator import FunctionApproximator
-from functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
+from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximatorWLS(FunctionApproximator):
@@ -47,9 +45,9 @@ class FunctionApproximatorWLS(FunctionApproximator):
         regularization = meta_params["regularization"]
 
         n_samples = targets.size
-        
-        inputs = inputs.reshape(n_samples,-1)
-        
+
+        inputs = inputs.reshape(n_samples, -1)
+
         # Make the design matrix
         if use_offset:
             # Add a column with 1s
@@ -58,12 +56,12 @@ class FunctionApproximatorWLS(FunctionApproximator):
             X = inputs
 
         # Weights matrix
-        weights = kwargs.get("weights",None)
+        weights = kwargs.get("weights", None)
         if weights is None:
             W = np.eye(n_samples)
         else:
             W = np.diagflat(weights)
-            
+
         # Regularization matrix
         n_dims_X = X.shape[1]
         Gamma = regularization * np.identity(n_dims_X)
@@ -84,21 +82,21 @@ class FunctionApproximatorWLS(FunctionApproximator):
             model_params = {"slope": beta[:-1], "offset": beta[-1]}
         else:
             model_params = {"slope": beta}
-        
+
         return model_params
 
     @staticmethod
     def _getActivations(inputs, model_params):
         return None
-        
+
     @staticmethod
     def _predict(inputs, model_params):
-        
+
         # Ensure ndims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
-        
+
         slope = model_params["slope"]
-        offset = model_params.get("offset",0.0)
+        offset = model_params.get("offset", 0.0)
 
         # Apparently, not everybody has python3.5 installed, so don't use @
         # lines[:,i_line] =  inputs@slopes[i_line,:].T + offsets[i_line]

@@ -20,11 +20,9 @@ import os
 import sys
 import argparse
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
 
-from dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
-from dmp_bbo.LearningSessionTask import *
+from dmpbbo.dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
+from dmpbbo.dmp_bbo.LearningSessionTask import *
 
 if __name__ == "__main__":
 

@@ -23,12 +23,10 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.FunctionApproximatorLWR import *
-from functionapproximators.FunctionApproximatorRBFN import *
-from DmpBboJSONEncoder import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):
@@ -144,7 +142,7 @@ def train(fa_name, n_dims):
     # Save the dynamical system to a json file
     basename = fa_name + "_" + str(n_dims) + "D"
     filename_json = directory + "/" + basename + ".json"
-    save_for_cpp=True
+    save_for_cpp = True
     saveToJSON(fa, filename_json, save_for_cpp_also=True)
 
     # Save the inputs to a directory

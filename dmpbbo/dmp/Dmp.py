@@ -21,20 +21,18 @@ import sys
 import os
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp.Trajectory import Trajectory
+from dmpbbo.dmp.Trajectory import Trajectory
 
-from functionapproximators.Parameterizable import Parameterizable
+from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
-from dynamicalsystems.DynamicalSystem import DynamicalSystem
-from dynamicalsystems.ExponentialSystem import ExponentialSystem
-from dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dynamicalsystems.TimeSystem import TimeSystem
-from dynamicalsystems.SpringDamperSystem import SpringDamperSystem
+from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
+from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
+from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 
-from DmpBboJSONEncoder import *
+from dmpbbo.DmpBboJSONEncoder import *
 
 
 class Dmp(DynamicalSystem, Parameterizable):

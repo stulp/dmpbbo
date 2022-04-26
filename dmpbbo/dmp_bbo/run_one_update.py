@@ -25,13 +25,11 @@ import inspect
 import jsonpickle
 from glob import glob
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from DmpBboJSONEncoder import *
-from dmp_bbo.Task import Task
-from dmp_bbo.LearningSessionTask import *
-from bbo.DistributionGaussian import *
+from dmpbbo.DmpBboJSONEncoder import *
+from dmpbbo.dmp_bbo.Task import Task
+from dmpbbo.dmp_bbo.LearningSessionTask import *
+from dmpbbo.bbo.DistributionGaussian import *
 
 
 def runOptimizationTaskPrepare(

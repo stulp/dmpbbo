@@ -22,13 +22,11 @@ import matplotlib.pyplot as plt
 import os, sys, subprocess
 
 # Include scripts for plotting
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.BasisFunction import *
-from functionapproximators.FunctionApproximatorWLS import *
-from functionapproximators.FunctionApproximatorLWR import *
-from functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.FunctionApproximatorWLS import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
 def targetFunction(n_samples_per_dim):

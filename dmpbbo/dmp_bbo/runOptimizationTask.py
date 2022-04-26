@@ -23,10 +23,8 @@ import sys
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp_bbo.LearningSessionTask import *
+from dmpbbo.dmp_bbo.LearningSessionTask import *
 
 
 def runOptimizationTask(

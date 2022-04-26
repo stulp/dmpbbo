@@ -21,10 +21,8 @@ import math
 import os
 import sys
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from bbo.LearningSession import LearningSession
+from dmpbbo.bbo.LearningSession import LearningSession
 
 
 def runOptimization(

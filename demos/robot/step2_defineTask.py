@@ -23,10 +23,7 @@ import argparse
 import inspect
 
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
-
-from DmpBboJSONEncoder import *
+from dmpbbo.DmpBboJSONEncoder import *
 
 from TaskThrowBall import TaskThrowBall
 

@@ -21,14 +21,11 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Add relative path, in case PYTHONPATH is not set
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from bbo.CostFunction import CostFunction
-from bbo.DistributionGaussian import DistributionGaussian
-from bbo.updaters import UpdaterCovarDecay
-from bbo.runOptimization import runOptimization
+from dmpbbo.bbo.CostFunction import CostFunction
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.updaters import UpdaterCovarDecay
+from dmpbbo.bbo.runOptimization import runOptimization
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):

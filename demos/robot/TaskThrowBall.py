@@ -3,10 +3,8 @@ import sys
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
 
-from dmp_bbo.Task import Task
+from dmpbbo.dmp_bbo.Task import Task
 
 
 class TaskThrowBall(Task):

@@ -19,10 +19,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os, sys, subprocess
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from dmp.Dmp import *
+from dmpbbo.dmp.Dmp import *
 
 y_floor = -0.3
 
@@ -140,8 +138,8 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
 
 if __name__ == "__main__":
-    from functionapproximators.FunctionApproximatorRBFN import *
-    from functionapproximators.FunctionApproximatorLWR import *
+    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+    from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 
     from TaskThrowBall import TaskThrowBall
 

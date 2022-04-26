@@ -23,16 +23,13 @@ import argparse
 import inspect
 
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
-
 from TaskThrowBall import TaskThrowBall
 
-from DmpBboJSONEncoder import *
+from dmpbbo.DmpBboJSONEncoder import *
 
-from bbo.updaters import *
-from bbo.DistributionGaussian import DistributionGaussian
-from dmp_bbo.run_one_update import *
+from dmpbbo.bbo.updaters import *
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.dmp_bbo.run_one_update import *
 
 if __name__ == "__main__":
 

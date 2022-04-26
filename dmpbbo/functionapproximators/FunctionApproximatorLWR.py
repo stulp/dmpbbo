@@ -18,12 +18,10 @@
 import os, sys
 from mpl_toolkits.mplot3d import Axes3D
 
-lib_path = os.path.abspath("../../../python/")
-sys.path.append(lib_path)
 
-from functionapproximators.FunctionApproximator import FunctionApproximator
-from functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
-from functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
+from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
+from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximatorLWR(FunctionApproximator):
@@ -58,18 +56,20 @@ class FunctionApproximatorLWR(FunctionApproximator):
         reg = meta_params["regularization"]
         wls_meta_params = {"regularization": reg, "use_offset": True}
         fa_lws = FunctionApproximatorWLS(wls_meta_params)
-        
+
         # Perform one weighted least squares regression for each kernel
         activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
         for i_kernel in range(n_bfs):
 
-            # Do one weighted least-squares with the current weights 
+            # Do one weighted least-squares with the current weights
             weights = activations[:, i_kernel]
-            wls_model_params = fa_lws._train(inputs,targets,wls_meta_params,weights=weights)
-            
-            slopes[i_kernel, :] = wls_model_params['slope']
-            offsets[i_kernel] = wls_model_params['offset']
-            
+            wls_model_params = fa_lws._train(
+                inputs, targets, wls_meta_params, weights=weights
+            )
+
+            slopes[i_kernel, :] = wls_model_params["slope"]
+            offsets[i_kernel] = wls_model_params["offset"]
+
         model_params["offsets"] = offsets
         model_params["slopes"] = slopes
 

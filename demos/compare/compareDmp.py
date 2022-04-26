@@ -25,12 +25,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Include scripts for plotting
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
-from DmpBboJSONEncoder import *
-from dmp.Dmp import *
-from functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.DmpBboJSONEncoder import *
+from dmpbbo.dmp.Dmp import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):

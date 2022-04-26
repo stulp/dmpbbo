@@ -22,15 +22,13 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../python/")
-sys.path.append(lib_path)
 
 from performRollouts import *
 from TaskThrowBall import *
 
-from DmpBboJSONEncoder import *
+from dmpbbo.DmpBboJSONEncoder import *
 
-from bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 
 if __name__ == "__main__":
 

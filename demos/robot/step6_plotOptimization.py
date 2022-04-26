@@ -22,12 +22,10 @@ import argparse
 import numpy as np
 import matplotlib.pyplot as plt
 
-lib_path = os.path.abspath("../../python")
-sys.path.append(lib_path)
 
-from dmp_bbo.Task import Task
-from dmp_bbo.run_one_update import *
-from dmp_bbo.LearningSessionTask import *
+from dmpbbo.dmp_bbo.Task import Task
+from dmpbbo.dmp_bbo.run_one_update import *
+from dmpbbo.dmp_bbo.LearningSessionTask import *
 
 if __name__ == "__main__":
 
