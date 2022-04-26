@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from dmpbbo.dmp.Trajectory import *
+from dmpbbo.dmps.Trajectory import *
 
 if __name__ == "__main__":
 

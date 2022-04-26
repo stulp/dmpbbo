@@ -21,7 +21,7 @@ import sys
 import matplotlib.pyplot as plt
 
 from dmpbbo.bbo.updaters import *
-from dmpbbo.dmp.Dmp import Dmp
+from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmp_bbo.runOptimizationTask import runOptimizationTask
 from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *

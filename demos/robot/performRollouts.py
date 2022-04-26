@@ -22,7 +22,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.dmp.Dmp import *
+from dmpbbo.dmps.Dmp import *
 
 y_floor = -0.3
 

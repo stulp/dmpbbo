@@ -19,7 +19,7 @@
 import sys
 
 from dmpbbo.bbo.updaters import *
-from dmpbbo.dmp.Dmp import Dmp
+from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmp_bbo.run_one_update import *
 from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *

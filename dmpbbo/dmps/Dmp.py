@@ -18,7 +18,7 @@
 
 import matplotlib.pyplot as plt
 
-from dmpbbo.dmp.Trajectory import Trajectory
+from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem

@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from dmpbbo.dmp.Dmp import *
+from dmpbbo.dmps.Dmp import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__ == "__main__":

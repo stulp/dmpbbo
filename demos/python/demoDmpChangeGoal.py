@@ -30,9 +30,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 
-from dmpbbo.dmp.Dmp import *
-from dmpbbo.dmp.dmp_plotting import *
-from dmpbbo.dmp.Trajectory import *
+from dmpbbo.dmps.Dmp import *
+from dmpbbo.dmps.dmp_plotting import *
+from dmpbbo.dmps.Trajectory import *
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 
 
