@@ -145,13 +145,10 @@ class UpdaterCovarAdaptation(Updater):
         """ Constructor
         
         Args:
-            eliteness The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
-        
-        Args:
-            weighting_method ('PI-BB' = PI^2 style weighting)
-        
-        Args:
-            base_level: Small covariance matrix that is added after each update to avoid premature convergence
+            eliteness: The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
+            weighting_method: ('PI-BB' = PI^2 style weighting)
+            diagonal_max: Max eigen value allowed along diagonals
+            diagonal_min: Small covariance matrix that is added after each update to avoid premature convergence
             diag_only: Update only the diagonal of the covariance matrix (true) or the full matrix (false)
             learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0] with 0.0 = no updating,
             1.0  = complete update by ignoring previous covar matrix.
@@ -241,14 +238,10 @@ def costsToWeights(costs, weighting_method, eliteness):
     """ Convert costs into weights using different weighting methods.
     
         Args:
-            costs A vector of costs.
-    
-        Args:
-            weighting_method The weighting method ('PI-BB','CMA-ES','CEM')
-    
-        Args:
-            eliteness The eliteness parameter (h in PI-BB, mu in CMA-ES)
-    Returns:
+            costs: A vector of costs.
+            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM')
+            eliteness: The eliteness parameter (h in PI-BB, mu in CMA-ES)
+        Returns:
             A vector of weights (they always sum to 1).
     """
 

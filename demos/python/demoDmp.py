@@ -16,12 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os, sys
-
-
 from dmpbbo.dmp.Dmp import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 

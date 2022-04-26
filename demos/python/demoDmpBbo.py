@@ -16,26 +16,16 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
 import sys
-import numpy as np
+
 import matplotlib.pyplot as plt
 
-
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
-
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.updaters import *
-
 from dmpbbo.dmp.Dmp import Dmp
-
-from dmpbbo.dmp_bbo.Task import Task
-from dmpbbo.dmp_bbo.TaskSolver import TaskSolver
 from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmp_bbo.runOptimizationTask import runOptimizationTask
-
-from TaskViapoint import TaskViapoint
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
 def runDemo(directory, n_dims):
@@ -108,7 +98,7 @@ def runDemo(directory, n_dims):
         covar_decay_factor = 0.9
         updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
     else:
-        min_level = 0.000001
+        min_level = 1.0
         max_level = None
         diag_only = False
         learning_rate = 0.5

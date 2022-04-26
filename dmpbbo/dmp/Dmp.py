@@ -284,14 +284,16 @@ class Dmp(DynamicalSystem, Parameterizable):
         """Return analytical solution of the system at certain times
 
         Args:
-            ts - A vector of times for which to compute the analytical solutions.
+            ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
         
         Returns:
-            xs - Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
-            xds - Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+            xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of
+            'ts'), and D the size of the state (i.e. dim())
+            xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times
+            (the length of 'ts'), and D the size of the state (i.e. dim())
             
-        The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T.
+        The output xs and xds will be of size D x T only if the matrix x you pass as an argument of size D x T.
         In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has
         been added so that you may pass matrices of either size.
         """
@@ -435,7 +437,8 @@ class Dmp(DynamicalSystem, Parameterizable):
     def computeFunctionApproximatorInputsAndTargets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
    
-        For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the gating function factored out).
+        For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the
+        gating function factored out).
         
         Args:
             trajectory - Trajectory, e.g. a demonstration.

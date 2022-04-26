@@ -88,7 +88,8 @@ class Gaussian:
         Args:
             inputs: The input data (size: n_samples X n_dims)
             n_bfs_per_dim: Number of basis functions per input dimension.
-            intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
+            intersection_height: The relative value at which two neighbouring basis functions will intersect (
+            default=0.7)
         
         Returns:
             centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
@@ -96,9 +97,9 @@ class Gaussian:
         """
         min_vals = inputs.min(axis=0)
         max_vals = inputs.max(axis=0)
-        mins = np.atleast_1d(min_vals)
-        maxs = np.atleast_1d(max_vals)
-        n_dims = len(mins)
+        min_vals = np.atleast_1d(min_vals)
+        max_vals = np.atleast_1d(max_vals)
+        n_dims = len(min_vals)
         n_bfs_per_dim = np.atleast_1d(n_bfs_per_dim)
         if n_bfs_per_dim.size < n_dims:
             if n_bfs_per_dim.size == 1:
@@ -113,7 +114,7 @@ class Gaussian:
         for i_dim in range(n_dims):
             n_bfs = n_bfs_per_dim[i_dim]
 
-            cur_centers = np.linspace(mins[i_dim], maxs[i_dim], n_bfs)
+            cur_centers = np.linspace(min_vals[i_dim], max_vals[i_dim], n_bfs)
 
             # Determine the widths from the centers
             cur_widths = np.ones(n_bfs)

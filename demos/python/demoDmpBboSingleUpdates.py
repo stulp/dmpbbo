@@ -16,26 +16,14 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
-
-
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
-
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import *
-
-from dmpbbo.dmp.Dmp import Dmp
-
-from dmpbbo.dmp_bbo.Task import Task
-from dmpbbo.dmp_bbo.TaskSolver import TaskSolver
-from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.dmp_bbo.run_one_update import *
 
 from TaskViapoint import TaskViapoint
+from dmpbbo.bbo.updaters import *
+from dmpbbo.dmp.Dmp import Dmp
+from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.dmp_bbo.run_one_update import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
 def runDemo(directory, n_dims):
@@ -123,7 +111,7 @@ def runDemo(directory, n_dims):
 
         runOptimizationTaskOneUpdate(session, i_update)
 
-    fig = session.plot()
+    return session.plot()
 
 
 if __name__ == "__main__":

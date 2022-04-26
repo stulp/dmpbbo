@@ -18,14 +18,12 @@
 
 import os
 import sys
-import numpy as np
+
 import matplotlib.pyplot as plt
 
-
 from dmpbbo.bbo.CostFunction import CostFunction
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import *
 from dmpbbo.bbo.runOptimization import runOptimization
+from dmpbbo.bbo.updaters import *
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):
@@ -35,7 +33,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         """ Constructor.
         
         Args:
-            point Point to which distance must be minimized.
+            point: Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
 

@@ -16,17 +16,13 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import numpy as np
 import matplotlib.pyplot as plt
-import os, sys, subprocess
 
-# Include scripts for plotting
-
-from dmpbbo.functionapproximators.BasisFunction import *
-from dmpbbo.functionapproximators.FunctionApproximatorWLS import *
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+
+
+# Include scripts for plotting
 
 
 def targetFunction(n_samples_per_dim):
@@ -52,7 +48,7 @@ def targetFunction(n_samples_per_dim):
                 targets[ii] = 2.5 * x1 * np.exp(-np.square(x1) - np.square(x2))
                 ii += 1
 
-    return (inputs, targets)
+    return inputs, targets
 
 
 def train(fa_name, n_dims):

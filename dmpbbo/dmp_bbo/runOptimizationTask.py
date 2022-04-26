@@ -48,7 +48,7 @@ def runOptimizationTask(
         cost_eval = task.evaluateRollout(cost_vars_eval, distribution.mean)
 
         # Bookkeeping
-        session.addEval(i_update, distribution.mean, cost_vars_eval, cost_eval)
+        session.addEvalTask(i_update, distribution.mean, cost_vars_eval, cost_eval)
 
         # 1. Sample from distribution
         samples = distribution.generateSamples(n_samples_per_update)

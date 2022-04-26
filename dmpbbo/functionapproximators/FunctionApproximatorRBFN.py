@@ -55,9 +55,8 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         activations = FunctionApproximatorRBFN._getActivations(inputs, model_params)
 
         # Prepare the least squares function approximator and train it
-        reg = meta_params["regularization"]
-        wls_meta_params = {"regularization": reg, "use_offset": False}
-        fa_lws = FunctionApproximatorWLS(wls_meta_params)
+        use_offset = False
+        fa_lws = FunctionApproximatorWLS(use_offset, meta_params["regularization"])
         wls_model_params = fa_lws.train(activations, targets)
 
         model_params["weights"] = wls_model_params["slope"].reshape(n_bfs, -1)

@@ -16,12 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os, sys
-
-
 from dmpbbo.dmp.Dmp import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
@@ -62,7 +56,7 @@ if __name__ == "__main__":
     h, axs = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
     plt.setp(h, color=[0.7, 0.7, 1.0], linewidth=6)
 
-    # Perturbed Dmps
+    # Perturbed DMPs
     for i_sample in range(5):
 
         rand_vector = 1.0 + 0.2 * np.random.standard_normal(values.shape)

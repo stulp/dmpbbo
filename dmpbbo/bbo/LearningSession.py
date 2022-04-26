@@ -21,17 +21,17 @@ import copy
 import inspect
 import os
 import warnings
+import jsonpickle
 from glob import glob
 
 import matplotlib.pyplot as plt
 import numpy as np
 from pylab import mean
 
+from dmpbbo.DmpBboJSONEncoder import saveToJSON
+
 # Avoid warnings when plotting very narrow covariance matrices
 warnings.simplefilter("ignore", np.ComplexWarning)
-
-
-from dmpbbo.DmpBboJSONEncoder import *
 
 
 def plotUpdateLines(n_samples_per_update, ax):
@@ -154,9 +154,9 @@ def setColor(handle, i_update, n_updates):
     """ Set the color of an object, according to how far the optimization has proceeded.
     
         Args:
-            handle Handle to the object
-            i_update Which update is the optimization at now?
-            n_update Which is the number of updates the optimization will run?
+            handle: Handle to the object
+            i_update: Which update is the optimization at now?
+            n_updates: Which is the number of updates the optimization will run?
     """
     if i_update == 0:
         plt.setp(handle, color="r", linewidth=2)
@@ -167,36 +167,21 @@ def setColor(handle, i_update, n_updates):
 
 
 def plotUpdate(
-    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
+        distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
     
         Args:
-            distribution Gaussian distribution before the update
-    
-        Args:
-            cost_eval Cost of the mean of the distribution 
-    
-        Args:
-            samples The samples in the search space
-    
-        Args:
-            costs The cost of each sample 
-    
-        Args:
-            weights The weight of each sample 
-    
-        Args:
-            distribution_new Gaussian distribution after the update
-    
-        Args:
-            ax Axis to plot the update on.
-    
-        Args:
-            highlight Whether to highlight this update (default=False)
-    
-        Args:
-            plot_samples Whether to plot the individual samples (default=False)
+            distribution: Gaussian distribution before the update
+            cost_eval: Cost of the mean of the distribution
+            samples: The samples in the search space
+            costs: The cost of each sample
+            weights: The weight of each sample
+            distribution_new: Gaussian distribution after the update
+            kwargs: Can be the following:
+                ax: Axis to plot the update on.
+                highlight: Whether to highlight this update (default=False)
+                plot_samples: Whether to plot the individual samples (default=False)
     """
     ax = kwargs.get("ax") or plt.axes()
     highlight = kwargs.get("highlight", False)
@@ -308,7 +293,7 @@ class LearningSession:
         self.tell(eval_sample, "eval_sample", i_update)
 
     def addUpdate(
-        self, i_update, distribution, samples, costs, weights, distribution_new=None
+            self, i_update, distribution, samples, costs, weights, distribution_new=None
     ):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
@@ -329,7 +314,8 @@ class LearningSession:
             last_dir = last_dir.replace("/", "")
             return int(last_dir)
 
-    def getBaseName(self, name, i_update=None, i_sample=None):
+    @staticmethod
+    def getBaseName(name, i_update=None, i_sample=None):
 
         if isinstance(i_sample, int):
             basename = f"{i_sample:03d}_{name}"  # e.g. 0 => "000_name"
@@ -529,7 +515,6 @@ class LearningSession:
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "directory", type=str, help="directory from which to read the learning session"

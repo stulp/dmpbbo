@@ -50,7 +50,7 @@ class LearningSessionTask(LearningSession):
         self.tell(cost_vars, "cost_vars", i_update, i_sample)
         self.tell(cost, "cost", i_update, i_sample)
 
-    def addEval(self, i_update, eval_sample, eval_cost_vars, eval_cost):
+    def addEvalTask(self, i_update, eval_sample, eval_cost_vars, eval_cost):
         super().addEval(i_update, eval_sample, eval_cost)
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 

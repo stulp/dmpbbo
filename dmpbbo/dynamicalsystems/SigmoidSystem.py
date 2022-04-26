@@ -33,6 +33,7 @@ class SigmoidSystem(DynamicalSystem):
                                achieved, i.e. at inflection_ratio * tau
         """
         super().__init__(1, tau, x_init)
+        self._tau = tau  # To avoid warnings (is already set by super.init above)
         self._max_rate = max_rate
         self._inflection_ratio = inflection_ratio
         self._Ks_cached = None

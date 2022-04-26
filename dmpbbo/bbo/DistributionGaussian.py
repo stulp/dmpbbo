@@ -41,7 +41,7 @@ def plot_error_ellipse(mu, cov, ax=None, **kwargs):
 
     From https://github.com/dfm/dfmplot/blob/master/dfmplot/ellipse.py
     """
-    # some sane defaults
+
     facecolor = kwargs.pop("facecolor", "none")
     edgecolor = kwargs.pop("edgecolor", "k")
 
@@ -72,10 +72,8 @@ class DistributionGaussian:
         """ Construct the Gaussian distribution with a mean and covariance matrix.
         
         Args:
-            mean Mean of the distribution
-        
-        Args:
-            covar Covariance matrix of the distribution
+            mean: Mean of the distribution
+            covar: Covariance matrix of the distribution
         """
         self.mean = mean
         self.covar = covar

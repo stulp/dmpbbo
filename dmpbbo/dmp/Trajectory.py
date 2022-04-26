@@ -126,20 +126,12 @@ class Trajectory:
         if as_times:
             if fro > self._ts[-1]:
                 print(
-                    "WARNING: Argument 'fro' out of range, because "
-                    + str(fro)
-                    + " > "
-                    + str(self._ts[-1])
-                    + ". Not cropping"
+                    "WARNING: Argument 'fro' out of range, because {fro} > {self._ts[-1]}. Not cropping"
                 )
                 return
             if to < self._ts[0]:
                 print(
-                    "WARNING: Argument 'to' out of range, because "
-                    + str(to)
-                    + " < "
-                    + str(self._ts[0])
-                    + ". Not cropping"
+                    "WARNING: Argument 'fro' out of range, because {to} < {self._ts[-1]}. Not cropping"
                 )
                 return
 
@@ -385,7 +377,7 @@ class Trajectory:
         return all_handles, axs
 
 
-def diffnc(X, dt):
+def diffnc(xs, dt):
     """ Do non-causal differentiation with time interval dt between data points.
 
     The returned vector (matrix) is of the same length as the original one.
@@ -393,23 +385,23 @@ def diffnc(X, dt):
     Stefan Schaal December 29, 1995. Converted to Python by Freek Stulp
     """
 
-    (n_samples, n_dims) = X.shape
+    (n_samples, n_dims) = xs.shape
     fil = np.array([1.0, 0.0, -1.0]) / 2 / dt
     XX = np.empty([n_samples + 2, n_dims])
     for i_dim in range(n_dims):
-        XX[:, i_dim] = np.convolve(X[:, i_dim], fil)
+        XX[:, i_dim] = np.convolve(xs[:, i_dim], fil)
 
-    X = XX[1:-1, :]
-    X[0, :] = X[1, :]
-    X[-1, :] = X[-2, :]
-    return X
+    xs = XX[1:-1, :]
+    xs[0, :] = xs[1, :]
+    xs[-1, :] = xs[-2, :]
+    return xs
 
 
 def butter_lowpass(cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
-    b, a = butter(order, cut, btype="low", analog=False)
+    b, a = butter(order, cut, btype="low", analog=False, output='ba')
     return b, a
 
 

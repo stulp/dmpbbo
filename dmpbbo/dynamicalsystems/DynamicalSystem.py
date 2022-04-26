@@ -37,6 +37,8 @@ class DynamicalSystem(ABC):
 
         self.tau = tau
 
+        y_init = np.atleast_1d(y_init)  # In case it is a scalar
+
         # These are set once, and are fixed
         self._dim_y = y_init.size
         self._dim_x = n_dims_x * order if n_dims_x else self._dim_y * order

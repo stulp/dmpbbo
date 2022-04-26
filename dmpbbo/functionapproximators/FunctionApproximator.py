@@ -18,6 +18,7 @@
 from abc import abstractmethod
 
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.Parameterizable import Parameterizable
@@ -40,12 +41,13 @@ class FunctionApproximator(Parameterizable):
         inputs = inputs.reshape(inputs.shape[0], -1)
         self._model_params = self._train(inputs, targets, self._meta_params, **kwargs)
         self._dim_input = inputs.shape[1]
+        return self._model_params
 
     def predict(self, inputs):
         if not self.isTrained():
             raise ValueError("Calling predict() on untrained function approx.")
 
-        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
         if inputs.shape[1] != self._dim_input:
             raise ValueError(
@@ -119,7 +121,8 @@ class FunctionApproximator(Parameterizable):
 
         if len(values) != self.getParamVectorSize():
             raise ValueError(
-                f"values ({len(values)}) should have same size as size of selected parameters vector ({self.getParamVectorSize()})"
+                f"values ({len(values)}) should have same size as size of selected parameters vector"
+                f"({self.getParamVectorSize()}) "
             )
 
         offset = 0
@@ -228,7 +231,7 @@ class FunctionApproximator(Parameterizable):
         ax = kwargs.get("ax") or self._getAxis()
 
         lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
-        alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.3
+        alpha = 1.0 if self.dim_input() < 2 else 0.3
         plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
 
         if "slopes" in self._model_params:
@@ -245,8 +248,8 @@ class FunctionApproximator(Parameterizable):
                 line_values[smaller, i_bf] = np.nan
 
             lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
-            alpha = 1.0 if len(n_samples_per_dim) < 2 else 0.5
-            w = 4 if len(n_samples_per_dim) < 2 else 1
+            alpha = 1.0 if self.dim_input() < 2 else 0.5
+            w = 4 if self.dim_input() < 2 else 1
             plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
 
         return lines, ax
@@ -259,6 +262,7 @@ class FunctionApproximator(Parameterizable):
         )
         outputs = self.predict(inputs)
 
+        h = []
         if self.dim_input() == 1:
             h = ax.plot(inputs, outputs, "-")
         elif self.dim_input() == 2:
@@ -273,11 +277,7 @@ class FunctionApproximator(Parameterizable):
                 cstride=1,
             )
         else:
-            print(
-                "Cannot plot input data with a dimensionality of "
-                + str(self.dim_input())
-                + "."
-            )
+            print("Cannot plot input data with a dimensionality of {self.dim_input()}")
 
         plt.setp(h, linewidth=1, color=[0.3, 0.3, 0.9], alpha=0.5)
 
@@ -291,6 +291,7 @@ class FunctionApproximator(Parameterizable):
         outputs = self.predict(inputs)
 
         h_residuals = []
+        h_targets = []
         if self.dim_input() == 1:
             if len(targets) > 0:
                 h_targets = ax.plot(inputs, targets, "o")

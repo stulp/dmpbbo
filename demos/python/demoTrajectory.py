@@ -16,12 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os, sys
-
-
 from dmpbbo.dmp.Trajectory import *
 
 if __name__ == "__main__":
@@ -34,8 +28,8 @@ if __name__ == "__main__":
     yd_last = np.array([10.0, 0])
     ydd_last = np.array([0, 0])
 
-    traj_minjerk = Trajectory.from_min_jerk(ts, y_first, y_last)
-    traj_minjerk.plot()
+    traj_min_jerk = Trajectory.from_min_jerk(ts, y_first, y_last)
+    traj_min_jerk.plot()
     plt.gcf().canvas.set_window_title("min-jerk trajectory")
 
     traj = Trajectory.from_polynomial(
@@ -62,7 +56,7 @@ if __name__ == "__main__":
 
     # Do low-pass filtering
     # Make a noisy trajectory
-    y_noisy = traj_minjerk._ys + 0.001 * np.random.random_sample(traj_minjerk._ys.shape)
+    y_noisy = traj_min_jerk.ys + 0.001 * np.random.random_sample(traj_min_jerk.ys.shape)
     traj = Trajectory(ts, y_noisy)
     # Plot it
     lines, axs = traj.plot()

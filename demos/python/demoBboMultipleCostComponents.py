@@ -16,16 +16,15 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import UpdaterCovarDecay
 from dmpbbo.bbo.runOptimization import runOptimization
+from dmpbbo.bbo.updaters import UpdaterCovarDecay
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):
@@ -35,7 +34,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         """ Constructor.
         
         Args:
-            point Point to which distance must be minimized.
+            point: Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
         self.regularization_weight = regularization_weight
@@ -59,8 +58,8 @@ if __name__ == "__main__":
 
     n_dims = 2
     minimum = np.full(n_dims, 2.0)
-    regul_weight = 1.0
-    cost_function = DemoCostFunctionDistanceToPoint(minimum, regul_weight)
+    regularization_weight = 1.0
+    cost_function = DemoCostFunctionDistanceToPoint(minimum, regularization_weight)
 
     mean_init = np.full(n_dims, 5.0)
     covar_init = 4.0 * np.eye(n_dims)

@@ -16,18 +16,16 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import os
-import sys
-
 import matplotlib.pyplot as plt
 import numpy as np
-
-# Include scripts for plotting
 
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
+
+
+# Include scripts for plotting
 
 
 def set_style(lines, label):
@@ -38,8 +36,6 @@ def set_style(lines, label):
         plt.setp(lines, linestyle="--", linewidth=2, color=(0.8, 0.0, 0.0))
     elif label == "rungekutta":
         plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.0))
-
-    # plt.setp(lines[1],plt.getp(lines[0]))
 
     plt.setp(lines[0], label=label)
 
