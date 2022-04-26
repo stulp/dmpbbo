@@ -191,7 +191,7 @@ class FunctionApproximator(Parameterizable):
             inputs_0_on_grid = np.reshape(inputs[:, 0], n_samples_per_dim)
             inputs_1_on_grid = np.reshape(inputs[:, 1], n_samples_per_dim)
             lines = []
-            #values_range = np.amax(activations) - np.amin(activations)
+            # values_range = np.amax(activations) - np.amin(activations)
             for i_basis_function in basis_functions_to_plot:
                 # cur_color = colors[i_basis_function]
                 cur_activations = activations[:, i_basis_function]
@@ -236,7 +236,7 @@ class FunctionApproximator(Parameterizable):
             line_values = self.getLines(inputs, self._model_params)
 
             # Plot line segment only when a basis function is the most active
-            #values_range = np.amax(activations) - np.amin(activations)
+            # values_range = np.amax(activations) - np.amin(activations)
             n_basis_functions = activations.shape[1]
             max_activations = np.max(activations, axis=1)
             for i_bf in range(n_basis_functions):

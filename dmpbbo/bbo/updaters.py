@@ -28,7 +28,7 @@ class Updater(ABC):
     """
 
     @abstractmethod
-    def updateDistribution(self,distribution, samples, costs):
+    def updateDistribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         
         Args:
