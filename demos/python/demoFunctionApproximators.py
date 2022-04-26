@@ -80,8 +80,8 @@ def train(fa_name, n_dims):
     (h, ax) = fa.plot(
         inputs, targets=targets, plot_residuals=True, plot_model_parameters=True
     )
-    ax.set_title(fa_name + " " + str(n_dims) + "D")
-    plt.gcf().canvas.set_window_title(fa_name + " " + str(n_dims) + "D")
+    ax.set_title(f"{fa_name} {n_dims}D")
+    plt.gcf().canvas.set_window_title(f"{fa_name} {n_dims}D")
 
 
 if __name__ == "__main__":
