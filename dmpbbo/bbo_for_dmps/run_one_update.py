@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from dmpbbo.dmp_bbo.LearningSessionTask import *
+from dmpbbo.bbo_for_dmpsLearningSessionTask import *
 
 
 def runOptimizationTaskPrepare(

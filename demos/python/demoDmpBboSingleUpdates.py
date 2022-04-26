@@ -20,8 +20,8 @@ import sys
 
 from dmpbbo.bbo.updaters import *
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.dmp_bbo.run_one_update import *
-from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.bbo_for_dmps.run_one_update import *
+from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 from TaskViapoint import TaskViapoint
 

@@ -19,7 +19,7 @@ import copy
 
 import numpy as np
 
-from dmpbbo.dmp_bbo.TaskSolver import TaskSolver
+from dmpbbo.bbo_for_dmpsTaskSolver import TaskSolver
 
 
 class TaskSolverDmp(TaskSolver):

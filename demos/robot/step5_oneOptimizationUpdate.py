@@ -20,8 +20,8 @@ import argparse
 import os
 import sys
 
-from dmpbbo.dmp_bbo.LearningSessionTask import *
-from dmpbbo.dmp_bbo.run_one_update import runOptimizationTaskOneUpdate
+from dmpbbo.bbo_for_dmps.LearningSessionTask import *
+from dmpbbo.bbo_for_dmps.run_one_update import runOptimizationTaskOneUpdate
 
 if __name__ == "__main__":
 

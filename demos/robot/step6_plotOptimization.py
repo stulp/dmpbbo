@@ -23,9 +23,9 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.dmp_bbo.LearningSessionTask import *
-from dmpbbo.dmp_bbo.run_one_update import *
-from dmpbbo.dmp_bbo.Task import Task
+from dmpbbo.bbo_for_dmps.LearningSessionTask import *
+from dmpbbo.bbo_for_dmps.run_one_update import *
+from dmpbbo.bbo_for_dmps.Task import Task
 
 if __name__ == "__main__":
 

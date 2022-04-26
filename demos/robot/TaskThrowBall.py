@@ -4,7 +4,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.dmp_bbo.Task import Task
+from dmpbbo.bbo_for_dmps.Task import Task
 
 
 class TaskThrowBall(Task):
