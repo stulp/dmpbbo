@@ -16,11 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-
 import numpy as np
-
 
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
@@ -45,7 +41,7 @@ class ExponentialSystem(DynamicalSystem):
         
         Note that for an ExponentialSystem y is equivalent to x.
         """
-        return _x_attr
+        return self._x_attr
 
     @y_attr.setter
     def y_attr(self, y):
@@ -63,11 +59,11 @@ class ExponentialSystem(DynamicalSystem):
         
         Note that for an ExponentialSystem y is equivalent to x.
         """
-        return _x_attr
+        return self._x_attr
 
     @x_attr.setter
     def x_attr(self, x):
-        """ Set the the attractor state.
+        """ Set the attractor state.
         
         Note that for an ExponentialSystem y is equivalent to x.
         """
@@ -93,20 +89,20 @@ class ExponentialSystem(DynamicalSystem):
          Args: ts - A vector of times for which to compute the analytical solutions 
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
-        T = ts.size
+        n_ts = ts.size
 
         exp_term = np.exp(-self._alpha * ts / self._tau)
         pos_scale = exp_term
         vel_scale = -(self._alpha / self._tau) * exp_term
 
         val_range = self._x_init - self._x_attr
-        val_range_repeat = np.repeat(np.atleast_2d(val_range), T, axis=0)
+        val_range_repeat = np.repeat(np.atleast_2d(val_range), n_ts, axis=0)
         pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale), self._dim_x, axis=0)
         xs = np.multiply(val_range_repeat, pos_scale_repeat.T)
 
-        xs = xs + np.repeat(np.atleast_2d(self._x_attr), T, axis=0)
+        xs = xs + np.repeat(np.atleast_2d(self._x_attr), n_ts, axis=0)
 
         vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale), self._dim_x, axis=0)
         xds = np.multiply(val_range_repeat, vel_scale_repeat.T)
 
-        return (xs, xds)
+        return xs, xds

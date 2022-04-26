@@ -15,16 +15,14 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys
 
-
-from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 from dmpbbo.functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 
 
 class FunctionApproximatorWLS(FunctionApproximator):
     def __init__(self, use_offset=True, regularization=0.0):
-        """Initialize an Least-Squares function approximator.
+        """Initialize a Least-Squares function approximator.
 
         Args:
             use_offset: Use linear model "y = a*x + offset" instead of "y = a*x". Default: true.
@@ -92,7 +90,7 @@ class FunctionApproximatorWLS(FunctionApproximator):
     @staticmethod
     def _predict(inputs, model_params):
 
-        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
 
         slope = model_params["slope"]

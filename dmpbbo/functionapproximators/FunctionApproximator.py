@@ -15,16 +15,12 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys
-from abc import ABC, abstractmethod
-import numpy as np
-import warnings
-from mpl_toolkits.mplot3d import Axes3D
+from abc import abstractmethod
+
 import matplotlib.pyplot as plt
 
-
-from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 from dmpbbo.functionapproximators.BasisFunction import *
+from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 
 class FunctionApproximator(Parameterizable):
@@ -37,6 +33,7 @@ class FunctionApproximator(Parameterizable):
         self._meta_params = meta_params
         self._model_params = {name: None for name in model_param_names}
         self._dim_input = None
+        self._selected_param_names = None
 
     def train(self, inputs, targets, **kwargs):
         # Ensure second dimension, i.e. shape = (30,) => (30,1)
@@ -75,7 +72,7 @@ class FunctionApproximator(Parameterizable):
 
     @staticmethod
     @abstractmethod
-    def _train(inputs, targets, meta_params):
+    def _train(inputs, targets, meta_params, **kwargs):
         """Train the function approximator with input and target examples.
         
         Args:
@@ -156,11 +153,13 @@ class FunctionApproximator(Parameterizable):
     def _getGrid(inputs_min, inputs_max, n_samples_per_dim=None):
         n_dims = inputs_min.size
         if n_dims == 1:
-            n_samples_per_dim = np.atleast_1d(101)
+            if n_samples_per_dim is None:
+                n_samples_per_dim = 101
             inputs_grid = np.linspace(0.0, 2.0, n_samples_per_dim)
 
         elif n_dims == 2:
-            n_samples_per_dim = np.atleast_1d([21, 21])
+            if n_samples_per_dim is None:
+                n_samples_per_dim = np.atleast_1d([21, 21])
             n_samples = np.prod(n_samples_per_dim)
             # Here comes naive inefficient implementation...
             x1s = np.linspace(-2.0, 2.0, n_samples_per_dim[0])
@@ -173,17 +172,15 @@ class FunctionApproximator(Parameterizable):
                     inputs_grid[ii, 1] = x2
                     ii += 1
         else:
-            raise ValueError(
-                "Cannot create axis with dim_input() = " + str(self.dim_input()) + "."
-            )
+            raise ValueError(f"Cannot create axis with n_dims = {n_dims}.")
 
-        return (inputs_grid, n_samples_per_dim)
+        return inputs_grid, n_samples_per_dim
 
     @staticmethod
     def _plotGridValues(inputs, activations, ax, n_samples_per_dim):
         """Plot basis functions activations, whilst being smart about the dimensionality of input data."""
 
-        n_dims = len(numpy.atleast_1d(inputs[0]))
+        n_dims = len(np.atleast_1d(inputs[0]))
         if n_dims == 1:
             lines = ax.plot(inputs, activations, "-")
 
@@ -191,16 +188,16 @@ class FunctionApproximator(Parameterizable):
             n_basis_functions = len(activations[0])
             basis_functions_to_plot = range(n_basis_functions)
 
-            inputs_0_on_grid = numpy.reshape(inputs[:, 0], n_samples_per_dim)
-            inputs_1_on_grid = numpy.reshape(inputs[:, 1], n_samples_per_dim)
+            inputs_0_on_grid = np.reshape(inputs[:, 0], n_samples_per_dim)
+            inputs_1_on_grid = np.reshape(inputs[:, 1], n_samples_per_dim)
             lines = []
-            values_range = numpy.amax(activations) - numpy.amin(activations)
+            #values_range = np.amax(activations) - np.amin(activations)
             for i_basis_function in basis_functions_to_plot:
                 # cur_color = colors[i_basis_function]
                 cur_activations = activations[:, i_basis_function]
                 # Make plotting easier by leaving out small numbers
                 # cur_activations[numpy.abs(cur_activations)<values_range*0.001] = numpy.nan
-                activations_on_grid = numpy.reshape(cur_activations, n_samples_per_dim)
+                activations_on_grid = np.reshape(cur_activations, n_samples_per_dim)
                 cur_lines = ax.plot_wireframe(
                     inputs_0_on_grid,
                     inputs_1_on_grid,
@@ -238,8 +235,8 @@ class FunctionApproximator(Parameterizable):
             # Plot lines also
             line_values = self.getLines(inputs, self._model_params)
 
-            # Plot line segment only when basis function is most active
-            values_range = numpy.amax(activations) - numpy.amin(activations)
+            # Plot line segment only when a basis function is the most active
+            #values_range = np.amax(activations) - np.amin(activations)
             n_basis_functions = activations.shape[1]
             max_activations = np.max(activations, axis=1)
             for i_bf in range(n_basis_functions):
@@ -252,7 +249,7 @@ class FunctionApproximator(Parameterizable):
             w = 4 if len(n_samples_per_dim) < 2 else 1
             plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
 
-        return (lines, ax)
+        return lines, ax
 
     def plotPredictionsGrid(self, inputs_min, inputs_max, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()
@@ -284,7 +281,7 @@ class FunctionApproximator(Parameterizable):
 
         plt.setp(h, linewidth=1, color=[0.3, 0.3, 0.9], alpha=0.5)
 
-        return (h, ax)
+        return h, ax
 
     def plotPredictions(self, inputs, **kwargs):
         targets = kwargs.get("targets", [])
@@ -338,7 +335,7 @@ class FunctionApproximator(Parameterizable):
         if len(targets) > 0:
             plt.setp(h_residuals, color=[0.8, 0.3, 0.3], linewidth=2)
 
-        return (h_outputs, ax)
+        return h_outputs, ax
 
     def plot(self, inputs, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()

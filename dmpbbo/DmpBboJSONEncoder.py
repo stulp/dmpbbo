@@ -26,7 +26,7 @@ from json import JSONEncoder
 # Standard jsonpickle replaces duplicate objects with their ids to save space. This
 # is challenging to parse in C++.
 #
-# With make_refs=False, there are no refs, but it outputs np.array wierdly.
+# With make_refs=False, there are no refs, but it outputs np.array weirdly.
 #
 # The simplest solution was to make a small DmpBboJSONEncoder for json, rather than
 # using jsonpickle

@@ -16,11 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-
 import numpy as np
-
 
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem  #
 
@@ -95,7 +91,7 @@ class SigmoidSystem(DynamicalSystem):
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
 
-        # Auxillary variables to improve legibility
+        # Auxiliary variables to improve legibility
         r = self._max_rate
         exp_rt = np.exp(-r * ts)
 
@@ -105,13 +101,13 @@ class SigmoidSystem(DynamicalSystem):
         Ks = self._getKs()
 
         for dd in range(self._dim_x):
-            # Auxillary variables to improve legibility
+            # Auxiliary variables to improve legibility
             K = Ks[dd]
             b = (K / self._x_init[dd]) - 1
             xs[:, dd] = K / (1 + b * exp_rt)
             xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
 
-        return (xs, xds)
+        return xs, xds
 
     def _getKs(self):
         if self._Ks_cached is not None:
@@ -156,9 +152,9 @@ class SigmoidSystem(DynamicalSystem):
         div = np.divide(N_0s, self._Ks_cached) - 1.0
         if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
             print(
-                "In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors during numerical integration. Recommended solution: choose a lower magnitude for the maximum rate of change (currently it is "
-                + str(r)
-                + ")"
+                f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors during numerical "
+                f"integration. Recommended solution: choose a lower magnitude for the maximum rate of change ("
+                f"currently it is {r}) "
             )
 
         return self._Ks_cached

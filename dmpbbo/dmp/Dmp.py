@@ -16,23 +16,16 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import numpy as np
-import sys
-import os
 import matplotlib.pyplot as plt
 
-
+from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dmp.Trajectory import Trajectory
-
-from dmpbbo.functionapproximators.Parameterizable import Parameterizable
-
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
-
-from dmpbbo.DmpBboJSONEncoder import *
+from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
+from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 
 class Dmp(DynamicalSystem, Parameterizable):
@@ -196,14 +189,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Set the attractor state of the spring system
         self._spring_system.y_attr = x[self.GOAL]
 
-        # Start integrating all futher subsystems
+        # Start integrating all further subsystems
         (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrateStart()
         (x[self.PHASE], xd[self.PHASE]) = self._phase_system.integrateStart()
         (x[self.GATING], xd[self.GATING]) = self._gating_system.integrateStart()
 
         # Add rates of change
         xd = self.differentialEquation(x)
-        return (x, xd)
+        return x, xd
 
     def differentialEquation(self, x):
         """The differential equation which defines the system.
@@ -224,7 +217,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             # simply the attractor state
             self._spring_system.y_attr = self._y_attr
             # with zero change
-            xd_goal = np.zeros(self._dim_x)
+            xd[self.GOAL] = np.zeros(self._dim_x)
         else:
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
@@ -298,7 +291,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs - Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
             xds - Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
             
-        The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has been added so that you may pass matrices of either size. 
+        The output xs and xds will be of size D x T \em only if the matrix x you pass as an argument of size D x T.
+        In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has
+        been added so that you may pass matrices of either size.
         """
         if ts is None:
             if self._ts_train is None:
@@ -333,10 +328,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             forcing_terms *= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            _scaling_amplitudesrep = np.tile(
+            _scaling_amplitudes_rep = np.tile(
                 self._scaling_amplitudes, (n_time_steps, 1)
             )
-            forcing_terms *= _scaling_amplitudesrep
+            forcing_terms *= _scaling_amplitudes_rep
 
         # Get current delayed goal
         if self._goal_system is None:
@@ -363,15 +358,15 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Reset the dynamical system, and get the first state
         damping = self._spring_system._damping_coefficient
-        localspring_system = SpringDamperSystem(
+        local_spring_system = SpringDamperSystem(
             self._tau, self.y_init, self._y_attr, damping
         )
 
         # Set first attractor state
-        localspring_system.y_attr = xs_goal[0, :]
+        local_spring_system.y_attr = xs_goal[0, :]
 
         # Start integrating spring damper system
-        (x_spring, xd_spring) = localspring_system.integrateStart()
+        (x_spring, xd_spring) = local_spring_system.integrateStart()
 
         # For convenience
         SPRING = self.SPRING
@@ -392,17 +387,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
             # Set the attractor state of the spring system
-            localspring_system.y_attr = xs[tt, self.GOAL]
+            local_spring_system.y_attr = xs[tt, self.GOAL]
 
             # Integrate spring damper system
-            xds[tt, SPRING] = localspring_system.differentialEquation(xs[tt, SPRING])
-
-            # If necessary add a perturbation. May be useful for some off-line tests.
-            # RowVectorXd perturbation = RowVectorXd::Constant(dim_orig(),0.0)
-            # if (analytical_solution_perturber_!=NULL)
-            #  for (int i_dim=0 i_dim<dim_orig() i_dim++)
-            #    // Sample perturbation from a normal Gaussian distribution
-            #    perturbation(i_dim) = (*analytical_solution_perturber_)()
+            xds[tt, SPRING] = local_spring_system.differentialEquation(xs[tt, SPRING])
 
             # Add forcing term to the acceleration of the spring state
             xds[tt, SPRING_Z] = (
@@ -411,7 +399,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Compute y component from z
             xds[tt, SPRING_Y] = xs[tt, SPRING_Z] / self._tau
 
-        return (xs, xds, forcing_terms, fa_outputs)
+        return xs, xds, forcing_terms, fa_outputs
 
     def train(self, trajectory):
         """Train a DMP with a trajectory.
@@ -499,12 +487,12 @@ class Dmp(DynamicalSystem, Parameterizable):
             f_target /= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            _scaling_amplitudesrep = np.tile(
+            _scaling_amplitudes_rep = np.tile(
                 self._scaling_amplitudes, (n_time_steps, 1)
             )
-            f_target /= _scaling_amplitudesrep
+            f_target /= _scaling_amplitudes_rep
 
-        return (fa_inputs_phase, f_target)
+        return fa_inputs_phase, f_target
 
     def stateAsPosVelAcc(self, x_in, xd_in):
         return (
@@ -516,7 +504,10 @@ class Dmp(DynamicalSystem, Parameterizable):
     def statesAsTrajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
         
-        As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and gating system. What we are most interested in is the output of the spring system. This function extracts that information, and also computes the accelerations of the spring system, which are only stored implicitely in xd_in because second order systems are converted to first order systems with expanded state.
+        As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and
+        gating system. What we are most interested in is the output of the spring system. This function extracts that
+        information, and also computes the accelerations of the spring system, which are only stored implicitly in
+        xd_in because second order systems are converted to first order systems with expanded state.
 
         Args:
             ts    - A vector of times 
@@ -561,7 +552,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         if "goal" in names:
             self._selected_param_names = ["goal"]
-            # No need to bother function approximators with it: remove all occurences
+            # No need to bother function approximators with it: remove all occurrences
             names = [n for n in names if n != "goal"]
 
         # Any remaining names are passed to all function approximators
@@ -623,9 +614,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Dimensionality of dynamical system.
         dim_x = xs.shape[1]
-        # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
+        # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system
+        # (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
         n_dims_dmp = (dim_x - 2) // 3
-        D = n_dims_dmp  # Abbreviation for convencience
+        D = n_dims_dmp  # Abbreviation for convenience
 
         # define SPRING    segment(0*dim_orig()+0,2*dim_orig())
         # define SPRING_Y  segment(0*dim_orig()+0,dim_orig())
@@ -655,7 +647,6 @@ class Dmp(DynamicalSystem, Parameterizable):
         for i_system in range(n_systems):
 
             # Plot 'x' for this subsystem (analytical solution and step-by-step integration)
-            # fig.suptitle(filename)
             cur_n_plots = 2
             if system_order[i_system] == 2:
                 cur_n_plots = 3
@@ -679,10 +670,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
             if system_names[i_system] == "gating":
                 plt.setp(h, color="m")
-                # cur_axs[0].set_ylim([0, 1.1])
             if system_names[i_system] == "phase":
                 plt.setp(h, color="c")
-                # cur_axs[0].set_ylim([0, 1.1])
 
             for ii in range(len(cur_axs)):
                 x = np.mean(cur_axs[ii].get_xlim())
@@ -729,4 +718,4 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"unknown")
 
-        return (all_handles, axs)
+        return all_handles, axs

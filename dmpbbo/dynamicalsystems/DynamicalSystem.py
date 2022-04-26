@@ -16,8 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
 from abc import ABC, abstractmethod
 
 import matplotlib.pyplot as plt
@@ -39,13 +37,12 @@ class DynamicalSystem(ABC):
 
         self.tau = tau
 
-        y_init = np.atleast_1d(y_init)
-
         # These are set once, and are fixed
         self._dim_y = y_init.size
         self._dim_x = n_dims_x * order if n_dims_x else self._dim_y * order
 
-        self.y_init = y_init
+        self._x_init = np.zeros(self._dim_x)
+        self._x_init[: self._dim_y] = y_init
 
     @property  # Needs to be a property, so that subclasses can override setter method
     def tau(self):
@@ -137,7 +134,7 @@ class DynamicalSystem(ABC):
         if y_init:
             self.y_init = y_init
         x = self._x_init
-        return (x, self.differentialEquation(x))
+        return x, self.differentialEquation(x)
 
     def integrateStep(self, dt, x):
         """ Integrate the system one time step.
@@ -165,7 +162,7 @@ class DynamicalSystem(ABC):
         assert x.size == self._dim_x
         xd_updated = self.differentialEquation(x)
         x_updated = x + dt * xd_updated
-        return (x_updated, xd_updated)
+        return x_updated, xd_updated
 
     def integrateStepRungeKutta(self, dt, x):
         """Integrate the system one time step using 4th order Runge-Kutta integration. 
@@ -194,7 +191,7 @@ class DynamicalSystem(ABC):
 
         x_updated = x + dt * (k1 + 2.0 * (k2 + k3) + k4) / 6.0
         xd_updated = self.differentialEquation(x_updated)
-        return (x_updated, xd_updated)
+        return x_updated, xd_updated
 
     def plot(self, ts, xs, xds, **kwargs):
         kwargs["dim_y"] = self._dim_y
@@ -225,7 +222,7 @@ class DynamicalSystem(ABC):
             fig = kwargs.get("fig") or plt.figure(figsize=(5 * n_plots, 4))
             axs = [fig.add_subplot(1, n_plots, p + 1) for p in range(n_plots)]
 
-        # Prepare tex intepretation
+        # Prepare tex interpretation
         plt.rc("text", usetex=True)
         plt.rc("font", family="serif")
 
@@ -242,7 +239,7 @@ class DynamicalSystem(ABC):
             # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
 
             ys = xs[:, 0 * dim_y : 1 * dim_y]
-            zs = xs[:, 1 * dim_y : 2 * dim_y]
+            # zs = xs[:, 1 * dim_y : 2 * dim_y]
             yds = xds[:, 0 * dim_y : 1 * dim_y]
             zds = xds[:, 1 * dim_y : 2 * dim_y]
 
@@ -262,4 +259,4 @@ class DynamicalSystem(ABC):
             # ax.axis('tight')
             ax.grid()
 
-        return (lines, axs)
+        return lines, axs

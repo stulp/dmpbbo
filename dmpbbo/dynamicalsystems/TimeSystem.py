@@ -16,11 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-
 import numpy as np
-
 
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
@@ -81,4 +77,4 @@ class TimeSystem(DynamicalSystem):
             xds[xs > 1.0] = 0.0
             xs[xs > 1.0] = 1.0
 
-        return (xs, xds)
+        return xs, xds

@@ -16,11 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-import sys
-
 import numpy as np
-
 
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
@@ -52,13 +48,13 @@ class SpringDamperSystem(DynamicalSystem):
         if spring_constant == "CRITICALLY_DAMPED":
             self._spring_constant = damping_coefficient * damping_coefficient / 4
         else:
-            self._spring_constant = spring_constant
+            self._spring_constant = float(spring_constant)
 
     @property
     def y_attr(self):
         """ Return the y part of the attractor state, where x = [y z]
         """
-        return _y_attr
+        return self._y_attr
 
     @y_attr.setter
     def y_attr(self, new_y_attr):
@@ -142,7 +138,7 @@ class SpringDamperSystem(DynamicalSystem):
             xs[:, Y] = self._y_attr[i_dim] + ABts * exp_term  # .array()
 
             # Derivative of the above (use product rule: (f*g)' = f'*g + f*g'
-            xds[:, Y] = ((B - omega_0 * ABts)) * exp_term  # .array()
+            xds[:, Y] = (B - omega_0 * ABts) * exp_term  # .array()
 
             # Derivative of the above (again use product    rule: (f*g)' = f'*g + f*g'
             ydds = (-omega_0 * (2 * B - omega_0 * ABts)) * exp_term
@@ -151,4 +147,4 @@ class SpringDamperSystem(DynamicalSystem):
             xs[:, Z] = xds[:, Y] * self._tau
             xds[:, Z] = ydds * self._tau
 
-        return (xs, xds)
+        return xs, xds

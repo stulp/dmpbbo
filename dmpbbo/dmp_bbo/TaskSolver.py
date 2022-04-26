@@ -26,9 +26,13 @@ class TaskSolver(ABC):
 
     @abstractmethod
     def performRollout(self, sample):
-        """ Perform rollouts, that is, given a set of samples, determine all the variables that are relevant to evaluating the cost function.         
+        """ Perform rollouts, that is, given a set of samples, determine all the variables that are relevant to
+        evaluating the cost function.
 
-        \param[in] sample The sample
-        \return The variables relevant to computing the cost.
+        
+        Args:
+            sample The sample
+        Returns:
+            The variables relevant to computing the cost.
         """
         pass

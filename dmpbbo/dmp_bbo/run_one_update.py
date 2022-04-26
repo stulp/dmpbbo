@@ -16,20 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import math
-import os
-import sys
-import pickle
-import inspect
-import jsonpickle
-from glob import glob
-
-
-from dmpbbo.DmpBboJSONEncoder import *
-from dmpbbo.dmp_bbo.Task import Task
 from dmpbbo.dmp_bbo.LearningSessionTask import *
-from dmpbbo.bbo.DistributionGaussian import *
 
 
 def runOptimizationTaskPrepare(

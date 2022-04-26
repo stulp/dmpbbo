@@ -16,18 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import math
-import os
-import sys
-from glob import glob
-import matplotlib.pyplot as plt
-from pylab import mean
-import inspect
-
-
-from dmpbbo.DmpBboJSONEncoder import *
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.LearningSession import *
 
 
@@ -75,10 +63,7 @@ class LearningSessionTask(LearningSession):
             lines, _ = self.plotRolloutsUpdate(i_update, ax, True, False)
             setColor(lines, i_update, n_updates)
             all_lines.extend(lines)
-            # plt.setp(lines,linewidth=1)
-            # alpha = float(i_update)/float(n_updates)
-            # plt.setp(lines,linewidth=1,color=[1-alpha,alpha,0])
-        return (all_lines, ax)
+        return all_lines, ax
 
     def plotRolloutsUpdate(self, i_update, ax=None, plot_eval=True, plot_samples=False):
         if not ax:
@@ -106,7 +91,7 @@ class LearningSessionTask(LearningSession):
                     lines = ax.plot(cost_vars)
                 plt.setp(lines, color="#999999", alpha=0.5)
 
-        return (lines_eval, ax)
+        return lines_eval, ax
 
     def plot(self, fig=None):
         if not fig:

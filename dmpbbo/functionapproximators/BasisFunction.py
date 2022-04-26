@@ -16,9 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
-import numpy.matlib
-from abc import ABC, abstractmethod
-import matplotlib.pyplot as plt
 
 
 class Gaussian:
@@ -32,8 +29,8 @@ class Gaussian:
             inputs: The input data (size: n_samples X n_dims)
             normalized_basis_functions: Whether to normalize the basis functions (default=False)
             
-        Returns:
-            The kernel activations, computed for each of the samples in the input data (size: n_samples X n_basis_functions)
+        Returns: The kernel activations, computed for each of the samples in the input data (size: n_samples X
+        n_basis_functions)
         """
 
         n_samples = inputs.shape[0]
@@ -89,8 +86,7 @@ class Gaussian:
         """Get the centers and widths of basis functions.
         
         Args:
-            mins: Minimum values of input data (one value for each dimension).
-            maxs: Maximum values of input data (one value for each dimension).
+            inputs: The input data (size: n_samples X n_dims)
             n_bfs_per_dim: Number of basis functions per input dimension.
             intersection_height: The relative value at which two neighbouring basis functions will intersect (default=0.7)
         
@@ -120,7 +116,7 @@ class Gaussian:
             cur_centers = np.linspace(mins[i_dim], maxs[i_dim], n_bfs)
 
             # Determine the widths from the centers
-            cur_widths = np.ones((n_bfs))
+            cur_widths = np.ones(n_bfs)
             h = intersection_height
             if n_bfs > 1:
                 # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
@@ -169,4 +165,4 @@ class Gaussian:
                     digit[i_dim] = 0
                     digit[i_dim - 1] += 1
 
-        return (centers, widths)
+        return centers, widths

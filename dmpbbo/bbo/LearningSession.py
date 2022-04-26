@@ -16,30 +16,30 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import math
-import os
-import sys
-import copy
 import argparse
+import copy
 import inspect
-from glob import glob
-import matplotlib.pyplot as plt
-from pylab import mean
+import os
 import warnings
+from glob import glob
+
+import matplotlib.pyplot as plt
+import numpy as np
+from pylab import mean
 
 # Avoid warnings when plotting very narrow covariance matrices
 warnings.simplefilter("ignore", np.ComplexWarning)
 
 
 from dmpbbo.DmpBboJSONEncoder import *
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 
 
 def plotUpdateLines(n_samples_per_update, ax):
-    """ Plot vertical lines when an parameter update occured during the optimization.
-    \param[in] n_samples_per_update Vector specifying how many samples were used between updates.
-    \param[in] ax Axis object to plot the lines in.
+    """ Plot vertical lines when a parameter update occurred during the optimization.
+    
+        Args:
+            n_samples_per_update Vector specifying how many samples were used between updates.
+            ax Axis object to plot the lines in.
     """
 
     # Find good number of horizontal update lines to plot
@@ -78,14 +78,22 @@ def plotUpdateLines(n_samples_per_update, ax):
 
 def plotLearningCurve(learning_curve, **kwargs):
     """ Plot a learning curve.
-    \param[in] learing_curve A learning curve that has the following format
+    
+        Args:
+            learning_curve A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
         column 1: The total cost 
         column 2...: Individual cost components (column 1 is their sum)
-    \param[in] ax Axis to plot the learning curve on.
-    \param[in] costs_all Vector of costs of each sample (default=[])
-    \param[in] cost_labels Vector of strings for the different cost components  (default=[]).
+    
+        Args:
+            ax Axis to plot the learning curve on.
+    
+        Args:
+            costs_all Vector of costs of each sample (default=[])
+    
+        Args:
+            cost_labels Vector of strings for the different cost components  (default=[]).
     """
 
     cost_labels = kwargs.get("cost_labels", None)
@@ -112,16 +120,20 @@ def plotLearningCurve(learning_curve, **kwargs):
 
     plotUpdateLines(samples_eval, ax)
 
-    return (lines, ax)
+    return lines, ax
 
 
 def plotExplorationCurve(exploration_curve, **kwargs):
     """ Plot an exploration curve.
-    \param[in] exploration An exploration curve that has the following format
+    
+        Args:
+            exploration An exploration curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
         column 1: The exploration at that update 
-    \param[in] ax Axis to plot the learning curve on.
+    
+        Args:
+            ax Axis to plot the learning curve on.
     """
     ax = kwargs.get("ax") or plt.axes()
 
@@ -132,17 +144,19 @@ def plotExplorationCurve(exploration_curve, **kwargs):
     line = ax.plot(samples_eval, explo, "-", color="green", linewidth=2)
     plotUpdateLines(samples_eval, ax)
     ax.set_xlabel("number of evaluations")
-    ax.set_ylabel("sqrt of max. eigval of covar")
+    ax.set_ylabel("sqrt of max. eigen-value of covar")
     ax.set_title("Exploration magnitude")
 
-    return (line, ax)
+    return line, ax
 
 
 def setColor(handle, i_update, n_updates):
     """ Set the color of an object, according to how far the optimization has proceeded.
-    \param[in] handle Handle to the object
-    \param[in] i_update Which update is the optimization at now?
-    \param[in] n_update Which is the number of updates the optimization will run?
+    
+        Args:
+            handle Handle to the object
+            i_update Which update is the optimization at now?
+            n_update Which is the number of updates the optimization will run?
     """
     if i_update == 0:
         plt.setp(handle, color="r", linewidth=2)
@@ -156,15 +170,33 @@ def plotUpdate(
     distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
-    \param[in] distribution Gaussian distribution before the update
-    \param[in] cost_eval Cost of the mean of the distribution 
-    \param[in] samples The samples in the search space
-    \param[in] costs The cost of each sample 
-    \param[in] weights The weight of each sample 
-    \param[in] distribution_new Gaussian distribution after the update
-    \param[in] ax Axis to plot the update on.
-    \param[in] highlight Wether to highlight this update (default=False)
-    \param[in] plot_samples Whether to plot the individual samples (default=False)
+    
+        Args:
+            distribution Gaussian distribution before the update
+    
+        Args:
+            cost_eval Cost of the mean of the distribution 
+    
+        Args:
+            samples The samples in the search space
+    
+        Args:
+            costs The cost of each sample 
+    
+        Args:
+            weights The weight of each sample 
+    
+        Args:
+            distribution_new Gaussian distribution after the update
+    
+        Args:
+            ax Axis to plot the update on.
+    
+        Args:
+            highlight Whether to highlight this update (default=False)
+    
+        Args:
+            plot_samples Whether to plot the individual samples (default=False)
     """
     ax = kwargs.get("ax") or plt.axes()
     highlight = kwargs.get("highlight", False)
@@ -184,9 +216,9 @@ def plotUpdate(
 
     if n_dims >= 2:
         distr_mean = distribution.mean[0:2]
-        distr_covar = distribution.covar[0:2, 0:2]
+        # distr_covar = distribution.covar[0:2, 0:2]
         distr_new_mean = distribution_new.mean[0:2]
-        distr_new_covar = distribution_new.covar[0:2, 0:2]
+        # distr_new_covar = distribution_new.covar[0:2, 0:2]
         if samples is not None:
             samples = samples[:, 0:2]
 
@@ -236,9 +268,6 @@ def plotUpdate(
         plt.setp(mean_handle_link, color="gray")
     ax.set_aspect("equal")
 
-    # plt.rcParams['text.usetex']=True
-    # ax.set_xlabel(r'$\theta_1$')
-    # ax.set_ylabel(r'$\theta_2$')
     ax.set_xlabel("dim 1 (of " + str(n_dims) + ")")
     ax.set_ylabel("dim 2 (of " + str(n_dims) + ")")
     ax.set_title("Search space")
@@ -317,7 +346,7 @@ class LearningSession:
 
     def exists(self, name, i_update=None, i_sample=None):
         try:
-            obj = self.ask(name, i_update, i_sample)
+            self.ask(name, i_update, i_sample)
         except Exception:
             return False
         return True
@@ -413,7 +442,7 @@ class LearningSession:
             cost_function = self.ask("task")
             cost_labels = cost_function.costLabels()
 
-        return (learning_curve, cost_labels)
+        return learning_curve, cost_labels
 
     def plotLearningCurve(self, ax=None):
         """

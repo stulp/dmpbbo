@@ -33,7 +33,9 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
     def __init__(self, point):
         """ Constructor.
-        \param[in] point Point to which distance must be minimized.
+        
+        Args:
+            point Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
 

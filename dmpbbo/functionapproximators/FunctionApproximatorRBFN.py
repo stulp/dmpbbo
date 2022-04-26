@@ -15,12 +15,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys
 
-
+from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
-from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximatorRBFN(FunctionApproximator):
@@ -29,7 +27,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
 
         Args:
             n_bfs_per_dim Number of basis functions per input dimension.
-            intersection_height The relative value at which two neighbouring basis functions will intersect (default=0.7)
+            intersection_height Relative value at which two neighbouring basis functions will intersect (default=0.7)
             regularization Regularization parameter (default=0.0)
         """
         meta_params = {
@@ -43,7 +41,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         super().__init__(meta_params, model_param_names)
 
     @staticmethod
-    def _train(inputs, targets, meta_params):
+    def _train(inputs, targets, meta_params, **kwargs):
 
         # Determine the centers and widths of the basis functions, given the input data range
         n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
@@ -60,7 +58,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         reg = meta_params["regularization"]
         wls_meta_params = {"regularization": reg, "use_offset": False}
         fa_lws = FunctionApproximatorWLS(wls_meta_params)
-        wls_model_params = fa_lws._train(activations, targets, wls_meta_params)
+        wls_model_params = fa_lws.train(activations, targets)
 
         model_params["weights"] = wls_model_params["slope"].reshape(n_bfs, -1)
 

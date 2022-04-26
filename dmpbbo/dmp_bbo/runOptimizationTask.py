@@ -16,14 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import math
-import os
-import sys
-import matplotlib.pyplot as plt
-from collections import OrderedDict
-
-
 from dmpbbo.dmp_bbo.LearningSessionTask import *
 
 

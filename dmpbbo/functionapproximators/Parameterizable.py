@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 
 class Parameterizable(ABC):
     @abstractmethod
-    def setSelectedParamNames(selected_values_labels):
+    def setSelectedParamNames(self, selected_values_labels):
         """Set the selected parameters."""
         pass
 

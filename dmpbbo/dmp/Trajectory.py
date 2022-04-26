@@ -16,11 +16,11 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import numpy as np
-import sys
 import os
+
 import matplotlib.pyplot as plt
-from scipy.signal import butter, lfilter, filtfilt
+import numpy as np
+from scipy.signal import butter, filtfilt
 
 
 class Trajectory:
@@ -239,13 +239,6 @@ class Trajectory:
         ):
             viapoint_time_step += 1
 
-        # if (viapoint_time_step>=n_time_steps)
-        # {
-        # cerr << __FILE__ << ":" << __LINE__ << ":"
-        # cerr << "ERROR: the time vector does not contain any time smaller than " << viapoint_time << ". Returning min-jerk trajectory WITHOUT viapoint." <<  endl
-        # return Trajectory()
-        # }
-
         yd_from = np.zeros(n_dims)
         ydd_from = np.zeros(n_dims)
 
@@ -313,14 +306,14 @@ class Trajectory:
         return cls(ts, ys, yds, ydds)
 
     def append(self, trajectory):
-        self._ts = np.concatenate((self._ts, trajectory._ts))
-        self._ys = np.concatenate((self._ys, trajectory._ys))
-        self._yds = np.concatenate((self._yds, trajectory._yds))
-        self._ydds = np.concatenate((self._ydds, trajectory._ydds))
-        if self._misc is None or trajectory._misc is None:
+        self._ts = np.concatenate((self._ts, trajectory.ts))
+        self._ys = np.concatenate((self._ys, trajectory.ys))
+        self._yds = np.concatenate((self._yds, trajectory.yds))
+        self._ydds = np.concatenate((self._ydds, trajectory.ydds))
+        if self._misc is None or trajectory.misc is None:
             self._misc = None
         else:
-            self._misc = np.concatenate((self._misc, trajectory._misc))
+            self._misc = np.concatenate((self._misc, trajectory.misc))
 
     def asMatrix(self):
         as_matrix = np.column_stack((self._ts, self._ys, self._yds, self._ydds))
@@ -389,15 +382,16 @@ class Trajectory:
         for ax in axs:
             ax.set_xlim(x_lim[0], x_lim[1])
 
-        return (all_handles, axs)
+        return all_handles, axs
 
 
 def diffnc(X, dt):
-    # [X] = diffc(X,dt) does non causal differentiation with time interval
-    # dt between data points. The returned vector (matrix) is of the same length
-    # as the original one
-    #
-    # Stefan Schaal December 29, 1995. Converted to Python by Freek Stulp
+    """ Do non-causal differentiation with time interval dt between data points.
+
+    The returned vector (matrix) is of the same length as the original one.
+
+    Stefan Schaal December 29, 1995. Converted to Python by Freek Stulp
+    """
 
     (n_samples, n_dims) = X.shape
     fil = np.array([1.0, 0.0, -1.0]) / 2 / dt

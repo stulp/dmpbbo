@@ -15,13 +15,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, sys
-from mpl_toolkits.mplot3d import Axes3D
 
-
+from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
-from dmpbbo.functionapproximators.BasisFunction import *
 
 
 class FunctionApproximatorLWR(FunctionApproximator):
@@ -38,7 +35,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         super().__init__(meta_params, model_param_names)
 
     @staticmethod
-    def _train(inputs, targets, meta_params):
+    def _train(inputs, targets, meta_params, **kwargs):
 
         # Determine the centers and widths of the basis functions, given the input data range
         n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
@@ -61,11 +58,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
         activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
         for i_kernel in range(n_bfs):
 
-            # Do one weighted least-squares with the current weights
+            # Do one weighted least-squares regression with the current weights
             weights = activations[:, i_kernel]
-            wls_model_params = fa_lws._train(
-                inputs, targets, wls_meta_params, weights=weights
-            )
+            wls_model_params = fa_lws.train(inputs, targets, weights=weights)
 
             slopes[i_kernel, :] = wls_model_params["slope"]
             offsets[i_kernel] = wls_model_params["offset"]
@@ -91,7 +86,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
     @staticmethod
     def getLines(inputs, model_params):
-        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
 
         slopes = model_params["slopes"]
@@ -110,7 +105,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
     @staticmethod
     def _predict(inputs, model_params):
-        # Ensure ndims=2, i.e. shape = (30,) => (30,1)
+        # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
 
         lines = FunctionApproximatorLWR.getLines(inputs, model_params)

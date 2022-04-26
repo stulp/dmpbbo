@@ -16,12 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import math
-import os
-import sys
-
-
 from dmpbbo.bbo.LearningSession import LearningSession
 
 
@@ -34,13 +28,16 @@ def runOptimization(
     directory=None,
 ):
     """ Run an evolutionary optimization process, see \ref page_bbo
-    \param[in] cost_function The cost function to optimize
-    \param[in] initial_distribution The initial parameter distribution
-    \param[in] updater The Updater used to update the parameters
-    \param[in] n_updates The number of updates to perform
-    \param[in] n_samples_per_update The number of samples per update
-    \param[in] directory Optional directory to save to (default: don't save)     
-    \return A learning curve that has the following format
+    
+        Args:
+            cost_function: The cost function to optimize
+            initial_distribution: The initial parameter distribution
+            updater: The Updater used to update the parameters
+            n_updates: The number of updates to perform
+            n_samples_per_update: The number of samples per update
+            directory: Optional directory to save to (default: don't save)
+    Returns:
+            A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
         column 1: The total cost 

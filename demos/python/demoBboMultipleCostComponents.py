@@ -33,7 +33,9 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
     def __init__(self, point, regularization_weight=1.0):
         """ Constructor.
-        \param[in] point Point to which distance must be minimized.
+        
+        Args:
+            point Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
         self.regularization_weight = regularization_weight
