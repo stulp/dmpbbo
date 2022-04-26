@@ -16,12 +16,13 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import numpy as np
-import matplotlib.pyplot as plt
-import os, sys
 import argparse
+import os
+import sys
 
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 from dmpbbo.functionapproximators.functionapproximators_plotting import *
 from dmpbbo.functionapproximators.leastSquares import *

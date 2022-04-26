@@ -25,9 +25,6 @@ from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
-# Include scripts for plotting
-
-
 def set_style(lines, label):
 
     if label == "analytical":

@@ -18,12 +18,12 @@
 
 import sys
 
-from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.updaters import *
 from dmpbbo.dmp.Dmp import Dmp
-from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmp_bbo.run_one_update import *
+from dmpbbo.dmp_bbo.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+from TaskViapoint import TaskViapoint
 
 
 def runDemo(directory, n_dims):

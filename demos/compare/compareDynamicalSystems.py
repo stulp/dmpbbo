@@ -23,12 +23,11 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
-from dmpbbo.DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):

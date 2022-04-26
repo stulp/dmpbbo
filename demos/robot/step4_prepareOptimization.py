@@ -15,21 +15,18 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
+import argparse
+import inspect
 import os
 import sys
 
 import jsonpickle
-import argparse
-import inspect
 
-
-from TaskThrowBall import TaskThrowBall
-
-from dmpbbo.DmpBboJSONEncoder import *
-
-from dmpbbo.bbo.updaters import *
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.updaters import *
 from dmpbbo.dmp_bbo.run_one_update import *
+from dmpbbo.DmpBboJSONEncoder import *
+from TaskThrowBall import TaskThrowBall
 
 if __name__ == "__main__":
 

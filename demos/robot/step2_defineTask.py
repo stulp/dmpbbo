@@ -15,18 +15,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
+import argparse
+import inspect
 import os
 import sys
 
 import jsonpickle
-import argparse
-import inspect
-
 
 from dmpbbo.DmpBboJSONEncoder import *
-
 from TaskThrowBall import TaskThrowBall
-
 
 if __name__ == "__main__":
 

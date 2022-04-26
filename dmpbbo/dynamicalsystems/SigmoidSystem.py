@@ -18,7 +18,7 @@
 
 import numpy as np
 
-from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem  #
+from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
 class SigmoidSystem(DynamicalSystem):

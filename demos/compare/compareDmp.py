@@ -24,10 +24,8 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Include scripts for plotting
-
-from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dmp.Dmp import *
+from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 

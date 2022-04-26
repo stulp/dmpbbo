@@ -18,8 +18,8 @@
 
 import matplotlib.pyplot as plt
 
-from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dmp.Trajectory import Trajectory
+from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem

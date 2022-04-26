@@ -16,18 +16,19 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import numpy as np
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
-import os, sys
 import argparse
+import os
+import sys
 
+import matplotlib.pyplot as plt
+import numpy as np
+from mpl_toolkits.mplot3d import Axes3D
 
 from dmpbbo.dmp.Dmp import *
 from dmpbbo.dmp.Trajectory import *
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.DmpBboJSONEncoder import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 if __name__ == "__main__":
 

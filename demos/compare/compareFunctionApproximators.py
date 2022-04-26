@@ -23,10 +23,9 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-
+from dmpbbo.DmpBboJSONEncoder import *
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
-from dmpbbo.DmpBboJSONEncoder import *
 
 
 def executeBinary(executable_name, arguments, print_command=False):

@@ -16,16 +16,16 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import argparse
 import os
 import sys
-import argparse
-import numpy as np
+
 import matplotlib.pyplot as plt
+import numpy as np
 
-
-from dmpbbo.dmp_bbo.Task import Task
-from dmpbbo.dmp_bbo.run_one_update import *
 from dmpbbo.dmp_bbo.LearningSessionTask import *
+from dmpbbo.dmp_bbo.run_one_update import *
+from dmpbbo.dmp_bbo.Task import Task
 
 if __name__ == "__main__":
 

@@ -21,9 +21,9 @@ import copy
 import inspect
 import os
 import warnings
-import jsonpickle
 from glob import glob
 
+import jsonpickle
 import matplotlib.pyplot as plt
 import numpy as np
 from pylab import mean
@@ -167,7 +167,7 @@ def setColor(handle, i_update, n_updates):
 
 
 def plotUpdate(
-        distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
+    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
     
@@ -293,7 +293,7 @@ class LearningSession:
         self.tell(eval_sample, "eval_sample", i_update)
 
     def addUpdate(
-            self, i_update, distribution, samples, costs, weights, distribution_new=None
+        self, i_update, distribution, samples, costs, weights, distribution_new=None
     ):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)

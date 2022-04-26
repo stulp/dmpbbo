@@ -1,8 +1,8 @@
 import os
 import sys
-import numpy as np
-import matplotlib.pyplot as plt
 
+import matplotlib.pyplot as plt
+import numpy as np
 
 from dmpbbo.dmp_bbo.Task import Task
 

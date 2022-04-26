@@ -16,19 +16,17 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import argparse
 import os
 import sys
-import argparse
-import numpy as np
+
 import matplotlib.pyplot as plt
-
-
-from performRollouts import *
-from TaskThrowBall import *
-
-from dmpbbo.DmpBboJSONEncoder import *
+import numpy as np
 
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.DmpBboJSONEncoder import *
+from performRollouts import *
+from TaskThrowBall import *
 
 if __name__ == "__main__":
 

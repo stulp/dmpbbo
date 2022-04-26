@@ -22,17 +22,17 @@
 ## \ingroup Demos
 ## \ingroup Dmps
 
-import numpy as np
+import os
+import sys
+
 import matplotlib.pyplot as plt
+import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
-import os, sys
-
-
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 
 from dmpbbo.dmp.Dmp import *
-from dmpbbo.dmp.Trajectory import *
 from dmpbbo.dmp.dmp_plotting import *
+from dmpbbo.dmp.Trajectory import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 
 
 def getDemoTrajectory(ts):

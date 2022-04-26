@@ -22,9 +22,6 @@ from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
-# Include scripts for plotting
-
-
 def targetFunction(n_samples_per_dim):
 
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
