@@ -156,7 +156,6 @@ class Trajectory:
                 # Get first index when time is smaller than 'to'
                 to = np.argmax(self._ts >= to)
 
-        assert to < self.length()
         self._ts = self._ts[fro:to]
         self._ys = self._ys[fro:to, :]
         self._yds = self._yds[fro:to, :]
@@ -227,9 +226,6 @@ class Trajectory:
 
         n_time_steps = ts.size
         n_dims = y_from.size
-
-        assert n_dims == y_to.size
-        assert 3 * n_dims == y_yd_ydd_viapoint.size  # Contains y, yd and ydd, so *3
 
         viapoint_time_step = 0
         while (
