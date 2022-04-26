@@ -84,10 +84,6 @@ class FunctionApproximatorWLS(FunctionApproximator):
         return model_params
 
     @staticmethod
-    def _getActivations(inputs, model_params):
-        return None
-
-    @staticmethod
     def _predict(inputs, model_params):
 
         # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
@@ -101,3 +97,8 @@ class FunctionApproximatorWLS(FunctionApproximator):
         outputs = np.dot(inputs, slope.T) + offset
 
         return outputs
+
+    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+        ax = kwargs.get("ax") or self._getAxis()
+        # No model parameters to plot
+        return [], ax

@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+from matplotlib import pyplot as plt
 
 from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
@@ -77,3 +77,18 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         for ii in range(acts.shape[1]):
             weighted_acts[:, ii] = acts[:, ii] * model_params["weights"][ii]
         return weighted_acts.sum(axis=1)
+
+    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+
+        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
+            inputs_min, inputs_max
+        )
+        activations = self._getActivations(inputs, self._model_params)
+
+        ax = kwargs.get("ax") or self._getAxis()
+
+        lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
+        alpha = 1.0 if self.dim_input() < 2 else 0.3
+        plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
+
+        return lines, ax

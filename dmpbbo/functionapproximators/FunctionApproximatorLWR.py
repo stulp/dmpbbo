@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+from matplotlib import pyplot as plt
 
 from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
@@ -116,3 +116,35 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         outputs = (lines * activations).sum(axis=1)
         return outputs
+
+    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+
+        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
+            inputs_min, inputs_max
+        )
+        activations = self._getActivations(inputs, self._model_params)
+
+        ax = kwargs.get("ax") or self._getAxis()
+
+        lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
+        alpha = 1.0 if self.dim_input() < 2 else 0.3
+        plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
+
+        # Plot lines also
+        line_values = self.getLines(inputs, self._model_params)
+
+        # Plot line segment only when a basis function is the most active
+        # values_range = np.amax(activations) - np.amin(activations)
+        n_basis_functions = activations.shape[1]
+        max_activations = np.max(activations, axis=1)
+        for i_bf in range(n_basis_functions):
+            cur_activations = activations[:, i_bf]
+            smaller = cur_activations < 0.2 * max_activations
+            line_values[smaller, i_bf] = np.nan
+
+        lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
+        alpha = 1.0 if self.dim_input() < 2 else 0.5
+        w = 4 if self.dim_input() < 2 else 1
+        plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
+
+        return lines, ax

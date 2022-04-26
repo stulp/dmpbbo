@@ -96,11 +96,6 @@ class FunctionApproximator(Parameterizable):
         """
         pass
 
-    @staticmethod
-    @abstractmethod
-    def _getActivations(inputs, model_params):
-        pass
-
     def setSelectedParamNames(self, names):
         if isinstance(names, str):
             names = [names]  # Convert to list
@@ -146,7 +141,7 @@ class FunctionApproximator(Parameterizable):
         if self.dim_input() == 1:
             return fig.add_subplot(111)
         elif self.dim_input() == 2:
-            return fig.add_subplot(111, projection="3d")
+            return fig.add_subplot(111, projection=Axes3D.name)
         else:
             raise ValueError(
                 "Cannot create axis with dim_input() = " + str(self.dim_input()) + "."
@@ -158,15 +153,15 @@ class FunctionApproximator(Parameterizable):
         if n_dims == 1:
             if n_samples_per_dim is None:
                 n_samples_per_dim = 101
-            inputs_grid = np.linspace(0.0, 2.0, n_samples_per_dim)
+            inputs_grid = np.linspace(inputs_min, inputs_max, n_samples_per_dim)
 
         elif n_dims == 2:
             if n_samples_per_dim is None:
                 n_samples_per_dim = np.atleast_1d([21, 21])
             n_samples = np.prod(n_samples_per_dim)
             # Here comes naive inefficient implementation...
-            x1s = np.linspace(-2.0, 2.0, n_samples_per_dim[0])
-            x2s = np.linspace(-2.0, 2.0, n_samples_per_dim[1])
+            x1s = np.linspace(inputs_min[0], inputs_max[0], n_samples_per_dim[0])
+            x2s = np.linspace(inputs_min[1], inputs_max[1], n_samples_per_dim[1])
             inputs_grid = np.zeros((n_samples, n_dims))
             ii = 0
             for x1 in x1s:
@@ -212,47 +207,14 @@ class FunctionApproximator(Parameterizable):
                 lines.append(cur_lines)
 
         else:
-            print(
-                "Cannot plot input data with a dimensionality of " + str(n_dims) + "."
-            )
+            print(f"Cannot plot input data with a dimensionality of {n_dims}")
             lines = []
 
         return lines
 
-    def plotBasisFunctions(self, inputs_min, inputs_max, **kwargs):
-
-        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
-            inputs_min, inputs_max
-        )
-        activations = self._getActivations(inputs, self._model_params)
-        if activations is None:
-            return None
-
-        ax = kwargs.get("ax") or self._getAxis()
-
-        lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
-        alpha = 1.0 if self.dim_input() < 2 else 0.3
-        plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
-
-        if "slopes" in self._model_params:
-            # Plot lines also
-            line_values = self.getLines(inputs, self._model_params)
-
-            # Plot line segment only when a basis function is the most active
-            # values_range = np.amax(activations) - np.amin(activations)
-            n_basis_functions = activations.shape[1]
-            max_activations = np.max(activations, axis=1)
-            for i_bf in range(n_basis_functions):
-                cur_activations = activations[:, i_bf]
-                smaller = cur_activations < 0.2 * max_activations
-                line_values[smaller, i_bf] = np.nan
-
-            lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
-            alpha = 1.0 if self.dim_input() < 2 else 0.5
-            w = 4 if self.dim_input() < 2 else 1
-            plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)
-
-        return lines, ax
+    @abstractmethod
+    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+        pass
 
     def plotPredictionsGrid(self, inputs_min, inputs_max, **kwargs):
         ax = kwargs.get("ax") or self._getAxis()
@@ -342,12 +304,12 @@ class FunctionApproximator(Parameterizable):
         ax = kwargs.get("ax") or self._getAxis()
         targets = kwargs.get("targets", [])
         plot_residuals = kwargs.get("plot_residuals", True)
-        plot_basis_functions = kwargs.get("plot_basis_functions", False)
+        plot_model_parameters = kwargs.get("plot_model_parameters", False)
 
         inputs_min = np.min(inputs, axis=0)
         inputs_max = np.max(inputs, axis=0)
-        if plot_basis_functions:
-            self.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
+        if plot_model_parameters:
+            self.plotModelParameters(inputs_min, inputs_max, ax=ax)
         self.plotPredictions(
             inputs, targets=targets, ax=ax, plot_residuals=plot_residuals
         )

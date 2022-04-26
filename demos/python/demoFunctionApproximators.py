@@ -78,7 +78,7 @@ def train(fa_name, n_dims):
 
     # Plotting
     (h, ax) = fa.plot(
-        inputs, targets=targets, plot_residuals=True, plot_basis_functions=True
+        inputs, targets=targets, plot_residuals=True, plot_model_parameters=True
     )
     ax.set_title(fa_name + " " + str(n_dims) + "D")
     plt.gcf().canvas.set_window_title(fa_name + " " + str(n_dims) + "D")

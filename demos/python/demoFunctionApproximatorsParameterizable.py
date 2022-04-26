@@ -16,8 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
-import matplotlib.pyplot as plt
-
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
@@ -98,7 +96,7 @@ def train(fa_name, n_dims):
         h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
         plt.setp(h, color=[0.0, 0.0, 0.6], linewidth=w, alpha=a)
         if n_dims == 1:
-            hb, _ = fa.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
+            hb, _ = fa.plotModelParameters(inputs_min, inputs_max, ax=ax)
             plt.setp(hb, color=[0.6, 0.0, 0.0], linewidth=w, alpha=a)
 
         # Perturbed function
@@ -113,7 +111,7 @@ def train(fa_name, n_dims):
             fa.setParamVector(new_values)
 
             if n_dims == 1:
-                hb, _ = fa.plotBasisFunctions(inputs_min, inputs_max, ax=ax)
+                hb, _ = fa.plotModelParameters(inputs_min, inputs_max, ax=ax)
                 plt.setp(hb, color=[1.0, 0.5, 0.5], linewidth=w / 3)
             h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
             plt.setp(h, color=[0.5, 0.5, 1.0], linewidth=w / 2)
