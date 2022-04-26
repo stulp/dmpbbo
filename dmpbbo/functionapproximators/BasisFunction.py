@@ -105,9 +105,7 @@ class Gaussian:
             if n_bfs_per_dim.size == 1:
                 n_bfs_per_dim = n_bfs_per_dim * np.ones(n_dims).astype(int)
             else:
-                raise ValueError(
-                    "n_bfs_per_dim should be of size n_dims = " + str(n_dims)
-                )
+                raise ValueError(f"n_bfs_per_dim should be of size {n_dims}")
 
         centers_per_dim_local = []
         widths_per_dim_local = []

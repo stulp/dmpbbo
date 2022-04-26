@@ -77,7 +77,7 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
 def runOptimizationTaskOneUpdate(session, i_update):
 
     print("======================================================")
-    print("i_update = " + str(i_update))
+    print(f"i_update = {i_update)}"
 
     print("EVALUATING ROLLOUTS")
     costs_per_sample = []

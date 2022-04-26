@@ -139,20 +139,20 @@ def train(fa_name, n_dims):
     outputs_grid = fa.predict(inputs_grid)
 
     # Save the dynamical system to a json file
-    basename = fa_name + "_" + str(n_dims) + "D"
-    filename_json = directory + "/" + basename + ".json"
+    basename = f"{fa_name}_{n_dims}D"
+    filename_json = directory + "/" + f"{basename}.json"
     save_for_cpp = True
     saveToJSON(fa, filename_json, save_for_cpp_also=True)
 
     # Save the inputs to a directory
-    np.savetxt(directory + "/" + basename + "_inputs.txt", inputs_grid)
+    np.savetxt(directory + "/" + f"{basename}_inputs.txt", inputs_grid)
 
     # Call the binary, which does analyticalSolution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
-    arguments = directory + " " + fa_name + " " + str(n_dims)
+    arguments = f"{directory} {fa_name} {n_dims}"
     executeBinary(exec_name, arguments, True)
 
-    outputs_grid_cpp = np.loadtxt(directory + "/" + basename + "_outputs.txt")
+    outputs_grid_cpp = np.loadtxt(directory + "/" + f"{basename}_outputs.txt")
 
     h_pyt, ax = fa.plot(inputs, targets=targets)
 
@@ -175,7 +175,7 @@ def train(fa_name, n_dims):
 
     save_me = False
     if save_me:
-        fig.savefig(os.path.join(directory, basename + ".png"))
+        fig.savefig(os.path.join(directory, f"{basename}.png"))
 
 
 if __name__ == "__main__":

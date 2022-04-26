@@ -253,8 +253,8 @@ def plotUpdate(
         plt.setp(mean_handle_link, color="gray")
     ax.set_aspect("equal")
 
-    ax.set_xlabel("dim 1 (of " + str(n_dims) + ")")
-    ax.set_ylabel("dim 2 (of " + str(n_dims) + ")")
+    ax.set_xlabel(f"dim 1 (of {n_dims})")
+    ax.set_ylabel(f"dim 2 (of {n_dims})")
     ax.set_title("Search space")
     return mean_handle, mean_handle_new, patch, patch_new
 
@@ -350,12 +350,12 @@ class LearningSession:
 
         else:
             abs_basename = os.path.join(self._root_dir, basename)
-            if os.path.isfile(abs_basename + ".json"):
-                with open(abs_basename + ".json", "r") as f:
+            if os.path.isfile(f"{abs_basename}.json"):
+                with open(f"{abs_basename}.json", "r") as f:
                     obj = jsonpickle.decode(f.read())
 
-            elif os.path.isfile(abs_basename + ".txt"):
-                obj = np.loadtxt(abs_basename + ".txt")
+            elif os.path.isfile(f"{abs_basename}.txt"):
+                obj = np.loadtxt(f"{abs_basename}.txt")
 
             else:
                 raise IOError("Could not find file with basename: " + abs_basename)
@@ -381,10 +381,10 @@ class LearningSession:
                 obj = np.atleast_1d(np.array(obj))
 
             if isinstance(obj, np.ndarray):
-                filename = abs_basename + ".txt"
+                filename = f"{abs_basename}.txt"
                 np.savetxt(filename, obj)
             else:
-                filename = abs_basename + ".json"
+                filename = f"{abs_basename}.json"
                 saveToJSON(obj, filename)
 
             return filename

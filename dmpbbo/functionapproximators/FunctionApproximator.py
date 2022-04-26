@@ -144,7 +144,7 @@ class FunctionApproximator(Parameterizable):
             return fig.add_subplot(111, projection=Axes3D.name)
         else:
             raise ValueError(
-                "Cannot create axis with dim_input() = " + str(self.dim_input()) + "."
+                f"Cannot create axis with dim_input() = {self.dim_input()}" + "."
             )
 
     @staticmethod
@@ -279,7 +279,7 @@ class FunctionApproximator(Parameterizable):
 
         else:
             raise ValueError(
-                "Cannot plot input data with dim_input() = " + str(self.dim_input())
+                f"Cannot plot input data with dim_input() = {self.dim_input()}"
             )
 
         if len(targets) > 0:

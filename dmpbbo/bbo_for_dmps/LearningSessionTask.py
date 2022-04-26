@@ -39,7 +39,7 @@ class LearningSessionTask(LearningSession):
             if self._root_dir:
                 basename = self.getBaseName(name, i_update, i_sample)
                 abs_basename = os.path.join(self._root_dir, basename)
-                filename = abs_basename + ".json"
+                filename = f"{abs_basename}.json"
                 saveToJSON(obj, filename, save_for_cpp_also=True)
 
         filename = super().tell(obj, name, i_update, i_sample)
