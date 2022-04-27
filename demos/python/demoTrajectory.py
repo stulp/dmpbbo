@@ -14,9 +14,10 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+import numpy as np
+from matplotlib import pyplot as plt
 
-
-from dmpbbo.dmps.Trajectory import *
+from dmpbbo.dmps.Trajectory import Trajectory
 
 if __name__ == "__main__":
 

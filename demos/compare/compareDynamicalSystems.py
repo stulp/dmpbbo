@@ -18,13 +18,12 @@
 
 import os
 import subprocess
-import sys
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import dmpbbo.DmpBboJSONEncoder as dj
-
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
@@ -34,7 +33,7 @@ from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
+        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first.")
 
     command = f"{executable_name} {arguments}"
     if print_command:

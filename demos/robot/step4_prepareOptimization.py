@@ -16,18 +16,12 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 import argparse
-import inspect
-import os
-import sys
+from pathlib import Path
 
 import jsonpickle
 
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import *
-from dmpbbo.bbo_for_dmps.run_one_update import *
-import dmpbbo.DmpBboJSONEncoder as dj
-
-from TaskThrowBall import TaskThrowBall
+import dmpbbo.bbo_for_dmps.run_one_update as run_one
+from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 
 if __name__ == "__main__":
 
@@ -68,7 +62,7 @@ if __name__ == "__main__":
     updater = updater_decay
 
     task_solver = None
-    session = runOptimizationTaskPrepare(
+    session = run_one.runOptimizationTaskPrepare(
         args.directory,
         task,
         task_solver,

@@ -19,7 +19,7 @@
 import argparse
 
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
-from dmpbbo.bbo_for_dmps.run_one_update import runOptimizationTaskOneUpdate
+import dmpbbo.bbo_for_dmps.run_one_update as run_one
 
 if __name__ == "__main__":
 
@@ -30,4 +30,4 @@ if __name__ == "__main__":
 
     session = LearningSessionTask.from_dir(args.directory)
 
-    runOptimizationTaskOneUpdate(session, args.update)
+    run_one.runOptimizationTaskOneUpdate(session, args.update)

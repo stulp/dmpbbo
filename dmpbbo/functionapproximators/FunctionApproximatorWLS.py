@@ -14,9 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+import numpy as np
 
-
-from dmpbbo.functionapproximators.BasisFunction import *
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 
 

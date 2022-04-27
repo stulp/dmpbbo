@@ -17,9 +17,9 @@
 #
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from dmpbbo.dmps.Trajectory import Trajectory
-import dmpbbo.DmpBboJSONEncoder as dj
 
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
@@ -27,7 +27,6 @@ from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 from dmpbbo.functionapproximators.Parameterizable import Parameterizable
-
 
 class Dmp(DynamicalSystem, Parameterizable):
     def __init__(
@@ -602,8 +601,8 @@ class Dmp(DynamicalSystem, Parameterizable):
             size += self.dim_dmp()
         return size
 
-    def __str__(self):
-        return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
+    #def __str__(self):
+    #    return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
 
     @staticmethod
     def getDmpAxes(has_fa_output=False):

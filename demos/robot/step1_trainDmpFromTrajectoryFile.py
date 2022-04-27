@@ -17,11 +17,16 @@
 
 
 import argparse
+import os
+from pathlib import Path
 
-from dmpbbo.DmpBboJSONEncoder import dj.savejson
-from dmpbbo.dmps.Dmp import *
-from dmpbbo.dmps.Trajectory import *
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+import numpy as np
+from matplotlib import pyplot as plt
+
+import dmpbbo.DmpBboJSONEncoder as dj
+from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.dmps.Trajectory import Trajectory
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 if __name__ == "__main__":
 

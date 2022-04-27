@@ -18,12 +18,16 @@
 
 import sys
 
-from dmpbbo.bbo.updaters import *
-from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.bbo_for_dmps.run_one_update import *
-from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+import numpy as np
+from matplotlib import pyplot as plt
+
+import dmpbbo.bbo_for_dmps.run_one_update as run_one
 from TaskViapoint import TaskViapoint
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
+from dmpbbo.bbo.updaters import UpdaterCovarDecay
+from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def runDemo(directory, n_dims):
@@ -95,7 +99,7 @@ def runDemo(directory, n_dims):
     n_samples_per_update = 10
     n_updates = 20
 
-    session = runOptimizationTaskPrepare(
+    session = run_one.runOptimizationTaskPrepare(
         directory, task, task_solver, distribution, n_samples_per_update, updater, dmp
     )
 
@@ -109,7 +113,7 @@ def runDemo(directory, n_dims):
             cost_vars = task_solver.performRolloutDmp(dmp_sample)
             session.tell(cost_vars, "cost_vars", i_update, i_sample)
 
-        runOptimizationTaskOneUpdate(session, i_update)
+        run_one.runOptimizationTaskOneUpdate(session, i_update)
 
     return session.plot()
 

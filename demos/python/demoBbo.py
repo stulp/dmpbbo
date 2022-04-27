@@ -20,10 +20,12 @@ import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 from dmpbbo.bbo.CostFunction import CostFunction
+from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.runOptimization import runOptimization
-from dmpbbo.bbo.updaters import *
+from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):

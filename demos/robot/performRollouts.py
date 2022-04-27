@@ -19,7 +19,12 @@ import os
 import subprocess
 from pathlib import Path
 
-from dmpbbo.dmps.Dmp import *
+import numpy as np
+from matplotlib import pyplot as plt
+
+from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.dmps.Trajectory import Trajectory
+import dmpbbo.DmpBboJSONEncoder as dj
 
 y_floor = -0.3
 
@@ -134,8 +139,8 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
 
 if __name__ == "__main__":
-    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
-    from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
+    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+    from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
 
     from TaskThrowBall import TaskThrowBall
 

@@ -18,21 +18,20 @@
 
 import os
 import subprocess
-import sys
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 import dmpbbo.DmpBboJSONEncoder as dj
-
-from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
+        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first.")
 
     command = f"{executable_name} {arguments}"
     if print_command:
@@ -100,7 +99,7 @@ def targetFunction(n_samples_per_dim):
                 targets[ii] = 2.5 * x1 * np.exp(-np.square(x1) - np.square(x2))
                 ii += 1
 
-    return (inputs, targets)
+    return inputs, targets
 
 
 def train(fa_name, n_dims):
@@ -142,7 +141,7 @@ def train(fa_name, n_dims):
     dj.savejson(filename_json, fa, save_for_cpp_also=True)
 
     # Save the inputs to a directory
-    np.savetxt(Path(directory,f"{basename}_inputs.txt", inputs_grid))
+    np.savetxt(Path(directory,f"{basename}_inputs.txt"), inputs_grid)
 
     # Call the binary, which does analyticalSolution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
@@ -163,7 +162,7 @@ def train(fa_name, n_dims):
             inputs_0_on_grid, inputs_1_on_grid, outputs_on_grid, rstride=1, cstride=1
         )
     else:
-        print(f"Cannot plot input data with a dimensionality of {n_dims}")
+        raise ValueError(f"Cannot plot input data with a dimensionality of {n_dims}")
 
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
@@ -172,7 +171,7 @@ def train(fa_name, n_dims):
 
     save_me = False
     if save_me:
-        fig.savefig(Path(directory, f"{basename}.png"))
+        plt.gcf().savefig(Path(directory, f"{basename}.png"))
 
 
 if __name__ == "__main__":

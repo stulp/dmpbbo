@@ -14,9 +14,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+import argparse
 
+from matplotlib import pyplot as plt
 
-from dmpbbo.bbo_for_dmps.LearningSessionTask import *
+from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
 if __name__ == "__main__":
 

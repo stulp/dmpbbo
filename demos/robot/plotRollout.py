@@ -17,7 +17,9 @@
 
 import argparse
 
+import jsonpickle
 import matplotlib.pyplot as plt
+import numpy as np
 
 import dmpbbo.DmpBboJSONEncoder as dj
 

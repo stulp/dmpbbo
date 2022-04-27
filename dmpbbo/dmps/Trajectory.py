@@ -16,9 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import os
-from pathlib import Path
-
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import butter, filtfilt
@@ -402,7 +399,7 @@ def butter_lowpass(cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
-    b, a = butter(order, cut, btype="low", analog=False, output="ba")
+    b, a = butter(order, cut, btype="low", analog=False, output="ba")  # noqa 'ba' => b, a
     return b, a
 
 

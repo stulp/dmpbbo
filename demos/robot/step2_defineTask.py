@@ -19,6 +19,8 @@ import argparse
 import os
 from pathlib import Path
 
+import jsonpickle
+
 from TaskThrowBall import TaskThrowBall
 import dmpbbo.DmpBboJSONEncoder as dj
 

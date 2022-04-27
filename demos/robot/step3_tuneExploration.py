@@ -17,11 +17,16 @@
 
 
 import argparse
+import os
+from pathlib import Path
+
+import numpy as np
+from matplotlib import pyplot as plt
 
 import dmpbbo.DmpBboJSONEncoder as dj
-from TaskThrowBall import *
+from TaskThrowBall import TaskThrowBall
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from performRollouts import *
+from performRollouts import performRollouts
 
 if __name__ == "__main__":
 
@@ -55,7 +60,8 @@ if __name__ == "__main__":
 
     n_samples = args.nsamples
     sigma = args.sigma
-    covar_init = sigma * sigma * np.eye(parameter_vector.size)
+    covar_init = sigma * sigma * \
+                 np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
 
     filename = Path(directory, f"distribution.json")

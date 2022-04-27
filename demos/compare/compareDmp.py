@@ -18,22 +18,21 @@
 
 import os
 import subprocess
-import sys
 from pathlib import Path
 
-import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import pyplot as plt
 
-from dmpbbo.dmps.Dmp import *
 import dmpbbo.DmpBboJSONEncoder as dj
-
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
+from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.dmps.Trajectory import Trajectory
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        raise ValueError(f"Executable '{executable}' does not exist. Please call 'make install' in the build directory first.")
+        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first.")
 
     command = f"{executable_name} {arguments}"
     if print_command:
