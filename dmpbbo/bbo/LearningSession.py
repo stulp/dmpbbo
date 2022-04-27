@@ -168,7 +168,7 @@ def setColor(handle, i_update, n_updates):
 
 
 def plotUpdate(
-    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
+        distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
     
@@ -191,14 +191,16 @@ def plotUpdate(
     if samples is None:
         plot_samples = False
 
+    mean_handle = []
+    mean_handle_new = []
+    patch = []
+    patch_new = []
+
     n_dims = len(distribution.mean)
     if n_dims == 1:
         raise ValueError(
             "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
         )
-
-    # ZZZ Take into consideration block_covar_sizes to plot sub blocks in
-    # different subplots
 
     if n_dims >= 2:
         distr_mean = distribution.mean[0:2]
@@ -257,7 +259,8 @@ def plotUpdate(
     ax.set_xlabel(f"dim 1 (of {n_dims})")
     ax.set_ylabel(f"dim 2 (of {n_dims})")
     ax.set_title("Search space")
-    return mean_handle, mean_handle_new, patch, patch_new
+    handles = [mean_handle, mean_handle_new, patch, patch_new]
+    return handles, ax
 
 
 class LearningSession:
@@ -294,7 +297,7 @@ class LearningSession:
         self.tell(eval_sample, "eval_sample", i_update)
 
     def addUpdate(
-        self, i_update, distribution, samples, costs, weights, distribution_new=None
+            self, i_update, distribution, samples, costs, weights, distribution_new=None
     ):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
@@ -308,10 +311,10 @@ class LearningSession:
         if not self._root_dir:
             return self._last_update_added
         else:
-            update_dirs = sorted(glob(str(Path(self._root_dir, "update*/"))))
+            update_dirs = sorted(glob(str(Path(self._root_dir, "update"))+"[0-9]*"))
             last_dir = update_dirs[-1]
             last_dir = last_dir.replace("update", "")
-            last_dir = last_dir.replace(self._root_dir, "")
+            last_dir = last_dir.replace(str(self._root_dir), "")
             last_dir = last_dir.replace("/", "")
             return int(last_dir)
 
@@ -332,11 +335,15 @@ class LearningSession:
         return basename
 
     def exists(self, name, i_update=None, i_sample=None):
-        try:
-            self.ask(name, i_update, i_sample)
-        except Exception:
-            return False
-        return True
+        basename = self.getBaseName(name, i_update, i_sample)
+        if basename in self._cache:
+            return True
+        if self._root_dir:
+            abs_basename = Path(self._root_dir, basename)
+            for extension in ['json', 'txt']:
+                if os.path.isfile(f"{abs_basename}.{extension}"):
+                    return True
+        return False
 
     def ask(self, name, i_update=None, i_sample=None):
 
@@ -377,13 +384,9 @@ class LearningSession:
             # Make sure directory exists
             os.makedirs(os.path.dirname(abs_basename), exist_ok=True)
 
-            if isinstance(obj, list) or isinstance(obj, int):
-                # Try to convert list to numpy array
-                obj = np.atleast_1d(np.array(obj))
-
-            if isinstance(obj, np.ndarray):
+            if isinstance(obj, (np.ndarray, list, int)):
                 filename = f"{abs_basename}.txt"
-                np.savetxt(filename, obj)
+                np.savetxt(filename, np.atleast_1d(np.array(obj)))
             else:
                 filename = f"{abs_basename}.json"
                 saveToJSON(obj, filename)

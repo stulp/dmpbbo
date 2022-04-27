@@ -52,7 +52,7 @@ def plot_error_ellipse(mu, cov, ax=None, **kwargs):
         xy=(x, y),
         width=2 * np.sqrt(S[0]),
         height=2 * np.sqrt(S[1]),
-        angle=theta,
+        angle=float(theta),
         facecolor=facecolor,
         edgecolor=edgecolor,
         **kwargs,

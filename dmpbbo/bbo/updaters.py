@@ -207,6 +207,7 @@ class UpdaterCovarAdaptation(Updater):
             covar_new = (1 - lr) * covar_cur + lr * covar_new
 
         # Set a maximum value for the diagonal to avoid too much exploration
+        level_max = None
         if self.diagonal_max is not None:
             is_scalar_max = np.isscalar(self.diagonal_max)
             if is_scalar_max:
@@ -218,6 +219,7 @@ class UpdaterCovarAdaptation(Updater):
                     covar_new[ii, ii] = level_max
 
         # Set a minimum value for the diagonal to avoid pre-mature convergence
+        level_min = None
         if self.diagonal_min is not None:
             is_scalar_min = np.isscalar(self.diagonal_min)
             if is_scalar_min:
