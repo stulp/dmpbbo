@@ -19,7 +19,8 @@
 import matplotlib.pyplot as plt
 
 from dmpbbo.dmps.Trajectory import Trajectory
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
@@ -35,26 +36,26 @@ class Dmp(DynamicalSystem, Parameterizable):
         y_init,
         y_attr,
         function_approximators=None,
-        sigmoid_max_rate=-15,
-        forcing_term_scaling="NO_SCALING",
-        alpha_spring_damper=20.0,
+        sigmoid_max_rate=-15,  # kwarg
+        forcing_term_scaling="NO_SCALING",  # kwarg
+        alpha_spring_damper=20.0,  # kwarg
         phase_system=None,
         gating_system=None,
-        goal_system=None,
+        goal_system=None,  # kwarg
     ):
         """Initialize a DMP with function approximators and subsystems 
         
         Args:
-            tau           - Time constant
-            y_init        - Initial state
-            y_attr        - Attractor state
-            function_approximators - Function approximators for the forcing term
-            forcing_term_scaling - Which method to use for scaling the forcing term
+            tau           : Time constant
+            y_init        : Initial state
+            y_attr        : Attractor state
+            function_approximators : Function approximators for the forcing term
+            forcing_term_scaling : Which method to use for scaling the forcing term
                 ( "NO_SCALING", "G_MINUS_Y0_SCALING")
-            alpha_spring_damper - \f$\alpha\f$ in the spring-damper system of the dmp
-            goal_system   - Dynamical system to compute delayed goal
-            phase_system  - Dynamical system to compute the phase
-            gating_system - Dynamical system to compute the gating term
+            alpha_spring_damper : alpha in the spring-damper system of the dmp
+            goal_system   : Dynamical system to compute delayed goal
+            phase_system  : Dynamical system to compute the phase
+            gating_system : Dynamical system to compute the gating term
         """
 
         dim_dmp = 3 * y_init.size + 2
@@ -105,8 +106,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         cls,
         trajectory,
         function_approximators,
-        dmp_type="KULVICIUS_2012_JOINING",
-        forcing_term_scaling="AMPLITUDE_SCALING",
+        dmp_type="KULVICIUS_2012_JOINING",  # kwarg
+        forcing_term_scaling="AMPLITUDE_SCALING",  # kwarg
     ):
         """Initialize a DMP by training it from a trajectory. 
         
@@ -163,7 +164,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def set_tau(self, new_tau):
 
-        self._tau = new_tau
+        self._tau = new_tau # noqa _tau is defined inside __init__ of DynamicalSystem
 
         # Set value in all relevant subsystems also
         self._spring_system.tau = new_tau
@@ -172,7 +173,16 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._phase_system.tau = new_tau
         self._gating_system.tau = new_tau
 
-    def integrateStart(self):
+    def integrateStart(self, y_init=None):
+        """ Start integrating the DMP with a new initial state.
+
+        Args:
+            y_init - The initial state vector (y part)
+        Returns:
+            x, xd - The first vector of state variables and their rates of change
+        """
+        if y_init:
+            self.y_init = y_init
 
         x = np.zeros(self._dim_x)
         xd = np.zeros(self._dim_x)
@@ -299,13 +309,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         if ts is None:
             if self._ts_train is None:
-                print(
-                    "Neither the argument 'ts' nor the member variable self._ts_train was set. Returning None."
-                )
-                return None
+                raise ValueError("Neither the argument 'ts' nor the member variable self._ts_train was set.")
             else:
-                # Set the times to the ones the Dmp was trained on.
-                ts = self._ts_train
+                ts = self._ts_train # Set the times to the ones the Dmp was trained on.
 
         n_time_steps = ts.size
 
@@ -359,7 +365,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # THE REST CANNOT BE DONE ANALYTICALLY
 
         # Reset the dynamical system, and get the first state
-        damping = self._spring_system._damping_coefficient
+        damping = self._spring_system.damping_coefficient
         local_spring_system = SpringDamperSystem(
             self._tau, self.y_init, self._y_attr, damping
         )
@@ -463,9 +469,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         fa_inputs_phase = xs_phase
 
         # Get parameters from the spring-dampers system to compute inverse
-        damping_coefficient = self._spring_system._damping_coefficient
-        spring_constant = self._spring_system._spring_constant
-        mass = self._spring_system._mass
+        damping_coefficient = self._spring_system.damping_coefficient
+        spring_constant = self._spring_system.spring_constant
+        mass = self._spring_system.mass
 
         # Compute inverse
         tau = self._tau
@@ -530,7 +536,7 @@ class Dmp(DynamicalSystem, Parameterizable):
     def set_initial_state(self, y_init_new):
         if y_init_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
-        self._y_init = y_init_new
+        self._y_init = y_init_new  # noqa _tau is defined inside __init__ of DynamicalSystem
 
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
@@ -635,7 +641,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # We will loop over each of the subsystems of the DMP: prepare some variables here
         # Names of each of the subsystems
         system_names = ["phase", "gating", "goal", "spring"]
-        system_varname = ["x", "v", "\mathbf{y}^{g_d}", "\mathbf{y}"]
+        system_varname = ["x", "v", "y^{g_d}", "y"]
         # The indices they have in the data
         system_indices = [
             range(3 * D, 3 * D + 1),
