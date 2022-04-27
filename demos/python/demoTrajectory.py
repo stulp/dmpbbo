@@ -50,10 +50,6 @@ if __name__ == "__main__":
     axs[0].plot(viapoint_time, y_yd_ydd_viapoint[1], "ok")
     plt.gcf().canvas.set_window_title("polynomial viapoint trajectory")
 
-    # traj.saveToFile('/tmp/','trajectory1.txt')
-    # traj_load = Trajectory.readFromFile('/tmp/trajectory1.txt',traj.dim_misc())
-    # traj_load.saveToFile('/tmp/','trajectory2.txt')
-
     # Do low-pass filtering
     # Make a noisy trajectory
     y_noisy = traj_min_jerk.ys + 0.001 * np.random.random_sample(traj_min_jerk.ys.shape)

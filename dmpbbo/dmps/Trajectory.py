@@ -316,10 +316,8 @@ class Trajectory:
             np.column_stack((as_matrix, self._misc))
         return as_matrix
 
-    def saveToFile(self, directory, filename):
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        np.savetxt(Path(directory,filename), self.asMatrix(), fmt="%1.7f")
+    def savetxt(self, filename):
+        np.savetxt(filename, self.asMatrix(), fmt="%1.7f")
 
     @staticmethod
     def readFromFile(filename, n_dims_misc=0):

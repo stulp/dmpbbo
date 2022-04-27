@@ -43,7 +43,8 @@ if __name__ == "__main__":
 
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
-    traj.saveToFile(args.output_directory, "trajectory.txt")
+    filename_traj = Path(args.output_directory, "trajectory.txt")
+    traj.savetxt(filename_traj)
     # dj.savejson(traj,Path(args.output_directory,'trajectory.json'))
     n_dims = traj.dim
     peak_to_peak = np.ptp(traj.ys, axis=0)  # Range of data; used later on

@@ -62,7 +62,7 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
         traj = dmp.statesAsTrajectory(ts, xs, xds)
 
         filename_traj = Path(directory, "robot_trajectory.txt")
-        traj.saveToFile(".", filename_traj)
+        traj.savetxt(filename_traj)
 
         filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_traj} {filename_cost_vars}"
