@@ -85,7 +85,7 @@ if __name__ == "__main__":
     # Read trajectory and train DMP with it.
     trajectory_file = "trajectory.txt"
     print(f"Reading trajectory from: {trajectory_file}\n")
-    traj = Trajectory.readFromFile(trajectory_file)
+    traj = Trajectory.loadtxt(trajectory_file)
     n_dims = traj.dim
 
     n_bfs = 10

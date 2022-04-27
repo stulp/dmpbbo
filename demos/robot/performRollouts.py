@@ -140,7 +140,7 @@ if __name__ == "__main__":
     from TaskThrowBall import TaskThrowBall
 
     filename_traj = "trajectory.txt"
-    traj = Trajectory.readFromFile(filename_traj)
+    traj = Trajectory.loadtxt(filename_traj)
 
     n_bfs = 10
     n_dims = traj.dim()

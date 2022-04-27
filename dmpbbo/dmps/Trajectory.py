@@ -320,7 +320,7 @@ class Trajectory:
         np.savetxt(filename, self.asMatrix(), fmt="%1.7f")
 
     @staticmethod
-    def readFromFile(filename, n_dims_misc=0):
+    def loadtxt(filename, n_dims_misc=0):
         data = np.loadtxt(filename)
 
         (n_time_steps, n_cols) = data.shape
