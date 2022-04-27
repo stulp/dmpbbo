@@ -33,7 +33,7 @@ class ExponentialSystem(DynamicalSystem):
         """
         super().__init__(1, tau, x_init)
         self._x_attr = x_attr
-        self._alpha = alpha
+        self.alpha = alpha
 
     @property
     def y_attr(self):
@@ -79,7 +79,7 @@ class ExponentialSystem(DynamicalSystem):
         Args: x - current state
         Returns: xd - rate of change in state
         """
-        xd = self._alpha * (self._x_attr - x) / self._tau
+        xd = self.alpha * (self._x_attr - x) / self._tau
         return xd
 
     def analyticalSolution(self, ts):
@@ -91,9 +91,9 @@ class ExponentialSystem(DynamicalSystem):
         """
         n_ts = ts.size
 
-        exp_term = np.exp(-self._alpha * ts / self._tau)
+        exp_term = np.exp(-self.alpha * ts / self._tau)
         pos_scale = exp_term
-        vel_scale = -(self._alpha / self._tau) * exp_term
+        vel_scale = -(self.alpha / self._tau) * exp_term
 
         val_range = self._x_init - self._x_attr
         val_range_repeat = np.repeat(np.atleast_2d(val_range), n_ts, axis=0)

@@ -29,14 +29,20 @@ class TimeSystem(DynamicalSystem):
             tau - Time constant
             count_down - Whether timer increases (False) or decreases (True)
         """
-        if count_down:
-            # Count-down from 1 to 0
-            x_init = np.ones((1, 1))
-        else:
-            # Count-up from 0 to 1
-            x_init = np.zeros((1, 1))
-        super().__init__(1, tau, x_init)
+        # Count-down from 1 to 0 or count-up from 0 to 1
         self._count_down = count_down
+        x_init = 1.0 if self._count_down else 0.0
+        super().__init__(1, tau, np.array(x_init))
+
+    @property
+    def count_down(self):
+        return self._count_down
+
+    @count_down.setter
+    def count_down(self, new_count_down):
+        self._count_down = new_count_down
+        x_init = 1.0 if self._count_down else 0.0
+        self.x_init = np.array(x_init)
 
     def differentialEquation(self, x):
         """ The differential equation which defines the system.

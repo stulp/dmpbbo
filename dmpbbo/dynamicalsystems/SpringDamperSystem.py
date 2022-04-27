@@ -43,12 +43,12 @@ class SpringDamperSystem(DynamicalSystem):
         """
         super().__init__(2, tau, y_init)
         self._y_attr = y_attr
-        self._damping_coefficient = damping_coefficient
-        self._mass = mass
+        self.damping_coefficient = damping_coefficient
+        self.mass = mass
         if spring_constant == "CRITICALLY_DAMPED":
-            self._spring_constant = damping_coefficient * damping_coefficient / 4
+            self.spring_constant = damping_coefficient * damping_coefficient / 4
         else:
-            self._spring_constant = float(spring_constant)
+            self.spring_constant = float(spring_constant)
 
     @property
     def y_attr(self):
@@ -85,8 +85,8 @@ class SpringDamperSystem(DynamicalSystem):
         yd = z / self._tau
 
         zd = (
-            -self._spring_constant * (y - self._y_attr) - self._damping_coefficient * z
-        ) / (self._mass * self._tau)
+            -self.spring_constant * (y - self._y_attr) - self.damping_coefficient * z
+        ) / (self.mass * self._tau)
 
         xd = np.concatenate((yd, zd))
 
@@ -108,10 +108,10 @@ class SpringDamperSystem(DynamicalSystem):
         # This system behaves like a critically damped spring-damper system
         # http://en.wikipedia.org/wiki/Damped_spring-mass_system
         omega_0 = (
-            np.sqrt(self._spring_constant / self._mass) / self._tau
+            np.sqrt(self.spring_constant / self.mass) / self._tau
         )  # natural frequency
-        zeta = self._damping_coefficient / (
-            2 * np.sqrt(self._mass * self._spring_constant)
+        zeta = self.damping_coefficient / (
+            2 * np.sqrt(self.mass * self.spring_constant)
         )  # damping ratio
         if zeta != 1.0:
             print(
