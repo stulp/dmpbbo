@@ -32,8 +32,10 @@ y_floor = -0.3
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build "
-                         f"directory first.")
+        raise ValueError(
+            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build "
+            f"directory first."
+        )
 
     command = f"{executable_name} {arguments}"
     if print_command:
@@ -139,8 +141,12 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
 
 if __name__ == "__main__":
-    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-    from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
+    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
+        FunctionApproximatorRBFN,
+    )
+    from dmpbbo.functionapproximators.FunctionApproximatorLWR import (
+        FunctionApproximatorLWR,
+    )
 
     from TaskThrowBall import TaskThrowBall
 

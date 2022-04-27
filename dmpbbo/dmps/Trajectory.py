@@ -399,7 +399,9 @@ def butter_lowpass(cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
-    b, a = butter(order, cut, btype="low", analog=False, output="ba")  # noqa 'ba' => b, a
+    b, a = butter(
+        order, cut, btype="low", analog=False, output="ba"
+    )  # noqa 'ba' => b, a
     return b, a
 
 

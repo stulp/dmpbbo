@@ -168,7 +168,7 @@ def setColor(handle, i_update, n_updates):
 
 
 def plotUpdate(
-        distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
+    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
     
@@ -297,7 +297,7 @@ class LearningSession:
         self.tell(eval_sample, "eval_sample", i_update)
 
     def addUpdate(
-            self, i_update, distribution, samples, costs, weights, distribution_new=None
+        self, i_update, distribution, samples, costs, weights, distribution_new=None
     ):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
@@ -311,7 +311,7 @@ class LearningSession:
         if not self._root_dir:
             return self._last_update_added
         else:
-            update_dirs = sorted(glob(str(Path(self._root_dir, "update"))+"[0-9]*"))
+            update_dirs = sorted(glob(str(Path(self._root_dir, "update")) + "[0-9]*"))
             last_dir = update_dirs[-1]
             last_dir = last_dir.replace("update", "")
             last_dir = last_dir.replace(str(self._root_dir), "")
@@ -340,7 +340,7 @@ class LearningSession:
             return True
         if self._root_dir:
             abs_basename = Path(self._root_dir, basename)
-            for extension in ['json', 'txt']:
+            for extension in ["json", "txt"]:
                 if os.path.isfile(f"{abs_basename}.{extension}"):
                     return True
         return False

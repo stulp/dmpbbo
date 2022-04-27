@@ -60,8 +60,7 @@ if __name__ == "__main__":
 
     n_samples = args.nsamples
     sigma = args.sigma
-    covar_init = sigma * sigma * \
-                 np.eye(parameter_vector.size)
+    covar_init = sigma * sigma * np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
 
     filename = Path(directory, f"distribution.json")

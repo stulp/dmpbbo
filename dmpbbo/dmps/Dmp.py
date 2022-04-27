@@ -28,6 +28,7 @@ from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
+
 class Dmp(DynamicalSystem, Parameterizable):
     def __init__(
         self,
@@ -163,7 +164,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def set_tau(self, new_tau):
 
-        self._tau = new_tau # noqa _tau is defined inside __init__ of DynamicalSystem
+        self._tau = new_tau  # noqa _tau is defined inside __init__ of DynamicalSystem
 
         # Set value in all relevant subsystems also
         self._spring_system.tau = new_tau
@@ -308,9 +309,11 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         if ts is None:
             if self._ts_train is None:
-                raise ValueError("Neither the argument 'ts' nor the member variable self._ts_train was set.")
+                raise ValueError(
+                    "Neither the argument 'ts' nor the member variable self._ts_train was set."
+                )
             else:
-                ts = self._ts_train # Set the times to the ones the Dmp was trained on.
+                ts = self._ts_train  # Set the times to the ones the Dmp was trained on.
 
         n_time_steps = ts.size
 
@@ -535,7 +538,9 @@ class Dmp(DynamicalSystem, Parameterizable):
     def set_initial_state(self, y_init_new):
         if y_init_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
-        self._y_init = y_init_new  # noqa _tau is defined inside __init__ of DynamicalSystem
+        self._y_init = (
+            y_init_new
+        )  # noqa _tau is defined inside __init__ of DynamicalSystem
 
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
@@ -545,7 +550,7 @@ class Dmp(DynamicalSystem, Parameterizable):
     def set_attractor_state(self, y_attr_new):
         if y_attr_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
-        
+
         self._y_attr = y_attr_new
 
         # Set value in all relevant subsystems also
@@ -601,7 +606,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             size += self.dim_dmp()
         return size
 
-    #def __str__(self):
+    # def __str__(self):
     #    return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
 
     @staticmethod

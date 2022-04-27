@@ -18,7 +18,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
+    FunctionApproximatorRBFN,
+)
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
 
 

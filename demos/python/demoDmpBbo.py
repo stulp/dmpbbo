@@ -27,7 +27,9 @@ from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdap
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.bbo_for_dmps.runOptimizationTask import runOptimizationTask
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
+    FunctionApproximatorRBFN,
+)
 
 
 def runDemo(directory, n_dims):

@@ -25,13 +25,17 @@ import numpy as np
 
 import dmpbbo.DmpBboJSONEncoder as dj
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
+    FunctionApproximatorRBFN,
+)
 
 
 def executeBinary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
-        raise ValueError(f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first.")
+        raise ValueError(
+            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
+        )
 
     command = f"{executable_name} {arguments}"
     if print_command:
@@ -136,19 +140,19 @@ def train(fa_name, n_dims):
 
     # Save the dynamical system to a json file
     basename = f"{fa_name}_{n_dims}D"
-    filename_json = Path(directory,f"{basename}.json")
+    filename_json = Path(directory, f"{basename}.json")
     save_for_cpp = True
     dj.savejson(filename_json, fa, save_for_cpp_also=True)
 
     # Save the inputs to a directory
-    np.savetxt(Path(directory,f"{basename}_inputs.txt"), inputs_grid)
+    np.savetxt(Path(directory, f"{basename}_inputs.txt"), inputs_grid)
 
     # Call the binary, which does analyticalSolution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     executeBinary(exec_name, arguments, True)
 
-    outputs_grid_cpp = np.loadtxt(Path(directory,f"{basename}_outputs.txt"))
+    outputs_grid_cpp = np.loadtxt(Path(directory, f"{basename}_outputs.txt"))
 
     h_pyt, ax = fa.plot(inputs, targets=targets)
 
