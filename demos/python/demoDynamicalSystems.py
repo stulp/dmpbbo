@@ -47,7 +47,7 @@ if __name__ == "__main__":
     x_init = np.array([0.5, 1.0])
     x_attr = np.array([0.8, 0.1])
     alpha = 6.0  # Decay factor
-    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}
+    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}  # noqa
 
     # TimeSystem
     dyn_systems["Time"] = TimeSystem(tau)

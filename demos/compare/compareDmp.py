@@ -25,7 +25,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from dmpbbo.dmps.Dmp import *
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
 
@@ -120,7 +121,7 @@ if __name__ == "__main__":
 
     # Save the dynamical system to a json file
     filename_json = Path(directory, "dmp.json")
-    saveToJSON(dmp, filename_json, save_for_cpp_also=True)
+    dj.savejson(filename_json, dmp, save_for_cpp_also=True)
     np.savetxt(Path(directory, "ts.txt"), ts)
 
     exec_name = "../../build_dir_realtime/demos/compare/compareDmp"

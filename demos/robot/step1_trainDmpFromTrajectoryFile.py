@@ -18,7 +18,7 @@
 
 import argparse
 
-from dmpbbo.DmpBboJSONEncoder import saveToJSON
+from dmpbbo.DmpBboJSONEncoder import dj.savejson
 from dmpbbo.dmps.Dmp import *
 from dmpbbo.dmps.Trajectory import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
@@ -44,7 +44,7 @@ if __name__ == "__main__":
     print(f"Reading trajectory from: {args.trajectory_file}\n")
     traj = Trajectory.readFromFile(args.trajectory_file)
     traj.saveToFile(args.output_directory, "trajectory.txt")
-    # saveToJSON(traj,Path(args.output_directory,'trajectory.json'))
+    # dj.savejson(traj,Path(args.output_directory,'trajectory.json'))
     n_dims = traj.dim
     peak_to_peak = np.ptp(traj.ys, axis=0)  # Range of data; used later on
 
@@ -65,7 +65,7 @@ if __name__ == "__main__":
 
         filename = Path(args.output_directory, f"dmp_trained_{n_bfs}.json")
         print(f"Saving trained DMP to: {filename}")
-        saveToJSON(dmp, filename, save_for_cpp_also=True)
+        dj.savejson(filename, dmp, save_for_cpp_also=True)
 
         ################################################
         # Analytical solution to compute difference

@@ -23,7 +23,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import *
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import *
 
@@ -138,7 +139,7 @@ def train(fa_name, n_dims):
     basename = f"{fa_name}_{n_dims}D"
     filename_json = Path(directory,f"{basename}.json")
     save_for_cpp = True
-    saveToJSON(fa, filename_json, save_for_cpp_also=True)
+    dj.savejson(filename_json, fa, save_for_cpp_also=True)
 
     # Save the inputs to a directory
     np.savetxt(Path(directory,f"{basename}_inputs.txt", inputs_grid))

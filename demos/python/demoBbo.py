@@ -51,13 +51,14 @@ if __name__ == "__main__":
     cost_function = DemoCostFunctionDistanceToPoint(minimum)
 
     updaters = {}
+    updaters2 = {}
 
     eliteness = 10
     weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-    updaters["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
+    updaters2["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
 
     covar_decay_factor = 0.8
-    updaters["covar_decay"] = UpdaterCovarDecay(
+    updaters2["covar_decay"] = UpdaterCovarDecay(
         eliteness, weighting_method, covar_decay_factor
     )
 

@@ -29,7 +29,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pylab import mean
 
-from dmpbbo.DmpBboJSONEncoder import saveToJSON
+import dmpbbo.DmpBboJSONEncoder as dj
 
 # Avoid warnings when plotting very narrow covariance matrices
 warnings.simplefilter("ignore", np.ComplexWarning)
@@ -389,7 +389,7 @@ class LearningSession:
                 np.savetxt(filename, np.atleast_1d(np.array(obj)))
             else:
                 filename = f"{abs_basename}.json"
-                saveToJSON(obj, filename)
+                dj.savejson(filename, obj)
 
             return filename
 

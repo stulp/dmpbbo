@@ -23,7 +23,8 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
@@ -127,7 +128,7 @@ if __name__ == "__main__":
 
         # Save the dynamical system to a json file
         filename_json = Path(directory, name + ".json")
-        saveToJSON(dyn_system, filename_json, save_for_cpp_also=True)
+        dj.savejson(filename_json, dyn_system, save_for_cpp_also=True)
 
         # Call the binary, which does analyticalSolution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"

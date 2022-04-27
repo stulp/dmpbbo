@@ -19,7 +19,8 @@ import argparse
 
 import matplotlib.pyplot as plt
 
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 
 if __name__ == "__main__":
 

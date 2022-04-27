@@ -45,7 +45,7 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
     elif mode == "robot_executes_dmp":
         filename_dmp = Path(directory, f"dmp_rollout.json")
         print(f"Saving trained DMP to: {filename_dmp}")
-        saveToJSON(dmp, filename_dmp, save_for_cpp_also=True)
+        dj.savejson(filename_dmp, dmp, save_for_cpp_also=True)
 
         filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_dmp} {filename_cost_vars}"

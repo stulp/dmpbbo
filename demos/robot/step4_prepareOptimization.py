@@ -25,7 +25,8 @@ import jsonpickle
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import *
 from dmpbbo.bbo_for_dmps.run_one_update import *
-from dmpbbo.DmpBboJSONEncoder import *
+import dmpbbo.DmpBboJSONEncoder as dj
+
 from TaskThrowBall import TaskThrowBall
 
 if __name__ == "__main__":

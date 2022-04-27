@@ -18,6 +18,7 @@
 
 import argparse
 
+import dmpbbo.DmpBboJSONEncoder as dj
 from TaskThrowBall import *
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from performRollouts import *
@@ -39,7 +40,7 @@ if __name__ == "__main__":
 
     filename = args.dmp
     print(f"Loading DMP from: {filename}")
-    dmp = loadFromJSON(filename)
+    dmp = dj.loadjson(filename)
 
     ts = dmp._ts_train
     xs, xds, _, _ = dmp.analyticalSolution(ts)
@@ -60,7 +61,7 @@ if __name__ == "__main__":
     filename = Path(directory, f"distribution.json")
     print(f"Saving sampling distribution to: {filename}")
     os.makedirs(directory, exist_ok=True)
-    saveToJSON(distribution, filename)
+    dj.savejson(filename, distribution)
 
     samples = distribution.generateSamples(n_samples)
 
@@ -82,7 +83,7 @@ if __name__ == "__main__":
 
         filename = Path(directory, f"dmp_sample_{i_sample}.json")
         print(f"Saving sampled DMP to: {filename}")
-        saveToJSON(dmp, filename, save_for_cpp_also=True)
+        dj.savejson(filename, dmp, save_for_cpp_also=True)
 
         (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution()
         traj_sample = dmp.statesAsTrajectory(ts, xs, xds)

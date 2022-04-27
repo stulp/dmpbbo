@@ -44,7 +44,7 @@ class DmpBboJSONEncoder(JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def saveToJSON(obj, filename, **kwargs):
+def savejson(filename, obj, **kwargs):
     save_for_cpp = kwargs.get("save_for_cpp_also", False)
 
     # Save to standard jsonpickle file
@@ -61,7 +61,7 @@ def saveToJSON(obj, filename, **kwargs):
             out_file.write(j)
 
 
-def loadFromJSON(filename):
+def loadjson(filename):
 
     # Load from standard jsonpickle file
     with open(filename, "r") as in_file:
