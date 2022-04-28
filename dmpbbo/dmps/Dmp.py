@@ -35,13 +35,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         tau,
         y_init,
         y_attr,
-        function_approximators=None,
-        sigmoid_max_rate=-15,  # kwarg
-        forcing_term_scaling="NO_SCALING",  # kwarg
-        alpha_spring_damper=20.0,  # kwarg
-        phase_system=None,
-        gating_system=None,
-        goal_system=None,  # kwarg
+        function_approximators,
+        phase_system,
+        gating_system,
+        **kwargs
     ):
         """Initialize a DMP with function approximators and subsystems 
         
@@ -60,7 +57,11 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         dim_dmp = 3 * y_init.size + 2
         super().__init__(1, tau, y_init, dim_dmp)
-        # def __init__(self, order, tau, y_init, n_dims_x=None):
+
+        sigmoid_max_rate = kwargs.get("sigmoid_max_rate",-15)
+        forcing_term_scaling = kwargs.get("forcing_term_scaling","NO_SCALING")
+        alpha_spring_damper = kwargs.get("alpha_spring_damper",20.0)
+        goal_system = kwargs.get("goal_system",None)
 
         self._y_attr = y_attr
 
@@ -106,8 +107,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         cls,
         trajectory,
         function_approximators,
-        dmp_type="KULVICIUS_2012_JOINING",  # kwarg
-        forcing_term_scaling="AMPLITUDE_SCALING",  # kwarg
+        **kwargs
     ):
         """Initialize a DMP by training it from a trajectory. 
         
@@ -121,6 +121,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system  - Dynamical system to compute the phase
             gating_system - Dynamical system to compute the gating term
         """
+
+        dmp_type = kwargs.get("dmp_type","KULVICIUS_2012_JOINING")
+        forcing_term_scaling = kwargs.get("forcing_term_scaling","AMPLITUDE_SCALING")
+
 
         # Relevant variables from trajectory
         tau = trajectory.ts[-1]
@@ -150,28 +154,16 @@ class Dmp(DynamicalSystem, Parameterizable):
             y_init,
             y_attr,
             function_approximators,
-            None,
-            forcing_term_scaling,
-            alpha_spring_damper,
             phase_system,
             gating_system,
-            goal_system,
+            forcing_term_scaling=forcing_term_scaling,
+            alpha_spring_damper=alpha_spring_damper,
+            goal_system=goal_system,
         )
 
         dmp.train(trajectory)
 
         return dmp
-
-    def set_tau(self, new_tau):
-
-        self._tau = new_tau  # noqa _tau is defined inside __init__ of DynamicalSystem
-
-        # Set value in all relevant subsystems also
-        self._spring_system.tau = new_tau
-        if self._goal_system:
-            self._goal_system.tau = new_tau
-        self._phase_system.tau = new_tau
-        self._gating_system.tau = new_tau
 
     def integrateStart(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
@@ -227,7 +219,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             # simply the attractor state
             self._spring_system.y_attr = self._y_attr
             # with zero change
-            xd[self.GOAL] = np.zeros(self._dim_x)
+            xd[self.GOAL] = np.zeros(self._dim_y)
         else:
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
@@ -418,9 +410,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             trajectory - The trajectory with which to train the DMP.
         """
         # Set tau, initial_state and attractor_state from the trajectory
-        self.set_tau(trajectory.ts[-1])
-        self.set_initial_state(trajectory.ys[0, :])
-        self.set_attractor_state(trajectory.ys[-1, :])
+        self.tau = trajectory.ts[-1]
+        self.y_init = trajectory.ys[0, :]
+        self.y_attr = trajectory.ys[-1, :]
 
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
@@ -535,19 +527,37 @@ class Dmp(DynamicalSystem, Parameterizable):
             xd_in[:, self.SPRING_Z] / self._tau,
         )
 
-    def set_initial_state(self, y_init_new):
+    @DynamicalSystem.tau.setter
+    def tau(self, new_tau):
+
+        self._tau = new_tau  # noqa defined inside __init__ of DynamicalSystem
+
+        # Set value in all relevant subsystems also
+        self._spring_system.tau = new_tau
+        if self._goal_system:
+            self._goal_system.tau = new_tau
+        self._phase_system.tau = new_tau
+        self._gating_system.tau = new_tau
+
+    @DynamicalSystem.y_init.setter
+    def y_init(self, y_init_new):
         if y_init_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
-        self._y_init = (
-            y_init_new
-        )  # noqa _tau is defined inside __init__ of DynamicalSystem
+        self._y_init = y_init_new  # noqa defined inside DynamicalSystem.__init__ of
 
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
         if self._goal_system:
             self._goal_system.y_init = y_init_new
 
-    def set_attractor_state(self, y_attr_new):
+    @property
+    def y_attr(self):
+        """ Return the y part of the attractor state, where x = [y z]
+        """
+        return self._y_attr
+
+    @y_attr.setter
+    def y_attr(self, y_attr_new):
         if y_attr_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
 
@@ -595,7 +605,7 @@ class Dmp(DynamicalSystem, Parameterizable):
                 fa.setParamVector(cur_values)
                 offset += cur_size
         if "goal" in self._selected_param_names:
-            self.set_attractor_state(values[offset : offset + self.dim_dmp()])
+            self.y_attr = values[offset : offset + self.dim_dmp()]
 
     def getParamVectorSize(self):
         size = 0
