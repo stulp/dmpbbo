@@ -73,8 +73,9 @@ if __name__ == "__main__":
 
     print("===============\nPython Numerical integration")
     n_time_steps = len(ts)
-    xs_step = np.zeros([n_time_steps, dmp._dim_x])
-    xds_step = np.zeros([n_time_steps, dmp._dim_x])
+    dim_x = xs_ana.shape[1]
+    xs_step = np.zeros([n_time_steps, dim_x])
+    xds_step = np.zeros([n_time_steps, dim_x])
 
     (x, xd) = dmp.integrate_start()
     xs_step[0, :] = x
@@ -98,12 +99,12 @@ if __name__ == "__main__":
 
     print("===============\nPython reading output from C++")
     d = directory
-    xs_ana_cpp = np.loadtxt(Path(d, "xs_ana.txt"))
-    xds_ana_cpp = np.loadtxt(Path(d, "xds_ana.txt"))
-    forcing_terms_ana_cpp = np.loadtxt(Path(d, "forcing_terms_ana.txt"))
-    fa_outputs_ana_cpp = np.loadtxt(Path(d, "fa_outputs_ana.txt"))
-    xs_step_cpp = np.loadtxt(Path(d, "xs_step.txt"))
-    xds_step_cpp = np.loadtxt(Path(d, "xds_step.txt"))
+    xs_ana_cpp = np.loadtxt(os.path.join(d, "xs_ana.txt"))
+    xds_ana_cpp = np.loadtxt(os.path.join(d, "xds_ana.txt"))
+    forcing_terms_ana_cpp = np.loadtxt(os.path.join(d, "forcing_terms_ana.txt"))
+    fa_outputs_ana_cpp = np.loadtxt(os.path.join(d, "fa_outputs_ana.txt"))
+    xs_step_cpp = np.loadtxt(os.path.join(d, "xs_step.txt"))
+    xds_step_cpp = np.loadtxt(os.path.join(d, "xds_step.txt"))
 
     # Plotting
 

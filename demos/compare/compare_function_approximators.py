@@ -144,14 +144,14 @@ def train(fa_name, n_dims):
     jc.savejson_for_cpp(Path(directory, f"{basename}_for_cpp.json"), fa)
 
     # Save the inputs to a directory
-    np.savetxt(Path(directory, f"{basename}_inputs.txt"), inputs_grid)
+    np.savetxt(os.path.join(directory, f"{basename}_inputs.txt"), inputs_grid)
 
     # Call the binary, which does analytical_solution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     execute_binary(exec_name, arguments, True)
 
-    outputs_grid_cpp = np.loadtxt(Path(directory, f"{basename}_outputs.txt"))
+    outputs_grid_cpp = np.loadtxt(os.path.join(directory, f"{basename}_outputs.txt"))
 
     h_pyt, ax = fa.plot(inputs, targets=targets)
 

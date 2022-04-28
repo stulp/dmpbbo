@@ -17,7 +17,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from dmpbbo.functionapproximators.BasisFunction import Gaussian
+from dmpbbo.functionapproximators.basis_functions import Gaussian
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
 
