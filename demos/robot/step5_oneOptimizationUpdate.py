@@ -30,4 +30,4 @@ if __name__ == "__main__":
 
     session = LearningSessionTask.from_dir(args.directory)
 
-    run_one.runOptimizationTaskOneUpdate(session, args.update)
+    run_one.run_optimization_task_one_update(session, args.update)

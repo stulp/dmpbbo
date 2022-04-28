@@ -72,7 +72,7 @@ class SigmoidSystem(DynamicalSystem):
         self.x_init = new_y_init
         self._Ks_cached = None  # Forces recomputing Ks
 
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """ The differential equation which defines the system.
         
         It relates state values to rates of change of those state values.
@@ -80,11 +80,11 @@ class SigmoidSystem(DynamicalSystem):
         Args: x - current state
         Returns: xd - rate of change in state
         """
-        ks = self._getKs()
+        ks = self._get_ks()
         xd = self._max_rate * x * (1 - (np.divide(x, ks)))
         return xd
 
-    def analyticalSolution(self, ts):
+    def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
         
@@ -99,7 +99,7 @@ class SigmoidSystem(DynamicalSystem):
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
-        Ks = self._getKs()  # noqa
+        Ks = self._get_ks()  # noqa
 
         for dd in range(self._dim_x):
             # Auxiliary variables to improve legibility
@@ -110,7 +110,7 @@ class SigmoidSystem(DynamicalSystem):
 
         return xs, xds
 
-    def _getKs(self):
+    def _get_ks(self):
         if self._Ks_cached is not None:
             # Cache available; simply return it.
             return self._Ks_cached
@@ -139,7 +139,7 @@ class SigmoidSystem(DynamicalSystem):
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
         # If Ks is too close to N_0===initial_state, then the differential equation will always return 0
-        # See differentialEquation below
+        # See differential_equation below
         #   xd = max_rate_*x*(1-(x/Ks_))
         # For initial_state this is
         #   xd = max_rate_*initial_state*(1-(initial_state/Ks_))

@@ -28,14 +28,14 @@ class TaskSolverDmp(TaskSolver):
         self.integrate_time_ = dmp.tau * integrate_dmp_beyond_tau_factor
         self.n_time_steps_ = int(np.floor(self.integrate_time_ / dt)) + 1
 
-    def performRolloutDmp(self, dmp, **kwargs):
+    def perform_rollout_dmp(self, dmp):
         ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
-        xs, xds, forcing_terms, fa_outputs = dmp.analyticalSolution(ts)
-        traj = dmp.statesAsTrajectory(ts, xs, xds)
+        xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution(ts)
+        traj = dmp.states_as_trajectory(ts, xs, xds)
         # traj.misc = forcing_terms
-        cost_vars = traj.asMatrix()
+        cost_vars = traj.as_matrix()
         return cost_vars
 
-    def performRollout(self, sample, **kwargs):
-        self.dmp_.setParamVector(sample)
-        return self.performRolloutDmp(self.dmp_, **kwargs)
+    def perform_rollout(self, sample, **kwargs):
+        self.dmp_.set_param_vector(sample)
+        return self.perform_rollout_dmp(self.dmp_)

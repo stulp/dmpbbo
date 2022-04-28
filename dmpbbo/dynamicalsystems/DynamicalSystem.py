@@ -105,7 +105,7 @@ class DynamicalSystem(ABC):
         self.x_init = x_init_new
 
     @abstractmethod
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """ The differential equation which defines the system.
         
         It relates state values to rates of change of those state values.
@@ -116,7 +116,7 @@ class DynamicalSystem(ABC):
         pass
 
     @abstractmethod
-    def analyticalSolution(self, ts):
+    def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
         
@@ -125,7 +125,7 @@ class DynamicalSystem(ABC):
         """
         pass
 
-    def integrateStart(self, y_init=None):
+    def integrate_start(self, y_init=None):
         """ Start integrating the system with a new initial state.
         
         Args:
@@ -133,12 +133,12 @@ class DynamicalSystem(ABC):
         Returns:
             x, xd - The first vector of state variables and their rates of change
         """
-        if y_init:
+        if y_init is not None:
             self.y_init = y_init
         x = self._x_init
-        return x, self.differentialEquation(x)
+        return x, self.differential_equation(x)
 
-    def integrateStep(self, dt, x):
+    def integrate_step(self, dt, x):
         """ Integrate the system one time step.
         
         Args:
@@ -148,9 +148,9 @@ class DynamicalSystem(ABC):
         Returns:    
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
-        return self.integrateStepRungeKutta(dt, x)
+        return self.integrate_step_runge_kutta(dt, x)
 
-    def integrateStepEuler(self, dt, x):
+    def integrate_step_euler(self, dt, x):
         """ Integrate the system one time step using Euler integration. 
         
         Args:
@@ -162,11 +162,11 @@ class DynamicalSystem(ABC):
         """
         if x.size != self._dim_x:
             raise ValueError("x must have size {self._dim_x}")
-        xd_updated = self.differentialEquation(x)
+        xd_updated = self.differential_equation(x)
         x_updated = x + dt * xd_updated
         return x_updated, xd_updated
 
-    def integrateStepRungeKutta(self, dt, x):
+    def integrate_step_runge_kutta(self, dt, x):
         """Integrate the system one time step using 4th order Runge-Kutta integration. 
         
         See http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
@@ -183,24 +183,19 @@ class DynamicalSystem(ABC):
         if x.size != self._dim_x:
             raise ValueError("x must have size {self._dim_x}")
 
-        k1 = self.differentialEquation(x)
+        k1 = self.differential_equation(x)
         input_k2 = x + dt * 0.5 * k1
-        k2 = self.differentialEquation(input_k2)
+        k2 = self.differential_equation(input_k2)
         input_k3 = x + dt * 0.5 * k2
-        k3 = self.differentialEquation(input_k3)
+        k3 = self.differential_equation(input_k3)
         input_k4 = x + dt * k3
-        k4 = self.differentialEquation(input_k4)
+        k4 = self.differential_equation(input_k4)
 
         x_updated = x + dt * (k1 + 2.0 * (k2 + k3) + k4) / 6.0
-        xd_updated = self.differentialEquation(x_updated)
+        xd_updated = self.differential_equation(x_updated)
         return x_updated, xd_updated
 
     def plot(self, ts, xs, xds, **kwargs):
-        kwargs["dim_y"] = self._dim_y
-        return DynamicalSystem.plotStatic(self._tau, ts, xs, xds, **kwargs)
-
-    @staticmethod
-    def plotStatic(tau, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
         
         Args:
@@ -212,9 +207,8 @@ class DynamicalSystem(ABC):
             axs - Axes on which the plot the output
             fig - Figure on which to plot the output
         """
-
-        dim_x = xs.shape[1]
-        dim_y = kwargs.pop("dim_y", dim_x)
+        dim_x = self._dim_x
+        dim_y = self._dim_y
 
         if "axs" in kwargs:
             axs = kwargs["axs"]
@@ -234,26 +228,26 @@ class DynamicalSystem(ABC):
             axs[0].set_ylabel(r"$x$")
 
             if len(axs) > 1:
-                lines[len(lines) :] = axs[1].plot(ts, xds)
+                lines[len(lines):] = axs[1].plot(ts, xds)
                 axs[1].set_ylabel(r"$\dot{x}$")
 
         else:
             # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
 
-            ys = xs[:, 0 * dim_y : 1 * dim_y]
+            ys = xs[:, 0 * dim_y: 1 * dim_y]
             # zs = xs[:, 1 * dim_y : 2 * dim_y]
-            yds = xds[:, 0 * dim_y : 1 * dim_y]
-            zds = xds[:, 1 * dim_y : 2 * dim_y]
+            yds = xds[:, 0 * dim_y: 1 * dim_y]
+            zds = xds[:, 1 * dim_y: 2 * dim_y]
 
             lines = axs[0].plot(ts, ys)
             axs[0].set_ylabel(r"$y$")
 
             if len(axs) > 1:
-                lines[len(lines) :] = axs[1].plot(ts, yds)
+                lines[len(lines):] = axs[1].plot(ts, yds)
                 axs[1].set_ylabel(r"$\dot{y} = z/\tau$")
 
             if len(axs) > 2:
-                lines[len(lines) :] = axs[2].plot(ts, zds / tau)
+                lines[len(lines):] = axs[2].plot(ts, zds / self._tau)
                 axs[2].set_ylabel(r"$\ddot{y} = \dot{z}/\tau$")
 
         for ax in axs:

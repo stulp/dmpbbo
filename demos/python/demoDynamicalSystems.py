@@ -78,21 +78,21 @@ if __name__ == "__main__":
     for name, dyn_system in dyn_systems.items():
 
         # Analytical solution
-        xs, xds = dyn_system.analyticalSolution(ts)
+        xs, xds = dyn_system.analytical_solution(ts)
         lines, axs = dyn_system.plot(ts, xs, xds)
         set_style(lines, "analytical")
 
         # Euler integration
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "euler")
 
         # Runge-kutta integration
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
                 dt, xs[ii - 1, :]
             )
         lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
@@ -100,9 +100,9 @@ if __name__ == "__main__":
 
         # Runge-kutta integration with different tau
         dyn_system.tau = 1.5 * tau
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
                 dt, xs[ii - 1, :]
             )
         lines = dyn_system.plot(ts, xs, xds, axs=axs)
@@ -110,11 +110,11 @@ if __name__ == "__main__":
         dyn_system.tau = tau
 
         # Runge-kutta integration with a perturbation
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             if ii == int(np.ceil(0.3 * n_time_steps)):
                 xs[ii - 1, :] = xs[ii - 1, :] - 0.2
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
                 dt, xs[ii - 1, :]
             )
         lines = dyn_system.plot(ts, xs, xds, axs=axs)
@@ -123,9 +123,9 @@ if __name__ == "__main__":
         # Runge-kutta integration with a different attractor
         if name == "Exponential" or name == "SpringDamper":
             dyn_system.y_attr = x_attr - 0.2
-            xs[0, :], xds[0, :] = dyn_system.integrateStart()
+            xs[0, :], xds[0, :] = dyn_system.integrate_start()
             for ii in range(1, n_time_steps):
-                xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
+                xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
                     dt, xs[ii - 1, :]
                 )
             lines = dyn_system.plot(ts, xs, xds, axs=axs)

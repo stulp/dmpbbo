@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 import dmpbbo.DmpBboJSONEncoder as dj
 from TaskThrowBall import TaskThrowBall
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from performRollouts import performRollouts
+from perform_rollouts import perform_rollouts
 
 if __name__ == "__main__":
 
@@ -48,15 +48,15 @@ if __name__ == "__main__":
     dmp = dj.loadjson(filename)
 
     ts = dmp._ts_train
-    xs, xds, _, _ = dmp.analyticalSolution(ts)
-    traj_mean = dmp.statesAsTrajectory(ts, xs, xds)
+    xs, xds, _, _ = dmp.analytical_solution(ts)
+    traj_mean = dmp.states_as_trajectory(ts, xs, xds)
 
     fig = plt.figure(1)
     ax1 = fig.add_subplot(131)
     lines, _ = traj_mean.plot([ax1])
     plt.setp(lines, linewidth=3)
 
-    parameter_vector = dmp.getParamVector()
+    parameter_vector = dmp.get_param_vector()
 
     n_samples = args.nsamples
     sigma = args.sigma
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     os.makedirs(directory, exist_ok=True)
     dj.savejson(filename, distribution)
 
-    samples = distribution.generateSamples(n_samples)
+    samples = distribution.generate_samples(n_samples)
 
     ax2 = fig.add_subplot(132)
     distribution.plot(ax2)
@@ -84,20 +84,20 @@ if __name__ == "__main__":
 
     for i_sample in range(n_samples):
 
-        dmp.setParamVector(samples[i_sample, :])
+        dmp.set_param_vector(samples[i_sample, :])
 
         filename = Path(directory, f"dmp_sample_{i_sample}.json")
         print(f"Saving sampled DMP to: {filename}")
         dj.savejson(filename, dmp, save_for_cpp_also=True)
 
-        (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution()
-        traj_sample = dmp.statesAsTrajectory(ts, xs, xds)
+        (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
+        traj_sample = dmp.states_as_trajectory(ts, xs, xds)
         lines, _ = traj_sample.plot([ax1])
         plt.setp(lines, color="#999999", alpha=0.5)
 
-        cost_vars = performRollouts(dmp, "python_simulation", directory)
+        cost_vars = perform_rollouts(dmp, "python_simulation", directory)
 
-        task.plotRollout(cost_vars, ax3)
+        task.plot_rollout(cost_vars, ax3)
 
     filename = "exploration.png"
     fig.savefig(Path(directory, filename))

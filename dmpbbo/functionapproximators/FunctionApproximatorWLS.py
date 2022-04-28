@@ -48,20 +48,20 @@ class FunctionApproximatorWLS(FunctionApproximator):
         # Make the design matrix
         if use_offset:
             # Add a column with 1s
-            X = np.column_stack((inputs, np.ones(n_samples)))
+            X = np.column_stack((inputs, np.ones(n_samples)))  # noqa
         else:
-            X = inputs
+            X = inputs  # noqa
 
         # Weights matrix
         weights = kwargs.get("weights", None)
         if weights is None:
-            W = np.eye(n_samples)
+            W = np.eye(n_samples)  # noqa
         else:
-            W = np.diagflat(weights)
+            W = np.diagflat(weights)  # noqa
 
         # Regularization matrix
-        n_dims_X = X.shape[1]
-        Gamma = regularization * np.identity(n_dims_X)
+        n_dims_X = X.shape[1]  # noqa
+        Gamma = regularization * np.identity(n_dims_X)  # noqa
 
         # Compute beta
         # 1 x n_betas
@@ -97,7 +97,7 @@ class FunctionApproximatorWLS(FunctionApproximator):
 
         return outputs
 
-    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
-        ax = kwargs.get("ax") or self._getAxis()
+    def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
+        ax = kwargs.get("ax") or self._get_axis()
         # No model parameters to plot
         return [], ax

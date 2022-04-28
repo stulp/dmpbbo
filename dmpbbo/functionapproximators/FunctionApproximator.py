@@ -44,7 +44,7 @@ class FunctionApproximator(Parameterizable):
         return self._model_params
 
     def predict(self, inputs):
-        if not self.isTrained():
+        if not self.is_trained():
             raise ValueError("Calling predict() on untrained function approx.")
 
         # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
@@ -64,7 +64,7 @@ class FunctionApproximator(Parameterizable):
         """
         return self._dim_input
 
-    def isTrained(self):
+    def is_trained(self):
         """Determine whether the function approximator has already been trained with data or not.
         
         Returns:
@@ -96,13 +96,13 @@ class FunctionApproximator(Parameterizable):
         """
         pass
 
-    def setSelectedParamNames(self, names):
+    def set_selected_param_names(self, names):
         if isinstance(names, str):
             names = [names]  # Convert to list
         self._selected_param_names = names
 
-    def getParamVector(self):
-        if not self.isTrained():
+    def get_param_vector(self):
+        if not self.is_trained():
             raise ValueError("FunctionApproximator is not trained.")
 
         values = []
@@ -110,32 +110,32 @@ class FunctionApproximator(Parameterizable):
             values.extend(self._model_params[label].flatten())
         return np.asarray(values)
 
-    def setParamVector(self, values):
-        if not self.isTrained():
+    def set_param_vector(self, values):
+        if not self.is_trained():
             raise ValueError("FunctionApproximator is not trained.")
 
-        if len(values) != self.getParamVectorSize():
+        if len(values) != self.get_param_vector_size():
             raise ValueError(
                 f"values ({len(values)}) should have same size as size of selected parameters vector"
-                f"({self.getParamVectorSize()}) "
+                f"({self.get_param_vector_size()}) "
             )
 
         offset = 0
         for label in self._selected_param_names:
             expected_shape = self._model_params[label].shape
             cur_n_values = np.prod(expected_shape)
-            cur_values = values[offset : offset + cur_n_values]
+            cur_values = values[offset: offset + cur_n_values]
             self._model_params[label] = np.reshape(cur_values, expected_shape)
             offset += cur_n_values
 
-    def getParamVectorSize(self):
+    def get_param_vector_size(self):
         size = 0
         for label in self._selected_param_names:
             if label in self._model_params:
                 size += np.prod(self._model_params[label].shape)
         return size
 
-    def _getAxis(self, fig=None):
+    def _get_axis(self, fig=None):
         if not fig:
             fig = plt.figure(figsize=(6, 6))
         if self.dim_input() == 1:
@@ -146,7 +146,7 @@ class FunctionApproximator(Parameterizable):
             raise ValueError(f"Cannot create axis with dim_input = {self.dim_input()}")
 
     @staticmethod
-    def _getGrid(inputs_min, inputs_max, n_samples_per_dim=None):
+    def _get_grid(inputs_min, inputs_max, n_samples_per_dim=None):
         n_dims = inputs_min.size
         if n_dims == 1:
             if n_samples_per_dim is None:
@@ -173,7 +173,7 @@ class FunctionApproximator(Parameterizable):
         return inputs_grid, n_samples_per_dim
 
     @staticmethod
-    def _plotGridValues(inputs, activations, ax, n_samples_per_dim):
+    def _plot_grid_values(inputs, activations, ax, n_samples_per_dim):
         """Plot basis functions activations, whilst being smart about the dimensionality of input data."""
 
         n_dims = len(np.atleast_1d(inputs[0]))
@@ -211,13 +211,13 @@ class FunctionApproximator(Parameterizable):
         return lines
 
     @abstractmethod
-    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+    def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
         pass
 
-    def plotPredictionsGrid(self, inputs_min, inputs_max, **kwargs):
-        ax = kwargs.get("ax") or self._getAxis()
+    def plot_predictions_grid(self, inputs_min, inputs_max, **kwargs):
+        ax = kwargs.get("ax") or self._get_axis()
 
-        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
+        inputs, n_samples_per_dim = FunctionApproximator._get_grid(
             inputs_min, inputs_max
         )
         outputs = self.predict(inputs)
@@ -243,9 +243,9 @@ class FunctionApproximator(Parameterizable):
 
         return h, ax
 
-    def plotPredictions(self, inputs, **kwargs):
+    def plot_predictions(self, inputs, **kwargs):
         targets = kwargs.get("targets", [])
-        ax = kwargs.get("ax") or self._getAxis()
+        ax = kwargs.get("ax") or self._get_axis()
         plot_residuals = kwargs.get("plot_residuals", True)
 
         outputs = self.predict(inputs)
@@ -299,7 +299,7 @@ class FunctionApproximator(Parameterizable):
         return h_outputs, ax
 
     def plot(self, inputs, **kwargs):
-        ax = kwargs.get("ax") or self._getAxis()
+        ax = kwargs.get("ax") or self._get_axis()
         targets = kwargs.get("targets", [])
         plot_residuals = kwargs.get("plot_residuals", True)
         plot_model_parameters = kwargs.get("plot_model_parameters", False)
@@ -307,8 +307,8 @@ class FunctionApproximator(Parameterizable):
         inputs_min = np.min(inputs, axis=0)
         inputs_max = np.max(inputs, axis=0)
         if plot_model_parameters:
-            self.plotModelParameters(inputs_min, inputs_max, ax=ax)
-        self.plotPredictions(
+            self.plot_model_parameters(inputs_min, inputs_max, ax=ax)
+        self.plot_predictions(
             inputs, targets=targets, ax=ax, plot_residuals=plot_residuals
         )
-        return self.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
+        return self.plot_predictions_grid(inputs_min, inputs_max, ax=ax)

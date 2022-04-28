@@ -15,12 +15,30 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
+from abc import ABC, abstractmethod
 import numpy as np
 
 
-class Gaussian:
+class BasisFunction(ABC):
     @staticmethod
-    def activations(centers, widths, inputs, normalized_basis_functions=False):
+    @abstractmethod
+    def activations(inputs, **kwargs):
+        pass
+
+
+class Gaussian(BasisFunction):
+
+    @staticmethod
+    def activations(inputs, **kwargs):
+        return Gaussian._activations(
+            inputs,
+            kwargs.get("centers"),
+            kwargs.get("widths"),
+            kwargs.get("normalized")
+        )
+
+    @staticmethod
+    def _activations(inputs, centers, widths, normalized_basis_functions=False):
         """Get the activations for given centers, widths and inputs.
         
         Args:
@@ -82,7 +100,7 @@ class Gaussian:
         return kernel_activations
 
     @staticmethod
-    def getCentersAndWidths(inputs, n_bfs_per_dim, intersection_height=0.7):
+    def get_centers_and_widths(inputs, n_bfs_per_dim, intersection_height=0.7):
         """Get the centers and widths of basis functions.
         
         Args:
@@ -165,3 +183,9 @@ class Gaussian:
                     digit[i_dim - 1] += 1
 
         return centers, widths
+
+
+class Cosine(BasisFunction):
+    @staticmethod
+    def activations(inputs, **kwargs):
+        raise NotImplementedError("Sorry: Cosine BasisFunction not implemented yet.")

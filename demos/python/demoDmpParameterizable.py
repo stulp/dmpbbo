@@ -49,12 +49,12 @@ if __name__ == "__main__":
     tau_exec = 0.7
     n_time_steps = 71
     ts = np.linspace(0, tau_exec, n_time_steps)
-    xs, xds, forcing, fas = dmp.analyticalSolution(ts)
+    xs, xds, forcing, fas = dmp.analytical_solution(ts)
 
-    for selected_param_names in ["weights","goal",["weights","goal"]]:
+    for selected_param_names in ["weights", "goal", ["weights", "goal"]]:
 
-        dmp.setSelectedParamNames(selected_param_names)
-        values = dmp.getParamVector()
+        dmp.set_selected_param_names(selected_param_names)
+        values = dmp.get_param_vector()
 
         # Plotting
 
@@ -64,12 +64,11 @@ if __name__ == "__main__":
 
         # Perturbed DMPs
         for i_sample in range(5):
-
             rand_vector = 1.0 + 0.2 * np.random.standard_normal(values.shape)
             new_values = rand_vector * values
-            dmp.setParamVector(new_values)
+            dmp.set_param_vector(new_values)
 
-            xs, xds, forcing, fas = dmp.analyticalSolution(ts)
+            xs, xds, forcing, fas = dmp.analytical_solution(ts)
             h, _ = dmp.plotStatic(
                 tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs
             )

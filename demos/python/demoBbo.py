@@ -24,7 +24,7 @@ import numpy as np
 
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.runOptimization import runOptimization
+from dmpbbo.bbo.runOptimization import run_optimization
 from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 
 
@@ -57,10 +57,10 @@ if __name__ == "__main__":
 
     eliteness = 10
     weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-    updaters2["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
+    updaters["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
 
     covar_decay_factor = 0.8
-    updaters2["covar_decay"] = UpdaterCovarDecay(
+    updaters["covar_decay"] = UpdaterCovarDecay(
         eliteness, weighting_method, covar_decay_factor
     )
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
         if directory:
             cur_directory = Path(directory, name)
 
-        session = runOptimization(
+        session = run_optimization(
             cost_function,
             distribution,
             updater,

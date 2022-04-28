@@ -23,16 +23,18 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 class TaskViapoint(Task):
     def __init__(
-        self,
-        viapoint,
-        viapoint_time=None,
-        viapoint_radius=0.0,
-        goal=None,
-        goal_time=None,
-        viapoint_weight=1.0,
-        acceleration_weight=0.0001,
-        goal_weight=0.0,  # fff kwargs
+            self,
+            viapoint,
+            **kwargs
     ):
+        viapoint_time = kwargs.get("viapoint_time", None)
+        viapoint_radius = kwargs.get("viapoint_radius", 0.0)
+        goal = kwargs.get("goal", None)
+        goal_time = kwargs.get("goal_time", None)
+        viapoint_weight = kwargs.get("viapoint_weight", 1.0)
+        acceleration_weight = kwargs.get("acceleration_weight", 0.0001)
+        goal_weight = kwargs.get("goal_weight", 0.0)
+
         if goal is not None:
             if goal.shape != viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
@@ -49,16 +51,16 @@ class TaskViapoint(Task):
         self.acceleration_weight_ = acceleration_weight
         self.goal_weight_ = goal_weight
 
-    def costLabels(self):
+    def cost_labels(self):
         return ["viapoint", "acceleration", "goal"]
 
-    def evaluateRollout(self, cost_vars, sample):
+    def evaluate_rollout(self, cost_vars, sample):
         n_dims = self.viapoint_.shape[0]
         n_time_steps = cost_vars.shape[0]
 
-        ts = cost_vars[:, 0]  # fff
-        y = cost_vars[:, 1 : 1 + n_dims]  # fff, rename to ys
-        ydd = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]  # fff, rename to ydds
+        ts = cost_vars[:, 0]
+        ys = cost_vars[:, 1: 1 + n_dims]
+        ydds = cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
 
         dist_to_viapoint = 0.0
         if self.viapoint_weight_ > 0.0:
@@ -71,7 +73,7 @@ class TaskViapoint(Task):
                 viapoint_repeat = np.repeat(
                     np.atleast_2d(self.viapoint_), n_time_steps, axis=0
                 )
-                dists = np.linalg.norm(y - viapoint_repeat, axis=1)
+                dists = np.linalg.norm(ys - viapoint_repeat, axis=1)
 
                 # Get minimum distance
                 dist_to_viapoint = dists.min()
@@ -84,7 +86,7 @@ class TaskViapoint(Task):
                         "WARNING: viapoint_time_step=0, maybe viapoint_time_ is too large?"
                     )
                 # Compute distance at that time step
-                y_via = cost_vars[viapoint_time_step, 1 : 1 + n_dims]
+                y_via = cost_vars[viapoint_time_step, 1: 1 + n_dims]
                 dist_to_viapoint = np.linalg.norm(y_via - self.viapoint_)
 
             if self.viapoint_radius_ > 0.0:
@@ -96,12 +98,12 @@ class TaskViapoint(Task):
 
         sum_ydd = 0.0
         if self.acceleration_weight_ > 0.0:
-            sum_ydd = np.sum(np.square(ydd))
+            sum_ydd = np.sum(np.square(ydds))
 
         delay_cost_mean = 0.0
         if self.goal_weight_ > 0.0 and self.goal_ is not None:
             after_goal_indices = ts >= self.goal_time_
-            ys_after_goal = y[after_goal_indices, :]
+            ys_after_goal = ys[after_goal_indices, :]
             n_time_steps = ys_after_goal.shape[0]
             goal_repeat = np.repeat(np.atleast_2d(self.goal_), n_time_steps, axis=0)
             delay_cost_mean = np.mean(
@@ -115,14 +117,14 @@ class TaskViapoint(Task):
         costs[0] = np.sum(costs[1:])
         return costs
 
-    def plotRollout(self, cost_vars, ax=None):
+    def plot_rollout(self, cost_vars, ax=None):
         if not ax:
             ax = plt.axes()
 
         """Simple script to plot y of DMP trajectory"""
         n_dims = self.viapoint_.shape[0]
         t = cost_vars[:, 0]
-        y = cost_vars[:, 1 : n_dims + 1]
+        y = cost_vars[:, 1: n_dims + 1]
         if n_dims == 1:
             line_handles = ax.plot(t, y, linewidth=0.5)
             ax.plot(t[0], y[0], "bo", label="start")

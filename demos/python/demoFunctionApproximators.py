@@ -24,7 +24,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
 
 
-def targetFunction(n_samples_per_dim):
+def target_function(n_samples_per_dim):
 
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
@@ -54,7 +54,7 @@ def train(fa_name, n_dims):
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
-    (inputs, targets) = targetFunction(n_samples_per_dim)
+    (inputs, targets) = target_function(n_samples_per_dim)
 
     n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
 
@@ -76,7 +76,7 @@ def train(fa_name, n_dims):
     fa.train(inputs, targets)
 
     # Make predictions for the targets
-    outputs = fa.predict(inputs)
+    outputs = fa.predict(inputs)  # noqa
 
     # Plotting
     (h, ax) = fa.plot(

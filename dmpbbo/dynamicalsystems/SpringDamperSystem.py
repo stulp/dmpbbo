@@ -23,13 +23,13 @@ from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 class SpringDamperSystem(DynamicalSystem):
     def __init__(
-        self,
-        tau,
-        y_init,
-        y_attr,
-        damping_coefficient,
-        spring_constant="CRITICALLY_DAMPED",
-        mass=1.0,
+            self,
+            tau,
+            y_init,
+            y_attr,
+            damping_coefficient,
+            spring_constant="CRITICALLY_DAMPED",
+            mass=1.0,
     ):
         """ Initialize a SpringDamperSystem.
         
@@ -64,7 +64,7 @@ class SpringDamperSystem(DynamicalSystem):
             raise ValueError(f"y_attr must have size {self._dim_y}")
         self._y_attr = np.atleast_1d(new_y_attr)
 
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """ The differential equation which defines the system.
         
         It relates state values to rates of change of those state values.
@@ -76,8 +76,8 @@ class SpringDamperSystem(DynamicalSystem):
         # Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
         # After rewriting it as a 1st order system it becomes [y z yd zd], with yd = z;
         # Get 'y' and 'z' parts of the state in 'x'
-        y = x[0 : self._dim_y]
-        z = x[self._dim_y :]
+        y = x[0: self._dim_y]
+        z = x[self._dim_y:]
 
         # Compute yd and zd
         # See  http://en.wikipedia.org/wiki/Damped_spring-mass_system#Example:mass_.E2.80.93spring.E2.80.93damper
@@ -85,14 +85,14 @@ class SpringDamperSystem(DynamicalSystem):
         yd = z / self._tau
 
         zd = (
-            -self.spring_constant * (y - self._y_attr) - self.damping_coefficient * z
-        ) / (self.mass * self._tau)
+                     -self.spring_constant * (y - self._y_attr) - self.damping_coefficient * z
+             ) / (self.mass * self._tau)
 
         xd = np.concatenate((yd, zd))
 
         return xd
 
-    def analyticalSolution(self, ts):
+    def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
         
@@ -108,10 +108,10 @@ class SpringDamperSystem(DynamicalSystem):
         # This system behaves like a critically damped spring-damper system
         # http://en.wikipedia.org/wiki/Damped_spring-mass_system
         omega_0 = (
-            np.sqrt(self.spring_constant / self.mass) / self._tau
+                np.sqrt(self.spring_constant / self.mass) / self._tau
         )  # natural frequency
         zeta = self.damping_coefficient / (
-            2 * np.sqrt(self.mass * self.spring_constant)
+                2 * np.sqrt(self.mass * self.spring_constant)
         )  # damping ratio
         if zeta != 1.0:
             print(

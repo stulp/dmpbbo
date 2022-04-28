@@ -31,14 +31,14 @@ from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 class Dmp(DynamicalSystem, Parameterizable):
     def __init__(
-        self,
-        tau,
-        y_init,
-        y_attr,
-        function_approximators,
-        phase_system,
-        gating_system,
-        **kwargs
+            self,
+            tau,
+            y_init,
+            y_attr,
+            function_approximators,
+            phase_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
+            gating_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
+            **kwargs
     ):
         """Initialize a DMP with function approximators and subsystems 
         
@@ -58,10 +58,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         dim_dmp = 3 * y_init.size + 2
         super().__init__(1, tau, y_init, dim_dmp)
 
-        sigmoid_max_rate = kwargs.get("sigmoid_max_rate",-15)
-        forcing_term_scaling = kwargs.get("forcing_term_scaling","NO_SCALING")
-        alpha_spring_damper = kwargs.get("alpha_spring_damper",20.0)
-        goal_system = kwargs.get("goal_system",None)
+        sigmoid_max_rate = kwargs.get("sigmoid_max_rate", -15)
+        forcing_term_scaling = kwargs.get("forcing_term_scaling", "NO_SCALING")
+        alpha = kwargs.get("alpha_spring_damper", 20.0)
+        goal_system = kwargs.get("goal_system", None)
 
         self._y_attr = y_attr
 
@@ -70,22 +70,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._forcing_term_scaling = forcing_term_scaling
         self._scaling_amplitudes = None
 
-        self._spring_system = SpringDamperSystem(
-            tau, y_init, y_attr, alpha_spring_damper
-        )
+        self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
         # Set defaults for subsystems if necessary
-        if not phase_system:
-            phase_system = TimeSystem(tau, False)
-        if not gating_system:
-            o = np.ones(1)
-            gating_system = SigmoidSystem(tau, o, sigmoid_max_rate, 0.85)
-        if goal_system:
-            goal_system = ExponentialSystem(tau, y_init, y_attr, 15)
-
-        self._phase_system = phase_system
-        self._gating_system = gating_system
-        self._goal_system = goal_system
+        self._phase_system = phase_system or TimeSystem(tau, False)
+        self._gating_system = gating_system or SigmoidSystem(tau, np.ones(1), sigmoid_max_rate, 0.85)
+        self._goal_system = goal_system or ExponentialSystem(tau, y_init, y_attr, 15)
 
         self._ts_train = None
 
@@ -104,10 +94,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @classmethod
     def from_traj(
-        cls,
-        trajectory,
-        function_approximators,
-        **kwargs
+            cls,
+            trajectory,
+            function_approximators,
+            **kwargs
     ):
         """Initialize a DMP by training it from a trajectory. 
         
@@ -122,9 +112,8 @@ class Dmp(DynamicalSystem, Parameterizable):
             gating_system - Dynamical system to compute the gating term
         """
 
-        dmp_type = kwargs.get("dmp_type","KULVICIUS_2012_JOINING")
-        forcing_term_scaling = kwargs.get("forcing_term_scaling","AMPLITUDE_SCALING")
-
+        dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
+        forcing_term_scaling = kwargs.get("forcing_term_scaling", "AMPLITUDE_SCALING")
 
         # Relevant variables from trajectory
         tau = trajectory.ts[-1]
@@ -165,7 +154,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         return dmp
 
-    def integrateStart(self, y_init=None):
+    def integrate_start(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
 
         Args:
@@ -186,21 +175,21 @@ class Dmp(DynamicalSystem, Parameterizable):
             xd[self.GOAL] = 0.0
         else:
             # Goal system exists. Start integrating it.
-            (x[self.GOAL], xd[self.GOAL]) = self._goal_system.integrateStart()
+            (x[self.GOAL], xd[self.GOAL]) = self._goal_system.integrate_start()
 
         # Set the attractor state of the spring system
         self._spring_system.y_attr = x[self.GOAL]
 
         # Start integrating all further subsystems
-        (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrateStart()
-        (x[self.PHASE], xd[self.PHASE]) = self._phase_system.integrateStart()
-        (x[self.GATING], xd[self.GATING]) = self._gating_system.integrateStart()
+        (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrate_start()
+        (x[self.PHASE], xd[self.PHASE]) = self._phase_system.integrate_start()
+        (x[self.GATING], xd[self.GATING]) = self._gating_system.integrate_start()
 
         # Add rates of change
-        xd = self.differentialEquation(x)
+        xd = self.differential_equation(x)
         return x, xd
 
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """The differential equation which defines the system.
    
         It relates state values to rates of change of those state values
@@ -224,19 +213,19 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
             x_goal = x[self.GOAL]
-            xd[self.GOAL] = self._goal_system.differentialEquation(x_goal)
+            xd[self.GOAL] = self._goal_system.differential_equation(x_goal)
             # The goal state is the attractor state of the spring-damper system
             self._spring_system.y_attr = x_goal
 
         # Integrate spring damper system
         # Forcing term is added to spring_state later
-        xd[self.SPRING] = self._spring_system.differentialEquation(x[self.SPRING])
+        xd[self.SPRING] = self._spring_system.differential_equation(x[self.SPRING])
 
         # Non-linear forcing term phase and gating systems
-        xd[self.PHASE] = self._phase_system.differentialEquation(x[self.PHASE])
-        xd[self.GATING] = self._gating_system.differentialEquation(x[self.GATING])
+        xd[self.PHASE] = self._phase_system.differential_equation(x[self.PHASE])
+        xd[self.GATING] = self._gating_system.differential_equation(x[self.GATING])
 
-        fa_output = self.computeFunctionApproximatorOutput(x[self.PHASE])
+        fa_output = self._compute_func_approx_predictions(x[self.PHASE])
 
         # Gate the output of the function approximators
         gating = x[self.GATING]
@@ -259,7 +248,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         return xd
 
-    def computeFunctionApproximatorOutput(self, phase_state):
+    def _compute_func_approx_predictions(self, phase_state):
         """Compute the outputs of the function approximators.
         
         Args:
@@ -271,18 +260,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         n_time_steps = phase_state.size
         fa_output = np.zeros([n_time_steps, self.dim_dmp()])
 
-        if not self._function_approximators:
-            return fa_output  # No function approximators, return zeros
-
         for i_fa in range(self.dim_dmp()):
-            if self._function_approximators[i_fa]:
-                if self._function_approximators[i_fa].isTrained():
-                    fa_output[:, i_fa] = self._function_approximators[i_fa].predict(
-                        phase_state
-                    )
+            if self._function_approximators[i_fa].is_trained():
+                fa_output[:, i_fa] = self._function_approximators[i_fa].predict(
+                    phase_state
+                )
         return fa_output
 
-    def analyticalSolution(self, ts=None):
+    def analytical_solution(self, ts=None):
         """Return analytical solution of the system at certain times
 
         Args:
@@ -312,13 +297,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         # INTEGRATE SYSTEMS ANALYTICALLY AS MUCH AS POSSIBLE
 
         # Integrate phase
-        (xs_phase, xds_phase) = self._phase_system.analyticalSolution(ts)
+        (xs_phase, xds_phase) = self._phase_system.analytical_solution(ts)
 
         # Compute gating term
-        (xs_gating, xds_gating) = self._gating_system.analyticalSolution(ts)
+        (xs_gating, xds_gating) = self._gating_system.analytical_solution(ts)
 
         # Compute the output of the function approximator
-        fa_outputs = self.computeFunctionApproximatorOutput(xs_phase)
+        fa_outputs = self._compute_func_approx_predictions(xs_phase)
 
         # Gate the output to get the forcing term
         forcing_terms = fa_outputs * xs_gating
@@ -344,7 +329,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             xds_goal = np.zeros(xs_goal.shape)
         else:
             # Integrate goal system and get current goal state
-            xs_goal, xds_goal = self._goal_system.analyticalSolution(ts)
+            xs_goal, xds_goal = self._goal_system.analytical_solution(ts)
 
         xs = np.zeros([n_time_steps, self._dim_x])
         xds = np.zeros([n_time_steps, self._dim_x])
@@ -368,7 +353,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         local_spring_system.y_attr = xs_goal[0, :]
 
         # Start integrating spring damper system
-        (x_spring, xd_spring) = local_spring_system.integrateStart()
+        (x_spring, xd_spring) = local_spring_system.integrate_start()
 
         # For convenience
         SPRING = self.SPRING  # noqa
@@ -392,11 +377,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             local_spring_system.y_attr = xs[tt, self.GOAL]
 
             # Integrate spring damper system
-            xds[tt, SPRING] = local_spring_system.differentialEquation(xs[tt, SPRING])
+            xds[tt, SPRING] = local_spring_system.differential_equation(xs[tt, SPRING])
 
             # Add forcing term to the acceleration of the spring state
             xds[tt, SPRING_Z] = (
-                xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
+                    xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
             )  # + perturbation
             # Compute y component from z
             xds[tt, SPRING_Y] = xs[tt, SPRING_Z] / self._tau
@@ -415,15 +400,15 @@ class Dmp(DynamicalSystem, Parameterizable):
         self.y_attr = trajectory.ys[-1, :]
 
         # This needs to be computed for (optional) scaling of the forcing term.
-        # Needs to be done BEFORE computeFunctionApproximatorInputsAndTargets
-        self._scaling_amplitudes = trajectory.getRangePerDim()
+        # Needs to be done BEFORE _compute_targets
+        self._scaling_amplitudes = trajectory.get_range_per_dim()
 
         # Do not train function approximators if there are none
-        if self._function_approximators:
+        if self._function_approximators is not None:
             (
                 fa_input_phase,
                 f_target,
-            ) = self.computeFunctionApproximatorInputsAndTargets(trajectory)
+            ) = self._compute_targets(trajectory)
 
             for dd in range(self.dim_dmp()):
                 fa_target = f_target[:, dd]
@@ -431,10 +416,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call
-        # analyticalSolution without the "ts" argument.
+        # analytical_solution without the "ts" argument.
         self._ts_train = trajectory.ts
 
-    def computeFunctionApproximatorInputsAndTargets(self, trajectory):
+    def _compute_targets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
    
         For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the
@@ -453,7 +438,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         if self.dim_dmp() != dim_data:
             raise ValueError("dims of trajectory data and dmp must be the same")
 
-        (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analyticalSolution(
+        (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analytical_solution(
             trajectory.ts
         )
         xs_goal = xs_ana[:, self.GOAL]
@@ -470,12 +455,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Compute inverse
         tau = self._tau
         f_target = (
-            tau * tau * trajectory.ydds
-            + (
-                spring_constant * (trajectory.ys - xs_goal)
-                + damping_coefficient * tau * trajectory.yds
-            )
-            / mass
+                tau * tau * trajectory.ydds
+                + (
+                        spring_constant * (trajectory.ys - xs_goal)
+                        + damping_coefficient * tau * trajectory.yds
+                )
+                / mass
         )
 
         # Factor out gating term
@@ -496,14 +481,14 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         return fa_inputs_phase, f_target
 
-    def stateAsPosVelAcc(self, x_in, xd_in):
+    def states_as_pos_vel_acc(self, x_in, xd_in):
         return (
             x_in[self.SPRING_Y],
             xd_in[self.SPRING_Y],
             xd_in[self.SPRING_Z] / self._tau,
         )
 
-    def statesAsTrajectory(self, ts, x_in, xd_in):
+    def states_as_trajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
         
         As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and
@@ -534,7 +519,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set value in all relevant subsystems also
         self._spring_system.tau = new_tau
-        if self._goal_system:
+        if self._goal_system is not None:
             self._goal_system.tau = new_tau
         self._phase_system.tau = new_tau
         self._gating_system.tau = new_tau
@@ -547,7 +532,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
-        if self._goal_system:
+        if self._goal_system is not None:
             self._goal_system.y_init = y_init_new
 
     @property
@@ -564,14 +549,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._y_attr = y_attr_new
 
         # Set value in all relevant subsystems also
-        if self._goal_system:
+        if self._goal_system is not None:
             self._goal_system.y_attr = y_attr_new
 
         # Do NOT do the following. The attractor state of the spring system is
         # determined by the goal system.
         # self._spring_system.y_attr = y_attr_new
 
-    def setSelectedParamNames(self, names):
+    def set_selected_param_names(self, names):
         if isinstance(names, str):
             names = [names]  # Convert to list
 
@@ -582,36 +567,36 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Any remaining names are passed to all function approximators
         for fa in self._function_approximators:
-            fa.setSelectedParamNames(names)
+            fa.set_selected_param_names(names)
 
-    def getParamVector(self):
+    def get_param_vector(self):
         values = np.empty(0)
         for fa in self._function_approximators:
-            if fa.isTrained():
-                values = np.append(values, fa.getParamVector())
+            if fa.is_trained():
+                values = np.append(values, fa.get_param_vector())
         if "goal" in self._selected_param_names:
             values = np.append(values, self._y_attr)
         return values
 
-    def setParamVector(self, values):
-        size = self.getParamVectorSize()
+    def set_param_vector(self, values):
+        size = self.get_param_vector_size()
         if len(values) != size:
             raise ValueError("values must have size {size}")
         offset = 0
         for fa in self._function_approximators:
-            if fa.isTrained():
-                cur_size = fa.getParamVectorSize()
-                cur_values = values[offset : offset + cur_size]
-                fa.setParamVector(cur_values)
+            if fa.is_trained():
+                cur_size = fa.get_param_vector_size()
+                cur_values = values[offset: offset + cur_size]
+                fa.set_param_vector(cur_values)
                 offset += cur_size
         if "goal" in self._selected_param_names:
-            self.y_attr = values[offset : offset + self.dim_dmp()]
+            self.y_attr = values[offset: offset + self.dim_dmp()]
 
-    def getParamVectorSize(self):
+    def get_param_vector_size(self):
         size = 0
         for fa in self._function_approximators:
-            if fa.isTrained():
-                size += fa.getParamVectorSize()
+            if fa.is_trained():
+                size += fa.get_param_vector_size()
         if "goal" in self._selected_param_names:
             size += self.dim_dmp()
         return size
@@ -620,7 +605,7 @@ class Dmp(DynamicalSystem, Parameterizable):
     #    return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
 
     @staticmethod
-    def getDmpAxes(has_fa_output=False):
+    def get_dmp_axes(has_fa_output=False):
         n_cols = 5
         n_rows = 3 if has_fa_output else 2
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
@@ -628,91 +613,37 @@ class Dmp(DynamicalSystem, Parameterizable):
         axs = [fig.add_subplot(n_rows, 5, i + 1) for i in range(n_rows * 5)]
         return axs
 
-    @staticmethod
-    def plotStatic(tau, ts, xs, xds, **kwargs):
+    def plot(self, ts, xs, xds, **kwargs):
         forcing_terms = kwargs.get("forcing_terms", [])
         fa_outputs = kwargs.get("fa_outputs", [])
         ext_dims = kwargs.get("ext_dims", [])
         plot_tau = kwargs.get("plot_tau", True)
         has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
 
-        axs = kwargs.get("axs") or Dmp.getDmpAxes(has_fa_output)
+        axs = kwargs.get("axs") or Dmp.get_dmp_axes(has_fa_output)
 
-        # Dimensionality of dynamical system.
-        dim_x = xs.shape[1]
-        # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system
-        # (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
-        n_dims_dmp = (dim_x - 2) // 3
-        D = n_dims_dmp  # noqa Abbreviation for convenience
-
-        # define SPRING    segment(0*dim_orig()+0,2*dim_orig())
-        # define SPRING_Y  segment(0*dim_orig()+0,dim_orig())
-        # define SPRING_Z  segment(1*dim_orig()+0,dim_orig())
-        # define GOAL      segment(2*dim_orig()+0,dim_orig())
-        # define PHASE     segment(3*dim_orig()+0,       1)
-        # define GATING    segment(3*dim_orig()+1,       1)
-
-        # We will loop over each of the subsystems of the DMP: prepare some variables here
-        # Names of each of the subsystems
-        system_names = ["phase", "gating", "goal", "spring"]
-        system_varname = ["x", "v", "y^{g_d}", "y"]
-        # The indices they have in the data
-        system_indices = [
-            range(3 * D, 3 * D + 1),
-            range(3 * D + 1, 3 * D + 2),
-            range(2 * D, 3 * D),
-            range(0 * D, 2 * D),
+        d = self.dim_dmp()  # noqa Abbreviation for convenience
+        systems = [
+            ("phase", range(3 * d, 3 * d + 1), axs[0:2], self._phase_system),
+            ("gating", range(3 * d + 1, 3 * d + 2), axs[5:7], self._gating_system),
+            ("goal", range(2 * d, 3 * d), axs[2:4], self._gating_system),
+            ("spring-damper", range(0 * d, 2 * d), axs[7:10], self._spring_system),
         ]
-        system_order = [1, 1, 1, 2]
-        # The subplot in which they are plotted (x is plotted here, xd in the subplot+1)
-        subplot_offsets = [1, 6, 3, 8]
+        # system_varname = ["x", "v", "y^{g_d}", "y"]
 
-        # Loop over each of the subsystems of the DMP
-        n_systems = len(system_names)
         all_handles = []
-        for i_system in range(n_systems):
-
-            # Plot 'x' for this subsystem (analytical solution and step-by-step integration)
-            cur_n_plots = 2
-            if system_order[i_system] == 2:
-                cur_n_plots = 3
-
-            cur_axs = axs[
-                subplot_offsets[i_system]
-                - 1 : subplot_offsets[i_system]
-                - 1
-                + cur_n_plots
-            ]
-            cur_indices = list(system_indices[i_system])
-            cur_xs = xs[:, cur_indices]
-            cur_xds = xds[:, cur_indices]
-            if system_order[i_system] == 2:
-                h, _ = DynamicalSystem.plotStatic(
-                    tau, ts, cur_xs, cur_xds, axs=cur_axs, dim_y=n_dims_dmp
-                )
-            else:
-                h, _ = DynamicalSystem.plotStatic(tau, ts, cur_xs, cur_xds, axs=cur_axs)
-            all_handles.extend(h)
-
-            if system_names[i_system] == "gating":
-                plt.setp(h, color="m")
-            if system_names[i_system] == "phase":
-                plt.setp(h, color="c")
-
-            for ii in range(len(cur_axs)):
-                x = np.mean(cur_axs[ii].get_xlim())
-                y = np.mean(cur_axs[ii].get_ylim())
-                cur_axs[ii].text(
-                    x, y, system_names[i_system], horizontalalignment="center"
-                )
+        for system in systems:
+            xs_cur = xs[:, system[1]]
+            xds_cur = xds[:, system[1]]
+            axs_cur = system[2]
+            h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+            all_handles.append(h)
+            for i, ax in enumerate(axs_cur):
+                x = np.mean(ax.get_xlim())
+                y = np.mean(ax.get_ylim())
+                ax.text(x, y, system[0], horizontalalignment="center")
                 if plot_tau:
-                    cur_axs[ii].plot([tau, tau], cur_axs[ii].get_ylim(), "-k")
-                if ii == 0:
-                    cur_axs[ii].set_ylabel(r"$" + system_varname[i_system] + "$")
-                if ii == 1:
-                    cur_axs[ii].set_ylabel(r"$\dot{" + system_varname[i_system] + "}$")
-                if ii == 2:
-                    cur_axs[ii].set_ylabel(r"$\ddot{" + system_varname[i_system] + "}$")
+                    ax.plot([self._tau, self._tau], ax.get_ylim(), "--k")
 
         if len(fa_outputs) > 1:
             ax = axs[11 - 1]
@@ -722,7 +653,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             y = np.mean(ax.get_ylim())
             ax.text(x, y, "func. approx.", horizontalalignment="center")
             ax.set_xlabel(r"time ($s$)")
-            ax.set_ylabel(r"$f_\mathbf{\theta}(" + system_varname[0] + ")$")
+            ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
 
         if len(forcing_terms) > 1:
             ax = axs[12 - 1]
@@ -732,7 +663,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             y = np.mean(ax.get_ylim())
             ax.text(x, y, "forcing term", horizontalalignment="center")
             ax.set_xlabel(r"time ($s$)")
-            ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(" + system_varname[0] + ")$")
+            ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(x)$")
 
         if len(ext_dims) > 1:
             ax = axs[13 - 1]

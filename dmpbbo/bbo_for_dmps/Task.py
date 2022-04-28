@@ -26,13 +26,13 @@ class Task(ABC):
     """
 
     @abstractmethod
-    def evaluateRollout(self, cost_vars, sample):
+    def evaluate_rollout(self, cost_vars, sample):
         """The cost function which defines the task.
        
         
         Args:
             cost_vars All the variables relevant to computing the cost. These are determined by
-        TaskSolver::performRollout(). For further information see the section on \ref sec_bbo_task_and_task_solver
+        TaskSolver::perform_rollout(). For further information see the section on \ref sec_bbo_task_and_task_solver
 
         
         Args:
@@ -45,13 +45,13 @@ class Task(ABC):
         """
         pass
 
-    def plotRollout(self, cost_vars, ax=None):
+    def plot_rollout(self, cost_vars, ax=None):
         if not ax:
             ax = plt.axes()
         h = ax.plot(cost_vars, "-")
         return h, ax
 
-    def costLabels(self):
+    def cost_labels(self):
         """Labels for the different cost components.
         
         The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of

@@ -23,7 +23,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
 )
 
 
-def targetFunction(n_samples_per_dim):
+def target_function(n_samples_per_dim):
 
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
@@ -53,7 +53,7 @@ def train(fa_name, n_dims):
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
-    (inputs, targets) = targetFunction(n_samples_per_dim)
+    (inputs, targets) = target_function(n_samples_per_dim)
 
     n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
 
@@ -71,13 +71,13 @@ def train(fa_name, n_dims):
     fa.train(inputs, targets)
 
     # Make predictions for the targets
-    outputs = fa.predict(inputs)
+    outputs = fa.predict(inputs)  # noqa
 
     if fa_name == "LWR":
-        fa.setSelectedParamNames(["offsets", "widths"])
+        fa.set_selected_param_names(["offsets", "widths"])
     else:
-        fa.setSelectedParamNames(["weights", "widths"])
-    values = fa.getParamVector()
+        fa.set_selected_param_names(["weights", "widths"])
+    values = fa.get_param_vector()
 
     # Plotting
     inputs_min = np.min(inputs, axis=0)
@@ -95,11 +95,11 @@ def train(fa_name, n_dims):
         ax = axs[0] if noise == "additive" else axs[1]
 
         # Original function
-        fa.setParamVector(values)
-        h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
+        fa.set_param_vector(values)
+        h, _ = fa.plot_predictions_grid(inputs_min, inputs_max, ax=ax)
         plt.setp(h, color=[0.0, 0.0, 0.6], linewidth=w, alpha=a)
         if n_dims == 1:
-            hb, _ = fa.plotModelParameters(inputs_min, inputs_max, ax=ax)
+            hb, _ = fa.plot_model_parameters(inputs_min, inputs_max, ax=ax)
             plt.setp(hb, color=[0.6, 0.0, 0.0], linewidth=w, alpha=a)
 
         # Perturbed function
@@ -111,12 +111,12 @@ def train(fa_name, n_dims):
             else:
                 rand_vector = 1.0 + 0.1 * np.random.standard_normal(values.shape)
                 new_values = rand_vector * values
-            fa.setParamVector(new_values)
+            fa.set_param_vector(new_values)
 
             if n_dims == 1:
-                hb, _ = fa.plotModelParameters(inputs_min, inputs_max, ax=ax)
+                hb, _ = fa.plot_model_parameters(inputs_min, inputs_max, ax=ax)
                 plt.setp(hb, color=[1.0, 0.5, 0.5], linewidth=w / 3)
-            h, _ = fa.plotPredictionsGrid(inputs_min, inputs_max, ax=ax)
+            h, _ = fa.plot_predictions_grid(inputs_min, inputs_max, ax=ax)
             plt.setp(h, color=[0.5, 0.5, 1.0], linewidth=w / 2)
 
         ax.set_title(f"{fa_name} {n_dims}D ({noise} noise)")

@@ -78,7 +78,7 @@ class DistributionGaussian:
         self.mean = mean
         self.covar = covar
 
-    def generateSamples(self, n_samples=1):
+    def generate_samples(self, n_samples=1):
         """ Generate samples from the distribution.
         
         Args:
@@ -88,7 +88,7 @@ class DistributionGaussian:
         """
         return np.random.multivariate_normal(self.mean, self.covar, n_samples)
 
-    def maxEigenValue(self):
+    def max_eigen_value(self):
         """ Get the largest eigenvalue of the covariance matrix of this distribution.
         Returns:
             largest eigenvalue of the covariance matrix of this distribution.

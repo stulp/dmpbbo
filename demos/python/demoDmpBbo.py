@@ -25,15 +25,14 @@ from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.bbo_for_dmps.runOptimizationTask import runOptimizationTask
+from dmpbbo.bbo_for_dmps.runOptimizationTask import run_optimization_task
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
     FunctionApproximatorRBFN,
 )
 
 
-def runDemo(directory, n_dims):
-
+def run_demo(directory, n_dims):
     # Some DMP parameters
     tau = 0.5
     y_init = np.linspace(1.8, 2.0, n_dims)
@@ -43,43 +42,34 @@ def runDemo(directory, n_dims):
     function_apps = []
     intersection_height = 0.8
     for n_basis in [6, 7]:
-
         fa = FunctionApproximatorRBFN(n_basis, intersection_height)
         fa.train(np.linspace(0, 1, 100), np.zeros(100))
 
-        fa.setSelectedParamNames("weights")
+        fa.set_selected_param_names("weights")
         random_weights = 10.0 * np.random.normal(0, 1, n_basis)
-        fa.setParamVector(random_weights)
+        fa.set_param_vector(random_weights)
 
         function_apps.append(fa)
 
     # Initialize Dmp
     dmp = Dmp(tau, y_init, y_attr, function_apps)
-    dmp.setSelectedParamNames("weights")
-    # dmp.setSelectedParamNames(['goal','weights'])
+    dmp.set_selected_param_names("weights")
+    # dmp.set_selected_param_names(['goal','weights'])
 
     # Make the task
     viapoint = 3 * np.ones(n_dims)
-    viapoint_time = 0.3
-    if n_dims == 2:
-        # Do not pass through viapoint at a specific time, but rather pass
-        # through it at any time.
-        viapoint_time = None
-    viapoint_radius = 0.1
-    goal = y_attr
-    goal_time = 1.1 * tau
-    viapoint_weight = 1.0
-    acceleration_weight = 0.0001
-    goal_weight = 0.0
+    viapoint_time = 0.3 if n_dims == 1 else None  # None means: Do not pass through viapoint at a specific time,
+    # but rather pass through it at any time.
+
     task = TaskViapoint(
         viapoint,
-        viapoint_time,
-        viapoint_radius,
-        goal,
-        goal_time,
-        viapoint_weight,
-        acceleration_weight,
-        goal_weight,
+        viapoint_time=viapoint_time,
+        viapoint_radius=0.1,
+        goal=y_attr,
+        goal_time=1.1 * tau,
+        viapoint_weight=1.0,
+        acceleration_weight=0.0001,
+        goal_weight=0.0,
     )
 
     # Make task solver, based on a Dmp
@@ -87,7 +77,7 @@ def runDemo(directory, n_dims):
     integrate_dmp_beyond_tau_factor = 1.5
     task_solver = TaskSolverDmp(dmp, dt, integrate_dmp_beyond_tau_factor)
 
-    n_search = dmp.getParamVectorSize()
+    n_search = dmp.get_param_vector_size()
 
     mean_init = np.full(n_search, 0.0)
     covar_init = 1000.0 * np.eye(n_search)
@@ -113,7 +103,7 @@ def runDemo(directory, n_dims):
     n_samples_per_update = 10
     n_updates = 40
 
-    session = runOptimizationTask(
+    session = run_optimization_task(
         task,
         task_solver,
         distribution,
@@ -131,6 +121,6 @@ if __name__ == "__main__":
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     for n_dims in [1, 2]:
-        runDemo(directory, n_dims)
+        run_demo(directory, n_dims)
 
     plt.show()

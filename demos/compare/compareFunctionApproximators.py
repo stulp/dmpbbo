@@ -30,7 +30,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
 )
 
 
-def executeBinary(executable_name, arguments, print_command=False):
+def execute_binary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
         raise ValueError(
@@ -44,7 +44,7 @@ def executeBinary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-def plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
+def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
 
     # plt.rc("text", usetex=True)
@@ -80,7 +80,7 @@ def plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     pass
 
 
-def targetFunction(n_samples_per_dim):
+def target_function(n_samples_per_dim):
 
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
@@ -113,7 +113,7 @@ def train(fa_name, n_dims):
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
-    (inputs, targets) = targetFunction(n_samples_per_dim)
+    (inputs, targets) = target_function(n_samples_per_dim)
 
     n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
 
@@ -135,7 +135,7 @@ def train(fa_name, n_dims):
 
     # Make predictions on a grid
     n_samples_per_dim_grid = 200 if n_dims == 1 else [30, 30]
-    inputs_grid, _ = targetFunction(n_samples_per_dim_grid)
+    inputs_grid, _ = target_function(n_samples_per_dim_grid)
     outputs_grid = fa.predict(inputs_grid)
 
     # Save the dynamical system to a json file
@@ -147,10 +147,10 @@ def train(fa_name, n_dims):
     # Save the inputs to a directory
     np.savetxt(Path(directory, f"{basename}_inputs.txt"), inputs_grid)
 
-    # Call the binary, which does analyticalSolution and integration in C++
+    # Call the binary, which does analytical_solution and integration in C++
     exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
-    executeBinary(exec_name, arguments, True)
+    execute_binary(exec_name, arguments, True)
 
     outputs_grid_cpp = np.loadtxt(Path(directory, f"{basename}_outputs.txt"))
 

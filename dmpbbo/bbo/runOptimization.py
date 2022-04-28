@@ -19,7 +19,7 @@
 from dmpbbo.bbo.LearningSession import LearningSession
 
 
-def runOptimization(
+def run_optimization(
     cost_function,
     initial_distribution,
     updater,
@@ -57,19 +57,19 @@ def runOptimization(
         cost_eval = cost_function.evaluate(distribution.mean)
 
         # 1. Sample from distribution
-        samples = distribution.generateSamples(n_samples_per_update)
+        samples = distribution.generate_samples(n_samples_per_update)
 
         # 2. Evaluate the samples
         costs = [cost_function.evaluate(sample) for sample in samples]
 
         # 3. Update the distribution
-        distribution_new, weights = updater.updateDistribution(
+        distribution_new, weights = updater.update_distribution(
             distribution, samples, costs
         )
 
         # Bookkeeping
-        session.addEval(i_update, distribution.mean, cost_eval)
-        session.addUpdate(
+        session.add_eval(i_update, distribution.mean, cost_eval)
+        session.add_update(
             i_update, distribution, samples, costs, weights, distribution_new
         )
 

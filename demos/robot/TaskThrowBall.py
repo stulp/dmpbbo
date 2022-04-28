@@ -11,10 +11,10 @@ class TaskThrowBall(Task):
         self.y_floor_ = y_floor
         self.acceleration_weight_ = acceleration_weight
 
-    def costLabels(self):
+    def cost_labels(self):
         return ["landing site", "acceleration"]
 
-    def evaluateRollout(self, cost_vars, sample):
+    def evaluate_rollout(self, cost_vars, sample):
         n_dims = 2
         n_time_steps = cost_vars.shape[0]
 
@@ -39,7 +39,7 @@ class TaskThrowBall(Task):
         costs[0] = np.sum(costs[1:])
         return costs
 
-    def plotRollout(self, cost_vars, ax):
+    def plot_rollout(self, cost_vars, ax):
         """Simple script to plot y of DMP trajectory"""
         t = cost_vars[:, 0]
         y = cost_vars[:, 1:3]

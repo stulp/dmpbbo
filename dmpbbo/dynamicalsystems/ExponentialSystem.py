@@ -71,7 +71,7 @@ class ExponentialSystem(DynamicalSystem):
             raise ValueError(f"y_attr must have size {self._dim_x}")
         self._x_attr = np.atleast_1d(x)
 
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """ The differential equation which defines the system.
         
         It relates state values to rates of change of those state values.
@@ -82,7 +82,7 @@ class ExponentialSystem(DynamicalSystem):
         xd = self.alpha * (self._x_attr - x) / self._tau
         return xd
 
-    def analyticalSolution(self, ts):
+    def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
         

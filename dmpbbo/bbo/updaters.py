@@ -28,7 +28,7 @@ class Updater(ABC):
     """
 
     @abstractmethod
-    def updateDistribution(self, distribution, samples, costs):
+    def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         
         Args:
@@ -49,15 +49,15 @@ class UpdaterMean(Updater):
         """ Initialize an UpdaterMean object.
         
         Args:
-            eliteness The eliteness parameter (see costsToWeights(...))
+            eliteness The eliteness parameter (see costs_to_weights(...))
         
         Args:
-            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costsToWeights(...))
+            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
         """
         self.eliteness = eliteness
         self.weighting_method = weighting_method
 
-    def updateDistribution(self, distribution, samples, costs):
+    def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         
         Args:
@@ -69,7 +69,7 @@ class UpdaterMean(Updater):
             The updated distribution.
         """
 
-        weights = costsToWeights(costs, self.weighting_method, self.eliteness)
+        weights = costs_to_weights(costs, self.weighting_method, self.eliteness)
 
         # Compute new mean with reward-weighed averaging
         # mean    = 1 x n_dims
@@ -90,9 +90,9 @@ class UpdaterCovarDecay(Updater):
         """ Initialize an UpdaterCovarDecay object.
         
         Args:
-            eliteness The eliteness parameter (see costsToWeights(...))
+            eliteness The eliteness parameter (see costs_to_weights(...))
 
-            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costsToWeights(...))
+            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
 
             covar_decay_factor Factor with which to decay the covariance matrix (i.e.
             covar_decay_factor*covar_decay_factor*C at each update)
@@ -101,7 +101,7 @@ class UpdaterCovarDecay(Updater):
         self.weighting_method = weighting_method
         self.covar_decay_factor = covar_decay_factor
 
-    def updateDistribution(self, distribution, samples, costs):
+    def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         
         Args:
@@ -113,7 +113,7 @@ class UpdaterCovarDecay(Updater):
             The updated distribution.
         """
 
-        weights = costsToWeights(costs, self.weighting_method, self.eliteness)
+        weights = costs_to_weights(costs, self.weighting_method, self.eliteness)
 
         # Compute new mean with reward-weighed averaging
         # mean    = 1 x n_dims
@@ -164,7 +164,7 @@ class UpdaterCovarAdaptation(Updater):
             learning_rate = 0.0
         self.learning_rate = learning_rate
 
-    def updateDistribution(self, distribution, samples, costs):
+    def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
         
         Args:
@@ -181,7 +181,7 @@ class UpdaterCovarAdaptation(Updater):
         n_samples = samples.shape[0]
         n_dims = samples.shape[1]
 
-        weights = costsToWeights(costs, self.weighting_method, self.eliteness)
+        weights = costs_to_weights(costs, self.weighting_method, self.eliteness)
 
         # Compute new mean with reward-weighed averaging
         # mean    = 1 x n_dims
@@ -236,7 +236,7 @@ class UpdaterCovarAdaptation(Updater):
         return distribution_new, weights
 
 
-def costsToWeights(costs, weighting_method, eliteness):
+def costs_to_weights(costs, weighting_method, eliteness):
     """ Convert costs into weights using different weighting methods.
     
         Args:
@@ -283,7 +283,7 @@ def costsToWeights(costs, weighting_method, eliteness):
             weighting_method,
             "'. Calling with PI-BB weighting.",
         )
-        return costsToWeights(costs, "PI-BB", eliteness)
+        return costs_to_weights(costs, "PI-BB", eliteness)
 
     # // Relative standard deviation of total costs
     # double mean = weights.mean();

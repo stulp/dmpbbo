@@ -44,7 +44,7 @@ class TimeSystem(DynamicalSystem):
         x_init = 1.0 if self._count_down else 0.0
         self.x_init = np.array(x_init)
 
-    def differentialEquation(self, x):
+    def differential_equation(self, x):
         """ The differential equation which defines the system.
         
         It relates state values to rates of change of those state values.
@@ -62,7 +62,7 @@ class TimeSystem(DynamicalSystem):
 
         return xd
 
-    def analyticalSolution(self, ts):
+    def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
         

@@ -39,7 +39,9 @@ if __name__ == "__main__":
         ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr
     )
 
-    for dmp_type in ["IJSPEERT_2002_MOVEMENT","KULVICIUS_2012_JOINING","COUNTDOWN_2013"]:
+    dmp_types = ["IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]
+    dmp_types = ["KULVICIUS_2012_JOINING"]  # noqa
+    for dmp_type in dmp_types:
         function_apps = [FunctionApproximatorRBFN(10, 0.7) for i_dim in range(n_dims)]
         dmp = Dmp.from_traj(traj, function_apps, dmp_type=dmp_type)
 
@@ -47,38 +49,38 @@ if __name__ == "__main__":
         n_time_steps = 71
         ts = np.linspace(0, tau_exec, n_time_steps)
 
-        (xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana) = dmp.analyticalSolution(ts)
+        xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana = dmp.analytical_solution(ts)
 
         dt = ts[1]
-        xs_step = np.zeros([n_time_steps, dmp._dim_x])
-        xds_step = np.zeros([n_time_steps, dmp._dim_x])
+        dim_x = xs_ana.shape[1]
+        xs_step = np.zeros([n_time_steps, dim_x])
+        xds_step = np.zeros([n_time_steps, dim_x])
 
-        (x, xd) = dmp.integrateStart()
+        x, xd = dmp.integrate_start()
         xs_step[0, :] = x
         xds_step[0, :] = xd
         for tt in range(1, n_time_steps):
-            (xs_step[tt, :], xds_step[tt, :]) = dmp.integrateStep(dt, xs_step[tt - 1, :])
+            xs_step[tt, :], xds_step[tt, :] = dmp.integrate_step(dt, xs_step[tt - 1, :])
 
         print("Plotting")
 
-        Dmp.plotStatic(
-            tau,
+        dmp.plot(
             ts,
             xs_ana,
             xds_ana,
             forcing_terms=forcing_terms_ana,
-            fa_output=fa_outputs_ana,
+            fa_outputs=fa_outputs_ana,
         )
         plt.gcf().canvas.set_window_title(f"Analytical integration ({dmp_type})")
 
-        Dmp.plotStatic(tau, ts, xs_step, xds_step)
+        dmp.plot(ts, xs_step, xds_step)
         plt.gcf().canvas.set_window_title(f"Step-by-step integration ({dmp_type})")
 
         lines, axs = traj.plot()
         plt.setp(lines, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
         plt.setp(lines, label="demonstration")
 
-        traj_reproduced = dmp.statesAsTrajectory(ts, xs_step, xds_step)
+        traj_reproduced = dmp.states_as_trajectory(ts, xs_step, xds_step)
         lines, axs = traj_reproduced.plot(axs)
         plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
         plt.setp(lines, label="reproduced")

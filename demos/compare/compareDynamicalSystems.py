@@ -30,7 +30,7 @@ from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
-def executeBinary(executable_name, arguments, print_command=False):
+def execute_binary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
         raise ValueError(
@@ -44,7 +44,7 @@ def executeBinary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-def plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
+def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
 
     # plt.rc("text", usetex=True)
@@ -131,42 +131,42 @@ if __name__ == "__main__":
         filename_json = Path(directory, name + ".json")
         dj.savejson(filename_json, dyn_system, save_for_cpp_also=True)
 
-        # Call the binary, which does analyticalSolution and integration in C++
+        # Call the binary, which does analytical_solution and integration in C++
         exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"
         arguments = f"{directory} {name}"
-        executeBinary(exec_name, arguments, True)
+        execute_binary(exec_name, arguments, True)
 
         print("===============")
         print("Python Analytical solution")
-        xs, xds = dyn_system.analyticalSolution(ts)
+        xs, xds = dyn_system.analytical_solution(ts)
         xs_cpp = np.loadtxt(Path(directory, "xs_analytical.txt"))
         xds_cpp = np.loadtxt(Path(directory, "xds_analytical.txt"))
         fig1 = plt.figure(fig_count, figsize=(10, 10))
-        plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
+        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
         fig1.suptitle(f"{name}System - Analytical")
 
         print("===============")
         print("Python Integrating with Euler")
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepEuler(dt, xs[ii - 1, :])
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(Path(directory, "xs_euler.txt"))
         xds_cpp = np.loadtxt(Path(directory, "xds_euler.txt"))
         fig2 = plt.figure(fig_count + 1, figsize=(10, 10))
-        plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
+        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
         fig2.suptitle(f"{name}System - Euler")
 
         print("===============")
         print("Python Integrating with Runge-Kutta")
-        xs[0, :], xds[0, :] = dyn_system.integrateStart()
+        xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrateStepRungeKutta(
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
                 dt, xs[ii - 1, :]
             )
         xs_cpp = np.loadtxt(Path(directory, "xs_rungekutta.txt"))
         xds_cpp = np.loadtxt(Path(directory, "xds_rungekutta.txt"))
         fig3 = plt.figure(fig_count + 2, figsize=(10, 10))
-        plotComparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
+        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
         fig3.suptitle(f"{name}System - Runge-Kutta")
 
         save_me = False

@@ -66,7 +66,7 @@ if __name__ == "__main__":
         dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
         # These are the parameters that will be optimized.
-        dmp.setSelectedParamNames("weights")
+        dmp.set_selected_param_names("weights")
 
         ################################################
         # Save DMP to file
@@ -79,8 +79,8 @@ if __name__ == "__main__":
         # Analytical solution to compute difference
 
         ts = traj.ts
-        xs_ana, xds_ana, _, _ = dmp.analyticalSolution(ts)
-        traj_reproduced_ana = dmp.statesAsTrajectory(ts, xs_ana, xds_ana)
+        xs_ana, xds_ana, _, _ = dmp.analytical_solution(ts)
+        traj_reproduced_ana = dmp.states_as_trajectory(ts, xs_ana, xds_ana)
 
         mae = np.mean(abs(traj.ys - traj_reproduced_ana._ys))
         mean_absolute_errors.append(mae)
@@ -100,19 +100,19 @@ if __name__ == "__main__":
         xs_step = np.zeros([n_time_steps, dmp._dim_x])
         xds_step = np.zeros([n_time_steps, dmp._dim_x])
 
-        x, xd = dmp.integrateStart()
+        x, xd = dmp.integrate_start()
         xs_step[0, :] = x
         xds_step[0, :] = xd
         for tt in range(1, n_time_steps):
             ts[tt] = dt * tt
-            xs_step[tt, :], xds_step[tt, :] = dmp.integrateStep(dt, xs_step[tt - 1, :])
+            xs_step[tt, :], xds_step[tt, :] = dmp.integrate_step(dt, xs_step[tt - 1, :])
 
-        traj_reproduced = dmp.statesAsTrajectory(ts, xs_step, xds_step)
+        traj_reproduced = dmp.states_as_trajectory(ts, xs_step, xds_step)
 
         ################################################
         # Plot results
 
-        # h, axs = Dmp.plotStatic(dmp.tau,ts,xs_step,xds_step)
+        # h, axs = Dmp.plot(dmp.tau,ts,xs_step,xds_step)
         # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
         # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
 

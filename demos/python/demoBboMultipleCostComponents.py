@@ -23,7 +23,7 @@ import numpy as np
 
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.runOptimization import runOptimization
+from dmpbbo.bbo.runOptimization import run_optimization
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
 
 
@@ -46,7 +46,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         regularization = self.regularization_weight * np.linalg.norm(sample)
         return [dist + regularization, dist, regularization]
 
-    def costLabels(self):
+    def cost_labels(self):
         return ["dist", "regularization"]
 
 
@@ -73,7 +73,7 @@ if __name__ == "__main__":
     n_samples_per_update = 20
     n_updates = 40
 
-    session = runOptimization(
+    session = run_optimization(
         cost_function, distribution, updater, n_updates, n_samples_per_update, directory
     )
 

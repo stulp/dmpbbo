@@ -35,7 +35,7 @@ import dmpbbo.DmpBboJSONEncoder as dj
 warnings.simplefilter("ignore", np.ComplexWarning)
 
 
-def plotUpdateLines(n_samples_per_update, ax):
+def plot_update_lines(n_samples_per_update, ax):
     """ Plot vertical lines when a parameter update occurred during the optimization.
     
         Args:
@@ -77,7 +77,7 @@ def plotUpdateLines(n_samples_per_update, ax):
     ax.set_ylim(y_limits)
 
 
-def plotLearningCurve(learning_curve, **kwargs):
+def plot_learning_curve(learning_curve, **kwargs):
     """ Plot a learning curve.
     
         Args:
@@ -115,16 +115,16 @@ def plotLearningCurve(learning_curve, **kwargs):
     ax.set_ylabel("cost")
     ax.set_title("Learning curve")
 
-    if cost_labels:
+    if cost_labels is not None:
         cost_labels.insert(0, "total cost")
         plt.legend(lines, cost_labels)
 
-    plotUpdateLines(samples_eval, ax)
+    plot_update_lines(samples_eval, ax)
 
     return lines, ax
 
 
-def plotExplorationCurve(exploration_curve, **kwargs):
+def plot_exploration_curve(exploration_curve, **kwargs):
     """ Plot an exploration curve.
     
         Args:
@@ -143,7 +143,7 @@ def plotExplorationCurve(exploration_curve, **kwargs):
     explo = exploration_curve[:, 1]
 
     line = ax.plot(samples_eval, explo, "-", color="green", linewidth=2)
-    plotUpdateLines(samples_eval, ax)
+    plot_update_lines(samples_eval, ax)
     ax.set_xlabel("number of evaluations")
     ax.set_ylabel("sqrt of max. eigen-value of covar")
     ax.set_title("Exploration magnitude")
@@ -151,7 +151,7 @@ def plotExplorationCurve(exploration_curve, **kwargs):
     return line, ax
 
 
-def plotUpdate(
+def plot_update(
     distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):
     """ Save an optimization update to a directory.
@@ -276,22 +276,22 @@ class LearningSession:
         n_samples_per_update = int(n_samples_per_update[0])
         return cls(n_samples_per_update, directory)
 
-    def addEval(self, i_update, eval_sample, eval_cost):
+    def add_eval(self, i_update, eval_sample, eval_cost):
         self.tell(eval_cost, "eval_cost", i_update)
         self.tell(eval_sample, "eval_sample", i_update)
 
-    def addUpdate(
+    def add_update(
         self, i_update, distribution, samples, costs, weights, distribution_new=None
     ):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
         self.tell(costs, "costs", i_update)
         self.tell(weights, "weights", i_update)
-        if distribution_new:
+        if distribution_new is not None:
             self.tell(distribution_new, "distribution_new", i_update)
         self._last_update_added = i_update
 
-    def getNUpdates(self):
+    def get_n_updates(self):
         if not self._root_dir:
             return self._last_update_added
         else:
@@ -303,7 +303,7 @@ class LearningSession:
             return int(last_dir)
 
     @staticmethod
-    def getBaseName(name, i_update=None, i_sample=None):
+    def get_base_name(name, i_update=None, i_sample=None):
 
         if isinstance(i_sample, int):
             basename = f"{i_sample:03d}_{name}"  # e.g. 0 => "000_name"
@@ -319,10 +319,10 @@ class LearningSession:
         return basename
 
     def exists(self, name, i_update=None, i_sample=None):
-        basename = self.getBaseName(name, i_update, i_sample)
+        basename = self.get_base_name(name, i_update, i_sample)
         if basename in self._cache:
             return True
-        if self._root_dir:
+        if self._root_dir is not None:
             abs_basename = Path(self._root_dir, basename)
             for extension in ["json", "txt"]:
                 if os.path.isfile(f"{abs_basename}.{extension}"):
@@ -331,7 +331,7 @@ class LearningSession:
 
     def ask(self, name, i_update=None, i_sample=None):
 
-        basename = self.getBaseName(name, i_update, i_sample)
+        basename = self.get_base_name(name, i_update, i_sample)
 
         if basename in self._cache:
             return copy.deepcopy(self._cache[basename])
@@ -358,11 +358,11 @@ class LearningSession:
 
     def tell(self, obj, name, i_update=None, i_sample=None):
 
-        basename = self.getBaseName(name, i_update, i_sample)
+        basename = self.get_base_name(name, i_update, i_sample)
 
         self._cache[basename] = copy.deepcopy(obj)
 
-        if self._root_dir:
+        if self._root_dir is not None:
             abs_basename = Path(self._root_dir, basename)
 
             # Make sure directory exists
@@ -370,27 +370,27 @@ class LearningSession:
 
             if isinstance(obj, (np.ndarray, list, int)):
                 filename = f"{abs_basename}.txt"
-                np.savetxt(filename, np.atleast_1d(np.array(obj)))
+                np.savetxt(filename, obj)
             else:
                 filename = f"{abs_basename}.json"
                 dj.savejson(filename, obj)
 
             return filename
 
-    def getEvalCosts(self, i_update):
+    def get_eval_costs(self, i_update):
         has_eval = self.exists("cost", 0, "eval")
         if has_eval:
             cost_eval = self.ask("cost", i_update, "eval")
             # Evaluation at the beginning of an update
             i_sample = i_update * self._n_samples_per_update
         else:
-            update_costs = self.getSampleCosts(i_update)
+            update_costs = self.get_sample_costs(i_update)
             cost_eval = np.mean(update_costs, axis=0)
             # Evaluation between two updates (mean of all samples)
             i_sample = (i_update + 0.5) * self._n_samples_per_update
         return cost_eval, i_sample
 
-    def getSampleCosts(self, i_update):
+    def get_sample_costs(self, i_update):
         if self.exists("costs", i_update):
             # Everything in one file
             sample_costs = self.ask("costs", i_update)
@@ -400,25 +400,25 @@ class LearningSession:
             sample_costs = [self.ask("costs", i_update, s) for s in range(n)]
         return np.array(sample_costs)
 
-    def getLearningCurve(self):
+    def get_learning_curve(self):
         learning_curve = []
-        n_updates = self.getNUpdates()
+        n_updates = self.get_n_updates()
         for i_update in range(n_updates):
-            costs_eval, i_sample = self.getEvalCosts(i_update)
+            costs_eval, i_sample = self.get_eval_costs(i_update)
             costs_eval = np.atleast_1d(costs_eval)
             learning_curve.append(np.concatenate(([i_sample], costs_eval)))
 
         cost_labels = []
         if self.exists("cost_function"):
             cost_function = self.ask("cost_function")
-            cost_labels = cost_function.costLabels()
+            cost_labels = cost_function.cost_labels()
         elif self.exists("task"):
             cost_function = self.ask("task")
-            cost_labels = cost_function.costLabels()
+            cost_labels = cost_function.cost_labels()
 
         return learning_curve, cost_labels
 
-    def plotLearningCurve(self, ax=None):
+    def plot_learning_curve(self, ax=None):
         """
         has eval or not
         has cost components or not
@@ -429,46 +429,48 @@ class LearningSession:
 
         # Plot costs of individual samples
         costs = []
-        for i_update in range(self.getNUpdates()):
-            sample_costs = self.getSampleCosts(i_update)
+        for i_update in range(self.get_n_updates()):
+            sample_costs = self.get_sample_costs(i_update)
             costs.extend([c[0] for c in sample_costs])  # Only include sum
         ax.plot(costs, ".", color="gray")
 
         # Plot learning curve itself
-        learning_curve, cost_labels = self.getLearningCurve()
-        return plotLearningCurve(learning_curve, ax=ax, cost_labels=cost_labels)
+        learning_curve, cost_labels = self.get_learning_curve()
+        return plot_learning_curve(learning_curve, ax=ax, cost_labels=cost_labels)
 
-    def plotExplorationCurve(self, ax=None):
-        n_updates = self.getNUpdates()
+    def plot_exploration_curve(self, ax=None):
+        n_updates = self.get_n_updates()
         curve = np.zeros((n_updates, 2))
         for i_update in range(n_updates):
             distribution = self.ask("distribution", i_update)
-            cur_exploration = np.sqrt(distribution.maxEigenValue())
+            cur_exploration = np.sqrt(distribution.max_eigen_value())
             curve[i_update, 0] = i_update * self._n_samples_per_update
             curve[i_update, 1] = cur_exploration
 
         if not ax:
             ax = plt.axes()
-        return plotExplorationCurve(curve, ax=ax)
+        return plot_exploration_curve(curve, ax=ax)
 
-    def plotDistributionUpdates(self, ax=None):
+    def plot_distribution_updates(self, ax=None):
         if not ax:
             ax = plt.axes()
 
-        n_updates = self.getNUpdates()
+        n_updates = self.get_n_updates()
+        all_lines = []
         for i_update in range(n_updates):
             highlight = i_update == 0
-            self.plotDistributionUpdate(i_update, ax, highlight=highlight)
-        return ax  # zzz
+            lines, _ = self.plot_distribution_update(i_update, ax, highlight=highlight)
+            all_lines.extend(lines)
+        return all_lines, ax
 
-    def plotDistributionUpdate(self, i_update, ax=None, **kwargs):
+    def plot_distribution_update(self, i_update, ax=None, **kwargs):
         # ax = kwargs.get("ax") or plt.axes()
         highlight = kwargs.get("highlight", False)
         plot_samples = kwargs.get("plot_samples", False)
 
         distribution = self.ask("distribution", i_update)
-        costs_eval = self.getEvalCosts(i_update)
-        costs = self.getSampleCosts(i_update)
+        costs_eval = self.get_eval_costs(i_update)
+        costs = self.get_sample_costs(i_update)
         samples = self.ask("samples", i_update)
         weights = self.ask("weights", i_update)
         distribution_new = self.ask("distribution_new", i_update)
@@ -476,7 +478,7 @@ class LearningSession:
         if not ax:
             ax = plt.axes()
 
-        return plotUpdate(
+        return plot_update(
             distribution,
             costs_eval,
             samples,
@@ -492,13 +494,13 @@ class LearningSession:
         if not fig:
             fig = plt.figure(figsize=(15, 5))
         axs = [fig.add_subplot(131 + sp) for sp in range(3)]
-        self.plotDistributionUpdates(axs[0])
-        self.plotExplorationCurve(axs[1])
-        self.plotLearningCurve(axs[2])
+        self.plot_distribution_updates(axs[0])
+        self.plot_exploration_curve(axs[1])
+        self.plot_learning_curve(axs[2])
         return fig
 
     @staticmethod
-    def plotMultiple(sessions):
+    def plot_multiple(sessions):
         pass
 
 

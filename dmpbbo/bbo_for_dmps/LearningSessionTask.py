@@ -40,8 +40,8 @@ class LearningSessionTask(LearningSession):
     def tell(self, obj, name, i_update=None, i_sample=None):
         # If it's a Dmp, save it in a C++-readable format also
         if "dmp" in name:
-            if self._root_dir:
-                basename = self.getBaseName(name, i_update, i_sample)
+            if self._root_dir is not None:
+                basename = self.get_base_name(name, i_update, i_sample)
                 abs_basename = Path(self._root_dir, basename)
                 filename = f"{abs_basename}.json"
                 dj.savejson(filename, obj, save_for_cpp_also=True)
@@ -49,17 +49,17 @@ class LearningSessionTask(LearningSession):
         filename = super().tell(obj, name, i_update, i_sample)
         return filename
 
-    def addRollout(self, i_update, i_sample, sample, cost_vars, cost):
+    def add_rollout(self, i_update, i_sample, sample, cost_vars, cost):
         self.tell(sample, "sample", i_update, i_sample)
         self.tell(cost_vars, "cost_vars", i_update, i_sample)
         self.tell(cost, "cost", i_update, i_sample)
 
-    def addEvalTask(self, i_update, eval_sample, eval_cost_vars, eval_cost):
-        super().addEval(i_update, eval_sample, eval_cost)
+    def add_eval_task(self, i_update, eval_sample, eval_cost_vars, eval_cost):
+        super().add_eval(i_update, eval_sample, eval_cost)
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 
     @staticmethod
-    def _setStyle(handle, i_update, n_updates):
+    def _set_style(handle, i_update, n_updates):
         """ Set the color of an object, according to how far the optimization has proceeded.
         
             Args:
@@ -68,25 +68,24 @@ class LearningSessionTask(LearningSession):
                 n_updates: Which is the number of updates the optimization will run?
         """
         if i_update == 0:
-            plt.setp(handle, color=[0.8,0.0,0.0], linewidth=2)
+            plt.setp(handle, color=[0.8, 0.0, 0.0], linewidth=2)
         else:
             c = 1.0 * i_update / n_updates
-            cur_color = [0.6 - 0.6 * c, 0.0 + 1.0 * c, 0.0 - 0.0 * c]
+            cur_color = [0.3 - 0.3 * c, 0.0 + 1.0 * c, 0.0 - 0.0 * c]
             plt.setp(handle, color=cur_color, linewidth=2)
-    
-    
-    def plotRollouts(self, ax=None):
+
+    def plot_rollouts(self, ax=None):
         if not ax:
             ax = plt.axes()
         all_lines = []
-        n_updates = self.getNUpdates()
+        n_updates = self.get_n_updates()
         for i_update in range(n_updates):
-            lines, _ = self.plotRolloutsUpdate(i_update, ax, True, False)
-            LearningSessionTask._setStyle(lines, i_update, n_updates)
+            lines, _ = self.plot_rollouts_update(i_update, ax, True, False)
+            LearningSessionTask._set_style(lines, i_update, n_updates)
             all_lines.extend(lines)
         return all_lines, ax
 
-    def plotRolloutsUpdate(self, i_update, ax=None, plot_eval=True, plot_samples=False):
+    def plot_rollouts_update(self, i_update, ax=None, plot_eval=True, plot_samples=False):
         if not ax:
             ax = plt.axes()
 
@@ -95,7 +94,7 @@ class LearningSessionTask(LearningSession):
         if plot_eval and self.exists("cost_vars", i_update, "eval"):
             cost_vars = self.ask("cost_vars", i_update, "eval")
             if task:
-                lines_eval, _ = task.plotRollout(cost_vars, ax)
+                lines_eval, _ = task.plot_rollout(cost_vars, ax)
             else:
                 lines_eval = ax.plot(cost_vars)
                 if not isinstance(lines_eval, list):
@@ -107,7 +106,7 @@ class LearningSessionTask(LearningSession):
             for i_sample in range(n_samples):
                 cost_vars = self.ask("cost_vars", i_update, i_sample)
                 if task:
-                    lines, _ = task.plotRollout(cost_vars, ax)
+                    lines, _ = task.plot_rollout(cost_vars, ax)
                 else:
                     lines = ax.plot(cost_vars)
                 plt.setp(lines, color="#999999", alpha=0.5)
@@ -118,8 +117,8 @@ class LearningSessionTask(LearningSession):
         if not fig:
             fig = plt.figure(figsize=(20, 5))
         axs = [fig.add_subplot(141 + sp) for sp in range(4)]
-        self.plotDistributionUpdates(axs[0])
-        self.plotRollouts(axs[1])
-        self.plotExplorationCurve(axs[2])
-        self.plotLearningCurve(axs[3])
+        self.plot_distribution_updates(axs[0])
+        self.plot_rollouts(axs[1])
+        self.plot_exploration_curve(axs[2])
+        self.plot_learning_curve(axs[3])
         return fig

@@ -32,7 +32,7 @@ class CostFunction(ABC):
         """
         pass
 
-    def costLabels(self):
+    def cost_labels(self):
         """Labels for the different cost components.
         
         The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of

@@ -41,7 +41,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         # Determine the centers and widths of the basis functions, given the input data range
         n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
         height = meta_params["intersection_height"]
-        centers, widths = Gaussian.getCentersAndWidths(inputs, n_bfs_per_dim, height)
+        centers, widths = Gaussian.get_centers_and_widths(inputs, n_bfs_per_dim, height)
         model_params = {"centers": centers, "widths": widths}
 
         # Prepare weighted least squares regressions
@@ -56,9 +56,8 @@ class FunctionApproximatorLWR(FunctionApproximator):
         fa_lws = FunctionApproximatorWLS(wls_meta_params)
 
         # Perform one weighted least squares regression for each kernel
-        activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
+        activations = FunctionApproximatorLWR._activations(inputs, model_params)
         for i_kernel in range(n_bfs):
-
             # Do one weighted least-squares regression with the current weights
             weights = activations[:, i_kernel]
             wls_model_params = fa_lws.train(inputs, targets, weights=weights)
@@ -72,7 +71,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
         return model_params
 
     @staticmethod
-    def _getActivations(inputs, model_params):
+    def _activations(inputs, model_params):
         """Get the activations of the basis functions.
         
         Uses the centers and widths in the model parameters.
@@ -80,13 +79,14 @@ class FunctionApproximatorLWR(FunctionApproximator):
         Args:
             inputs (numpy.ndarray): Input values of the query.
         """
-        normalize = True
-        centers = model_params["centers"]
-        widths = model_params["widths"]
-        return Gaussian.activations(centers, widths, inputs, normalize)
+        return Gaussian.activations(
+            inputs,
+            centers=model_params["centers"],
+            widths=model_params["widths"],
+            normalized=True)
 
     @staticmethod
-    def getLines(inputs, model_params):
+    def _get_lines(inputs, model_params):
         # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
 
@@ -109,30 +109,30 @@ class FunctionApproximatorLWR(FunctionApproximator):
         # Ensure n_dims=2, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
 
-        lines = FunctionApproximatorLWR.getLines(inputs, model_params)
+        lines = FunctionApproximatorLWR._get_lines(inputs, model_params)
 
         # Weight the values for each line with the normalized basis function activations
         # Get the activations of the basis functions
-        activations = FunctionApproximatorLWR._getActivations(inputs, model_params)
+        activations = FunctionApproximatorLWR._activations(inputs, model_params)
 
         outputs = (lines * activations).sum(axis=1)
         return outputs
 
-    def plotModelParameters(self, inputs_min, inputs_max, **kwargs):
+    def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
 
-        inputs, n_samples_per_dim = FunctionApproximator._getGrid(
+        inputs, n_samples_per_dim = FunctionApproximator._get_grid(
             inputs_min, inputs_max
         )
-        activations = self._getActivations(inputs, self._model_params)
+        activations = self._activations(inputs, self._model_params)
 
-        ax = kwargs.get("ax") or self._getAxis()
+        ax = kwargs.get("ax") or self._get_axis()
 
-        lines = self._plotGridValues(inputs, activations, ax, n_samples_per_dim)
+        lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
         alpha = 1.0 if self.dim_input() < 2 else 0.3
         plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
 
         # Plot lines also
-        line_values = self.getLines(inputs, self._model_params)
+        line_values = self._get_lines(inputs, self._model_params)
 
         # Plot line segment only when a basis function is the most active
         # values_range = np.amax(activations) - np.amin(activations)
@@ -143,7 +143,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
             smaller = cur_activations < 0.2 * max_activations
             line_values[smaller, i_bf] = np.nan
 
-        lines = self._plotGridValues(inputs, line_values, ax, n_samples_per_dim)
+        lines = self._plot_grid_values(inputs, line_values, ax, n_samples_per_dim)
         alpha = 1.0 if self.dim_input() < 2 else 0.5
         w = 4 if self.dim_input() < 2 else 1
         plt.setp(lines, color=[0.8, 0.8, 0.8], linewidth=w, alpha=alpha)

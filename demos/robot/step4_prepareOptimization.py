@@ -62,7 +62,7 @@ if __name__ == "__main__":
     updater = updater_decay
 
     task_solver = None
-    session = run_one.runOptimizationTaskPrepare(
+    session = run_one.run_optimization_task_prepare(
         args.directory,
         task,
         task_solver,

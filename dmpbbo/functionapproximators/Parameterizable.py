@@ -20,21 +20,21 @@ from abc import ABC, abstractmethod
 
 class Parameterizable(ABC):
     @abstractmethod
-    def setSelectedParamNames(self, selected_values_labels):
+    def set_selected_param_names(self, selected_values_labels):
         """Set the selected parameters."""
         pass
 
     @abstractmethod
-    def getParamVector(self):
+    def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
         pass
 
     @abstractmethod
-    def setParamVector(self, values):
+    def set_param_vector(self, values):
         """Set a vector containing the values of the selected parameters."""
         pass
 
     @abstractmethod
-    def getParamVectorSize(self):
+    def get_param_vector_size(self):
         """Get the size of the vector containing the values of the selected parameters."""
         pass

@@ -19,7 +19,7 @@
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
 
-def runOptimizationTask(
+def run_optimization_task(
     task,
     task_solver,
     initial_distribution,
@@ -44,36 +44,36 @@ def runOptimizationTask(
         print(f"Update: {i_update}")
 
         # 0. Get cost of current distribution mean
-        cost_vars_eval = task_solver.performRollout(distribution.mean)
-        cost_eval = task.evaluateRollout(cost_vars_eval, distribution.mean)
+        cost_vars_eval = task_solver.perform_rollout(distribution.mean)
+        cost_eval = task.evaluate_rollout(cost_vars_eval, distribution.mean)
 
         # Bookkeeping
-        session.addEvalTask(i_update, distribution.mean, cost_vars_eval, cost_eval)
+        session.add_eval_task(i_update, distribution.mean, cost_vars_eval, cost_eval)
 
         # 1. Sample from distribution
-        samples = distribution.generateSamples(n_samples_per_update)
+        samples = distribution.generate_samples(n_samples_per_update)
 
         # 2. Evaluate the samples
         costs = []
         for i_sample, sample in enumerate(samples):
 
             # 2A. Perform the rollouts
-            cost_vars = task_solver.performRollout(sample)
+            cost_vars = task_solver.perform_rollout(sample)
 
             # 2B. Evaluate the rollouts
-            cur_cost = task.evaluateRollout(cost_vars, sample)
+            cur_cost = task.evaluate_rollout(cost_vars, sample)
             costs.append(cur_cost)
 
             # Bookkeeping
-            session.addRollout(i_update, i_sample, sample, cost_vars, cur_cost)
+            session.add_rollout(i_update, i_sample, sample, cost_vars, cur_cost)
 
         # 3. Update parameters
-        distribution_new, weights = updater.updateDistribution(
+        distribution_new, weights = updater.update_distribution(
             distribution, samples, costs
         )
 
         # Bookkeeping
-        session.addUpdate(
+        session.add_update(
             i_update, distribution, samples, costs, weights, distribution_new
         )
 

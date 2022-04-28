@@ -109,57 +109,57 @@ class Trajectory:
     def y_final(self):
         return self._ys[-1]
 
-    def startTimeAtZero(self):
+    def set_start_time_to_zero(self):
         self._ts = self._ts - self._ts[0]
 
-    def getRangePerDim(self):
+    def get_range_per_dim(self):
         return self._ys.max(axis=0) - self._ys.min(axis=0)
 
-    def crop(self, fro, to, as_times=False):
-        # Crop trajectory from 'fro' to 'to'
-        # if as_times is False, 'fro' to 'to' are interpreted as indices
-        # if as_times is True, 'fro' to 'to' are interpreted as times
+    def crop(self, start, end, as_times=False):
+        # Crop trajectory from 'start' to 'end'
+        # if as_times is False, 'start' to 'end' are interpreted as indices
+        # if as_times is True, 'start' to 'end' are interpreted as times
 
         # No need to crop empty trajectory
         if self._ts.size == 0:
             return
 
-        if fro >= to:
-            raise ValueError("fro >= to does not hold (not {fro} >= {to})")
+        if start >= end:
+            raise ValueError("start >= end does not hold (not {start} >= {end})")
 
         if as_times:
-            if fro > self._ts[-1]:
+            if start > self._ts[-1]:
                 print(
                     "WARNING: Argument 'fro' out of range, because {fro} > {self._ts[-1]}. Not cropping"
                 )
                 return
-            if to < self._ts[0]:
+            if end < self._ts[0]:
                 print(
                     "WARNING: Argument 'fro' out of range, because {to} < {self._ts[-1]}. Not cropping"
                 )
                 return
 
             # Convert time 'fro' to index 'fro'
-            if fro <= self._ts[0]:
-                # Time 'fro' lies before first time in trajectory
-                fro = 0
+            if start <= self._ts[0]:
+                # Time 'start' lies before first time in trajectory
+                start = 0
             else:
-                # Get first index when time is larger than 'fro'
-                fro = np.argmax(self._ts >= fro)
+                # Get first index when time is larger than 'start'
+                start = np.argmax(self._ts >= start)
 
-            if to >= self._ts[-1]:
-                # Time 'to' is larger than the last time in the trajectory
-                to = len(self._ts) - 1
+            if end >= self._ts[-1]:
+                # Time 'end' is larger than the last time in the trajectory
+                end = len(self._ts) - 1
             else:
-                # Get first index when time is smaller than 'to'
-                to = np.argmax(self._ts >= to)
+                # Get first index when time is smaller than 'end'
+                end = np.argmax(self._ts >= end)
 
-        self._ts = self._ts[fro:to]
-        self._ys = self._ys[fro:to, :]
-        self._yds = self._yds[fro:to, :]
-        self._ydds = self._ydds[fro:to, :]
+        self._ts = self._ts[start:end]
+        self._ys = self._ys[start:end, :]
+        self._yds = self._yds[start:end, :]
+        self._ydds = self._ydds[start:end, :]
         if self._misc is not None:
-            self._misc = self._misc[fro:to, :]
+            self._misc = self._misc[start:end, :]
 
     @classmethod
     def from_polynomial(cls, ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
@@ -169,21 +169,21 @@ class Trajectory:
         a2 = ydd_from / 2
 
         a3 = (
-            -10 * y_from
-            - 6 * yd_from
-            - 2.5 * ydd_from
-            + 10 * y_to
-            - 4 * yd_to
-            + 0.5 * ydd_to
+                -10 * y_from
+                - 6 * yd_from
+                - 2.5 * ydd_from
+                + 10 * y_to
+                - 4 * yd_to
+                + 0.5 * ydd_to
         )
         a4 = 15 * y_from + 8 * yd_from + 2 * ydd_from - 15 * y_to + 7 * yd_to - ydd_to
         a5 = (
-            -6 * y_from
-            - 3 * yd_from
-            - 0.5 * ydd_from
-            + 6 * y_to
-            - 3 * yd_to
-            + 0.5 * ydd_to
+                -6 * y_from
+                - 3 * yd_from
+                - 0.5 * ydd_from
+                + 6 * y_to
+                - 3 * yd_to
+                + 0.5 * ydd_to
         )
 
         n_time_steps = ts.size
@@ -196,19 +196,19 @@ class Trajectory:
         for i in range(n_time_steps):
             t = (ts[i] - ts[0]) / (ts[n_time_steps - 1] - ts[0])
             ys[i, :] = (
-                a0
-                + a1 * t
-                + a2 * pow(t, 2)
-                + a3 * pow(t, 3)
-                + a4 * pow(t, 4)
-                + a5 * pow(t, 5)
+                    a0
+                    + a1 * t
+                    + a2 * pow(t, 2)
+                    + a3 * pow(t, 3)
+                    + a4 * pow(t, 4)
+                    + a5 * pow(t, 5)
             )
             yds[i, :] = (
-                a1
-                + 2 * a2 * t
-                + 3 * a3 * pow(t, 2)
-                + 4 * a4 * pow(t, 3)
-                + 5 * a5 * pow(t, 4)
+                    a1
+                    + 2 * a2 * t
+                    + 3 * a3 * pow(t, 2)
+                    + 4 * a4 * pow(t, 3)
+                    + 5 * a5 * pow(t, 4)
             )
             ydds[i, :] = 2 * a2 + 6 * a3 * t + 12 * a4 * pow(t, 2) + 20 * a5 * pow(t, 3)
 
@@ -219,7 +219,7 @@ class Trajectory:
 
     @classmethod
     def from_viapoint_polynomial(
-        cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to
+            cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to
     ):
 
         n_time_steps = ts.size
@@ -227,16 +227,16 @@ class Trajectory:
 
         viapoint_time_step = 0
         while (
-            viapoint_time_step < n_time_steps and ts[viapoint_time_step] < viapoint_time
+                viapoint_time_step < n_time_steps and ts[viapoint_time_step] < viapoint_time
         ):
             viapoint_time_step += 1
 
         yd_from = np.zeros(n_dims)
         ydd_from = np.zeros(n_dims)
 
-        y_viapoint = y_yd_ydd_viapoint[0 * n_dims : 1 * n_dims]
-        yd_viapoint = y_yd_ydd_viapoint[1 * n_dims : 2 * n_dims]
-        ydd_viapoint = y_yd_ydd_viapoint[2 * n_dims : 3 * n_dims]
+        y_viapoint = y_yd_ydd_viapoint[0 * n_dims: 1 * n_dims]
+        yd_viapoint = y_yd_ydd_viapoint[1 * n_dims: 2 * n_dims]
+        ydd_viapoint = y_yd_ydd_viapoint[2 * n_dims: 3 * n_dims]
 
         yd_to = np.zeros(n_dims)
         ydd_to = np.zeros(n_dims)
@@ -274,25 +274,24 @@ class Trajectory:
         yds = np.zeros([n_time_steps, n_dims])
         ydds = np.zeros([n_time_steps, n_dims])
 
-        D = ts[n_time_steps - 1] # noqa
+        D = ts[n_time_steps - 1]  # noqa
         tss = ts / D
 
-        A = y_to - y_from # noqa
+        A = y_to - y_from  # noqa
 
         for i_dim in range(n_dims):
-
             # http://noisyaccumulation.blogspot.fr/2012/02/how-to-decompose-2d-trajectory-data.html
 
             ys[:, i_dim] = y_from[i_dim] + A[i_dim] * (
-                6 * (tss ** 5) - 15 * (tss ** 4) + 10 * (tss ** 3)
+                    6 * (tss ** 5) - 15 * (tss ** 4) + 10 * (tss ** 3)
             )
 
             yds[:, i_dim] = (A[i_dim] / D) * (
-                30 * (tss ** 4) - 60 * (tss ** 3) + 30 * (tss ** 2)
+                    30 * (tss ** 4) - 60 * (tss ** 3) + 30 * (tss ** 2)
             )
 
             ydds[:, i_dim] = (A[i_dim] / (D * D)) * (
-                120 * (tss ** 3) - 180 * (tss ** 2) + 60 * tss
+                    120 * (tss ** 3) - 180 * (tss ** 2) + 60 * tss
             )
 
         return cls(ts, ys, yds, ydds)
@@ -307,14 +306,14 @@ class Trajectory:
         else:
             self._misc = np.concatenate((self._misc, trajectory.misc))
 
-    def asMatrix(self):
+    def as_matrix(self):
         as_matrix = np.column_stack((self._ts, self._ys, self._yds, self._ydds))
         if self._misc is not None:
             np.column_stack((as_matrix, self._misc))
         return as_matrix
 
     def savetxt(self, filename):
-        np.savetxt(filename, self.asMatrix(), fmt="%1.7f")
+        np.savetxt(filename, self.as_matrix(), fmt="%1.7f")
 
     @staticmethod
     def loadtxt(filename, n_dims_misc=0):
@@ -324,23 +323,23 @@ class Trajectory:
         n_dims = (n_cols - 1 - n_dims_misc) // 3
 
         ts = data[:, 0]
-        ys = data[:, 1 : 1 * n_dims + 1]
-        yds = data[:, 1 * n_dims + 1 : 2 * n_dims + 1]
-        ydds = data[:, 2 * n_dims + 1 : 3 * n_dims + 1]
-        misc = data[:, 3 * n_dims + 1 :]
+        ys = data[:, 1: 1 * n_dims + 1]
+        yds = data[:, 1 * n_dims + 1: 2 * n_dims + 1]
+        ydds = data[:, 2 * n_dims + 1: 3 * n_dims + 1]
+        misc = data[:, 3 * n_dims + 1:]
 
         return Trajectory(ts, ys, yds, ydds, misc)
 
-    def recomputeDerivatives(self):
+    def recompute_derivatives(self):
         self._yds = diffnc(self._ys, self._dt_mean)
         self._ydds = diffnc(self._yds, self._dt_mean)
 
-    def applyLowPassFilter(self, cutoff, order=3):
+    def apply_low_pass_filter(self, cutoff, order=3):
         # Sample rate and desired cutoff frequencies (in Hz).
         _dt_mean = np.mean(np.diff(self._ts))
         sample_freq = 1.0 / _dt_mean
         self._ys = butter_low_pass_filter(self._ys, cutoff, sample_freq, order)
-        self.recomputeDerivatives()
+        self.recompute_derivatives()
 
     def plot(self, axs=None):
         if not axs:
@@ -399,7 +398,7 @@ def butter_low_pass(cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
-    b, a = butter( # noqa 'ba' => b, a
+    b, a = butter(  # noqa 'ba' => b, a
         order, cut, btype="low", analog=False, output="ba"
     )
     return b, a

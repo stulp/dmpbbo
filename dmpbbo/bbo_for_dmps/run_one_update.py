@@ -19,7 +19,7 @@
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
 
-def runOptimizationTaskPrepare(
+def run_optimization_task_prepare(
     directory,
     task,
     task_solver,
@@ -38,16 +38,16 @@ def runOptimizationTaskPrepare(
 
     # Generate first batch of samples
     i_update = 0
-    _runOptimizationTaskGenerateSamples(
+    _run_optimization_task_generate_samples(
         session, distribution_initial, n_samples_per_update, i_update
     )
 
     return session
 
 
-def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_update):
+def _run_optimization_task_generate_samples(session, distribution, n_samples, i_update):
 
-    samples = distribution.generateSamples(n_samples)
+    samples = distribution.generate_samples(n_samples)
 
     # Save some things to file
     session.tell(distribution, "distribution", i_update)
@@ -63,9 +63,9 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
 
         if i_sample == "eval":
             # Evaluation rollout: no perturbation
-            dmp.setParamVector(distribution.mean)
+            dmp.set_param_vector(distribution.mean)
         else:
-            dmp.setParamVector(samples[i_sample, :])
+            dmp.set_param_vector(samples[i_sample, :])
 
         f = session.tell(dmp, "dmp", i_update, i_sample)
         filenames.append(f)
@@ -74,7 +74,7 @@ def _runOptimizationTaskGenerateSamples(session, distribution, n_samples, i_upda
     print("  " + "\n  ".join(filenames))
 
 
-def runOptimizationTaskOneUpdate(session, i_update):
+def run_optimization_task_one_update(session, i_update):
 
     print("======================================================")
     print(f"i_update = {i_update}")
@@ -91,9 +91,9 @@ def runOptimizationTaskOneUpdate(session, i_update):
 
         cost_vars = session.ask("cost_vars", i_update, i_sample)
         dmp = session.ask("dmp", i_update, i_sample)
-        sample = dmp.getParamVector()
+        sample = dmp.get_param_vector()
 
-        costs = task.evaluateRollout(cost_vars, sample)
+        costs = task.evaluate_rollout(cost_vars, sample)
 
         session.tell(costs, "costs", i_update, i_sample)
 
@@ -106,7 +106,7 @@ def runOptimizationTaskOneUpdate(session, i_update):
     samples = session.ask("samples", i_update)
     updater = session.ask("updater")
 
-    distribution_new, weights = updater.updateDistribution(
+    distribution_new, weights = updater.update_distribution(
         distribution_prev, samples, costs_per_sample
     )
 
@@ -116,4 +116,4 @@ def runOptimizationTaskOneUpdate(session, i_update):
     # Update done: generate new samples
     print("GENERATE NEW SAMPLES")
     i_update += 1  # Next batch of samples are for the next update.
-    _runOptimizationTaskGenerateSamples(session, distribution_new, n_samples, i_update)
+    _run_optimization_task_generate_samples(session, distribution_new, n_samples, i_update)

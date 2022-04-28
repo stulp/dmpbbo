@@ -29,7 +29,7 @@ import dmpbbo.DmpBboJSONEncoder as dj
 y_floor = -0.3
 
 
-def executeBinary(executable_name, arguments, print_command=False):
+def execute_binary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
         raise ValueError(
@@ -44,7 +44,7 @@ def executeBinary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-def performRollouts(dmp, mode="python_simulation", directory="."):
+def perform_rollouts(dmp, mode="python_simulation", directory="."):
 
     if mode == "python_simulation":
         return run_python_simulation(dmp)
@@ -56,7 +56,7 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
 
         filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_dmp} {filename_cost_vars}"
-        executeBinary("./robotExecuteDmp", arguments)
+        execute_binary("./robotExecuteDmp", arguments)
 
         cost_vars = np.loadtxt(filename_cost_vars)
         return cost_vars
@@ -65,15 +65,15 @@ def performRollouts(dmp, mode="python_simulation", directory="."):
 
         dt = 0.01
         ts = np.arange(0, 1.5 * dmp.tau_, dt)
-        (xs, xds, forcing, fa_outputs) = dmp.analyticalSolution(ts)
-        traj = dmp.statesAsTrajectory(ts, xs, xds)
+        (xs, xds, forcing, fa_outputs) = dmp.analytical_solution(ts)
+        traj = dmp.states_as_trajectory(ts, xs, xds)
 
         filename_traj = Path(directory, "robot_trajectory.txt")
         traj.savetxt(filename_traj)
 
         filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_traj} {filename_cost_vars}"
-        executeBinary("./robotExecuteTrajectory", arguments)
+        execute_binary("./robotExecuteTrajectory", arguments)
 
         cost_vars = np.loadtxt(filename_cost_vars)
         return cost_vars
@@ -85,7 +85,7 @@ def run_python_simulation(dmp, y_floor=-0.3):
     ts = np.arange(0, 1.5 * dmp.tau, dt)
     n_time_steps = len(ts)
 
-    (x, xd) = dmp.integrateStart()
+    (x, xd) = dmp.integrate_start()
 
     # ts = cost_vars[:,0]
     # y = cost_vars[:,1:1+n_dims]
@@ -103,7 +103,7 @@ def run_python_simulation(dmp, y_floor=-0.3):
     ball_in_hand = True
     ball_in_air = False
     for ii in range(1, n_time_steps):
-        (x, xd) = dmp.integrateStep(dt, x)
+        (x, xd) = dmp.integrate_step(dt, x)
         (ys[ii, :], yds[ii, :], ydds[ii, :]) = dmp.stateAsPosVelAcc(x, xd)
 
         if ball_in_hand:
@@ -165,14 +165,14 @@ if __name__ == "__main__":
 
     for mode in modes:
 
-        cost_vars = performRollouts(dmp, mode)
+        cost_vars = perform_rollouts(dmp, mode)
 
         x_goal = -0.70
         x_margin = 0.01
         acceleration_weight = 0.001
         task = TaskThrowBall(x_goal, x_margin, y_floor, acceleration_weight)
 
-        task.plotRollout(cost_vars, axs[mode])
+        task.plot_rollout(cost_vars, axs[mode])
         axs[mode].set_title(mode)
 
     plt.show()

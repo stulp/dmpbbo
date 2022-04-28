@@ -33,15 +33,14 @@ if __name__ == "__main__":
 
     cost_vars = np.loadtxt(args.filename)
     task = None
-
-    if args.task:
+    if args.task is not None:
         with open(args.task, "r") as f:
             task = jsonpickle.decode(f.read())
 
     fig = plt.figure(1)
     n_subplots = 1
     ax = fig.add_subplot(1, n_subplots, n_subplots)
-    task.plotRollout(cost_vars, ax)
+    task.plot_rollout(cost_vars, ax)
 
     filename = "plotRollout.png"
     print(f"Saving to file: {filename}")
