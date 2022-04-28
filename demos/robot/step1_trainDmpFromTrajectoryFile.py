@@ -63,7 +63,7 @@ if __name__ == "__main__":
         function_apps = [
             FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)
         ]
-        dmp = Dmp.from_traj(traj, function_apps, "KULVICIUS_2012_JOINING")
+        dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
         # These are the parameters that will be optimized.
         dmp.setSelectedParamNames("weights")

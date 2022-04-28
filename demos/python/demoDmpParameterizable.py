@@ -44,33 +44,35 @@ if __name__ == "__main__":
     dmp_type = "KULVICIUS_2012_JOINING"
     # dmp_type='COUNTDOWN_2013'
     dmp_scaling = "AMPLITUDE_SCALING"
-    dmp = Dmp.from_traj(traj, function_apps, dmp_type, dmp_scaling)
+    dmp = Dmp.from_traj(traj, function_apps, dmp_type=dmp_type, forcing_term_scaling=dmp_scaling)
 
     tau_exec = 0.7
     n_time_steps = 71
     ts = np.linspace(0, tau_exec, n_time_steps)
     xs, xds, forcing, fas = dmp.analyticalSolution(ts)
 
-    dmp.setSelectedParamNames(["weights", "goal"])
-    values = dmp.getParamVector()
+    for selected_param_names in ["weights","goal",["weights","goal"]]:
 
-    # Plotting
+        dmp.setSelectedParamNames(selected_param_names)
+        values = dmp.getParamVector()
 
-    # Original Dmp
-    h, axs = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
-    plt.setp(h, color=[0.7, 0.7, 1.0], linewidth=6)
+        # Plotting
 
-    # Perturbed DMPs
-    for i_sample in range(5):
+        # Original Dmp
+        h, axs = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
+        plt.setp(h, color=[0.7, 0.7, 1.0], linewidth=6)
 
-        rand_vector = 1.0 + 0.2 * np.random.standard_normal(values.shape)
-        new_values = rand_vector * values
-        dmp.setParamVector(new_values)
+        # Perturbed DMPs
+        for i_sample in range(5):
 
-        xs, xds, forcing, fas = dmp.analyticalSolution(ts)
-        h, _ = dmp.plotStatic(
-            tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs
-        )
-        plt.setp(h, color=[0.6, 0.0, 0.0], linewidth=1)
+            rand_vector = 1.0 + 0.2 * np.random.standard_normal(values.shape)
+            new_values = rand_vector * values
+            dmp.setParamVector(new_values)
+
+            xs, xds, forcing, fas = dmp.analyticalSolution(ts)
+            h, _ = dmp.plotStatic(
+                tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs
+            )
+            plt.setp(h, color=[0.6, 0.0, 0.0], linewidth=1)
 
     plt.show()

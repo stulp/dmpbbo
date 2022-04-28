@@ -151,22 +151,6 @@ def plotExplorationCurve(exploration_curve, **kwargs):
     return line, ax
 
 
-def setColor(handle, i_update, n_updates):
-    """ Set the color of an object, according to how far the optimization has proceeded.
-    
-        Args:
-            handle: Handle to the object
-            i_update: Which update is the optimization at now?
-            n_updates: Which is the number of updates the optimization will run?
-    """
-    if i_update == 0:
-        plt.setp(handle, color="r", linewidth=2)
-    else:
-        c = 1.0 * i_update / n_updates
-        cur_color = [0.0 - 0.0 * c, 0.0 + 1.0 * c, 0.0 - 0.0 * c]
-        plt.setp(handle, color=cur_color)
-
-
 def plotUpdate(
     distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
 ):

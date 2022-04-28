@@ -35,7 +35,7 @@ class DynamicalSystem(ABC):
         if order < 1 or order > 2:
             raise ValueError("order should be 1 or 2")
 
-        self.tau = tau
+        self._tau = tau
 
         y_init = np.atleast_1d(y_init)  # In case it is a scalar
 

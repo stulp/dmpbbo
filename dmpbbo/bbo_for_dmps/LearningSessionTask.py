@@ -19,7 +19,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-from dmpbbo.bbo.LearningSession import LearningSession, setColor
+from dmpbbo.bbo.LearningSession import LearningSession
 import dmpbbo.DmpBboJSONEncoder as dj
 
 
@@ -58,6 +58,23 @@ class LearningSessionTask(LearningSession):
         super().addEval(i_update, eval_sample, eval_cost)
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 
+    @staticmethod
+    def _setStyle(handle, i_update, n_updates):
+        """ Set the color of an object, according to how far the optimization has proceeded.
+        
+            Args:
+                handle: Handle to the object
+                i_update: Which update is the optimization at now?
+                n_updates: Which is the number of updates the optimization will run?
+        """
+        if i_update == 0:
+            plt.setp(handle, color=[0.8,0.0,0.0], linewidth=2)
+        else:
+            c = 1.0 * i_update / n_updates
+            cur_color = [0.6 - 0.6 * c, 0.0 + 1.0 * c, 0.0 - 0.0 * c]
+            plt.setp(handle, color=cur_color, linewidth=2)
+    
+    
     def plotRollouts(self, ax=None):
         if not ax:
             ax = plt.axes()
@@ -65,7 +82,7 @@ class LearningSessionTask(LearningSession):
         n_updates = self.getNUpdates()
         for i_update in range(n_updates):
             lines, _ = self.plotRolloutsUpdate(i_update, ax, True, False)
-            setColor(lines, i_update, n_updates)
+            LearningSessionTask._setStyle(lines, i_update, n_updates)
             all_lines.extend(lines)
         return all_lines, ax
 

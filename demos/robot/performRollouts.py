@@ -156,7 +156,7 @@ if __name__ == "__main__":
     n_bfs = 10
     n_dims = traj.dim()
     fas = [FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)]
-    dmp = Dmp.from_traj(traj, fas, "Dmp", "KULVICIUS_2012_JOINING")
+    dmp = Dmp.from_traj(traj, fas, dmp_type="KULVICIUS_2012_JOINING")
 
     modes = ["python_simulation", "robot_executes_trajectory", "robot_executes_dmp"]
 

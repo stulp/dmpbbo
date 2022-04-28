@@ -93,7 +93,7 @@ if __name__ == "__main__":
 
     n_bfs = 10
     function_apps = [FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)]
-    dmp = Dmp.from_traj(traj, function_apps, "KULVICIUS_2012_JOINING")
+    dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
     ################
     # Analytical solution to compute difference
