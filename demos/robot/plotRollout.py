@@ -21,7 +21,7 @@ import jsonpickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 
 
 if __name__ == "__main__":

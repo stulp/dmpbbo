@@ -601,9 +601,6 @@ class Dmp(DynamicalSystem, Parameterizable):
             size += self.dim_dmp()
         return size
 
-    # def __str__(self):
-    #    return json.dumps(self, cls=DmpBboJSONEncoder, indent=2)
-
     @staticmethod
     def get_dmp_axes(has_fa_output=False):
         n_cols = 5

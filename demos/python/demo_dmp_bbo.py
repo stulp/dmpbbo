@@ -25,7 +25,7 @@ from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.bbo_for_dmps.runOptimizationTask import run_optimization_task
+from dmpbbo.bbo_for_dmps.run_optimization_task import run_optimization_task
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
     FunctionApproximatorRBFN,

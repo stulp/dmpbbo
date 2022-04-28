@@ -22,7 +22,7 @@ from pathlib import Path
 import jsonpickle
 
 from TaskThrowBall import TaskThrowBall
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 
 
 if __name__ == "__main__":

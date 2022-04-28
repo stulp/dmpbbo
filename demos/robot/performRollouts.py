@@ -24,7 +24,7 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 
 y_floor = -0.3
 
@@ -52,7 +52,8 @@ def perform_rollouts(dmp, mode="python_simulation", directory="."):
     elif mode == "robot_executes_dmp":
         filename_dmp = Path(directory, f"dmp_rollout.json")
         print(f"Saving trained DMP to: {filename_dmp}")
-        dj.savejson(filename_dmp, dmp, save_for_cpp_also=True)
+        jc.savejson(Path(directory, f"dmp_rollout.json"), dmp)
+        jc.savejson_for_cpp(Path(directory, f"dmp_rollout_  "), dmp)
 
         filename_cost_vars = Path(directory, "cost_vars.txt")
         arguments = f"{filename_dmp} {filename_cost_vars}"

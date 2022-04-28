@@ -21,6 +21,7 @@ from json import JSONEncoder
 import jsonpickle
 import numpy as np
 
+
 # Using jsonpickle to generate JSON that can be read by nlohmann::json was difficult.
 #
 # Standard jsonpickle replaces duplicate objects with their ids to save space. This
@@ -44,25 +45,22 @@ class DmpBboJSONEncoder(JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def savejson(filename, obj, **kwargs):
-    save_for_cpp = kwargs.get("save_for_cpp_also", False)
+def savejson_for_cpp(filename, obj):
+    # Save a simple JSON version that can be read by the C++ code.
+    filename = str(filename)  # In case it is path
+    j = json.dumps(obj, cls=DmpBboJSONEncoder, indent=2)
+    with open(filename, "w") as out_file:
+        out_file.write(j)
 
+
+def savejson(filename, obj):
     # Save to standard jsonpickle file
     j = jsonpickle.encode(obj)
     with open(filename, "w") as out_file:
         out_file.write(j)
 
-    # Save a simple JSON version that can be read by the C++ code.
-    if save_for_cpp:
-        filename = str(filename)  # In case it is path
-        filename_dmpbbo = filename.replace(".json", "_for_cpp.json")
-        j = json.dumps(obj, cls=DmpBboJSONEncoder, indent=2)
-        with open(filename_dmpbbo, "w") as out_file:
-            out_file.write(j)
-
 
 def loadjson(filename):
-
     # Load from standard jsonpickle file
     with open(filename, "r") as in_file:
         j = in_file.read()

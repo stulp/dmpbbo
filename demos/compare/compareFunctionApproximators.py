@@ -23,7 +23,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
     FunctionApproximatorRBFN,
@@ -140,9 +140,8 @@ def train(fa_name, n_dims):
 
     # Save the dynamical system to a json file
     basename = f"{fa_name}_{n_dims}D"
-    filename_json = Path(directory, f"{basename}.json")
-    save_for_cpp = True
-    dj.savejson(filename_json, fa, save_for_cpp_also=True)
+    jc.savejson(Path(directory, f"{basename}.json"), fa)
+    jc.savejson_for_cpp(Path(directory, f"{basename}_for_cpp.json"), fa)
 
     # Save the inputs to a directory
     np.savetxt(Path(directory, f"{basename}_inputs.txt"), inputs_grid)

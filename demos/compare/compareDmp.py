@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
@@ -89,8 +89,8 @@ if __name__ == "__main__":
     # Call the binary, which does analytical_solution and numerical integration in C++
 
     # Save the dynamical system to a json file
-    filename_json = Path(directory, "dmp.json")
-    dj.savejson(filename_json, dmp, save_for_cpp_also=True)
+    jc.savejson(Path(directory, "dmp.json"), dmp)
+    jc.savejson_for_cpp(Path(directory, "dmp_for_cpp.json"), dmp)
     np.savetxt(Path(directory, "ts.txt"), ts)
 
     exec_name = "../../build_dir_realtime/demos/compare/compareDmp"

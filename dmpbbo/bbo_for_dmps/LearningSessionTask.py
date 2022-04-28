@@ -20,7 +20,7 @@ from pathlib import Path
 from matplotlib import pyplot as plt
 
 from dmpbbo.bbo.LearningSession import LearningSession
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 
 
 class LearningSessionTask(LearningSession):
@@ -43,8 +43,8 @@ class LearningSessionTask(LearningSession):
             if self._root_dir is not None:
                 basename = self.get_base_name(name, i_update, i_sample)
                 abs_basename = Path(self._root_dir, basename)
-                filename = f"{abs_basename}.json"
-                dj.savejson(filename, obj, save_for_cpp_also=True)
+                jc.savejson(f"{abs_basename}.json", obj)
+                jc.savejson_for_cpp(f"{abs_basename}_for_cpp.json", obj)
 
         filename = super().tell(obj, name, i_update, i_sample)
         return filename

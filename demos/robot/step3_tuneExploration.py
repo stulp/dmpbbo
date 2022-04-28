@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-import dmpbbo.DmpBboJSONEncoder as dj
+import dmpbbo.json_for_cpp as jc
 from TaskThrowBall import TaskThrowBall
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from perform_rollouts import perform_rollouts
@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     filename = args.dmp
     print(f"Loading DMP from: {filename}")
-    dmp = dj.loadjson(filename)
+    dmp = jc.loadjson(filename)
 
     ts = dmp._ts_train
     xs, xds, _, _ = dmp.analytical_solution(ts)
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     filename = Path(directory, f"distribution.json")
     print(f"Saving sampling distribution to: {filename}")
     os.makedirs(directory, exist_ok=True)
-    dj.savejson(filename, distribution)
+    jc.savejson(filename, distribution)
 
     samples = distribution.generate_samples(n_samples)
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
         filename = Path(directory, f"dmp_sample_{i_sample}.json")
         print(f"Saving sampled DMP to: {filename}")
-        dj.savejson(filename, dmp, save_for_cpp_also=True)
+        jc.savejson(filename, dmp, save_for_cpp_also=True)
 
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)
