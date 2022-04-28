@@ -70,16 +70,16 @@ class TimeSystem(DynamicalSystem):
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
 
-        T = ts.size
+        n_time_steps = ts.size
 
         if self._count_down:
-            xs = 1.0 - np.reshape(ts / self.tau, (T, 1))
-            xds = -np.ones((T, 1)) / self.tau
+            xs = 1.0 - np.reshape(ts / self.tau, (n_time_steps, 1))
+            xds = -np.ones((n_time_steps, 1)) / self.tau
             xds[xs < 0.0] = 0.0
             xs[xs < 0.0] = 0.0
         else:
-            xs = np.reshape(ts / self.tau, (T, 1))
-            xds = np.ones((T, 1)) / self.tau
+            xs = np.reshape(ts / self.tau, (n_time_steps, 1))
+            xds = np.ones((n_time_steps, 1)) / self.tau
             xds[xs > 1.0] = 0.0
             xs[xs > 1.0] = 1.0
 

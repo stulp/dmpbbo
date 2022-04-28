@@ -80,8 +80,8 @@ class SigmoidSystem(DynamicalSystem):
         Args: x - current state
         Returns: xd - rate of change in state
         """
-        Ks = self._getKs()
-        xd = self._max_rate * x * (1 - (np.divide(x, Ks)))
+        ks = self._getKs()
+        xd = self._max_rate * x * (1 - (np.divide(x, ks)))
         return xd
 
     def analyticalSolution(self, ts):
@@ -99,11 +99,11 @@ class SigmoidSystem(DynamicalSystem):
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
-        Ks = self._getKs()
+        Ks = self._getKs()  # noqa
 
         for dd in range(self._dim_x):
             # Auxiliary variables to improve legibility
-            K = Ks[dd]
+            K = Ks[dd]  # noqa
             b = (K / self._x_init[dd]) - 1
             xs[:, dd] = K / (1 + b * exp_rt)
             xds[:, dd] = np.multiply((K * r * b) / np.square(1.0 + b * exp_rt), exp_rt)
@@ -116,7 +116,7 @@ class SigmoidSystem(DynamicalSystem):
             return self._Ks_cached
 
         # Variable rename so that it is the same as on the Wikipedia page
-        N_0s = self.x_init
+        N_0s = self.x_init  # noqa
         r = self._max_rate
         t_infl = self.tau * self._inflection_ratio
 

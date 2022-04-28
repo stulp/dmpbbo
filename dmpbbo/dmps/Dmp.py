@@ -371,9 +371,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         (x_spring, xd_spring) = local_spring_system.integrateStart()
 
         # For convenience
-        SPRING = self.SPRING
-        SPRING_Y = self.SPRING_Y
-        SPRING_Z = self.SPRING_Z
+        SPRING = self.SPRING  # noqa
+        SPRING_Y = self.SPRING_Y  # noqa
+        SPRING_Z = self.SPRING_Z  # noqa
 
         t0 = 0
         xs[t0, SPRING] = x_spring
@@ -643,7 +643,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Dimensionality of the DMP. -2 because of phase and gating (which are 1D) and /3 because of spring system
         # (which has dimensionality 2*n_dims_dmp) and goal system (which has dimensionality n_dims_dmp)
         n_dims_dmp = (dim_x - 2) // 3
-        D = n_dims_dmp  # Abbreviation for convenience
+        D = n_dims_dmp  # noqa Abbreviation for convenience
 
         # define SPRING    segment(0*dim_orig()+0,2*dim_orig())
         # define SPRING_Y  segment(0*dim_orig()+0,dim_orig())

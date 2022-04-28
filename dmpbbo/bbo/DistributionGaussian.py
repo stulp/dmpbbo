@@ -46,9 +46,9 @@ def plot_error_ellipse(mu, cov, ax=None, **kwargs):
     edgecolor = kwargs.pop("edgecolor", "k")
 
     x, y = mu
-    U, S, V = np.linalg.svd(cov)
+    U, S, V = np.linalg.svd(cov)  # noqa
     theta = np.degrees(np.arctan2(U[1, 0], U[0, 0]))
-    ellipsePlot = Ellipse(
+    ellipse_plot = Ellipse(
         xy=(x, y),
         width=2 * np.sqrt(S[0]),
         height=2 * np.sqrt(S[1]),
@@ -60,7 +60,7 @@ def plot_error_ellipse(mu, cov, ax=None, **kwargs):
 
     if not ax:
         ax = plt.gca()
-    lines = ax.add_patch(ellipsePlot)
+    lines = ax.add_patch(ellipse_plot)
     return lines, ax
 
 

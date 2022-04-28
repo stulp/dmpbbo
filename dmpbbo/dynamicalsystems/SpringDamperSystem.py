@@ -122,18 +122,18 @@ class SpringDamperSystem(DynamicalSystem):
             y0 = self._x_init[i_dim] - self._y_attr[i_dim]
             yd0 = self._x_init[self._dim_y + i_dim]
 
-            A = y0
-            B = yd0 + omega_0 * y0
+            A = y0  # noqa
+            B = yd0 + omega_0 * y0  # noqa
 
             # Closed form solutions
             # See http://en.wikipedia.org/wiki/Damped_spring-mass_system
             exp_term = -omega_0 * ts
             exp_term = np.exp(exp_term)
 
-            Y = 0 * self._dim_y + i_dim
-            Z = 1 * self._dim_y + i_dim
+            Y = 0 * self._dim_y + i_dim  # noqa
+            Z = 1 * self._dim_y + i_dim  # noqa
 
-            ABts = A + B * ts
+            ABts = A + B * ts  # noqa
 
             xs[:, Y] = self._y_attr[i_dim] + ABts * exp_term  # .array()
 

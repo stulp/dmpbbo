@@ -274,10 +274,10 @@ class Trajectory:
         yds = np.zeros([n_time_steps, n_dims])
         ydds = np.zeros([n_time_steps, n_dims])
 
-        D = ts[n_time_steps - 1]
+        D = ts[n_time_steps - 1] # noqa
         tss = ts / D
 
-        A = y_to - y_from
+        A = y_to - y_from # noqa
 
         for i_dim in range(n_dims):
 
@@ -339,7 +339,7 @@ class Trajectory:
         # Sample rate and desired cutoff frequencies (in Hz).
         _dt_mean = np.mean(np.diff(self._ts))
         sample_freq = 1.0 / _dt_mean
-        self._ys = butter_lowpass_filter(self._ys, cutoff, sample_freq, order)
+        self._ys = butter_low_pass_filter(self._ys, cutoff, sample_freq, order)
         self.recomputeDerivatives()
 
     def plot(self, axs=None):
@@ -385,28 +385,28 @@ def diffnc(xs, dt):
 
     (n_samples, n_dims) = xs.shape
     fil = np.array([1.0, 0.0, -1.0]) / 2 / dt
-    XX = np.empty([n_samples + 2, n_dims])
+    xs2 = np.empty([n_samples + 2, n_dims])
     for i_dim in range(n_dims):
-        XX[:, i_dim] = np.convolve(xs[:, i_dim], fil)
+        xs2[:, i_dim] = np.convolve(xs[:, i_dim], fil)
 
-    xs = XX[1:-1, :]
+    xs = xs2[1:-1, :]
     xs[0, :] = xs[1, :]
     xs[-1, :] = xs[-2, :]
     return xs
 
 
-def butter_lowpass(cutoff, fs, order=3):
+def butter_low_pass(cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
-    b, a = butter(
+    b, a = butter( # noqa 'ba' => b, a
         order, cut, btype="low", analog=False, output="ba"
-    )  # noqa 'ba' => b, a
+    )
     return b, a
 
 
-def butter_lowpass_filter(data, cutoff, fs, order=3):
+def butter_low_pass_filter(data, cutoff, fs, order=3):
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
-    b, a = butter_lowpass(cutoff, fs, order=order)
+    b, a = butter_low_pass(cutoff, fs, order=order)
     y = filtfilt(b, a, data, axis=0)
     return y
