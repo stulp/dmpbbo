@@ -20,7 +20,8 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", type=str, help="directory to read results from")
@@ -29,3 +30,7 @@ if __name__ == "__main__":
     session = LearningSessionTask.from_dir(args.directory)
     session.plot()
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

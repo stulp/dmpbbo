@@ -44,32 +44,28 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         return [np.linalg.norm(sample - self.point)]
 
 
-if __name__ == "__main__":
-
+def main():
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     n_dims = 2
     minimum = np.full(n_dims, 2.0)
     cost_function = DemoCostFunctionDistanceToPoint(minimum)
 
-    updaters = {}
-    updaters2 = {}
+    updaters = {}  # noqa
 
-    eliteness = 10
-    weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
-    updaters["fixed_exploration"] = UpdaterMean(eliteness, weighting_method)
+    updaters["fixed_exploration"] = UpdaterMean(eliteness=10, weighting_method="PI-BB")
 
-    covar_decay_factor = 0.8
     updaters["covar_decay"] = UpdaterCovarDecay(
-        eliteness, weighting_method, covar_decay_factor
+        eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8
     )
 
-    min_level = 0.000001
-    max_level = None
-    diag_only = False
-    learning_rate = 0.75
     updaters["covar_adaptation"] = UpdaterCovarAdaptation(
-        eliteness, weighting_method, max_level, min_level, diag_only, learning_rate
+        eliteness=10,
+        weighting_method="PI-BB",
+        max_level=None,
+        min_level=0.000001,
+        diag_only=False,
+        learning_rate=0.8,
     )
 
     for name, updater in updaters.items():
@@ -98,3 +94,7 @@ if __name__ == "__main__":
         fig.canvas.set_window_title(f"Optimization with covar_update={name}")
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

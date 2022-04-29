@@ -25,7 +25,7 @@ from TaskThrowBall import TaskThrowBall
 import dmpbbo.json_for_cpp as jc
 
 
-if __name__ == "__main__":
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write task to")
@@ -45,3 +45,7 @@ if __name__ == "__main__":
     json = jsonpickle.encode(task)
     with open(filename, "w") as text_file:
         text_file.write(json)
+
+
+if __name__ == "__main__":
+    main()

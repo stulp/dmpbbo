@@ -32,7 +32,6 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
 
 
 def execute_binary(executable_name, arguments, print_command=False):
-
     if not os.path.isfile(executable_name):
         raise ValueError(
             f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
@@ -45,8 +44,7 @@ def execute_binary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-if __name__ == "__main__":
-
+def main():
     directory = "/tmp/compareDmp/"
     os.makedirs(directory, exist_ok=True)
 
@@ -58,7 +56,7 @@ if __name__ == "__main__":
     n_dims = traj.dim
 
     n_bfs = 10
-    function_apps = [FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)]
+    function_apps = [FunctionApproximatorRBFN(n_bfs, 0.7) for _ in range(n_dims)]
     dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
     ################
@@ -165,3 +163,7 @@ if __name__ == "__main__":
         plt.gcf().savefig(Path(directory, "numerical_diff.png"))
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

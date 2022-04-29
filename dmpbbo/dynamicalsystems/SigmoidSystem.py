@@ -140,11 +140,11 @@ class SigmoidSystem(DynamicalSystem):
 
         # If Ks is too close to N_0===initial_state, then the differential equation will always return 0
         # See differential_equation below
-        #   xd = max_rate_*x*(1-(x/Ks_))
+        #   xd = max_rate_*x*(1-(x/Ks))
         # For initial_state this is
-        #   xd = max_rate_*initial_state*(1-(initial_state/Ks_))
+        #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
         # If initial_state is very close/equal to Ks we get
-        #   xd = max_rate_*Ks*(1-(Ks/Ks_))
+        #   xd = max_rate_*Ks*(1-(Ks/Ks))
         #   xd = max_rate_*Ks*(1-1)
         #   xd = max_rate_*Ks*0
         #   xd = 0

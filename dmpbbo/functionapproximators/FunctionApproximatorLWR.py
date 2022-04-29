@@ -83,7 +83,8 @@ class FunctionApproximatorLWR(FunctionApproximator):
             inputs,
             centers=model_params["centers"],
             widths=model_params["widths"],
-            normalized=True)
+            normalized=True,
+        )
 
     @staticmethod
     def _get_lines(inputs, model_params):

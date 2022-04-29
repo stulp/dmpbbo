@@ -31,7 +31,6 @@ from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
 def execute_binary(executable_name, arguments, print_command=False):
-
     if not os.path.isfile(executable_name):
         raise ValueError(
             f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
@@ -80,8 +79,7 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     pass
 
 
-if __name__ == "__main__":
-
+def main():
     directory = "/tmp/compareDynamicalSystems/"
     os.makedirs(directory, exist_ok=True)
 
@@ -177,3 +175,7 @@ if __name__ == "__main__":
         fig_count += 3
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

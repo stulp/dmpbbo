@@ -30,7 +30,8 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
     FunctionApproximatorRBFN,
 )
 
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("trajectory_file", help="file to read trajectory from")
@@ -152,3 +153,7 @@ if __name__ == "__main__":
 
     if args.show:
         plt.show()
+
+
+if __name__ == "__main__":
+    main()

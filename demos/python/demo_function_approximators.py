@@ -25,7 +25,6 @@ from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproxi
 
 
 def target_function(n_samples_per_dim):
-
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
     if n_dims == 1:
@@ -51,7 +50,6 @@ def target_function(n_samples_per_dim):
 
 
 def train(fa_name, n_dims):
-
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
     (inputs, targets) = target_function(n_samples_per_dim)
@@ -86,7 +84,7 @@ def train(fa_name, n_dims):
     plt.gcf().canvas.set_window_title(f"{fa_name} {n_dims}D")
 
 
-if __name__ == "__main__":
+def main():
     """Run some training sessions and plot results."""
 
     for fa_name in ["WLS", "RBFN", "LWR"]:
@@ -94,3 +92,7 @@ if __name__ == "__main__":
             train(fa_name, n_dims)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

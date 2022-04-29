@@ -31,7 +31,6 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
 
 
 def execute_binary(executable_name, arguments, print_command=False):
-
     if not os.path.isfile(executable_name):
         raise ValueError(
             f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
@@ -81,7 +80,6 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
 
 
 def target_function(n_samples_per_dim):
-
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
     if n_dims == 1:
@@ -107,7 +105,6 @@ def target_function(n_samples_per_dim):
 
 
 def train(fa_name, n_dims):
-
     directory = "/tmp/compareFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
@@ -131,12 +128,11 @@ def train(fa_name, n_dims):
     fa.train(inputs, targets)
 
     # Make predictions for the targets
-    outputs = fa.predict(inputs)
+    outputs = fa.predict(inputs)  # noqa
 
     # Make predictions on a grid
     n_samples_per_dim_grid = 200 if n_dims == 1 else [30, 30]
     inputs_grid, _ = target_function(n_samples_per_dim_grid)
-    outputs_grid = fa.predict(inputs_grid)
 
     # Save the dynamical system to a json file
     basename = f"{fa_name}_{n_dims}D"
@@ -177,10 +173,13 @@ def train(fa_name, n_dims):
         plt.gcf().savefig(Path(directory, f"{basename}.png"))
 
 
-if __name__ == "__main__":
-
+def main():
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
             train(fa_name, n_dims)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

@@ -27,14 +27,13 @@ class BasisFunction(ABC):
 
 
 class Gaussian(BasisFunction):
-
     @staticmethod
     def activations(inputs, **kwargs):
         return Gaussian._activations(
             inputs,
             kwargs.get("centers"),
             kwargs.get("widths"),
-            kwargs.get("normalized")
+            kwargs.get("normalized"),
         )
 
     @staticmethod

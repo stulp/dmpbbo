@@ -151,16 +151,12 @@ def plot_exploration_curve(exploration_curve, **kwargs):
     return line, ax
 
 
-def plot_update(
-    distribution, cost_eval, samples, costs, weights, distribution_new, **kwargs
-):
+def plot_update(distribution, samples, weights, distribution_new, **kwargs):
     """ Save an optimization update to a directory.
     
         Args:
             distribution: Gaussian distribution before the update
-            cost_eval: Cost of the mean of the distribution
             samples: The samples in the search space
-            costs: The cost of each sample
             weights: The weight of each sample
             distribution_new: Gaussian distribution after the update
             kwargs: Can be the following:
@@ -469,8 +465,6 @@ class LearningSession:
         plot_samples = kwargs.get("plot_samples", False)
 
         distribution = self.ask("distribution", i_update)
-        costs_eval = self.get_eval_costs(i_update)
-        costs = self.get_sample_costs(i_update)
         samples = self.ask("samples", i_update)
         weights = self.ask("weights", i_update)
         distribution_new = self.ask("distribution_new", i_update)
@@ -480,9 +474,7 @@ class LearningSession:
 
         return plot_update(
             distribution,
-            costs_eval,
             samples,
-            costs,
             weights,
             distribution_new,
             ax=ax,
@@ -504,7 +496,7 @@ class LearningSession:
         pass
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "directory", type=str, help="directory from which to read the learning session"
@@ -514,3 +506,7 @@ if __name__ == "__main__":
     session = LearningSession.from_dir(args.directory)
     session.plot()
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

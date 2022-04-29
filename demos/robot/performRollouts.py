@@ -65,7 +65,7 @@ def perform_rollouts(dmp, mode="python_simulation", directory="."):
     else:  # 'robot_executes_trajectory':
 
         dt = 0.01
-        ts = np.arange(0, 1.5 * dmp.tau_, dt)
+        ts = np.arange(0, 1.5 * dmp.tau, dt)
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution(ts)
         traj = dmp.states_as_trajectory(ts, xs, xds)
 
@@ -141,7 +141,7 @@ def run_python_simulation(dmp, y_floor=-0.3):
     return cost_vars
 
 
-if __name__ == "__main__":
+def main():
     from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
         FunctionApproximatorRBFN,
     )
@@ -177,3 +177,7 @@ if __name__ == "__main__":
         axs[mode].set_title(mode)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

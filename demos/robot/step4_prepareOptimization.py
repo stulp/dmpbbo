@@ -23,7 +23,8 @@ import jsonpickle
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
 from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
 
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write results to")
@@ -71,3 +72,7 @@ if __name__ == "__main__":
         updater,
         dmp,
     )
+
+
+if __name__ == "__main__":
+    main()

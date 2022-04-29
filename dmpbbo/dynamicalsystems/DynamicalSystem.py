@@ -228,26 +228,26 @@ class DynamicalSystem(ABC):
             axs[0].set_ylabel(r"$x$")
 
             if len(axs) > 1:
-                lines[len(lines):] = axs[1].plot(ts, xds)
+                lines[len(lines) :] = axs[1].plot(ts, xds)
                 axs[1].set_ylabel(r"$\dot{x}$")
 
         else:
             # data has following format: [ y_1..y_D  z_1..z_D   yd_1..yd_D  zd_1..zd_D ]
 
-            ys = xs[:, 0 * dim_y: 1 * dim_y]
+            ys = xs[:, 0 * dim_y : 1 * dim_y]
             # zs = xs[:, 1 * dim_y : 2 * dim_y]
-            yds = xds[:, 0 * dim_y: 1 * dim_y]
-            zds = xds[:, 1 * dim_y: 2 * dim_y]
+            yds = xds[:, 0 * dim_y : 1 * dim_y]
+            zds = xds[:, 1 * dim_y : 2 * dim_y]
 
             lines = axs[0].plot(ts, ys)
             axs[0].set_ylabel(r"$y$")
 
             if len(axs) > 1:
-                lines[len(lines):] = axs[1].plot(ts, yds)
+                lines[len(lines) :] = axs[1].plot(ts, yds)
                 axs[1].set_ylabel(r"$\dot{y} = z/\tau$")
 
             if len(axs) > 2:
-                lines[len(lines):] = axs[2].plot(ts, zds / self._tau)
+                lines[len(lines) :] = axs[2].plot(ts, zds / self._tau)
                 axs[2].set_ylabel(r"$\ddot{y} = \dot{z}/\tau$")
 
         for ax in axs:

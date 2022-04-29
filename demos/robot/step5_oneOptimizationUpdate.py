@@ -21,7 +21,8 @@ import argparse
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
 
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", type=str, help="directory to write results to")
@@ -31,3 +32,7 @@ if __name__ == "__main__":
     session = LearningSessionTask.from_dir(args.directory)
 
     run_one.run_optimization_task_one_update(session, args.update)
+
+
+if __name__ == "__main__":
+    main()

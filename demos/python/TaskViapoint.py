@@ -22,98 +22,83 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 
 class TaskViapoint(Task):
-    def __init__(
-            self,
-            viapoint,
-            **kwargs
-    ):
-        viapoint_time = kwargs.get("viapoint_time", None)
-        viapoint_radius = kwargs.get("viapoint_radius", 0.0)
-        goal = kwargs.get("goal", None)
-        goal_time = kwargs.get("goal_time", None)
-        viapoint_weight = kwargs.get("viapoint_weight", 1.0)
-        acceleration_weight = kwargs.get("acceleration_weight", 0.0001)
-        goal_weight = kwargs.get("goal_weight", 0.0)
+    def __init__(self, viapoint, **kwargs):
+        self.viapoint = viapoint
+        self.viapoint_time = kwargs.get("viapoint_time", None)
+        self.viapoint_radius = kwargs.get("viapoint_radius", 0.0)
+        self.goal = kwargs.get("goal", np.zeros(viapoint.shape))
+        self.goal_time = kwargs.get("goal_time", None)
+        self.viapoint_weight = kwargs.get("viapoint_weight", 1.0)
+        self.acceleration_weight = kwargs.get("acceleration_weight", 0.0001)
+        self.goal_weight = kwargs.get("goal_weight", 0.0)
 
-        if goal is not None:
-            if goal.shape != viapoint.shape:
+        if self.goal is not None:
+            if self.goal.shape != self.viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
-
-        self.viapoint_ = viapoint
-        self.viapoint_time_ = viapoint_time
-        self.viapoint_radius_ = viapoint_radius
-        if goal_time is None:
-            self.goal_ = np.zeros(viapoint.shape)
-        else:
-            self.goal_ = goal
-        self.goal_time_ = goal_time
-        self.viapoint_weight_ = viapoint_weight
-        self.acceleration_weight_ = acceleration_weight
-        self.goal_weight_ = goal_weight
 
     def cost_labels(self):
         return ["viapoint", "acceleration", "goal"]
 
     def evaluate_rollout(self, cost_vars, sample):
-        n_dims = self.viapoint_.shape[0]
+        n_dims = self.viapoint.shape[0]
         n_time_steps = cost_vars.shape[0]
 
         ts = cost_vars[:, 0]
-        ys = cost_vars[:, 1: 1 + n_dims]
-        ydds = cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
+        ys = cost_vars[:, 1 : 1 + n_dims]
+        ydds = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
 
         dist_to_viapoint = 0.0
-        if self.viapoint_weight_ > 0.0:
+        if self.viapoint_weight > 0.0:
 
-            if self.viapoint_time_ is None:
+            if self.viapoint_time is None:
                 # Don't compute the distance at some time, but rather get the
                 # minimum distance
 
                 # Compute all distances along trajectory
                 viapoint_repeat = np.repeat(
-                    np.atleast_2d(self.viapoint_), n_time_steps, axis=0
+                    np.atleast_2d(self.viapoint), n_time_steps, axis=0
                 )
                 dists = np.linalg.norm(ys - viapoint_repeat, axis=1)
 
                 # Get minimum distance
-                dist_to_viapoint = dists.min()
+                dist_to_viapoint = dists.min()  # noqa
 
             else:
                 # Get integer time step at t=viapoint_time
-                viapoint_time_step = np.argmax(ts >= self.viapoint_time_)
+                viapoint_time_step = np.argmax(ts >= self.viapoint_time)
                 if viapoint_time_step == 0:
                     print(
-                        "WARNING: viapoint_time_step=0, maybe viapoint_time_ is too large?"
+                        "WARNING: viapoint_time_step=0, maybe viapoint_time is too large?"
                     )
                 # Compute distance at that time step
-                y_via = cost_vars[viapoint_time_step, 1: 1 + n_dims]
-                dist_to_viapoint = np.linalg.norm(y_via - self.viapoint_)
+                y_via = cost_vars[viapoint_time_step, 1 : 1 + n_dims]
+                dist_to_viapoint = np.linalg.norm(y_via - self.viapoint)
 
-            if self.viapoint_radius_ > 0.0:
+            if self.viapoint_radius > 0.0:
                 # The viapoint_radius defines a radius within which the cost is
                 # always 0
-                dist_to_viapoint -= self.viapoint_radius_
+                dist_to_viapoint -= self.viapoint_radius
                 if dist_to_viapoint < 0.0:
                     dist_to_viapoint = 0.0
 
         sum_ydd = 0.0
-        if self.acceleration_weight_ > 0.0:
+        if self.acceleration_weight > 0.0:
             sum_ydd = np.sum(np.square(ydds))
 
         delay_cost_mean = 0.0
-        if self.goal_weight_ > 0.0 and self.goal_ is not None:
-            after_goal_indices = ts >= self.goal_time_
+        if self.goal_weight > 0.0 and self.goal is not None:
+            after_goal_indices = ts >= self.goal_time
             ys_after_goal = ys[after_goal_indices, :]
             n_time_steps = ys_after_goal.shape[0]
-            goal_repeat = np.repeat(np.atleast_2d(self.goal_), n_time_steps, axis=0)
+            goal_repeat = np.repeat(np.atleast_2d(self.goal), n_time_steps, axis=0)
             delay_cost_mean = np.mean(
                 np.linalg.norm(ys_after_goal - goal_repeat, axis=1)
             )
 
         costs = np.zeros(1 + 3)
-        costs[1] = self.viapoint_weight_ * dist_to_viapoint
-        costs[2] = self.acceleration_weight_ * sum_ydd / n_time_steps
-        costs[3] = self.goal_weight_ * delay_cost_mean
+        costs[1] = self.viapoint_weight * dist_to_viapoint
+        costs[2] = self.acceleration_weight * sum_ydd / n_time_steps
+        costs[3] = self.goal_weight * delay_cost_mean
         costs[0] = np.sum(costs[1:])
         return costs
 
@@ -122,18 +107,18 @@ class TaskViapoint(Task):
             ax = plt.axes()
 
         """Simple script to plot y of DMP trajectory"""
-        n_dims = self.viapoint_.shape[0]
+        n_dims = self.viapoint.shape[0]
         t = cost_vars[:, 0]
-        y = cost_vars[:, 1: n_dims + 1]
+        y = cost_vars[:, 1 : n_dims + 1]
         if n_dims == 1:
             line_handles = ax.plot(t, y, linewidth=0.5)
             ax.plot(t[0], y[0], "bo", label="start")
             ax.plot(t[-1], y[-1], "go", label="end")
-            ax.plot(self.viapoint_time_, self.viapoint_, "ok", label="viapoint")
-            if self.viapoint_radius_ > 0.0:
-                r = self.viapoint_radius_
-                t = self.viapoint_time_
-                v = self.viapoint_[0]
+            ax.plot(self.viapoint_time, self.viapoint, "ok", label="viapoint")
+            if self.viapoint_radius > 0.0:
+                r = self.viapoint_radius
+                t = self.viapoint_time
+                v = self.viapoint[0]
                 ax.plot([t, t], [v + r, v - r], "-k")
                 ax.set_xlabel("time (s)")
                 ax.set_ylabel("y")
@@ -142,10 +127,10 @@ class TaskViapoint(Task):
             line_handles = ax.plot(y[:, 0], y[:, 1], linewidth=0.5)
             ax.plot(y[0, 0], y[0, 1], "bo", label="start")
             ax.plot(y[-1, 0], y[-1, 1], "go", label="end")
-            ax.plot(self.viapoint_[0], self.viapoint_[1], "ko", label="viapoint")
-            if self.viapoint_radius_ > 0.0:
+            ax.plot(self.viapoint[0], self.viapoint[1], "ko", label="viapoint")
+            if self.viapoint_radius > 0.0:
                 circle = plt.Circle(
-                    self.viapoint_, self.viapoint_radius_, color="k", fill=False
+                    self.viapoint, self.viapoint_radius, color="k", fill=False
                 )
                 ax.add_artist(circle)
             ax.axis("equal")

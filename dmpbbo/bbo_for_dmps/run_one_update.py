@@ -116,4 +116,6 @@ def run_optimization_task_one_update(session, i_update):
     # Update done: generate new samples
     print("GENERATE NEW SAMPLES")
     i_update += 1  # Next batch of samples are for the next update.
-    _run_optimization_task_generate_samples(session, distribution_new, n_samples, i_update)
+    _run_optimization_task_generate_samples(
+        session, distribution_new, n_samples, i_update
+    )

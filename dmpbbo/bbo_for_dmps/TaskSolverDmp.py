@@ -24,12 +24,12 @@ from dmpbbo.bbo_for_dmps.TaskSolver import TaskSolver
 
 class TaskSolverDmp(TaskSolver):
     def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor):
-        self.dmp_ = copy.deepcopy(dmp)
-        self.integrate_time_ = dmp.tau * integrate_dmp_beyond_tau_factor
-        self.n_time_steps_ = int(np.floor(self.integrate_time_ / dt)) + 1
+        self._dmp = copy.deepcopy(dmp)
+        self._integrate_time = dmp.tau * integrate_dmp_beyond_tau_factor
+        self._n_time_steps = int(np.floor(self._integrate_time / dt)) + 1
 
     def perform_rollout_dmp(self, dmp):
-        ts = np.linspace(0.0, self.integrate_time_, self.n_time_steps_)
+        ts = np.linspace(0.0, self._integrate_time, self._n_time_steps)
         xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution(ts)
         traj = dmp.states_as_trajectory(ts, xs, xds)
         # traj.misc = forcing_terms
@@ -37,5 +37,5 @@ class TaskSolverDmp(TaskSolver):
         return cost_vars
 
     def perform_rollout(self, sample, **kwargs):
-        self.dmp_.set_param_vector(sample)
-        return self.perform_rollout_dmp(self.dmp_)
+        self._dmp.set_param_vector(sample)
+        return self.perform_rollout_dmp(self._dmp)

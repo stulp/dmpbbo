@@ -58,7 +58,9 @@ def run_demo(directory, n_dims):
 
     # Make the task
     viapoint = 3 * np.ones(n_dims)
-    viapoint_time = 0.3 if n_dims == 1 else None  # None means: Do not pass through viapoint at a specific time,
+    viapoint_time = (
+        0.3 if n_dims == 1 else None
+    )  # None means: Do not pass through viapoint at a specific time,
     # but rather pass through it at any time.
 
     task = TaskViapoint(
@@ -83,10 +85,9 @@ def run_demo(directory, n_dims):
     covar_init = 1000.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    eliteness = 10
-    weighting_method = "PI-BB"
-    covar_decay_factor = 0.9
-    updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
+    updater = UpdaterCovarDecay(
+        eliteness=10, weighting_method="PI_BB", covar_decay_factor=0.9
+    )
 
     n_samples_per_update = 10
     n_updates = 20
@@ -110,8 +111,7 @@ def run_demo(directory, n_dims):
     return session.plot()
 
 
-if __name__ == "__main__":
-
+def main():
     directory = "/tmp/demoDmpBboSingleUpdates"
     if len(sys.argv) > 1:
         directory = sys.argv[1]
@@ -120,3 +120,7 @@ if __name__ == "__main__":
         run_demo(directory, n_dims)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

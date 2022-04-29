@@ -124,7 +124,7 @@ class FunctionApproximator(Parameterizable):
         for label in self._selected_param_names:
             expected_shape = self._model_params[label].shape
             cur_n_values = np.prod(expected_shape)
-            cur_values = values[offset: offset + cur_n_values]
+            cur_values = values[offset : offset + cur_n_values]
             self._model_params[label] = np.reshape(cur_values, expected_shape)
             offset += cur_n_values
 

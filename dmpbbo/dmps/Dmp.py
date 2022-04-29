@@ -31,14 +31,14 @@ from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 class Dmp(DynamicalSystem, Parameterizable):
     def __init__(
-            self,
-            tau,
-            y_init,
-            y_attr,
-            function_approximators,
-            phase_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
-            gating_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
-            **kwargs
+        self,
+        tau,
+        y_init,
+        y_attr,
+        function_approximators,
+        phase_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
+        gating_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
+        **kwargs,
     ):
         """Initialize a DMP with function approximators and subsystems 
         
@@ -74,7 +74,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set defaults for subsystems if necessary
         self._phase_system = phase_system or TimeSystem(tau, False)
-        self._gating_system = gating_system or SigmoidSystem(tau, np.ones(1), sigmoid_max_rate, 0.85)
+        self._gating_system = gating_system or SigmoidSystem(
+            tau, np.ones(1), sigmoid_max_rate, 0.85
+        )
         self._goal_system = goal_system or ExponentialSystem(tau, y_init, y_attr, 15)
 
         self._ts_train = None
@@ -93,12 +95,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return self._dim_y
 
     @classmethod
-    def from_traj(
-            cls,
-            trajectory,
-            function_approximators,
-            **kwargs
-    ):
+    def from_traj(cls, trajectory, function_approximators, **kwargs):
         """Initialize a DMP by training it from a trajectory. 
         
         Args:
@@ -381,7 +378,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
             # Add forcing term to the acceleration of the spring state
             xds[tt, SPRING_Z] = (
-                    xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
+                xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
             )  # + perturbation
             # Compute y component from z
             xds[tt, SPRING_Y] = xs[tt, SPRING_Z] / self._tau
@@ -405,10 +402,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Do not train function approximators if there are none
         if self._function_approximators is not None:
-            (
-                fa_input_phase,
-                f_target,
-            ) = self._compute_targets(trajectory)
+            (fa_input_phase, f_target) = self._compute_targets(trajectory)
 
             for dd in range(self.dim_dmp()):
                 fa_target = f_target[:, dd]
@@ -455,12 +449,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Compute inverse
         tau = self._tau
         f_target = (
-                tau * tau * trajectory.ydds
-                + (
-                        spring_constant * (trajectory.ys - xs_goal)
-                        + damping_coefficient * tau * trajectory.yds
-                )
-                / mass
+            tau * tau * trajectory.ydds
+            + (
+                spring_constant * (trajectory.ys - xs_goal)
+                + damping_coefficient * tau * trajectory.yds
+            )
+            / mass
         )
 
         # Factor out gating term
@@ -586,11 +580,11 @@ class Dmp(DynamicalSystem, Parameterizable):
         for fa in self._function_approximators:
             if fa.is_trained():
                 cur_size = fa.get_param_vector_size()
-                cur_values = values[offset: offset + cur_size]
+                cur_values = values[offset : offset + cur_size]
                 fa.set_param_vector(cur_values)
                 offset += cur_size
         if "goal" in self._selected_param_names:
-            self.y_attr = values[offset: offset + self.dim_dmp()]
+            self.y_attr = values[offset : offset + self.dim_dmp()]
 
     def get_param_vector_size(self):
         size = 0

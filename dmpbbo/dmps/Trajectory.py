@@ -169,21 +169,21 @@ class Trajectory:
         a2 = ydd_from / 2
 
         a3 = (
-                -10 * y_from
-                - 6 * yd_from
-                - 2.5 * ydd_from
-                + 10 * y_to
-                - 4 * yd_to
-                + 0.5 * ydd_to
+            -10 * y_from
+            - 6 * yd_from
+            - 2.5 * ydd_from
+            + 10 * y_to
+            - 4 * yd_to
+            + 0.5 * ydd_to
         )
         a4 = 15 * y_from + 8 * yd_from + 2 * ydd_from - 15 * y_to + 7 * yd_to - ydd_to
         a5 = (
-                -6 * y_from
-                - 3 * yd_from
-                - 0.5 * ydd_from
-                + 6 * y_to
-                - 3 * yd_to
-                + 0.5 * ydd_to
+            -6 * y_from
+            - 3 * yd_from
+            - 0.5 * ydd_from
+            + 6 * y_to
+            - 3 * yd_to
+            + 0.5 * ydd_to
         )
 
         n_time_steps = ts.size
@@ -196,19 +196,19 @@ class Trajectory:
         for i in range(n_time_steps):
             t = (ts[i] - ts[0]) / (ts[n_time_steps - 1] - ts[0])
             ys[i, :] = (
-                    a0
-                    + a1 * t
-                    + a2 * pow(t, 2)
-                    + a3 * pow(t, 3)
-                    + a4 * pow(t, 4)
-                    + a5 * pow(t, 5)
+                a0
+                + a1 * t
+                + a2 * pow(t, 2)
+                + a3 * pow(t, 3)
+                + a4 * pow(t, 4)
+                + a5 * pow(t, 5)
             )
             yds[i, :] = (
-                    a1
-                    + 2 * a2 * t
-                    + 3 * a3 * pow(t, 2)
-                    + 4 * a4 * pow(t, 3)
-                    + 5 * a5 * pow(t, 4)
+                a1
+                + 2 * a2 * t
+                + 3 * a3 * pow(t, 2)
+                + 4 * a4 * pow(t, 3)
+                + 5 * a5 * pow(t, 4)
             )
             ydds[i, :] = 2 * a2 + 6 * a3 * t + 12 * a4 * pow(t, 2) + 20 * a5 * pow(t, 3)
 
@@ -219,7 +219,7 @@ class Trajectory:
 
     @classmethod
     def from_viapoint_polynomial(
-            cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to
+        cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to
     ):
 
         n_time_steps = ts.size
@@ -227,16 +227,16 @@ class Trajectory:
 
         viapoint_time_step = 0
         while (
-                viapoint_time_step < n_time_steps and ts[viapoint_time_step] < viapoint_time
+            viapoint_time_step < n_time_steps and ts[viapoint_time_step] < viapoint_time
         ):
             viapoint_time_step += 1
 
         yd_from = np.zeros(n_dims)
         ydd_from = np.zeros(n_dims)
 
-        y_viapoint = y_yd_ydd_viapoint[0 * n_dims: 1 * n_dims]
-        yd_viapoint = y_yd_ydd_viapoint[1 * n_dims: 2 * n_dims]
-        ydd_viapoint = y_yd_ydd_viapoint[2 * n_dims: 3 * n_dims]
+        y_viapoint = y_yd_ydd_viapoint[0 * n_dims : 1 * n_dims]
+        yd_viapoint = y_yd_ydd_viapoint[1 * n_dims : 2 * n_dims]
+        ydd_viapoint = y_yd_ydd_viapoint[2 * n_dims : 3 * n_dims]
 
         yd_to = np.zeros(n_dims)
         ydd_to = np.zeros(n_dims)
@@ -283,15 +283,15 @@ class Trajectory:
             # http://noisyaccumulation.blogspot.fr/2012/02/how-to-decompose-2d-trajectory-data.html
 
             ys[:, i_dim] = y_from[i_dim] + A[i_dim] * (
-                    6 * (tss ** 5) - 15 * (tss ** 4) + 10 * (tss ** 3)
+                6 * (tss ** 5) - 15 * (tss ** 4) + 10 * (tss ** 3)
             )
 
             yds[:, i_dim] = (A[i_dim] / D) * (
-                    30 * (tss ** 4) - 60 * (tss ** 3) + 30 * (tss ** 2)
+                30 * (tss ** 4) - 60 * (tss ** 3) + 30 * (tss ** 2)
             )
 
             ydds[:, i_dim] = (A[i_dim] / (D * D)) * (
-                    120 * (tss ** 3) - 180 * (tss ** 2) + 60 * tss
+                120 * (tss ** 3) - 180 * (tss ** 2) + 60 * tss
             )
 
         return cls(ts, ys, yds, ydds)
@@ -323,10 +323,10 @@ class Trajectory:
         n_dims = (n_cols - 1 - n_dims_misc) // 3
 
         ts = data[:, 0]
-        ys = data[:, 1: 1 * n_dims + 1]
-        yds = data[:, 1 * n_dims + 1: 2 * n_dims + 1]
-        ydds = data[:, 2 * n_dims + 1: 3 * n_dims + 1]
-        misc = data[:, 3 * n_dims + 1:]
+        ys = data[:, 1 : 1 * n_dims + 1]
+        yds = data[:, 1 * n_dims + 1 : 2 * n_dims + 1]
+        ydds = data[:, 2 * n_dims + 1 : 3 * n_dims + 1]
+        misc = data[:, 3 * n_dims + 1 :]
 
         return Trajectory(ts, ys, yds, ydds, misc)
 

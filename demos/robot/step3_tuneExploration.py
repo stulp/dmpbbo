@@ -28,7 +28,8 @@ from TaskThrowBall import TaskThrowBall
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from perform_rollouts import perform_rollouts
 
-if __name__ == "__main__":
+
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("dmp", help="input dmp")
@@ -104,3 +105,7 @@ if __name__ == "__main__":
 
     if args.show:
         plt.show()
+
+
+if __name__ == "__main__":
+    main()

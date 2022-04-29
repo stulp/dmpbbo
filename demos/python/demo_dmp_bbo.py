@@ -58,7 +58,9 @@ def run_demo(directory, n_dims):
 
     # Make the task
     viapoint = 3 * np.ones(n_dims)
-    viapoint_time = 0.3 if n_dims == 1 else None  # None means: Do not pass through viapoint at a specific time,
+    viapoint_time = (
+        0.3 if n_dims == 1 else None
+    )  # None means: Do not pass through viapoint at a specific time,
     # but rather pass through it at any time.
 
     task = TaskViapoint(
@@ -84,20 +86,20 @@ def run_demo(directory, n_dims):
     distribution = DistributionGaussian(mean_init, covar_init)
 
     covar_update = "cma"
-    eliteness = 10
-    weighting_method = "PI-BB"  # or 'CEM' or 'CMA-ES'
     if covar_update == "none":
-        updater = UpdaterMean(eliteness, weighting_method)
+        updater = UpdaterMean(eliteness=10, weighting_method="PI-BB")
     elif covar_update == "decay":
-        covar_decay_factor = 0.9
-        updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
+        updater = UpdaterCovarDecay(
+            eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9
+        )
     else:
-        min_level = 1.0
-        max_level = None
-        diag_only = False
-        learning_rate = 0.5
         updater = UpdaterCovarAdaptation(
-            eliteness, weighting_method, max_level, min_level, diag_only, learning_rate
+            eliteness=10,
+            weighting_method="PI-BB",
+            max_level=None,
+            min_level=1.0,
+            diag_only=False,
+            learning_rate=0.5,
         )
 
     n_samples_per_update = 10
@@ -116,11 +118,14 @@ def run_demo(directory, n_dims):
     fig.canvas.set_window_title(f"Optimization with covar_update={covar_update}")
 
 
-if __name__ == "__main__":
-
+def main():
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     for n_dims in [1, 2]:
         run_demo(directory, n_dims)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

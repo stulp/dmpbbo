@@ -50,8 +50,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         return ["dist", "regularization"]
 
 
-if __name__ == "__main__":
-
+def main():
     directory = "/tmp/dmpbbo/demoBboMultipleCostComponents"
     if len(sys.argv) > 1:
         directory = sys.argv[1]
@@ -65,10 +64,9 @@ if __name__ == "__main__":
     covar_init = 4.0 * np.eye(n_dims)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    eliteness = 10
-    weighting_method = "PI-BB"
-    covar_decay_factor = 0.8
-    updater = UpdaterCovarDecay(eliteness, weighting_method, covar_decay_factor)
+    updater = UpdaterCovarDecay(
+        eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8
+    )
 
     n_samples_per_update = 20
     n_updates = 40
@@ -79,3 +77,7 @@ if __name__ == "__main__":
 
     session.plot()
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

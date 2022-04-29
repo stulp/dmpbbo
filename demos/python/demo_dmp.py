@@ -23,8 +23,8 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
     FunctionApproximatorRBFN,
 )
 
-if __name__ == "__main__":
 
+def main():
     tau = 0.5
     n_dims = 2
     n_time_steps = 51
@@ -40,9 +40,8 @@ if __name__ == "__main__":
     )
 
     dmp_types = ["IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]
-    dmp_types = ["KULVICIUS_2012_JOINING"]  # noqa
     for dmp_type in dmp_types:
-        function_apps = [FunctionApproximatorRBFN(10, 0.7) for i_dim in range(n_dims)]
+        function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
         dmp = Dmp.from_traj(traj, function_apps, dmp_type=dmp_type)
 
         tau_exec = 0.7
@@ -90,3 +89,7 @@ if __name__ == "__main__":
         plt.gcf().canvas.set_window_title(t)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

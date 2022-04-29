@@ -45,17 +45,15 @@ class Updater(ABC):
 class UpdaterMean(Updater):
     """ Updater that updates the mean of the distribution only."""
 
-    def __init__(self, eliteness=10, weighting_method="PI-BB"):
+    def __init__(self, **kwargs):
         """ Initialize an UpdaterMean object.
         
-        Args:
-            eliteness The eliteness parameter (see costs_to_weights(...))
-        
-        Args:
-            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
+        kwargs:
+            eliteness: The eliteness parameter (see costs_to_weights(...))
+            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
         """
-        self.eliteness = eliteness
-        self.weighting_method = weighting_method
+        self.eliteness = kwargs.get("eliteness", 10)
+        self.weighting_method = kwargs.get("weighting_method", "PI-BB")
 
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
@@ -86,20 +84,18 @@ class UpdaterMean(Updater):
 class UpdaterCovarDecay(Updater):
     """ Updater that updates the mean of the distribution, and decays the covariance matrix of the distribution."""
 
-    def __init__(self, eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8):
+    def __init__(self, **kwargs):
         """ Initialize an UpdaterCovarDecay object.
         
-        Args:
-            eliteness The eliteness parameter (see costs_to_weights(...))
-
-            weighting_method The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
-
-            covar_decay_factor Factor with which to decay the covariance matrix (i.e.
+        kwargs:
+            eliteness: The eliteness parameter (see costs_to_weights(...))
+            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
+            covar_decay_factor: Factor with which to decay the covariance matrix (i.e.
             covar_decay_factor*covar_decay_factor*C at each update)
         """
-        self.eliteness = eliteness
-        self.weighting_method = weighting_method
-        self.covar_decay_factor = covar_decay_factor
+        self.eliteness = kwargs.get("eliteness", 10)
+        self.weighting_method = kwargs.get("weighting_method", "PI-BB")
+        self.covar_decay_factor = kwargs.get("covar_decay_factor", 0.8)
 
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
@@ -133,15 +129,7 @@ class UpdaterCovarAdaptation(Updater):
     """ Updater that updates the mean of the distribution, and uses covariance matrix adaptation to update the
     covariance matrix of the distribution. """
 
-    def __init__(
-        self,
-        eliteness=10,
-        weighting_method="PI-BB",
-        diagonal_max=None,
-        diagonal_min=None,
-        diag_only=False,
-        learning_rate=1.0,
-    ):
+    def __init__(self, **kwargs):
         """ Constructor
         
         Args:
@@ -153,16 +141,14 @@ class UpdaterCovarAdaptation(Updater):
             learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0] with 0.0 = no updating,
             1.0  = complete update by ignoring previous covar matrix.
         """
-        self.eliteness = eliteness
-        self.weighting_method = weighting_method
-        self.diagonal_max = diagonal_max
-        self.diagonal_min = diagonal_min
-        self.diag_only = diag_only
-        if learning_rate > 1.0:
-            learning_rate = 1.0
-        elif learning_rate < 0.0:
-            learning_rate = 0.0
-        self.learning_rate = learning_rate
+        self.eliteness = kwargs.get("eliteness", 10)
+        self.weighting_method = kwargs.get("weighting_method", "PI-BB")
+        self.diagonal_max = kwargs.get("diagonal_max", None)
+        self.diagonal_min = kwargs.get("diagonal_min", None)
+        self.diag_only = kwargs.get("diag_only", False)
+        self.learning_rate = kwargs.get("learning_rate", 1.0)
+        if self.learning_rate > 1.0 or self.learning_rate < 0.0:
+            raise ValueError("Learning rate must be between 0.0 and 1.0")
 
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.

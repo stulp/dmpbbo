@@ -19,8 +19,8 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.dmps.Trajectory import Trajectory
 
-if __name__ == "__main__":
 
+def main():
     ts = np.linspace(0, 0.5, 101)
     y_first = np.array([0.0, 1.0])
     yd_first = np.array([0.0, 0.0])
@@ -66,3 +66,7 @@ if __name__ == "__main__":
     plt.setp(lines, linestyle="-", linewidth=2, color=(0.2, 0.8, 0.2))
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

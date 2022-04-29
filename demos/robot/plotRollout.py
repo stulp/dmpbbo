@@ -24,7 +24,7 @@ import numpy as np
 import dmpbbo.json_for_cpp as jc
 
 
-if __name__ == "__main__":
+def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="file (txt) to read cost vars from")
@@ -47,3 +47,7 @@ if __name__ == "__main__":
     fig.savefig(filename)
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

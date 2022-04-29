@@ -69,7 +69,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
             inputs,
             centers=model_params["centers"],
             widths=model_params["widths"],
-            normalized=False
+            normalized=False,
         )
 
     @staticmethod

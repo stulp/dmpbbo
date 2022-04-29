@@ -26,7 +26,6 @@ from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
 def set_style(lines, label):
-
     if label == "analytical":
         plt.setp(lines, linestyle="-", linewidth=5, color=(0.8, 0.8, 0.8))
     elif label == "euler":
@@ -37,8 +36,7 @@ def set_style(lines, label):
     plt.setp(lines[0], label=label)
 
 
-if __name__ == "__main__":
-
+def main():
     ###########################################################################
     # Create all systems and add them to a dictionary
 
@@ -139,3 +137,7 @@ if __name__ == "__main__":
         # fig.savefig(f'{name}.png')
 
     plt.show()
+
+
+if __name__ == "__main__":
+    main()

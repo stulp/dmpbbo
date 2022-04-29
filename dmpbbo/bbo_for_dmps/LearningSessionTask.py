@@ -26,11 +26,10 @@ import dmpbbo.json_for_cpp as jc
 class LearningSessionTask(LearningSession):
     def __init__(self, n_samples_per_update, directory=None, **kwargs):
         super().__init__(n_samples_per_update, directory, **kwargs)
-        self.task_ = kwargs.get("task", None)
-        self.task_solver_ = kwargs.get("task_solver", None)
-
-        if directory and self.task_:
-            src = inspect.getsourcelines(self.task_.__class__)
+        # self._task_solver = kwargs.get("task_solver", None)
+        task = kwargs.get("task", None)
+        if directory and task:
+            src = inspect.getsourcelines(task.__class__)
             src = " ".join(src[0])
             src = src.replace("(Task)", "")
             filename = Path(directory, "task.py")
@@ -80,14 +79,17 @@ class LearningSessionTask(LearningSession):
         all_lines = []
         n_updates = self.get_n_updates()
         for i_update in range(n_updates):
-            lines, _ = self.plot_rollouts_update(i_update, ax, True, False)
+            lines, _ = self.plot_rollouts_update(
+                i_update, ax=ax, plot_eval=True, plot_samples=False
+            )
             LearningSessionTask._set_style(lines, i_update, n_updates)
             all_lines.extend(lines)
         return all_lines, ax
 
-    def plot_rollouts_update(self, i_update, ax=None, plot_eval=True, plot_samples=False):
-        if not ax:
-            ax = plt.axes()
+    def plot_rollouts_update(self, i_update, **kwargs):
+        ax = kwargs.get("ax", None) or plt.axes()
+        plot_eval = kwargs.get("plot_eval", True)
+        plot_samples = kwargs.get("plot_samples", False)
 
         task = self.ask("task")
         lines_eval = []
