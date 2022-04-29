@@ -147,7 +147,7 @@ def train(fa_name, n_dims):
     np.savetxt(os.path.join(directory, f"{basename}_inputs.txt"), inputs_grid)
 
     # Call the binary, which does analytical_solution and integration in C++
-    exec_name = "../../build_dir_realtime/demos/compare/compareFunctionApproximators"
+    exec_name = "../../bin/compareFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     execute_binary(exec_name, arguments, True)
 

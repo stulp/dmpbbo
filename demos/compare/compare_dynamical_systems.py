@@ -129,10 +129,10 @@ if __name__ == "__main__":
 
         # Save the dynamical system to a json file
         jc.savejson(Path(directory, f"{name}.json"), dyn_system)
-        jc.savejson_for_cpp(Path(directory, "{name}_for_cpp.json"), dyn_system)
+        jc.savejson_for_cpp(Path(directory, f"{name}_for_cpp.json"), dyn_system)
 
         # Call the binary, which does analytical_solution and integration in C++
-        exec_name = "../../build_dir_realtime/demos/compare/compareDynamicalSystems"
+        exec_name = "../../bin/compareDynamicalSystems"
         arguments = f"{directory} {name}"
         execute_binary(exec_name, arguments, True)
 

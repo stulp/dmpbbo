@@ -1,8 +1,11 @@
 add_executable(compareDynamicalSystems compareDynamicalSystems.cpp)
 target_link_libraries(compareDynamicalSystems dynamicalsystems ${Boost_LIBRARIES})
+install(TARGETS compareDynamicalSystems DESTINATION bin)
 
 add_executable(compareFunctionApproximators compareFunctionApproximators.cpp)
 target_link_libraries(compareFunctionApproximators functionapproximators ${Boost_LIBRARIES})
+install(TARGETS compareFunctionApproximators DESTINATION bin)
 
 add_executable(compareDmp compareDmp.cpp)
 target_link_libraries(compareDmp dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES})
+install(TARGETS compareDmp DESTINATION bin)

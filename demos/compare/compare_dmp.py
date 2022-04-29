@@ -94,7 +94,7 @@ if __name__ == "__main__":
     jc.savejson_for_cpp(Path(directory, "dmp_for_cpp.json"), dmp)
     np.savetxt(Path(directory, "ts.txt"), ts)
 
-    exec_name = "../../build_dir_realtime/demos/compare/compareDmp"
+    exec_name = "../../bin/compareDmp"
     execute_binary(exec_name, f"{directory} dmp", True)
 
     print("===============\nPython reading output from C++")
