@@ -67,12 +67,13 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     pass
 
 
-def test_dynamical_systems():
-    main()
+def test_dynamical_systems(tmp_path):
+    main(tmp_path)
     
-def main(show=False, save=False, verbose=False):
-    directory = "/tmp/testDynamicalSystems/"
-    os.makedirs(directory, exist_ok=True)
+def main(directory, **kwargs):
+    show = kwargs.get("show",False)
+    save = kwargs.get("save",False)
+    verbose = kwargs.get("verbose",False)
 
     ###########################################################################
     # Create all systems and add them to a dictionary
@@ -131,7 +132,10 @@ def main(show=False, save=False, verbose=False):
         xs, xds = dyn_system.analytical_solution(ts)
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_analytical.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
-        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
+        if verbose:
+            print(f"    max_diff = {max_diff}  (Analytical)")
+        assert max_diff < 10e-7
         if save or show:
             fig1 = plt.figure(figsize=(10, 10))
             plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
@@ -145,7 +149,10 @@ def main(show=False, save=False, verbose=False):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_euler.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
-        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
+        if verbose:
+            print(f"    max_diff = {max_diff}  (Euler)")
+        assert max_diff < 10e-7
         if save or show:
             fig2 = plt.figure(figsize=(10, 10))
             plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
@@ -159,7 +166,10 @@ def main(show=False, save=False, verbose=False):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
-        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
+        if verbose:
+            print(f"    max_diff = {max_diff}  (Runge-Kutta)")
+        assert max_diff < 10e-7
         if save or show:
             fig3 = plt.figure(figsize=(10, 10))
             plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
@@ -176,9 +186,9 @@ def main(show=False, save=False, verbose=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--show", action="store_true", help="show plots")
+    # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
-    parser.add_argument("--verbose", action="store_true", help="print output")
+    # parser.add_argument("--verbose", action="store_true", help="print output")
     args = parser.parse_args()
 
-    main(args.show, args.save, args.verbose)
+    main(Path("/tmp"), show=True, save=args.save, verbose=True)

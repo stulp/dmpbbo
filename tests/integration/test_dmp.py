@@ -30,12 +30,17 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 from tests.integration.execute_binary import execute_binary
 from tests.integration.get_trajectory import get_trajectory
 
-def test_dmp():
-    main()
-
-def main(show=False, save=False, verbose=False):
-    directory = "/tmp/testDmp/"
-    os.makedirs(directory, exist_ok=True)
+def test_dmp(tmp_path):
+    main(tmp_path)
+    
+def main(directory, **kwargs):
+    show = kwargs.get("show",False)
+    save = kwargs.get("save",False)
+    verbose = kwargs.get("verbose",False)
+    
+    
+    directory = directory / "test_dmp_data"
+    directory.mkdir(exist_ok=True)
 
     ################################
     # Read trajectory and train DMP with it.
@@ -161,9 +166,9 @@ def main(show=False, save=False, verbose=False):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--show", action="store_true", help="show plots")
+    # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
-    parser.add_argument("--verbose", action="store_true", help="print output")
+    # parser.add_argument("--verbose", action="store_true", help="print output")
     args = parser.parse_args()
 
-    main(args.show, args.save, args.verbose)
+    main(Path("/tmp"), show=True, save=args.save, verbose=True)

@@ -54,9 +54,10 @@ def target_function(n_samples_per_dim):
     return inputs, targets
 
 
-def train(fa_name, n_dims, show=False, save=False):
-    directory = "/tmp/testFunctionApproximators/"
-    os.makedirs(directory, exist_ok=True)
+def train(directory, fa_name, n_dims, **kwargs):
+    show = kwargs.get("show",False)
+    save = kwargs.get("save",False)
+    verbose = kwargs.get("verbose",False)
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
@@ -125,25 +126,28 @@ def train(fa_name, n_dims, show=False, save=False):
         if save:
             plt.gcf().savefig(Path(directory, f"{basename}.png"))
     
-        if show:
-            plt.show()
         
-def test_function_approximators():
-    main()
+def test_function_approximators(tmp_path):
+    main(tmp_path)
 
-def main(show=False, save=False):
+def main(directory, **kwargs):
+    directory = directory / "test_function_approximators_data"
+    directory.mkdir(exist_ok=True)
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
-            train(fa_name, n_dims, show, save)
+            train(directory, fa_name, n_dims, **kwargs)
+    if kwargs.get("show",False):
+        plt.show()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--show", action="store_true", help="show plots")
+    # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
+    # parser.add_argument("--verbose", action="store_true", help="print output")
     args = parser.parse_args()
 
-    main(args.show, args.save)
+    main(Path("/tmp"), show=True, save=args.save, verbose=True)
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]

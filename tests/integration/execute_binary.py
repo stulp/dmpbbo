@@ -21,6 +21,11 @@ from pathlib import Path
 
 
 def execute_binary(executable_name, arguments, print_command=False):
+    
+    # This is a workaround to find the bin directory...
+    # I did not find another way to make the test scripts compatible with pytest
+    # AND calling the script on command line.
+    
     cur_dir = 'bin'
     for go_up in range(6):
         rel_executable_name = Path(cur_dir,executable_name)
@@ -28,7 +33,6 @@ def execute_binary(executable_name, arguments, print_command=False):
         
         if os.path.isfile(rel_executable_name):
             command = f"{rel_executable_name} {arguments}"
-            print(command)
             if print_command:
                 print(command)
             subprocess.call(command, shell=True)
