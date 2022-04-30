@@ -140,7 +140,10 @@ def train(fa_name, n_dims):
     jc.savejson_for_cpp(Path(directory, f"{basename}_for_cpp.json"), fa)
 
     # Save the inputs to a directory
-    np.savetxt(os.path.join(directory, f"{basename}_inputs.txt"), inputs_grid)
+    filename = os.path.join(directory, f"{basename}_inputs.txt")
+    np.savetxt(
+        filename, inputs_grid
+    )  # noqa https://youtrack.jetbrains.com/issue/PY-35025
 
     # Call the binary, which does analytical_solution and integration in C++
     exec_name = "../../bin/compareFunctionApproximators"

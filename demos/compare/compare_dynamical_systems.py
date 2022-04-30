@@ -118,7 +118,9 @@ def main():
     n_time_steps = int(np.ceil(integration_duration / dt)) + 1
     # Generate a vector of times, i.e. 0.0, dt, 2*dt, 3*dt .... n_time_steps*dt=integration_duration
     ts = np.linspace(0.0, integration_duration, n_time_steps)
-    np.savetxt(os.path.join(directory, "ts.txt"), ts)
+    np.savetxt(
+        os.path.join(directory, "ts.txt"), ts
+    )  # noqa https://youtrack.jetbrains.com/issue/PY-35025
 
     fig_count = 1
     for name in dyn_systems.keys():

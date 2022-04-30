@@ -353,25 +353,30 @@ class LearningSession:
             return obj
 
     def tell(self, obj, name, i_update=None, i_sample=None):
-
         basename = self.get_base_name(name, i_update, i_sample)
-
         self._cache[basename] = copy.deepcopy(obj)
-
         if self._root_dir is not None:
-            abs_basename = Path(self._root_dir, basename)
+            return LearningSession.save(obj, self._root_dir, basename)
 
-            # Make sure directory exists
-            os.makedirs(os.path.dirname(abs_basename), exist_ok=True)
+    @staticmethod
+    def save(obj, directory, basename):
+        abs_basename = Path(directory, basename)
 
-            if isinstance(obj, (np.ndarray, list, int)):
-                filename = f"{abs_basename}.txt"
-                np.savetxt(filename, obj)
-            else:
-                filename = f"{abs_basename}.json"
-                jc.savejson(filename, obj)
+        # Make sure directory exists
+        os.makedirs(os.path.dirname(abs_basename), exist_ok=True)
 
-            return filename
+        if isinstance(obj, (np.ndarray, list, int)):
+            filename = f"{abs_basename}.txt"
+            np.savetxt(filename, obj)
+        else:
+            filename = f"{abs_basename}.json"
+            jc.savejson(filename, obj)
+
+        return filename
+
+    def save_all(self, directory):
+        for basename, obj in self._cache.items():
+            LearningSession.save(obj, directory, basename)
 
     def get_eval_costs(self, i_update):
         has_eval = self.exists("cost", 0, "eval")
