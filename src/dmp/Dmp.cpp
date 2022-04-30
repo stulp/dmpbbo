@@ -537,7 +537,7 @@ void from_json(const nlohmann::json& j, Dmp*& obj)
   double tau = j.at("_tau");
 
   double alpha_spring_damper =
-      j.at("_spring_system").at("_damping_coefficient");
+      j.at("_spring_system").at("damping_coefficient");
 
   VectorXd y_init = j.at("_y_init");
   VectorXd y_attr = j.at("_y_attr");
@@ -572,7 +572,7 @@ void Dmp::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
 
-  j["_spring_system"]["_damping_coefficient"] =
+  j["_spring_system"]["damping_coefficient"] =
       spring_system_->damping_coefficient();
   j["_goal_system"] = goal_system_;
   j["_phase_system"] = phase_system_;

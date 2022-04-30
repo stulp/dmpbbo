@@ -91,7 +91,7 @@ void ExponentialSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 {
   double tau = j.at("_tau");
-  double alpha = j.at("_alpha");
+  double alpha = j.at("alpha");
   VectorXd x_init = j.at("_x_init");
   VectorXd x_attr = j.at("_x_attr");
 
@@ -101,7 +101,7 @@ void from_json(const nlohmann::json& j, ExponentialSystem*& obj)
 void ExponentialSystem::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
-  j["_alpha"] = alpha_;
+  j["alpha"] = alpha_;
   j["_y_attr"] = x_attr_;
   j["class"] = "ExponentialSystem";
 }

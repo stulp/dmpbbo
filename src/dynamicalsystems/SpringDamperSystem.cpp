@@ -164,9 +164,9 @@ void SpringDamperSystem::analyticalSolution(const VectorXd& ts, MatrixXd& xs,
 void from_json(const nlohmann::json& j, SpringDamperSystem*& obj)
 {
   double tau = j.at("_tau");
-  double damping_coefficient = j.at("_damping_coefficient");
-  double spring_constant = j.at("_spring_constant");
-  double mass = j.at("_mass");
+  double damping_coefficient = j.at("damping_coefficient");
+  double spring_constant = j.at("spring_constant");
+  double mass = j.at("mass");
 
   VectorXd y_attr = j.at("_y_attr");
   VectorXd x_init = j.at("_x_init");
@@ -180,9 +180,9 @@ void SpringDamperSystem::to_json_helper(nlohmann::json& j) const
 {
   to_json_base(j);  // Get the json string from the base class
 
-  j["_damping_coefficient"] = damping_coefficient_;
-  j["_spring_constant"] = spring_constant_;
-  j["_mass"] = mass_;
+  j["damping_coefficient"] = damping_coefficient_;
+  j["spring_constant"] = spring_constant_;
+  j["mass"] = mass_;
   j["_y_attr"] = y_attr_;
   j["class"] = "SpringDamperSystem";
 }

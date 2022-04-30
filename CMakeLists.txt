@@ -56,9 +56,9 @@ link_directories ( ${Boost_LIBRARY_DIRS} )
 include_directories ( ${Boost_INCLUDE_DIRS} )
 
 ###############################################################################
-# Things to compile are in the src/ directory
 add_subdirectory(src)
 add_subdirectory(demos)
+add_subdirectory(tests)
 
 ###############################################################################
 # Generate doxygen documentation from CMake

@@ -106,7 +106,7 @@ def main():
         ################################################
         # Plot results
 
-        # h, axs = Dmp.plot(dmp.tau,ts,xs_step,xds_step)
+        # h, axs = dmp.plot(dmp.tau,ts,xs_step,xds_step)
         # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
         # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
 
