@@ -8,3 +8,5 @@ Thanks to those who proofread the tutorial and found several mistakes:
   Olivier Sigaud
   Jacco van der Spek
   Xavier Lamy
+  
+Thank you Antonin Raffin for introducing me to isort, flake8.
