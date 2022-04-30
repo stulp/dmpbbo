@@ -40,8 +40,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         gating_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
         **kwargs,
     ):
-        """Initialize a DMP with function approximators and subsystems 
-        
+        """Initialize a DMP with function approximators and subsystems
+
         Args:
             tau           : Time constant
             y_init        : Initial state
@@ -96,8 +96,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
-        """Initialize a DMP by training it from a trajectory. 
-        
+        """Initialize a DMP by training it from a trajectory.
+
         Args:
             trajectory    - the trajectory to train on
             function_approximators - Function approximators for the forcing term
@@ -188,12 +188,12 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def differential_equation(self, x):
         """The differential equation which defines the system.
-   
+
         It relates state values to rates of change of those state values
-        
+
         Args:
             x - current state (column vector of size dim() X 1)
-            
+
         Returns:
             Rate of change in state (column vector of size dim() X 1)
         """
@@ -245,10 +245,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def _compute_func_approx_predictions(self, phase_state):
         """Compute the outputs of the function approximators.
-        
+
         Args:
             phase_state The phase states for which the outputs are computed.
-            
+
         Returns:
             The outputs of the function approximators.
         """
@@ -266,13 +266,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         Args:
             ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
-        
+
         Returns:
             xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of
             'ts'), and D the size of the state (i.e. dim())
             xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times
             (the length of 'ts'), and D the size of the state (i.e. dim())
-            
+
         The output xs and xds will be of size D x T only if the matrix x you pass as an argument of size D x T.
         In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has
         been added so that you may pass matrices of either size.
@@ -379,7 +379,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def train(self, trajectory):
         """Train a DMP with a trajectory.
-        
+
         Args:
             trajectory - The trajectory with which to train the DMP.
         """
@@ -407,13 +407,13 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def _compute_targets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
-   
+
         For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the
         gating function factored out).
-        
+
         Args:
             trajectory - Trajectory, e.g. a demonstration.
-            
+
         Returns:
             fa_inputs_phase - The inputs for the function approximators (phase signal)
             fa_targets - The targets for the function approximators (forcing term)
@@ -468,17 +468,17 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def states_as_trajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
-        
+
         As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and
         gating system. What we are most interested in is the output of the spring system. This function extracts that
         information, and also computes the accelerations of the spring system, which are only stored implicitly in
         xd_in because second order systems are converted to first order systems with expanded state.
 
         Args:
-            ts    - A vector of times 
+            ts    - A vector of times
             x_in  - State vector over time
             xd_in - State vector over time (rates of change)
-            
+
         Return:
             Trajectory representation of the DMP state vector output.
         """

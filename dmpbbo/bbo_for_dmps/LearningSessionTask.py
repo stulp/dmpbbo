@@ -60,7 +60,7 @@ class LearningSessionTask(LearningSession):
     @staticmethod
     def _set_style(handle, i_update, n_updates):
         """ Set the color of an object, according to how far the optimization has proceeded.
-        
+
             Args:
                 handle: Handle to the object
                 i_update: Which update is the optimization at now?

@@ -25,12 +25,12 @@ import numpy as np
 class DynamicalSystem(ABC):
     def __init__(self, order, tau, y_init, n_dims_x=None):
         """ Initialize a first or second order dynamical system.
-        
+
         Args:
             order    - Order of the system (1 or 2)
             tau      - Time constant
             y_init   - Initial state
-            n_dims_x - Dimensionality of the state (which may differ from the size  of y_init) 
+            n_dims_x - Dimensionality of the state (which may differ from the size  of y_init)
         """
         if order < 1 or order > 2:
             raise ValueError("order should be 1 or 2")
@@ -49,7 +49,7 @@ class DynamicalSystem(ABC):
     @property  # Needs to be a property, so that subclasses can override setter method
     def tau(self):
         """ Get the time constant.
-         
+
          Returns: Time constant
         """
         return self._tau
@@ -57,7 +57,7 @@ class DynamicalSystem(ABC):
     @tau.setter
     def tau(self, new_tau):
         """ Set the time constant.
-         
+
          Args:
             new_tau - Time constant
         """
@@ -65,14 +65,14 @@ class DynamicalSystem(ABC):
 
     @property
     def x_init(self):
-        """ Get the initial state of the dynamical system. 
+        """ Get the initial state of the dynamical system.
         """
         return self._x_init
 
     @x_init.setter
     def x_init(self, new_x_init):
         """ Set the initial state of the dynamical system.
-        
+
          Args:
             new_x_init Initial state of the dynamical system.
         """
@@ -84,7 +84,7 @@ class DynamicalSystem(ABC):
     def y_init(self):
         """
          Get the y part of the initial state of the dynamical system.
-        
+
         Returns: Initial state of the dynamical system.
         """
         # if _dim_y==_dim_x, this returns all of x_init
@@ -93,7 +93,7 @@ class DynamicalSystem(ABC):
     @y_init.setter
     def y_init(self, y_init_new):
         """ Set the y part of the initial state of the dynamical system.
-        
+
         Args:
             y_init_new Initial state of the dynamical system.
         """
@@ -107,9 +107,9 @@ class DynamicalSystem(ABC):
     @abstractmethod
     def differential_equation(self, x):
         """ The differential equation which defines the system.
-        
+
         It relates state values to rates of change of those state values.
-        
+
         Args: x - current state
         Returns: xd - rate of change in state
         """
@@ -119,15 +119,15 @@ class DynamicalSystem(ABC):
     def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
-        
-         Args: ts - A vector of times for which to compute the analytical solutions 
+
+         Args: ts - A vector of times for which to compute the analytical solutions
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
         pass
 
     def integrate_start(self, y_init=None):
         """ Start integrating the system with a new initial state.
-        
+
         Args:
             y_init - The initial state vector (y part)
         Returns:
@@ -140,24 +140,24 @@ class DynamicalSystem(ABC):
 
     def integrate_step(self, dt, x):
         """ Integrate the system one time step.
-        
+
         Args:
             dt - Duration of the time step
             x - Current state
-            
-        Returns:    
+
+        Returns:
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
         return self.integrate_step_runge_kutta(dt, x)
 
     def integrate_step_euler(self, dt, x):
-        """ Integrate the system one time step using Euler integration. 
-        
+        """ Integrate the system one time step using Euler integration.
+
         Args:
             dt - Duration of the time step
             x - Current state
-            
-        Returns:    
+
+        Returns:
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
         if x.size != self._dim_x:
@@ -167,16 +167,16 @@ class DynamicalSystem(ABC):
         return x_updated, xd_updated
 
     def integrate_step_runge_kutta(self, dt, x):
-        """Integrate the system one time step using 4th order Runge-Kutta integration. 
-        
+        """Integrate the system one time step using 4th order Runge-Kutta integration.
+
         See http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
-        
-        
+
+
         Args:
             dt - Duration of the time step
             x - Current state
-            
-        Returns:    
+
+        Returns:
             (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
 
@@ -197,11 +197,11 @@ class DynamicalSystem(ABC):
 
     def plot(self, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
-        
+
         Args:
             ts - Times at which the state was determined (size: n_time_steps)
             xs, xds - System states and its rates of change (shape: n_time_steps X n_dim_x)
-            
+
         Kwargs:
             dim_y - Dimensionality of y part of state, i.e. x = [y z]. Default: dim_y = dim_x
             axs - Axes on which the plot the output

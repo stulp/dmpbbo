@@ -24,7 +24,7 @@ from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):
         """ Initialize an ExponentialSystem.
-        
+
         Args:
             tau    - Time constant
             x_init - Initial state
@@ -38,7 +38,7 @@ class ExponentialSystem(DynamicalSystem):
     @property
     def y_attr(self):
         """ Return the y part of the attractor state.
-        
+
         Note that for an ExponentialSystem y is equivalent to x.
         """
         return self._x_attr
@@ -46,7 +46,7 @@ class ExponentialSystem(DynamicalSystem):
     @y_attr.setter
     def y_attr(self, y):
         """ Set the y part of the attractor state.
-        
+
         Note that for an ExponentialSystem y is equivalent to x.
         """
         if y.size != self._dim_y:
@@ -56,7 +56,7 @@ class ExponentialSystem(DynamicalSystem):
     @property
     def x_attr(self):
         """ Get the y part of the attractor state.
-        
+
         Note that for an ExponentialSystem y is equivalent to x.
         """
         return self._x_attr
@@ -64,7 +64,7 @@ class ExponentialSystem(DynamicalSystem):
     @x_attr.setter
     def x_attr(self, x):
         """ Set the attractor state.
-        
+
         Note that for an ExponentialSystem y is equivalent to x.
         """
         if x.size != self._dim_x:
@@ -73,9 +73,9 @@ class ExponentialSystem(DynamicalSystem):
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
-        
+
         It relates state values to rates of change of those state values.
-        
+
         Args: x - current state
         Returns: xd - rate of change in state
         """
@@ -85,8 +85,8 @@ class ExponentialSystem(DynamicalSystem):
     def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
-        
-         Args: ts - A vector of times for which to compute the analytical solutions 
+
+         Args: ts - A vector of times for which to compute the analytical solutions
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
         n_ts = ts.size

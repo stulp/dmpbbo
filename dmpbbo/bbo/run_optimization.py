@@ -23,7 +23,7 @@ def run_optimization(
     cost_function, initial_distribution, updater, n_updates, n_samples_per_update, directory=None
 ):
     """ Run an evolutionary optimization process, see \ref page_bbo
-    
+
         Args:
             cost_function: The cost function to optimize
             initial_distribution: The initial parameter distribution
@@ -35,7 +35,7 @@ def run_optimization(
             A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
-        column 1: The total cost 
+        column 1: The total cost
         column 2...: Individual cost components (column 1 is their sum)
     """
 

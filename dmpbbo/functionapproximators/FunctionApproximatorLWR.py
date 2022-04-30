@@ -73,9 +73,9 @@ class FunctionApproximatorLWR(FunctionApproximator):
     @staticmethod
     def _activations(inputs, model_params):
         """Get the activations of the basis functions.
-        
+
         Uses the centers and widths in the model parameters.
-        
+
         Args:
             inputs (numpy.ndarray): Input values of the query.
         """

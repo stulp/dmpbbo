@@ -33,7 +33,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
     def __init__(self, point):
         """ Constructor.
-        
+
         Args:
             point: Point to which distance must be minimized.
         """

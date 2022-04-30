@@ -70,7 +70,7 @@ class DistributionGaussian:
 
     def __init__(self, mean=0.0, covar=1.0):
         """ Construct the Gaussian distribution with a mean and covariance matrix.
-        
+
         Args:
             mean: Mean of the distribution
             covar: Covariance matrix of the distribution
@@ -80,7 +80,7 @@ class DistributionGaussian:
 
     def generate_samples(self, n_samples=1):
         """ Generate samples from the distribution.
-        
+
         Args:
             n_samples Number of samples to sample
         Returns:

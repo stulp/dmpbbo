@@ -36,13 +36,13 @@ class Gaussian(BasisFunction):
     @staticmethod
     def _activations(inputs, centers, widths, normalized_basis_functions=False):
         """Get the activations for given centers, widths and inputs.
-        
+
         Args:
             centers: The center of the basis function (size: n_basis_functions X n_dims)
             widths: The width of the basis function (size: n_basis_functions X n_dims)
             inputs: The input data (size: n_samples X n_dims)
             normalized_basis_functions: Whether to normalize the basis functions (default=False)
-            
+
         Returns: The kernel activations, computed for each of the samples in the input data (size: n_samples X
         n_basis_functions)
         """
@@ -96,13 +96,13 @@ class Gaussian(BasisFunction):
     @staticmethod
     def get_centers_and_widths(inputs, n_bfs_per_dim, intersection_height=0.7):
         """Get the centers and widths of basis functions.
-        
+
         Args:
             inputs: The input data (size: n_samples X n_dims)
             n_bfs_per_dim: Number of basis functions per input dimension.
             intersection_height: The relative value at which two neighbouring basis functions will intersect (
             default=0.7)
-        
+
         Returns:
             centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
             widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims

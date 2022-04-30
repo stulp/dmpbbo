@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 
 class TaskSolver(ABC):
     """Interface for classes that can perform rollouts.
-    
+
     For further information see the section on \ref sec_bbo_task_and_task_solver
     """
 
@@ -29,7 +29,7 @@ class TaskSolver(ABC):
         """ Perform rollouts, that is, given a set of samples, determine all the variables that are relevant to
         evaluating the cost function.
 
-        
+
         Args:
             sample The sample
         Returns:

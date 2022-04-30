@@ -32,7 +32,7 @@ class SpringDamperSystem(DynamicalSystem):
         mass=1.0,
     ):
         """ Initialize a SpringDamperSystem.
-        
+
         Args:
             tau    - Time constant
             y_init - Initial state (y part, i.e. x = [y z])
@@ -66,9 +66,9 @@ class SpringDamperSystem(DynamicalSystem):
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
-        
+
         It relates state values to rates of change of those state values.
-        
+
         Args: x - current state
         Returns: xd - rate of change in state
         """
@@ -95,8 +95,8 @@ class SpringDamperSystem(DynamicalSystem):
     def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
-        
-         Args: ts - A vector of times for which to compute the analytical solutions 
+
+         Args: ts - A vector of times for which to compute the analytical solutions
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
 

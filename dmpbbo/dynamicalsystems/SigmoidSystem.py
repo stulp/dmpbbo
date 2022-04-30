@@ -24,12 +24,12 @@ from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 class SigmoidSystem(DynamicalSystem):
     def __init__(self, tau, x_init, max_rate, inflection_ratio):
         """ Initialize a SigmoidSystem.
-        
+
         Args:
             tau    - Time constant
             x_init - Initial state
             max_rate - Maximum rate of change
-            inflection_ratio - Time at which maximum rate of change is 
+            inflection_ratio - Time at which maximum rate of change is
                                achieved, i.e. at inflection_ratio * tau
         """
         super().__init__(1, tau, x_init)
@@ -41,7 +41,7 @@ class SigmoidSystem(DynamicalSystem):
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
         """ Set the time constant.
-         
+
          Args:
             new_tau - Time constant
         """
@@ -51,7 +51,7 @@ class SigmoidSystem(DynamicalSystem):
     @DynamicalSystem.x_init.setter
     def x_init(self, new_x_init):
         """ Set the initial state of the dynamical system.
-        
+
          Args:
             new_x_init Initial state of the dynamical system.
         """
@@ -63,10 +63,10 @@ class SigmoidSystem(DynamicalSystem):
     @DynamicalSystem.y_init.setter
     def y_init(self, new_y_init):
         """ Set the initial state of the dynamical system (y part)
-     
+
          Args:
             new_y_init Initial state of the dynamical system. (y part)
-     
+
         Note that for an ExponentialSystem y is equivalent to x.
         """
         self.x_init = new_y_init
@@ -74,9 +74,9 @@ class SigmoidSystem(DynamicalSystem):
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
-        
+
         It relates state values to rates of change of those state values.
-        
+
         Args: x - current state
         Returns: xd - rate of change in state
         """
@@ -87,8 +87,8 @@ class SigmoidSystem(DynamicalSystem):
     def analytical_solution(self, ts):
         """
          Return analytical solution of the system at certain times.
-        
-         Args: ts - A vector of times for which to compute the analytical solutions 
+
+         Args: ts - A vector of times for which to compute the analytical solutions
          Returns: (xs, xds) - Sequence of states and their rates of change.
         """
 

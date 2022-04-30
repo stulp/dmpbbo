@@ -26,7 +26,7 @@ class CostFunction(ABC):
     @abstractmethod
     def evaluate(self, sample):
         """The cost function which defines the cost_function.
-        
+
          Args: sample The sample
          Returns: The scalar cost components for the sample. The first item costs[0] should contain the total cost.
         """
@@ -34,7 +34,7 @@ class CostFunction(ABC):
 
     def cost_labels(self):
         """Labels for the different cost components.
-        
+
         The cost function evaluateRollout may return an array of costs. The first one cost[0] is always the sum of
         the other ones, i.e. costs[0] = sum(costs[1:]). This function optionally returns labels for the individual
         cost components.

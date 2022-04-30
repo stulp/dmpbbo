@@ -58,7 +58,7 @@ class FunctionApproximator(Parameterizable):
 
     def dim_input(self):
         """ Return the dimensionality of the inputs of the function_approximator
-        
+
         Returns:
             The dimensionality of the inputs of the function_approximator.
         """
@@ -66,7 +66,7 @@ class FunctionApproximator(Parameterizable):
 
     def is_trained(self):
         """Determine whether the function approximator has already been trained with data or not.
-        
+
         Returns:
             bool: True if the function approximator has already been trained, False otherwise.
         """
@@ -76,7 +76,7 @@ class FunctionApproximator(Parameterizable):
     @abstractmethod
     def _train(inputs, targets, meta_params, **kwargs):
         """Train the function approximator with input and target examples.
-        
+
         Args:
             inputs (numpy.ndarray): Input values of the training examples.
             targets (numpy.ndarray): Target values of the training examples.
@@ -87,10 +87,10 @@ class FunctionApproximator(Parameterizable):
     @abstractmethod
     def _predict(inputs, model_params):
         """Query the function approximator to make a prediction.
-        
+
         Args:
             inputs (numpy.ndarray): Input values of the query.
-            
+
         Returns:
             numpy.ndarray: Predicted output values.
         """
