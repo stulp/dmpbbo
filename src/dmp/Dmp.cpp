@@ -536,8 +536,7 @@ void from_json(const nlohmann::json& j, Dmp*& obj)
 {
   double tau = j.at("_tau");
 
-  double alpha_spring_damper =
-      j.at("_spring_system").at("damping_coefficient");
+  double alpha_spring_damper = j.at("_spring_system").at("damping_coefficient");
 
   VectorXd y_init = j.at("_y_init");
   VectorXd y_attr = j.at("_y_attr");

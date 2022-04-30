@@ -55,9 +55,9 @@ def target_function(n_samples_per_dim):
 
 
 def train(directory, fa_name, n_dims, **kwargs):
-    show = kwargs.get("show",False)
-    save = kwargs.get("save",False)
-    verbose = kwargs.get("verbose",False)
+    show = kwargs.get("show", False)
+    save = kwargs.get("save", False)
+    verbose = kwargs.get("verbose", False)
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
@@ -84,7 +84,7 @@ def train(directory, fa_name, n_dims, **kwargs):
 
     # Make predictions for the targets
     outputs_grid = fa.predict(inputs_grid)
-    
+
     # Save the function approximator to a json file
     basename = f"{fa_name}_{n_dims}D"
     jc.savejson(Path(directory, f"{basename}.json"), fa)
@@ -101,14 +101,14 @@ def train(directory, fa_name, n_dims, **kwargs):
 
     outputs_grid_cpp = np.loadtxt(os.path.join(directory, f"{basename}_outputs.txt"))
 
-    max_diff = np.max(np.abs(outputs_grid-outputs_grid_cpp))
+    max_diff = np.max(np.abs(outputs_grid - outputs_grid_cpp))
     if verbose:
         print(f"    max_diff = {max_diff}  ({fa_name}, {n_dims}D)")
     assert max_diff < 10e-7
 
     if show or save:
         h_pyt, ax = fa.plot(inputs, targets=targets)
-    
+
         if n_dims == 1:
             h_cpp = ax.plot(inputs_grid, outputs_grid_cpp, "-")
         elif n_dims == 2:
@@ -120,25 +120,26 @@ def train(directory, fa_name, n_dims, **kwargs):
             )
         else:
             raise ValueError(f"Cannot plot input data with a dimensionality of {n_dims}")
-    
+
         plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
         plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    
+
         plt.gcf().suptitle(basename)
-    
+
         if save:
             plt.gcf().savefig(Path(directory, f"{basename}.png"))
-    
-        
+
+
 def test_function_approximators(tmp_path):
     main(tmp_path)
 
+
 def main(directory, **kwargs):
-    directory.mkdir(parents=True,exist_ok=True)
+    directory.mkdir(parents=True, exist_ok=True)
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
             train(directory, fa_name, n_dims, **kwargs)
-    if kwargs.get("show",False):
+    if kwargs.get("show", False):
         plt.show()
 
 
@@ -147,10 +148,15 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
-    parser.add_argument("--directory", help="directory to write results to", default="/tmp/dmpbbo/test_function_approximators_data")
+    parser.add_argument(
+        "--directory",
+        help="directory to write results to",
+        default="/tmp/dmpbbo/test_function_approximators_data",
+    )
     args = parser.parse_args()
-    
+
     main(Path(args.directory), show=True, save=args.save, verbose=True)
+
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]

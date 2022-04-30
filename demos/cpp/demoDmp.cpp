@@ -50,7 +50,7 @@ int main(int n_args, char** args)
   if (file.fail()) {
     cerr << "ERROR: Could not find file: " << filename_dmp << endl;
     return -1;
-  }    
+  }
   json j = json::parse(file);
   cout << j << endl;
 

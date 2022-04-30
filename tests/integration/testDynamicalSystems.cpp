@@ -49,8 +49,7 @@ int main(int n_args, char** args)
   if (verbose)
     cout << "========================================================" << endl;
   string filename_json = directory + "/" + basename + "_for_cpp.json";
-  if (verbose)
-    cout << filename_json << endl;
+  if (verbose) cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
     cerr << "Could not find: " << filename_json << endl;

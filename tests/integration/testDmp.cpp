@@ -46,12 +46,11 @@ int main(int n_args, char** args)
   string dmp_name = args[2];
 
   bool verbose = false;
-  
+
   if (verbose)
     cout << "========================================================" << endl;
   string filename_json = directory + "/" + dmp_name + "_for_cpp.json";
-  if (verbose)
-    cout << filename_json << endl;
+  if (verbose) cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
     cerr << "Could not find: " << filename_json << endl;
@@ -68,22 +67,19 @@ int main(int n_args, char** args)
   VectorXd ts;
   if (!loadMatrix(directory + "/ts.txt", ts)) return -1;
 
-  if (verbose)
-    cout << "===============" << endl << "C++ Analytical solution";
+  if (verbose) cout << "===============" << endl << "C++ Analytical solution";
 
   MatrixXd xs, xds, forcing_terms, fa_outputs;
   dmp->analyticalSolution(ts, xs, xds, forcing_terms, fa_outputs);
 
-  if (verbose)
-    cout << " (saving)" << endl;
+  if (verbose) cout << " (saving)" << endl;
   bool overwrite = true;
   saveMatrix(directory, "xs_ana.txt", xs, overwrite);
   saveMatrix(directory, "xds_ana.txt", xds, overwrite);
   saveMatrix(directory, "forcing_terms_ana.txt", forcing_terms, overwrite);
   saveMatrix(directory, "fa_outputs_ana.txt", fa_outputs, overwrite);
 
-  if (verbose)
-   cout << "===============" << endl << "C++ Numerical integration";
+  if (verbose) cout << "===============" << endl << "C++ Numerical integration";
 
   VectorXd x(dmp->dim(), 1);
   VectorXd xd(dmp->dim(), 1);
@@ -98,8 +94,7 @@ int main(int n_args, char** args)
     xds.row(t) = xd;
   }
 
-  if (verbose)
-   cout << " (saving)" << endl;
+  if (verbose) cout << " (saving)" << endl;
   saveMatrix(directory + "/xs_step.txt", xs, overwrite);
   saveMatrix(directory + "/xds_step.txt", xds, overwrite);
 

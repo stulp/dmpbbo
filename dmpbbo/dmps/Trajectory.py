@@ -69,7 +69,7 @@ class Trajectory:
         misc = matrix[:, 3 * n_dims + 1 :]
 
         return cls(ts, ys, yds, ydds, misc)
-        
+
     @property
     def ts(self):
         return self._ts

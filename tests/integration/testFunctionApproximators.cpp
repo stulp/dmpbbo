@@ -46,13 +46,11 @@ int main(int n_args, char** args)
   int n_dims = atoi(args[3]);
   string basename = fa_name + "_" + to_string(n_dims) + "D";
   bool verbose = false;
-  
 
   if (verbose)
     cout << "========================================================" << endl;
   string filename_json = directory + "/" + basename + "_for_cpp.json";
-  if (verbose)
-    cout << filename_json << endl;
+  if (verbose) cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
     cerr << "Could not find: " << filename_json << endl;

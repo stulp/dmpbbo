@@ -30,22 +30,24 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 from tests.integration.execute_binary import execute_binary
 from tests.integration.get_trajectory import get_trajectory
 
+
 def test_dmp(tmp_path):
     main(tmp_path)
-    
+
+
 def main(directory, **kwargs):
-    show = kwargs.get("show",False)
-    save = kwargs.get("save",False)
-    verbose = kwargs.get("verbose",False)
-    
-    directory.mkdir(parents=True,exist_ok=True)
+    show = kwargs.get("show", False)
+    save = kwargs.get("save", False)
+    verbose = kwargs.get("verbose", False)
+
+    directory.mkdir(parents=True, exist_ok=True)
 
     ################################
     # Read trajectory and train DMP with it.
-    #trajectory_file = Path("..", "fixtures", "trajectory.txt")
-    #if verbose:
+    # trajectory_file = Path("..", "fixtures", "trajectory.txt")
+    # if verbose:
     #    print(f"Reading trajectory from: {trajectory_file}\n")
-    #traj = Trajectory.loadtxt(trajectory_file)
+    # traj = Trajectory.loadtxt(trajectory_file)
     traj = get_trajectory()
     n_dims = traj.dim
 
@@ -99,18 +101,17 @@ def main(directory, **kwargs):
     xs_step_cpp = np.loadtxt(os.path.join(d, "xs_step.txt"))
     xds_step_cpp = np.loadtxt(os.path.join(d, "xds_step.txt"))
 
-    max_diff_ana = np.max(np.abs(xs_ana - np.reshape(xs_ana_cpp, xs_ana.shape))) 
-    max_diff_step = np.max(np.abs(xs_step - np.reshape(xs_step_cpp, xs_step.shape))) 
+    max_diff_ana = np.max(np.abs(xs_ana - np.reshape(xs_ana_cpp, xs_ana.shape)))
+    max_diff_step = np.max(np.abs(xs_step - np.reshape(xs_step_cpp, xs_step.shape)))
     if verbose:
         print(f"    max_diff_ana = {max_diff_ana}")
         print(f"    max_diff_step = {max_diff_step}")
     assert max_diff_ana < 10e-7
     assert max_diff_step < 10e-7
 
-
     # Plotting
     if save or show:
-    
+
         if verbose:
             print("===============\nPython Plotting")
         h_pyt, axs1 = dmp.plot(
@@ -127,10 +128,10 @@ def main(directory, **kwargs):
         plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
         plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
         plt.gcf().suptitle("Analytical solution")
-    
+
         if save:
             plt.gcf().savefig(Path(directory, "analytical.png"))
-    
+
         h_diff, axs1d = dmp.plot(
             ts,
             xs_ana - xs_ana_cpp,
@@ -143,7 +144,7 @@ def main(directory, **kwargs):
         plt.gcf().suptitle("Analytical solution (diff)")
         if save:
             plt.gcf().savefig(Path(directory, "analytical_diff.png"))
-    
+
         h_pyt, axs2 = dmp.plot(ts, xs_step, xds_step)
         h_cpp, _ = dmp.plot(ts, xs_step_cpp, xds_step_cpp, axs=axs2)
         plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
@@ -151,13 +152,13 @@ def main(directory, **kwargs):
         plt.gcf().suptitle("Numerical integration")
         if save:
             plt.gcf().savefig(Path(directory, "numerical.png"))
-    
+
         h_diff, axs2d = dmp.plot(ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False)
         plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
         plt.gcf().suptitle("Numerical integration (diff)")
         if save:
             plt.gcf().savefig(Path(directory, "numerical_diff.png"))
-    
+
         if show:
             plt.show()
 
@@ -167,7 +168,9 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
-    parser.add_argument("--directory", help="directory to write results to",default="/tmp/dmpbbo/test_dmp_data")
+    parser.add_argument(
+        "--directory", help="directory to write results to", default="/tmp/dmpbbo/test_dmp_data"
+    )
     args = parser.parse_args()
 
     main(Path(args.directory), show=True, save=args.save, verbose=True)

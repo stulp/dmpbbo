@@ -69,13 +69,14 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
 
 def test_dynamical_systems(tmp_path):
     main(tmp_path)
-    
-def main(directory, **kwargs):
-    show = kwargs.get("show",False)
-    save = kwargs.get("save",False)
-    verbose = kwargs.get("verbose",False)
 
-    directory.mkdir(parents=True,exist_ok=True)
+
+def main(directory, **kwargs):
+    show = kwargs.get("show", False)
+    save = kwargs.get("save", False)
+    verbose = kwargs.get("verbose", False)
+
+    directory.mkdir(parents=True, exist_ok=True)
 
     ###########################################################################
     # Create all systems and add them to a dictionary
@@ -86,7 +87,7 @@ def main(directory, **kwargs):
     x_attr_2D = np.array([0.8, 0.1])
     x_init_1D = np.array([0.5])
     x_attr_1D = np.array([0.8])
-    
+
     alpha = 6.0
     dyn_systems = {}
     dyn_systems["ExponentialSystem_1D"] = ExponentialSystem(tau, x_init_1D, x_attr_1D, alpha)
@@ -109,7 +110,6 @@ def main(directory, **kwargs):
     # TimeSystem (but counting down instead of up)
     count_down = True
     dyn_systems["TimeCountDownSystem"] = TimeSystem(tau, count_down)
-
 
     ###########################################################################
     # Start integration of all systems
@@ -199,7 +199,11 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
-    parser.add_argument("--directory", help="directory to write results to",default="/tmp/dmpbbo/test_dynamical_systems_data")
+    parser.add_argument(
+        "--directory",
+        help="directory to write results to",
+        default="/tmp/dmpbbo/test_dynamical_systems_data",
+    )
     args = parser.parse_args()
 
     main(Path(args.directory), show=True, save=args.save, verbose=True)
