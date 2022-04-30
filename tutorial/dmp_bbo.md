@@ -123,13 +123,19 @@ for i_sample, sample in enumerate(samples):
 
 Again the robot reads "000_dmp.json", "001_dmp.json" etc, executes them, and writes to "000_cost_vars.json", "001_cost_vars.json", and the "DO ONE DISTRIBUTION UPDATE" step is performed iteratively.
 
-This approach has been implemented in run_one_update.py
-
-
 The LearningSession (in bbo) and LearningSessionTask (in bbo_for_dmps) provide a database interface for the save and load functions in the code above. It is responsible for file management and correct file names, e.g. "results/update00004/001_dmp.json" etc.  
 
+This approach has been implemented in run_one_update.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
+
+
+### Why text files?!
+
+So all the above could be done with bindings or sockets or serialization to binary files or protobufs etc. This would probably be faster, and perhaps lead to a higher degree of automation. However, I've learned to appreciate the "robustness" of ASCII. Over time I've worked in 10 different labs, and they all used different middlewares, programming languages, operating systems and file formats, etc. But they all knew what ASCII and JSON were ;-)  Using ASCII files has allowed this code to quickly be ported to other robots, also by others (e.g. https://www.youtube.com/watch?v=jkaRO8J_1XI)
+
+It's also important to realize that dmpbbo is tailored for use on real robots. It's not made for running thousands of rollouts on a CPU cluster, where writing/reading json to file would be a major performance bottleneck. dmpbbo is for running tens or perhaps hundreds of rollouts on a real robot. And the rollout files will not be that large. So in that scenario, the overhead of using json/txt files in terms of execution time or storage space is neglible; the bottleneck will be the robot, which performs in real-time at 1 second per second!
+
 <a name="sec_cost_components"></a>
-### Cost components
+## Cost components
 
 evaluateRollout returns a vector of costs. This is convenient for tracing different cost components. For instance, consider a task where the costs consist of going through a viapoint with minimal acceleration. In this case, the cost components are: 1) distance to the viapoint and 2) sum of acceleration. Then 
 
