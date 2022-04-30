@@ -14,15 +14,22 @@ You can also manually install these dependencies. For instructions see below.
 
   
 <a name="manual_installation"></a>
-## Manual installation of required/optional packages for C++
+## Manual installation of packages for C++
 
 ### cmake (required)
- http://www.cmake.org/cmake/resources/software.html	
+
+*  http://www.cmake.org/cmake/resources/software.html	
   
+### Eigen 
+
+* http://eigen.tuxfamily.org/index.php?title=Main_Page#Download
+
 ### boost (required modules: filesystem, system. version >=1.34) 
-  http://www.boost.org/doc/libs/1_55_0/more/getting_started/
-  http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/
-  http://www.boost.org/doc/libs/1_55_0/libs/system/doc/
+
+* http://www.boost.org/doc/libs/1_55_0/more/getting_started/
+* http://www.boost.org/doc/libs/1_55_0/libs/filesystem/doc/
+* http://www.boost.org/doc/libs/1_55_0/libs/system/doc/
   	
 ###  Doxygen (optional, version >1.7.5, for the \cite command)
-  http://www.doxygen.nl/download.html
+
+* http://www.doxygen.nl/download.html
