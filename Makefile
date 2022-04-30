@@ -11,6 +11,9 @@ build_debug:
 	make -C build_dir_debug -j 5 
 
 install:
+	make -C build_dir install
+	
+install_debug:
 	make -C build_dir_debug install
 	
 test:

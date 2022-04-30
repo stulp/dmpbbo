@@ -10,7 +10,7 @@ of dynamical movement primitives.
 
 # For whom?
 
-This library may be useful for you if you:
+This library may be useful for you if you
 
 + are interested in the **theory** behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
