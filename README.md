@@ -18,12 +18,7 @@ This library may be useful for you if you
 
 + run the optimization of DMPs **on a real robot**. In this case, go right ahead to <a href="demos/robot/"><b>demos/robot/</b></a>. Reading the tutorials and inspecting demos beforehand will help to understand demos/robot.
 
-+ want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
-
-  
-# How?
-
-How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
++ want to develop and contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
 # Why?
 
@@ -42,35 +37,43 @@ For our own use, the aims of coding this were the following:
     
 + Running dynamical movement primitives in the control loop on real robots.
 
+
+# How?
+
+How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
+
 # Code structure
 
-The core functionality is in the Python module <a href="dmpbbo/">. It contains five subpackages:
+The core functionality is in the Python module <a href="dmpbbo/">dmpbbo/</a>. It contains five subpackages:
 
-+ `functionapproximators/` : defines a generic interface for function approximators, as well as several specific implementations (weighted least-squares regression (WLS), radial basis function networks (RBFN), and locally-weighted regression (LWR).
++ <a href="dmpbbo/functionapproximators">dmpbbo/functionapproximators</a> : defines a generic interface for function approximators, as well as several specific implementations (weighted least-squares regression (WLS), radial basis function networks (RBFN), and locally-weighted regression (LWR).
     
-+ `dynamicalsystems/` : definition of a generic interface for dynamical 
++ <a href="dmpbbo/dynamicalsystems">dmpbbo/dynamicalsystems</a> : definition of a generic interface for dynamical 
   systems, as well as several specific implementations (exponential system, sigmoid system, 
   spring-damper system, etc.)
 
-+ `dmp/` : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
++ <a href="dmpbbo/dmp">dmpbbo/dmp</a> : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
 
-+ `bbo/` : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
++ <a href="dmpbbo/bbo">dmpbbo/</a> : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
 
-+ `bbo_for_dmp/` : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
++ <a href="dmpbbo/bbo_for_dmps">dmpbbo/bbo_for_dmps</a> : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
 
-The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/"> (with nlohmann::json). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.".
+The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/">src/</a> (with <a href="https://github.com/nlohmann/json">nlohmann::json</a>). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.".
 
-As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the bbo and bbo_for_dmps has not been implemented in C++.
+As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_for_dmps` subpackages have not been implemented in C++. Summarizing:
 
 
-|                                  | `functionapproximators/`  | `bbo/`         | 
-|                                  | `dynamicalsystems/`       | `bbo_for_dmps` |
-|                                  | `dmp/`                    |                |
-| -------------------------------- | ------------------------- |--------------- |
-| training                         | Python                    |                |
-| prediction/integration           | Python / C++              |                |
-| real-time prediction/integration | C++                       |                |
-| optimization                     |                           | Python         |
+| functionality                      | package                  | package             | 
+| ---- | ----  | ---- | 
+|                                    | `functionapproximators/` | `bbo/`              | 
+|                                    | `dynamicalsystems/`      | `bbo_for_dmps/`     |
+|                                    | `dmp/`                   |                     |
+|                                    | **language**             | **language**        |
+|                                    | Python                   |                     |
+| *training*                         | Python                   |                     |
+| *prediction/integration*           | Python / C++             |                     |
+| *real-time prediction/integration* | C++                      |                     |
+| *optimization*                     |                          | Python              |
 
 
 To see how the Python and C++ implementations are intended to work together, please see `demos/robot/`. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
