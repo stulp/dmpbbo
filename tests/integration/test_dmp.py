@@ -27,8 +27,11 @@ import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-from execute_binary import execute_binary
+from tests.integration.execute_binary import execute_binary
+from tests.integration.get_trajectory import get_trajectory
 
+def test_dmp():
+    main()
 
 def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDmp/"
@@ -36,10 +39,11 @@ def main(show=False, save=False, verbose=False):
 
     ################################
     # Read trajectory and train DMP with it.
-    trajectory_file = Path("..", "fixtures", "trajectory.txt")
-    if verbose:
-        print(f"Reading trajectory from: {trajectory_file}\n")
-    traj = Trajectory.loadtxt(trajectory_file)
+    #trajectory_file = Path("..", "fixtures", "trajectory.txt")
+    #if verbose:
+    #    print(f"Reading trajectory from: {trajectory_file}\n")
+    #traj = Trajectory.loadtxt(trajectory_file)
+    traj = get_trajectory()
     n_dims = traj.dim
 
     n_bfs = 10
@@ -79,7 +83,7 @@ def main(show=False, save=False, verbose=False):
     jc.savejson_for_cpp(Path(directory, "dmp_for_cpp.json"), dmp)
     np.savetxt(Path(directory, "ts.txt"), ts)
 
-    exec_name = "../../bin/testDmp"
+    exec_name = "testDmp"
     execute_binary(exec_name, f"{directory} dmp")
 
     if verbose:
@@ -102,56 +106,57 @@ def main(show=False, save=False, verbose=False):
 
 
     # Plotting
-
-    if verbose:
-        print("===============\nPython Plotting")
-    h_pyt, axs1 = dmp.plot(
-        ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana
-    )
-    h_cpp, _ = dmp.plot(
-        ts,
-        xs_ana_cpp,
-        xds_ana_cpp,
-        axs=axs1,
-        forcing_terms=forcing_terms_ana_cpp,
-        fa_outputs=fa_outputs_ana_cpp,
-    )
-    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    plt.gcf().suptitle("Analytical solution")
-
-    if save:
-        plt.gcf().savefig(Path(directory, "analytical.png"))
-
-    h_diff, axs1d = dmp.plot(
-        ts,
-        xs_ana - xs_ana_cpp,
-        xds_ana - xds_ana_cpp,
-        forcing_terms=forcing_terms_ana - forcing_terms_ana_cpp,
-        fa_outputs=fa_outputs_ana - fa_outputs_ana_cpp,
-        plot_tau=False,
-    )
-    plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
-    plt.gcf().suptitle("Analytical solution (diff)")
-    if save:
-        plt.gcf().savefig(Path(directory, "analytical_diff.png"))
-
-    h_pyt, axs2 = dmp.plot(ts, xs_step, xds_step)
-    h_cpp, _ = dmp.plot(ts, xs_step_cpp, xds_step_cpp, axs=axs2)
-    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    plt.gcf().suptitle("Numerical integration")
-    if save:
-        plt.gcf().savefig(Path(directory, "numerical.png"))
-
-    h_diff, axs2d = dmp.plot(ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False)
-    plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
-    plt.gcf().suptitle("Numerical integration (diff)")
-    if save:
-        plt.gcf().savefig(Path(directory, "numerical_diff.png"))
-
-    if show:
-        plt.show()
+    if save or show:
+    
+        if verbose:
+            print("===============\nPython Plotting")
+        h_pyt, axs1 = dmp.plot(
+            ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana
+        )
+        h_cpp, _ = dmp.plot(
+            ts,
+            xs_ana_cpp,
+            xds_ana_cpp,
+            axs=axs1,
+            forcing_terms=forcing_terms_ana_cpp,
+            fa_outputs=fa_outputs_ana_cpp,
+        )
+        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+        plt.gcf().suptitle("Analytical solution")
+    
+        if save:
+            plt.gcf().savefig(Path(directory, "analytical.png"))
+    
+        h_diff, axs1d = dmp.plot(
+            ts,
+            xs_ana - xs_ana_cpp,
+            xds_ana - xds_ana_cpp,
+            forcing_terms=forcing_terms_ana - forcing_terms_ana_cpp,
+            fa_outputs=fa_outputs_ana - fa_outputs_ana_cpp,
+            plot_tau=False,
+        )
+        plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
+        plt.gcf().suptitle("Analytical solution (diff)")
+        if save:
+            plt.gcf().savefig(Path(directory, "analytical_diff.png"))
+    
+        h_pyt, axs2 = dmp.plot(ts, xs_step, xds_step)
+        h_cpp, _ = dmp.plot(ts, xs_step_cpp, xds_step_cpp, axs=axs2)
+        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+        plt.gcf().suptitle("Numerical integration")
+        if save:
+            plt.gcf().savefig(Path(directory, "numerical.png"))
+    
+        h_diff, axs2d = dmp.plot(ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False)
+        plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
+        plt.gcf().suptitle("Numerical integration (diff)")
+        if save:
+            plt.gcf().savefig(Path(directory, "numerical_diff.png"))
+    
+        if show:
+            plt.show()
 
 
 if __name__ == "__main__":

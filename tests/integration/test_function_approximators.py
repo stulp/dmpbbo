@@ -26,43 +26,7 @@ import numpy as np
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-from execute_binary import execute_binary
-
-
-def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
-    axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
-
-    # plt.rc("text", usetex=True)
-    # plt.rc("font", family="serif")
-
-    h_cpp = []
-    h_pyt = []
-    h_diff = []
-
-    h_pyt.extend(axs[0].plot(ts, xs, label="Python"))
-    h_cpp.extend(axs[0].plot(ts, xs_cpp, label="C++"))
-    axs[0].set_ylabel("x")
-
-    h_pyt.extend(axs[1].plot(ts, xds, label="Python"))
-    h_cpp.extend(axs[1].plot(ts, xds_cpp, label="C++"))
-    axs[1].set_ylabel("dx")
-
-    # Reshape needed when xs_cpp has shape (T,)
-    h_diff.extend(axs[2].plot(ts, xs - np.reshape(xs_cpp, xs.shape), label="diff"))
-    axs[2].set_ylabel("diff x")
-
-    h_diff.extend(axs[3].plot(ts, xds - np.reshape(xds_cpp, xds.shape), label="diff"))
-    axs[3].set_ylabel("diff xd")
-
-    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
-
-    for ax in axs:
-        ax.set_xlabel("$t$")
-        ax.legend()
-
-    pass
+from tests.integration.execute_binary import execute_binary
 
 
 def target_function(n_samples_per_dim):
@@ -90,7 +54,7 @@ def target_function(n_samples_per_dim):
     return inputs, targets
 
 
-def train(fa_name, n_dims, save=False):
+def train(fa_name, n_dims, show=False, save=False):
     directory = "/tmp/testFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
@@ -130,7 +94,7 @@ def train(fa_name, n_dims, save=False):
     np.savetxt(filename, inputs_grid)  # noqa https://youtrack.jetbrains.com/issue/PY-35025
 
     # Call the binary, which does analytical_solution and integration in C++
-    exec_name = "../../bin/testFunctionApproximators"
+    exec_name = "testFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     execute_binary(exec_name, arguments)
 
@@ -138,35 +102,39 @@ def train(fa_name, n_dims, save=False):
 
     assert np.max(np.abs(outputs_grid-outputs_grid_cpp)) < 10e-7
 
-    h_pyt, ax = fa.plot(inputs, targets=targets)
-
-    if n_dims == 1:
-        h_cpp = ax.plot(inputs_grid, outputs_grid_cpp, "-")
-    elif n_dims == 2:
-        inputs_0_on_grid = np.reshape(inputs_grid[:, 0], n_samples_per_dim_grid)
-        inputs_1_on_grid = np.reshape(inputs_grid[:, 1], n_samples_per_dim_grid)
-        outputs_on_grid = np.reshape(outputs_grid_cpp, n_samples_per_dim_grid)
-        h_cpp = ax.plot_wireframe(
-            inputs_0_on_grid, inputs_1_on_grid, outputs_on_grid, rstride=1, cstride=1
-        )
-    else:
-        raise ValueError(f"Cannot plot input data with a dimensionality of {n_dims}")
-
-    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-
-    plt.gcf().suptitle(basename)
-
-    if save:
-        plt.gcf().savefig(Path(directory, f"{basename}.png"))
-
+    if show or save:
+        h_pyt, ax = fa.plot(inputs, targets=targets)
+    
+        if n_dims == 1:
+            h_cpp = ax.plot(inputs_grid, outputs_grid_cpp, "-")
+        elif n_dims == 2:
+            inputs_0_on_grid = np.reshape(inputs_grid[:, 0], n_samples_per_dim_grid)
+            inputs_1_on_grid = np.reshape(inputs_grid[:, 1], n_samples_per_dim_grid)
+            outputs_on_grid = np.reshape(outputs_grid_cpp, n_samples_per_dim_grid)
+            h_cpp = ax.plot_wireframe(
+                inputs_0_on_grid, inputs_1_on_grid, outputs_on_grid, rstride=1, cstride=1
+            )
+        else:
+            raise ValueError(f"Cannot plot input data with a dimensionality of {n_dims}")
+    
+        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+    
+        plt.gcf().suptitle(basename)
+    
+        if save:
+            plt.gcf().savefig(Path(directory, f"{basename}.png"))
+    
+        if show:
+            plt.show()
+        
+def test_function_approximators():
+    main()
 
 def main(show=False, save=False):
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
-            train(fa_name, n_dims, save)
-    if show:
-        plt.show()
+            train(fa_name, n_dims, show, save)
 
 
 if __name__ == "__main__":
@@ -176,3 +144,36 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.show, args.save)
+
+def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
+    axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
+
+    # plt.rc("text", usetex=True)
+    # plt.rc("font", family="serif")
+
+    h_cpp = []
+    h_pyt = []
+    h_diff = []
+
+    h_pyt.extend(axs[0].plot(ts, xs, label="Python"))
+    h_cpp.extend(axs[0].plot(ts, xs_cpp, label="C++"))
+    axs[0].set_ylabel("x")
+
+    h_pyt.extend(axs[1].plot(ts, xds, label="Python"))
+    h_cpp.extend(axs[1].plot(ts, xds_cpp, label="C++"))
+    axs[1].set_ylabel("dx")
+
+    # Reshape needed when xs_cpp has shape (T,)
+    h_diff.extend(axs[2].plot(ts, xs - np.reshape(xs_cpp, xs.shape), label="diff"))
+    axs[2].set_ylabel("diff x")
+
+    h_diff.extend(axs[3].plot(ts, xds - np.reshape(xds_cpp, xds.shape), label="diff"))
+    axs[3].set_ylabel("diff xd")
+
+    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+    plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
+
+    for ax in axs:
+        ax.set_xlabel("$t$")
+        ax.legend()

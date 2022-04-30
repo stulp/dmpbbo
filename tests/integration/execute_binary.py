@@ -17,16 +17,24 @@
 
 import os
 import subprocess
+from pathlib import Path
 
 
 def execute_binary(executable_name, arguments, print_command=False):
-    if not os.path.isfile(executable_name):
-        raise ValueError(
-            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
+    cur_dir = 'bin'
+    for go_up in range(6):
+        rel_executable_name = Path(cur_dir,executable_name)
+        cur_dir = Path('..',cur_dir)
+        
+        if os.path.isfile(rel_executable_name):
+            command = f"{rel_executable_name} {arguments}"
+            print(command)
+            if print_command:
+                print(command)
+            subprocess.call(command, shell=True)
+            return 
+
+    raise ValueError(
+        f"Executable '{executable_name}' does not exist in any bin directory above. Please call 'make install' in the build directory first."
         )
 
-    command = f"{executable_name} {arguments}"
-    if print_command:
-        print(command)
-
-    subprocess.call(command, shell=True)

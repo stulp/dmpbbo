@@ -56,6 +56,20 @@ class Trajectory:
         self._ydds = ydds
         self._misc = misc
 
+    @classmethod
+    def from_matrix(cls, matrix, n_dims_misc=0):
+
+        (n_time_steps, n_cols) = matrix.shape
+        n_dims = (n_cols - 1 - n_dims_misc) // 3
+
+        ts = matrix[:, 0]
+        ys = matrix[:, 1 : 1 * n_dims + 1]
+        yds = matrix[:, 1 * n_dims + 1 : 2 * n_dims + 1]
+        ydds = matrix[:, 2 * n_dims + 1 : 3 * n_dims + 1]
+        misc = matrix[:, 3 * n_dims + 1 :]
+
+        return cls(ts, ys, yds, ydds, misc)
+        
     @property
     def ts(self):
         return self._ts

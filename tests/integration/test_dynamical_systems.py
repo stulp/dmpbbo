@@ -28,7 +28,7 @@ from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
-from execute_binary import execute_binary
+from tests.integration.execute_binary import execute_binary
 
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
@@ -67,6 +67,9 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     pass
 
 
+def test_dynamical_systems():
+    main()
+    
 def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDynamicalSystems/"
     os.makedirs(directory, exist_ok=True)
@@ -118,7 +121,7 @@ def main(show=False, save=False, verbose=False):
         jc.savejson_for_cpp(Path(directory, f"{name}_for_cpp.json"), dyn_system)
 
         # Call the binary, which does analytical_solution and integration in C++
-        exec_name = "../../bin/testDynamicalSystems"
+        exec_name = "testDynamicalSystems"
         arguments = f"{directory} {name}"
         execute_binary(exec_name, arguments)
 
@@ -128,10 +131,11 @@ def main(show=False, save=False, verbose=False):
         xs, xds = dyn_system.analytical_solution(ts)
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_analytical.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
-        fig1 = plt.figure(figsize=(10, 10))
-        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
-        fig1.suptitle(f"{name}System - Analytical")
         assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        if save or show:
+            fig1 = plt.figure(figsize=(10, 10))
+            plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
+            fig1.suptitle(f"{name}System - Analytical")
 
         if verbose:
             print("===============")
@@ -141,10 +145,11 @@ def main(show=False, save=False, verbose=False):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_euler.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
-        fig2 = plt.figure(figsize=(10, 10))
-        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
-        fig2.suptitle(f"{name}System - Euler")
         assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        if save or show:
+            fig2 = plt.figure(figsize=(10, 10))
+            plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
+            fig2.suptitle(f"{name}System - Euler")
 
         if verbose:
             print("===============")
@@ -154,10 +159,11 @@ def main(show=False, save=False, verbose=False):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
-        fig3 = plt.figure(figsize=(10, 10))
-        plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
-        fig3.suptitle(f"{name}System - Runge-Kutta")
         assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
+        if save or show:
+            fig3 = plt.figure(figsize=(10, 10))
+            plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
+            fig3.suptitle(f"{name}System - Runge-Kutta")
 
         if save:
             fig1.savefig(Path(directory, f"{name}System_analytical.png"))
