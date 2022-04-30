@@ -30,6 +30,7 @@ from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 from execute_binary import execute_binary
 
+
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
 
@@ -170,5 +171,5 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true", help="save plots")
     parser.add_argument("--verbose", action="store_true", help="print output")
     args = parser.parse_args()
-    
+
     main(args.show, args.save, args.verbose)

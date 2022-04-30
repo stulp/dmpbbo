@@ -90,7 +90,7 @@ def target_function(n_samples_per_dim):
     return inputs, targets
 
 
-def train(fa_name, n_dims,  save=False):
+def train(fa_name, n_dims, save=False):
     directory = "/tmp/testFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
@@ -172,5 +172,5 @@ if __name__ == "__main__":
     parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     args = parser.parse_args()
-    
+
     main(args.show, args.save)

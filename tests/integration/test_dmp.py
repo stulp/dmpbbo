@@ -18,7 +18,6 @@
 
 import argparse
 import os
-import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -30,13 +29,14 @@ from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from execute_binary import execute_binary
 
+
 def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDmp/"
     os.makedirs(directory, exist_ok=True)
 
     ################################
     # Read trajectory and train DMP with it.
-    trajectory_file = Path('..', "fixtures", "trajectory.txt")
+    trajectory_file = Path("..", "fixtures", "trajectory.txt")
     if verbose:
         print(f"Reading trajectory from: {trajectory_file}\n")
     traj = Trajectory.loadtxt(trajectory_file)
@@ -110,7 +110,7 @@ def main(show=False, save=False, verbose=False):
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
     plt.gcf().suptitle("Analytical solution")
-    
+
     if save:
         plt.gcf().savefig(Path(directory, "analytical.png"))
 
@@ -146,11 +146,10 @@ def main(show=False, save=False, verbose=False):
 
 
 if __name__ == "__main__":
-    
     parser = argparse.ArgumentParser()
     parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     parser.add_argument("--verbose", action="store_true", help="print output")
     args = parser.parse_args()
-    
+
     main(args.show, args.save, args.verbose)

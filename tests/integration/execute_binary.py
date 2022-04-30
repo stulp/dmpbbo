@@ -18,6 +18,7 @@
 import os
 import subprocess
 
+
 def execute_binary(executable_name, arguments, print_command=False):
     if not os.path.isfile(executable_name):
         raise ValueError(
