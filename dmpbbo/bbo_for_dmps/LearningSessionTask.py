@@ -19,8 +19,8 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-from dmpbbo.bbo.LearningSession import LearningSession
 import dmpbbo.json_for_cpp as jc
+from dmpbbo.bbo.LearningSession import LearningSession
 
 
 class LearningSessionTask(LearningSession):

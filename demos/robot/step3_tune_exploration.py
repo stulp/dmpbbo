@@ -24,9 +24,9 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import dmpbbo.json_for_cpp as jc
-from TaskThrowBall import TaskThrowBall
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from perform_rollouts import perform_rollouts
+from TaskThrowBall import TaskThrowBall
 
 
 def main():

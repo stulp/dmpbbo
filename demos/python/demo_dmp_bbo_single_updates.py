@@ -22,12 +22,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
-from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+from TaskViapoint import TaskViapoint
 
 
 def run_demo(directory, n_dims):

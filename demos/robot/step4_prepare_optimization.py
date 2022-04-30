@@ -21,7 +21,7 @@ from pathlib import Path
 import jsonpickle
 
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
-from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
+from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 
 
 def main():

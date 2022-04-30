@@ -20,7 +20,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from dmpbbo.dmps.Trajectory import Trajectory
-
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem

@@ -25,7 +25,7 @@ import numpy as np
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.run_optimization import run_optimization
-from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
+from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 
 
 class DemoCostFunctionDistanceToPoint(CostFunction):

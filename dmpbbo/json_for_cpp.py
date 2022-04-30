@@ -21,7 +21,6 @@ from json import JSONEncoder
 import jsonpickle
 import numpy as np
 
-
 # Using jsonpickle to generate JSON that can be read by nlohmann::json was difficult.
 #
 # Standard jsonpickle replaces duplicate objects with their ids to save space. This

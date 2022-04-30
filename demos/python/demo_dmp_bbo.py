@@ -21,13 +21,13 @@ import sys
 import numpy as np
 from matplotlib import pyplot as plt
 
-from TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdaptation
-from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 from dmpbbo.bbo_for_dmps.run_optimization_task import run_optimization_task
+from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+from TaskViapoint import TaskViapoint
 
 
 def run_demo(directory, n_dims):

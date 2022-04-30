@@ -17,8 +17,8 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 

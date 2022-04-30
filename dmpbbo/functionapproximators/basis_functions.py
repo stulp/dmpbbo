@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 from abc import ABC, abstractmethod
+
 import numpy as np
 
 

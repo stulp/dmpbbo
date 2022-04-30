@@ -18,8 +18,8 @@
 
 import argparse
 
-from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
+from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
 
 def main():
