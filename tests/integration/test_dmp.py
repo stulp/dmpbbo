@@ -43,7 +43,7 @@ def execute_binary(executable_name, arguments, print_command=False):
 
 
 def main():
-    directory = "/tmp/compareDmp/"
+    directory = "/tmp/testDmp/"
     os.makedirs(directory, exist_ok=True)
 
     ################################
@@ -88,7 +88,7 @@ def main():
     jc.savejson_for_cpp(Path(directory, "dmp_for_cpp.json"), dmp)
     np.savetxt(Path(directory, "ts.txt"), ts)
 
-    exec_name = "../../bin/compareDmp"
+    exec_name = "../../bin/testDmp"
     execute_binary(exec_name, f"{directory} dmp", True)
 
     print("===============\nPython reading output from C++")

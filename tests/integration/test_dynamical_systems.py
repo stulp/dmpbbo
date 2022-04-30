@@ -80,7 +80,7 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
 
 
 def main():
-    directory = "/tmp/compareDynamicalSystems/"
+    directory = "/tmp/testDynamicalSystems/"
     os.makedirs(directory, exist_ok=True)
 
     ###########################################################################
@@ -131,7 +131,7 @@ def main():
         jc.savejson_for_cpp(Path(directory, f"{name}_for_cpp.json"), dyn_system)
 
         # Call the binary, which does analytical_solution and integration in C++
-        exec_name = "../../bin/compareDynamicalSystems"
+        exec_name = "../../bin/testDynamicalSystems"
         arguments = f"{directory} {name}"
         execute_binary(exec_name, arguments, True)
 

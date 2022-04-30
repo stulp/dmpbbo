@@ -103,7 +103,7 @@ def target_function(n_samples_per_dim):
 
 
 def train(fa_name, n_dims):
-    directory = "/tmp/compareFunctionApproximators/"
+    directory = "/tmp/testFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
     # Generate training data
@@ -142,7 +142,7 @@ def train(fa_name, n_dims):
     np.savetxt(filename, inputs_grid)  # noqa https://youtrack.jetbrains.com/issue/PY-35025
 
     # Call the binary, which does analytical_solution and integration in C++
-    exec_name = "../../bin/compareFunctionApproximators"
+    exec_name = "../../bin/testFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
     execute_binary(exec_name, arguments, True)
 
