@@ -75,7 +75,7 @@ def main():
         ax2 = fig.add_subplot(132)  # noqa
         distribution.plot(ax2)
         ax2.plot(samples[:, 0], samples[:, 1], "o", color="#999999")
-    
+
         ax3 = fig.add_subplot(133)
 
     y_floor = -0.3
@@ -96,7 +96,7 @@ def main():
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)
         cost_vars = perform_rollouts(dmp, "python_simulation", directory)
-        
+
         if args.show or args.save:
             lines, _ = traj_sample.plot([ax1])  # noqa
             plt.setp(lines, color="#999999", alpha=0.5)

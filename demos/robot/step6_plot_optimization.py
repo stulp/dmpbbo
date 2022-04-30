@@ -25,7 +25,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", type=str, help="directory to read results from")
-    args = parser.parse_args()                             
+    args = parser.parse_args()
 
     session = LearningSessionTask.from_dir(args.directory)
     session.plot()
