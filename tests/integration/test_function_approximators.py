@@ -18,7 +18,6 @@
 
 import argparse
 import os
-import subprocess
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -27,19 +26,7 @@ import numpy as np
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-
-
-def execute_binary(executable_name, arguments, print_command=False):
-    if not os.path.isfile(executable_name):
-        raise ValueError(
-            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
-        )
-
-    command = f"{executable_name} {arguments}"
-    if print_command:
-        print(command)
-
-    subprocess.call(command, shell=True)
+from execute_binary import execute_binary
 
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):

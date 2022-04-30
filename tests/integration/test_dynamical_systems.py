@@ -18,7 +18,6 @@
 
 import argparse
 import os
-import subprocess
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -29,20 +28,7 @@ from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
-
-
-def execute_binary(executable_name, arguments, print_command=False):
-    if not os.path.isfile(executable_name):
-        raise ValueError(
-            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
-        )
-
-    command = f"{executable_name} {arguments}"
-    if print_command:
-        print(command)
-
-    subprocess.call(command, shell=True)
-
+from execute_binary import execute_binary
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]

@@ -28,20 +28,7 @@ import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-
-
-def execute_binary(executable_name, arguments, print_command=False):
-    if not os.path.isfile(executable_name):
-        raise ValueError(
-            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build directory first."
-        )
-
-    command = f"{executable_name} {arguments}"
-    if print_command:
-        print(command)
-
-    subprocess.call(command, shell=True)
-
+from execute_binary import execute_binary
 
 def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDmp/"
