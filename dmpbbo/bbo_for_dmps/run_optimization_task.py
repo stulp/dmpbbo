@@ -53,10 +53,10 @@ def run_optimization_task(
         costs = []
         for i_sample, sample in enumerate(samples):
 
-            # 2A. Perform the rollouts
+            # 2A. Perform the rollout
             cost_vars = task_solver.perform_rollout(sample)
 
-            # 2B. Evaluate the rollouts
+            # 2B. Evaluate the rollout
             cur_cost = task.evaluate_rollout(cost_vars, sample)
             costs.append(cur_cost)
 
