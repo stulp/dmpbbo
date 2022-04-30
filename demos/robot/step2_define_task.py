@@ -22,7 +22,6 @@ from pathlib import Path
 import jsonpickle
 
 from TaskThrowBall import TaskThrowBall
-import dmpbbo.json_for_cpp as jc
 
 
 def main():

@@ -48,7 +48,7 @@ def main():
     print(f"Loading DMP from: {filename}")
     dmp = jc.loadjson(filename)
 
-    ts = dmp._ts_train
+    ts = dmp.ts_train
     xs, xds, _, _ = dmp.analytical_solution(ts)
     traj_mean = dmp.states_as_trajectory(ts, xs, xds)
 
@@ -89,7 +89,8 @@ def main():
 
         filename = Path(directory, f"dmp_sample_{i_sample}.json")
         print(f"Saving sampled DMP to: {filename}")
-        jc.savejson(filename, dmp, save_for_cpp_also=True)
+        jc.savejson(Path(directory, f"dmp_sample_{i_sample}.json"), dmp)
+        jc.savejson_for_cpp(Path(directory, f"dmp_sample_{i_sample}_for_cpp.json"), dmp)
 
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)

@@ -25,7 +25,6 @@ from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdap
 
 
 def main():
-
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write results to")
     args = parser.parse_args()
@@ -44,26 +43,23 @@ def main():
 
     n_samples_per_update = 5
 
-    eliteness = 10
-    weighting = "PI-BB"
-
-    updater_mean = UpdaterMean(eliteness, weighting)
-
-    decay = 0.85
-    updater_decay = UpdaterCovarDecay(eliteness, weighting, decay)
-
-    min_level = 0.3
-    max_level = 3.0
-    diag_only = False
-    learning_rate = 0.5
-    updater_cma = UpdaterCovarAdaptation(
-        eliteness, weighting, max_level, min_level, diag_only, learning_rate
-    )
-
-    updater = updater_decay
+    updater_name = "decay"
+    if updater_name == "mean":
+        updater = UpdaterMean(eliteness=10, weighting="PI-BB")
+    elif updater_name == "decay":
+        updater = UpdaterCovarDecay(eliteness=10, weighting="PI-BB", decay=0.85)
+    else:
+        updater = UpdaterCovarAdaptation(
+            eliteness=10,
+            weighting="PI-BB",
+            max_level=3.0,
+            min_level=0.3,
+            diag_only=False,
+            learning_rate=0.5,
+        )
 
     task_solver = None
-    session = run_one.run_optimization_task_prepare(
+    run_one.run_optimization_task_prepare(
         args.directory,
         task,
         task_solver,

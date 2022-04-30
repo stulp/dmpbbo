@@ -22,11 +22,9 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
+import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
-import dmpbbo.json_for_cpp as jc
-
-y_floor = -0.3
 
 
 def execute_binary(executable_name, arguments, print_command=False):
@@ -59,7 +57,7 @@ def perform_rollouts(dmp, mode="python_simulation", directory="."):
         arguments = f"{filename_dmp} {filename_cost_vars}"
         execute_binary("./robotExecuteDmp", arguments)
 
-        cost_vars = np.loadtxt(filename_cost_vars)
+        cost_vars = np.loadtxt(str(filename_cost_vars))
         return cost_vars
 
     else:  # 'robot_executes_trajectory':
@@ -76,7 +74,7 @@ def perform_rollouts(dmp, mode="python_simulation", directory="."):
         arguments = f"{filename_traj} {filename_cost_vars}"
         execute_binary("./robotExecuteTrajectory", arguments)
 
-        cost_vars = np.loadtxt(filename_cost_vars)
+        cost_vars = np.loadtxt(str(filename_cost_vars))
         return cost_vars
 
 
@@ -97,6 +95,8 @@ def run_python_simulation(dmp, y_floor=-0.3):
     yds = np.zeros([n_time_steps, n_dims_y])
     ydds = np.zeros([n_time_steps, n_dims_y])
     ys_ball = np.zeros([n_time_steps, n_dims_y])
+    yd_ball = np.zeros([1, n_dims_y])
+    ydd_ball = np.zeros([1, n_dims_y])
 
     (ys[0, :], yds[0, :], ydds[0, :]) = dmp.stateAsPosVelAcc(x, xd)
     ys_ball[0, :] = ys[0, :]
@@ -111,7 +111,7 @@ def run_python_simulation(dmp, y_floor=-0.3):
             # If the ball is in your hand, it moves along with your hand
             ys_ball[ii, :] = ys[ii, :]
             yd_ball = yds[ii, :]
-            ydd_ball = ydds[ii, :]
+            ydd_ball = ydds[ii, :]  # noqa
 
             if ts[ii] > 0.6:
                 # Release the ball to throw it!
@@ -120,8 +120,8 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
         elif ball_in_air:
             # Ball is flying through the air
-            ydd_ball = 0.0  # No friction
-            ydd_ball = -9.81  # Gravity
+            ydd_ball[0] = 0.0  # No friction
+            ydd_ball[1] = -9.81  # Gravity
 
             # Euler integration
             yd_ball = yd_ball + dt * ydd_ball
@@ -145,9 +145,6 @@ def main():
     from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
         FunctionApproximatorRBFN,
     )
-    from dmpbbo.functionapproximators.FunctionApproximatorLWR import (
-        FunctionApproximatorLWR,
-    )
 
     from TaskThrowBall import TaskThrowBall
 
@@ -156,7 +153,7 @@ def main():
 
     n_bfs = 10
     n_dims = traj.dim()
-    fas = [FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)]
+    fas = [FunctionApproximatorRBFN(n_bfs, 0.7) for _ in range(n_dims)]
     dmp = Dmp.from_traj(traj, fas, dmp_type="KULVICIUS_2012_JOINING")
 
     modes = ["python_simulation", "robot_executes_trajectory", "robot_executes_dmp"]
@@ -170,6 +167,7 @@ def main():
 
         x_goal = -0.70
         x_margin = 0.01
+        y_floor = -0.3
         acceleration_weight = 0.001
         task = TaskThrowBall(x_goal, x_margin, y_floor, acceleration_weight)
 

@@ -21,8 +21,6 @@ import jsonpickle
 import matplotlib.pyplot as plt
 import numpy as np
 
-import dmpbbo.json_for_cpp as jc
-
 
 def main():
 

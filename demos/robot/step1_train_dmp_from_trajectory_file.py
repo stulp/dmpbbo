@@ -61,9 +61,7 @@ def main():
     n_bfs_list = list(range(3, args.n))
     for n_bfs in n_bfs_list:
 
-        function_apps = [
-            FunctionApproximatorRBFN(n_bfs, 0.7) for i_dim in range(n_dims)
-        ]
+        function_apps = [FunctionApproximatorRBFN(n_bfs, 0.7) for _ in range(n_dims)]
         dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
         # These are the parameters that will be optimized.
@@ -71,11 +69,11 @@ def main():
 
         ################################################
         # Save DMP to file
-
-        filename = Path(args.output_directory, f"dmp_trained_{n_bfs}.json")
+        d = args.output_directory
+        filename = Path(d, f"dmp_trained_{n_bfs}.json")
         print(f"Saving trained DMP to: {filename}")
         jc.savejson(filename, dmp)
-        jc.savejson(filename, dmp, save_for_cpp_also=True)
+        jc.savejson_for_cpp(Path(d, f"dmp_trained_{n_bfs}_for_cpp.json"), dmp)
 
         ################################################
         # Analytical solution to compute difference
@@ -84,7 +82,7 @@ def main():
         xs_ana, xds_ana, _, _ = dmp.analytical_solution(ts)
         traj_reproduced_ana = dmp.states_as_trajectory(ts, xs_ana, xds_ana)
 
-        mae = np.mean(abs(traj.ys - traj_reproduced_ana._ys))
+        mae = np.mean(abs(traj.ys - traj_reproduced_ana.ys))
         mean_absolute_errors.append(mae)
         print()
         print(f"               Number of basis functions: {n_bfs}")
@@ -99,8 +97,8 @@ def main():
         dt = 0.01
         n_time_steps = int(tau_exec / dt)
         ts = np.zeros([n_time_steps, 1])
-        xs_step = np.zeros([n_time_steps, dmp._dim_x])
-        xds_step = np.zeros([n_time_steps, dmp._dim_x])
+        xs_step = np.zeros([n_time_steps, dmp.dim_x])
+        xds_step = np.zeros([n_time_steps, dmp.dim_x])
 
         x, xd = dmp.integrate_start()
         xs_step[0, :] = x

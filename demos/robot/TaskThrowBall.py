@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 
 from dmpbbo.bbo_for_dmps.Task import Task
 
@@ -39,9 +40,11 @@ class TaskThrowBall(Task):
         costs[0] = np.sum(costs[1:])
         return costs
 
-    def plot_rollout(self, cost_vars, ax):
-        """Simple script to plot y of DMP trajectory"""
-        t = cost_vars[:, 0]
+    def plot_rollout(self, cost_vars, ax=None):
+        """Plot y of DMP trajectory"""
+        if not ax:
+            ax = plt.axes()
+        # t = cost_vars[:, 0]
         y = cost_vars[:, 1:3]
         ball = cost_vars[:, -2:]
 
