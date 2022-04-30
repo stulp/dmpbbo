@@ -1,7 +1,5 @@
 [![DOI](http://joss.theoj.org/papers/10.21105/joss.01225/status.svg)](https://doi.org/10.21105/joss.01225)
 
-[![Build Status](https://travis-ci.org/stulp/dmpbbo.svg?branch=master)](https://travis-ci.org/stulp/dmpbbo)
-
 # What?
 
 This repository provides an implementation of dynamical systems, 
@@ -10,51 +8,24 @@ function approximators,
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
-
 # For whom?
 
-This library may be useful for you if you
+This library may be useful for you if you:
 
 + are interested in the **theory** behind dynamical movement primitives and their optimization. Then the <a href="tutorial/"><b>tutorials</b></a> are the best place to start.
 
-+ already know about dynamical movement primitives and reinforcement learning, but would rather **use existing, tested code** than brew it yourself. In this case, <a href="demos_cpp/"><b>demos_cpp/</b></a> and <a href="demos_python/"><b>demos_python/</b></a> are a good starting point, as they provide examples of how to use the code.
++ already know about dynamical movement primitives and reinforcement learning, but would rather use existing than brew it yourself. In this case, <a href="demos/"><b>demos/</b></a> is a good starting point, as they provide examples of how to use the code.
 
-+ run the optimization of DMPs **on a real robot**. In this case, go right ahead to <a href="demo_robot/"><b>demo_robot/</b></a>.
++ run the optimization of DMPs **on a real robot**. In this case, go right ahead to <a href="demos/robot/"><b>demos/robot/</b></a>. Reading the tutorials and inspecting demos beforehand will help to understand demos/robot.
 
 + want to contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
   
- 
 # How?
 
 How to install the libraries/binaries/documentation is described in [INSTALL.md](INSTALL.md)
 
-
-# Code structure
-
-Most submodules of this project are independent of all others, so if you don't care 
-about dynamical movement primitives, the following submodules can still easily be 
-integrated in other code to perform some (hopefully) useful function:
-
-+ `functionapproximators/` : a module that defines a generic interface for function 
-  approximators, as well as several specific implementations (LWR, LWPR, iRFRLS, GMR)
-    
-+ `dynamicalsystems/` : a module that defines a generic interface for dynamical 
-  systems, as well as several specific implementations (exponential, sigmoid, 
-  spring-damper)
-
-+ `bbo/` : implementation of some (rather simple) algorithms for the stochastic 
-  optimization of black-box cost functions
-  
-## Why Python and C++?
-
-When optimizing DMPs on a real robot, it's best to have the DMPs running in your real-time control loop. Hence, DMPs need to be implemented in C++. For the optimization algorithms itself, real-time concerns are not an issue. However, on-the-fly visualization to monitor the optimization process is important, and for this Python is a better choice.
-
-For completeness, basic DMP functionality has been implemented in Python as well. And the optimization algorithms have been implemented in C++ also. However, the main use case is C++ for DMPs, and Python for optimization. How to do this is implemented in `demo_robot/`, and documented in `tutorial/dmp_bbo_robot.md`
-
-Note that for now the Python code has not been documented well, please Doxygen navigate the C++ documentation instead (class/function names have been kept consistent).
-
-# Why dmpbbo?
+# Why?
 
 For our own use, the aims of coding this were the following:
 
@@ -69,7 +40,45 @@ For our own use, the aims of coding this were the following:
     
 + Enabling the optimization of different parameter subsets of function approximators.
     
-+ Running dynamical movement primitives on real robots.
++ Running dynamical movement primitives in the control loop on real robots.
+
+# Code structure
+
+The core functionality is in the Python module <a href="dmpbbo/">. It contains five subpackages:
+
++ `functionapproximators/` : defines a generic interface for function approximators, as well as several specific implementations (weighted least-squares regression (WLS), radial basis function networks (RBFN), and locally-weighted regression (LWR).
+    
++ `dynamicalsystems/` : definition of a generic interface for dynamical 
+  systems, as well as several specific implementations (exponential system, sigmoid system, 
+  spring-damper system, etc.)
+
++ `dmp/` : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
+
++ `bbo/` : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
+
++ `bbo_for_dmp/` : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
+
+The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/"> (with nlohmann::json). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.".
+
+As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the bbo and bbo_for_dmps has not been implemented in C++.
+
+
+|                                  | `functionapproximators/`  | `bbo/`         | 
+|                                  | `dynamicalsystems/`       | `bbo_for_dmps` |
+|                                  | `dmp/`                    |                |
+| -------------------------------- | ------------------------- |--------------- |
+| training                         | Python                    |                |
+| prediction/integration           | Python / C++              |                |
+| real-time prediction/integration | C++                       |                |
+| optimization                     |                           | Python         |
+
+
+To see how the Python and C++ implementations are intended to work together, please see `demos/robot/`. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
+
+#### Relation to v1 of dmpbbo
+
+If you still require the previous C++ implementations of training and optimization that used XML as the serialization format, please use the previous releases https://github.com/stulp/dmpbbo/tree/v1.1.0 or https://github.com/stulp/dmpbbo/tree/v1.0.0
+
 
 ##  Research background
 
@@ -118,5 +127,5 @@ If you use this library in the context of experiments for a scientific paper, we
 
 Contributions in the form of feedback, code, and bug reports are very welcome:
 
-* If you have found an issue or a bug, please open a GitHub issue.
+* If you have found an issue or a bug or have a question about the code, please open a GitHub issue.
 * If you want to implement a new feature, please fork the source code, modify, and issue a pull request through the project GitHub page.
