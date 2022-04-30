@@ -73,7 +73,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
         # Set defaults for subsystems if necessary
-        self._phase_system = phase_system or TimeSystem(tau, False)
+        self._phase_system = phase_system or TimeSystem(tau)
         self._gating_system = gating_system or SigmoidSystem(
             tau, np.ones(1), sigmoid_max_rate, 0.85
         )
@@ -464,7 +464,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return fa_inputs_phase, f_target
 
     def states_as_pos_vel_acc(self, x_in, xd_in):
-        return (x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z] / self._tau)
+        return x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z] / self._tau
 
     def states_as_trajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.

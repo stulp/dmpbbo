@@ -50,7 +50,7 @@ class UpdaterMean(Updater):
         
         kwargs:
             eliteness: The eliteness parameter (see costs_to_weights(...))
-            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
+            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM')
         """
         self.eliteness = kwargs.get("eliteness", 10)
         self.weighting_method = kwargs.get("weighting_method", "PI-BB")
