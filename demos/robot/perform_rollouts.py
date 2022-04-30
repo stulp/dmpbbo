@@ -98,14 +98,14 @@ def run_python_simulation(dmp, y_floor=-0.3):
     yd_ball = np.zeros([1, n_dims_y])
     ydd_ball = np.zeros([1, n_dims_y])
 
-    (ys[0, :], yds[0, :], ydds[0, :]) = dmp.stateAsPosVelAcc(x, xd)
+    (ys[0, :], yds[0, :], ydds[0, :]) = dmp.states_as_pos_vel_acc(x, xd)
     ys_ball[0, :] = ys[0, :]
 
     ball_in_hand = True
     ball_in_air = False
     for ii in range(1, n_time_steps):
         (x, xd) = dmp.integrate_step(dt, x)
-        (ys[ii, :], yds[ii, :], ydds[ii, :]) = dmp.stateAsPosVelAcc(x, xd)
+        (ys[ii, :], yds[ii, :], ydds[ii, :]) = dmp.states_as_pos_vel_acc(x, xd)
 
         if ball_in_hand:
             # If the ball is in your hand, it moves along with your hand

@@ -103,33 +103,36 @@ def main():
 
         traj_reproduced = dmp.states_as_trajectory(ts, xs_step, xds_step)
 
-        ################################################
-        # Plot results
-
-        # h, axs = dmp.plot(dmp.tau,ts,xs_step,xds_step)
-        # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
-        # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
-
-        h_demo, axs = traj.plot()
-        h_repr, _ = traj_reproduced.plot(axs)
-        plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label="demonstration")
-        plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
-        plt.gcf().canvas.set_window_title(f"Comparison demonstration/reproduced  (n_bfs={n_bfs})")
-        plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
-        plt.legend()
-
-    if len(n_bfs_list) > 1:
-        # Plot the mean absolute error
-        ax = plt.figure().add_subplot(111)
-        ax.plot(n_bfs_list, mean_absolute_errors)
-        ax.set_xlabel("number of basis functions")
-        ax.set_ylabel("mean absolute error between demonstration and reproduced")
-        filename = "mean_absolute_errors.png"
-        plt.gcf().savefig(Path(args.output_directory, filename))
-
+        if args.show:
+            ################################################
+            # Plot results
+    
+            # h, axs = dmp.plot(dmp.tau,ts,xs_step,xds_step)
+            # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
+            # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
+    
+            h_demo, axs = traj.plot()
+            h_repr, _ = traj_reproduced.plot(axs)
+            plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label="demonstration")
+            plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
+            plt.gcf().canvas.set_window_title(f"Comparison demonstration/reproduced  (n_bfs={n_bfs})")
+            plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
+            plt.legend()
+    
     if args.show:
+        if len(n_bfs_list) > 1:
+            # Plot the mean absolute error
+            ax = plt.figure().add_subplot(111)
+            print(n_bfs_list)
+            print(mean_absolute_errors)
+            ax.plot(n_bfs_list, mean_absolute_errors)
+            ax.set_xlabel("number of basis functions")
+            ax.set_ylabel("mean absolute error between demonstration and reproduced")
+            filename = "mean_absolute_errors.png"
+            plt.gcf().savefig(Path(args.output_directory, filename))
+    
         plt.show()
-
+    
 
 if __name__ == "__main__":
     main()

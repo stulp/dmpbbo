@@ -530,6 +530,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         # determined by the goal system.
         # self._spring_system.y_attr = y_attr_new
 
+    @property
+    def ts_train(self):
+        return self._ts_train
+        
     def set_selected_param_names(self, names):
         if isinstance(names, str):
             names = [names]  # Convert to list

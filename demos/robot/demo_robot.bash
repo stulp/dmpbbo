@@ -2,6 +2,7 @@
 
 D=results
 
+# Adding --show to (most) python scripts below will plot the results
 
 # STEP 1: Train the DMP with a trajectory. Try it with different # basis functions
 python3 step1_train_dmp_from_trajectory_file.py trajectory.txt ${D}/training --n 15
@@ -27,10 +28,10 @@ do
   
   # Run the sampled DMPs on the robot
   DU="${D}/update${i_update}"
-  ./robotExecuteDmp ${DU}/eval_dmp_for_cpp.json ${DU}/eval_cost_vars.txt
+  ../../bin/robotExecuteDmp ${DU}/eval_dmp_for_cpp.json ${DU}/eval_cost_vars.txt
   for i in $(seq -f "%03g" 0 4)
   do
-    ./robotExecuteDmp ${DU}/${i}_dmp_for_cpp.json ${DU}/${i}_cost_vars.txt
+    ../../bin/robotExecuteDmp ${DU}/${i}_dmp_for_cpp.json ${DU}/${i}_cost_vars.txt
   done
   
   python3 step5_one_optimization_update.py ${D} ${i_update}

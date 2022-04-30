@@ -37,6 +37,7 @@ def main():
     parser.add_argument("--sigma", help="sigma of covariance matrix", type=float, default=3.0)
     parser.add_argument("--nsamples", help="number of samples", type=int, default=12)
     parser.add_argument("--show", action="store_true", help="show result plots")
+    parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
     sigma_dir = "sigma_%1.3f" % args.sigma
@@ -50,10 +51,11 @@ def main():
     xs, xds, _, _ = dmp.analytical_solution(ts)
     traj_mean = dmp.states_as_trajectory(ts, xs, xds)
 
-    fig = plt.figure(1)
-    ax1 = fig.add_subplot(131)
-    lines, _ = traj_mean.plot([ax1])
-    plt.setp(lines, linewidth=3)
+    if args.show or args.save:
+        fig = plt.figure(1)
+        ax1 = fig.add_subplot(131)
+        lines, _ = traj_mean.plot([ax1])
+        plt.setp(lines, linewidth=3)
 
     parameter_vector = dmp.get_param_vector()
 
@@ -69,11 +71,12 @@ def main():
 
     samples = distribution.generate_samples(n_samples)
 
-    ax2 = fig.add_subplot(132)
-    distribution.plot(ax2)
-    ax2.plot(samples[:, 0], samples[:, 1], "o", color="#999999")
-
-    ax3 = fig.add_subplot(133)
+    if args.show or args.save:
+        ax2 = fig.add_subplot(132)
+        distribution.plot(ax2)
+        ax2.plot(samples[:, 0], samples[:, 1], "o", color="#999999")
+    
+        ax3 = fig.add_subplot(133)
 
     y_floor = -0.3
     x_goal = -0.70
@@ -92,15 +95,16 @@ def main():
 
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)
-        lines, _ = traj_sample.plot([ax1])
-        plt.setp(lines, color="#999999", alpha=0.5)
-
         cost_vars = perform_rollouts(dmp, "python_simulation", directory)
+        
+        if args.show or args.save:
+            lines, _ = traj_sample.plot([ax1])
+            plt.setp(lines, color="#999999", alpha=0.5)
+            task.plot_rollout(cost_vars, ax3)
 
-        task.plot_rollout(cost_vars, ax3)
-
-    filename = "exploration.png"
-    fig.savefig(Path(directory, filename))
+    if args.save:
+        filename = "exploration.png"
+        fig.savefig(Path(directory, filename))
 
     if args.show:
         plt.show()

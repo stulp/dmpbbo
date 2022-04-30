@@ -359,7 +359,7 @@ class LearningSession:
 
         if isinstance(obj, (np.ndarray, list, int)):
             filename = f"{abs_basename}.txt"
-            np.savetxt(filename, obj)
+            np.savetxt(filename, np.atleast_1d(obj))
         else:
             filename = f"{abs_basename}.json"
             jc.savejson(filename, obj)
