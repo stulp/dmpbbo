@@ -18,11 +18,11 @@ When the cost function has a simple structure, e.g. cost = ![alt text](formulae/
 In robotics however, it is suitable to make the distinction between a task (e.g. lift an object), and an entity that solves this task (e.g. your robot, my robot, a simulated robot, etc.). For these cases, the CostFunction is split into a Task and a TaskSolver, as follows:
 
 ```
-	CostFunction.evaluate(sample) {
-		cost_vars = TaskSolver.perform_rollout(sample)
-		costs = Task.evaluateRollout(cost_vars)
-		return costs
-	}
+class CostFunction:
+    def evaluate(sample):
+        cost_vars = TaskSolver.perform_rollout(sample)
+        costs = Task.evaluateRollout(cost_vars)
+        return costs
 ```
 
 The roles of the Task/TaskSolver are:
@@ -76,7 +76,7 @@ for i_update in range(n_updates):
         costs.append(cur_cost)
 ```
 
-This nicely separates the non-real time optimization scripts from the real-time DMP execution on the real robot. But of course, those comments don't do anything. We thus have to reorganize the loop somewhat.
+This nicely separates the non-real time optimization scripts from the real-time DMP execution on the real robot. But of course, those comments about the robot executing the dmp don't do anything. To integrate the execution of the dmps on the robot, we have to reorganize the loop somewhat.
 
 ```Python
 # INITIALIZE OPTIMIZATION
