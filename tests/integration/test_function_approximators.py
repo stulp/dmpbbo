@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import argparse
 import os
 import subprocess
 from pathlib import Path
@@ -102,7 +103,7 @@ def target_function(n_samples_per_dim):
     return inputs, targets
 
 
-def train(fa_name, n_dims):
+def train(fa_name, n_dims,  save=False):
     directory = "/tmp/testFunctionApproximators/"
     os.makedirs(directory, exist_ok=True)
 
@@ -144,7 +145,7 @@ def train(fa_name, n_dims):
     # Call the binary, which does analytical_solution and integration in C++
     exec_name = "../../bin/testFunctionApproximators"
     arguments = f"{directory} {fa_name} {n_dims}"
-    execute_binary(exec_name, arguments, True)
+    execute_binary(exec_name, arguments)
 
     outputs_grid_cpp = np.loadtxt(os.path.join(directory, f"{basename}_outputs.txt"))
 
@@ -167,18 +168,22 @@ def train(fa_name, n_dims):
 
     plt.gcf().suptitle(basename)
 
-    save_me = False
-    if save_me:
+    if save:
         plt.gcf().savefig(Path(directory, f"{basename}.png"))
 
 
-def main():
+def main(show=False, save=False):
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
-            train(fa_name, n_dims)
-
-    plt.show()
+            train(fa_name, n_dims, save)
+    if show:
+        plt.show()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--show", action="store_true", help="show plots")
+    parser.add_argument("--save", action="store_true", help="save plots")
+    args = parser.parse_args()
+    
+    main(args.show, args.save)

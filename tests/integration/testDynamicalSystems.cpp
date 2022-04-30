@@ -44,10 +44,13 @@ int main(int n_args, char** args)
 
   string directory = args[1];
   string basename = args[2];
+  bool verbose = false;
 
-  cout << "========================================================" << endl;
+  if (verbose)
+    cout << "========================================================" << endl;
   string filename_json = directory + "/" + basename + "_for_cpp.json";
-  cout << filename_json << endl;
+  if (verbose)
+    cout << filename_json << endl;
   ifstream file(filename_json);
   if (file.fail()) {
     cerr << "Could not find: " << filename_json << endl;
@@ -56,8 +59,10 @@ int main(int n_args, char** args)
   json j = json::parse(file);
   DynamicalSystem* d = j.get<DynamicalSystem*>();
 
-  cout << j << endl;
-  cout << *d << endl;
+  if (verbose) {
+    cout << j << endl;
+    cout << *d << endl;
+  }
 
   VectorXd ts;
   string filename_ts = directory + "/ts.txt";
@@ -66,10 +71,9 @@ int main(int n_args, char** args)
     return -1;
   }
 
-  // Prepare analytical solution
+  if (verbose)
+    cout << "===============" << endl << "C++ Analytical solution" << endl;
   MatrixXd xs, xds;
-
-  cout << "===============" << endl << "C++ Analytical solution" << endl;
   d->analyticalSolution(ts, xs, xds);
   bool overwrite = true;
   saveMatrix(directory + "/xs_analytical.txt", xs, overwrite);
@@ -80,7 +84,8 @@ int main(int n_args, char** args)
   VectorXd xd(d->dim(), 1);
   double dt;
 
-  cout << "===============" << endl << "C++ Integrating with Euler" << endl;
+  if (verbose)
+    cout << "===============" << endl << "C++ Integrating with Euler" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;
@@ -94,8 +99,9 @@ int main(int n_args, char** args)
   saveMatrix(directory + "/xs_euler.txt", xs, overwrite);
   saveMatrix(directory + "/xds_euler.txt", xds, overwrite);
 
-  cout << "===============" << endl
-       << "C++ Integrating with Runge-Kutta" << endl;
+  if (verbose)
+    cout << "===============" << endl
+         << "C++ Integrating with Runge-Kutta" << endl;
   d->integrateStart(x, xd);
   xs.row(0) = x;
   xds.row(0) = xd;

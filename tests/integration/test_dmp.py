@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import argparse
 import os
 import subprocess
 from pathlib import Path
@@ -42,14 +43,15 @@ def execute_binary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-def main():
+def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDmp/"
     os.makedirs(directory, exist_ok=True)
 
     ################################
     # Read trajectory and train DMP with it.
     trajectory_file = Path('..', "fixtures", "trajectory.txt")
-    print(f"Reading trajectory from: {trajectory_file}\n")
+    if verbose:
+        print(f"Reading trajectory from: {trajectory_file}\n")
     traj = Trajectory.loadtxt(trajectory_file)
     n_dims = traj.dim
 
@@ -59,7 +61,8 @@ def main():
 
     ################
     # Analytical solution to compute difference
-    print("===============\nPython Analytical solution")
+    if verbose:
+        print("===============\nPython Analytical solution")
 
     ts = traj.ts
     xs_ana, xds_ana, forcing_terms_ana, fa_outputs_ana = dmp.analytical_solution(ts)
@@ -67,7 +70,8 @@ def main():
     ################################################
     # Numerically integrate the DMP
 
-    print("===============\nPython Numerical integration")
+    if verbose:
+        print("===============\nPython Numerical integration")
     n_time_steps = len(ts)
     dim_x = xs_ana.shape[1]
     xs_step = np.zeros([n_time_steps, dim_x])
@@ -89,9 +93,10 @@ def main():
     np.savetxt(Path(directory, "ts.txt"), ts)
 
     exec_name = "../../bin/testDmp"
-    execute_binary(exec_name, f"{directory} dmp", True)
+    execute_binary(exec_name, f"{directory} dmp")
 
-    print("===============\nPython reading output from C++")
+    if verbose:
+        print("===============\nPython reading output from C++")
     d = directory
     xs_ana_cpp = np.loadtxt(os.path.join(d, "xs_ana.txt"))
     xds_ana_cpp = np.loadtxt(os.path.join(d, "xds_ana.txt"))
@@ -102,9 +107,8 @@ def main():
 
     # Plotting
 
-    print("===============\nPython Plotting")
-    save_png = True
-
+    if verbose:
+        print("===============\nPython Plotting")
     h_pyt, axs1 = dmp.plot(
         ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana
     )
@@ -119,7 +123,8 @@ def main():
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
     plt.gcf().suptitle("Analytical solution")
-    if save_png:
+    
+    if save:
         plt.gcf().savefig(Path(directory, "analytical.png"))
 
     h_diff, axs1d = dmp.plot(
@@ -132,7 +137,7 @@ def main():
     )
     plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
     plt.gcf().suptitle("Analytical solution (diff)")
-    if save_png:
+    if save:
         plt.gcf().savefig(Path(directory, "analytical_diff.png"))
 
     h_pyt, axs2 = dmp.plot(ts, xs_step, xds_step)
@@ -140,17 +145,25 @@ def main():
     plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
     plt.gcf().suptitle("Numerical integration")
-    if save_png:
+    if save:
         plt.gcf().savefig(Path(directory, "numerical.png"))
 
     h_diff, axs2d = dmp.plot(ts, xs_step - xs_step_cpp, xds_step - xds_step_cpp, plot_tau=False)
     plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
     plt.gcf().suptitle("Numerical integration (diff)")
-    if save_png:
+    if save:
         plt.gcf().savefig(Path(directory, "numerical_diff.png"))
 
-    plt.show()
+    if show:
+        plt.show()
 
 
 if __name__ == "__main__":
-    main()
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--show", action="store_true", help="show plots")
+    parser.add_argument("--save", action="store_true", help="save plots")
+    parser.add_argument("--verbose", action="store_true", help="print output")
+    args = parser.parse_args()
+    
+    main(args.show, args.save, args.verbose)

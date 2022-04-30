@@ -32,7 +32,7 @@ def run_optimization_task_prepare(
     args = {"task": task, "task_solver": task_solver}
     args.update({"distribution_initial": distribution_initial})
     args.update({"updater": updater})
-    if dmp_initial:
+    if dmp_initial is not None:
         args.update({"dmp_initial": dmp_initial})
     session = LearningSessionTask(n_samples_per_update, directory, **args)
 

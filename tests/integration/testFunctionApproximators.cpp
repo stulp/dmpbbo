@@ -45,8 +45,11 @@ int main(int n_args, char** args)
   string fa_name = args[2];
   int n_dims = atoi(args[3]);
   string basename = fa_name + "_" + to_string(n_dims) + "D";
+  bool verbose = false;
+  
 
-  cout << "========================================================" << endl;
+  if (verbose)
+    cout << "========================================================" << endl;
   string filename_json = directory + "/" + basename + "_for_cpp.json";
   cout << filename_json << endl;
   ifstream file(filename_json);
@@ -57,8 +60,10 @@ int main(int n_args, char** args)
   json j = json::parse(file);
   FunctionApproximator* fa = j.get<FunctionApproximator*>();
 
-  cout << j << endl;
-  cout << *fa << endl;
+  if (verbose) {
+    cout << j << endl;
+    cout << *fa << endl;
+  }
 
   MatrixXd inputs;
   string filename_inputs = directory + "/" + basename + "_inputs.txt";
@@ -67,7 +72,8 @@ int main(int n_args, char** args)
     return -1;
   }
 
-  cout << "===============" << endl << "C++ Analytical solution" << endl;
+  if (verbose)
+    cout << "===============" << endl << "C++ Analytical solution" << endl;
   MatrixXd outputs;
   fa->predict(inputs, outputs);
   bool overwrite = true;

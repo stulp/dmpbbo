@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import argparse
 import os
 import subprocess
 from pathlib import Path
@@ -79,7 +80,7 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     pass
 
 
-def main():
+def main(show=False, save=False, verbose=False):
     directory = "/tmp/testDynamicalSystems/"
     os.makedirs(directory, exist_ok=True)
 
@@ -121,7 +122,6 @@ def main():
     # https://youtrack.jetbrains.com/issue/PY-35025
     np.savetxt(os.path.join(directory, "ts.txt"), ts)  # noqa
 
-    fig_count = 1
     for name in dyn_systems.keys():
 
         dyn_system = dyn_systems[name]
@@ -133,48 +133,56 @@ def main():
         # Call the binary, which does analytical_solution and integration in C++
         exec_name = "../../bin/testDynamicalSystems"
         arguments = f"{directory} {name}"
-        execute_binary(exec_name, arguments, True)
+        execute_binary(exec_name, arguments)
 
-        print("===============")
-        print("Python Analytical solution")
+        if verbose:
+            print("===============")
+            print("Python Analytical solution")
         xs, xds = dyn_system.analytical_solution(ts)
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_analytical.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
-        fig1 = plt.figure(fig_count, figsize=(10, 10))
+        fig1 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
         fig1.suptitle(f"{name}System - Analytical")
 
-        print("===============")
-        print("Python Integrating with Euler")
+        if verbose:
+            print("===============")
+            print("Python Integrating with Euler")
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_euler.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
-        fig2 = plt.figure(fig_count + 1, figsize=(10, 10))
+        fig2 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
         fig2.suptitle(f"{name}System - Euler")
 
-        print("===============")
-        print("Python Integrating with Runge-Kutta")
+        if verbose:
+            print("===============")
+            print("Python Integrating with Runge-Kutta")
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
-        fig3 = plt.figure(fig_count + 2, figsize=(10, 10))
+        fig3 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
         fig3.suptitle(f"{name}System - Runge-Kutta")
 
-        save_me = False
-        if save_me:
+        if save:
             fig1.savefig(Path(directory, f"{name}System_analytical.png"))
             fig2.savefig(Path(directory, f"{name}System_euler.png"))
             fig2.savefig(Path(directory, f"{name}System_rungekutta.png"))
-        fig_count += 3
 
-    plt.show()
+    if show:
+        plt.show()
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--show", action="store_true", help="show plots")
+    parser.add_argument("--save", action="store_true", help="save plots")
+    parser.add_argument("--verbose", action="store_true", help="print output")
+    args = parser.parse_args()
+    
+    main(args.show, args.save, args.verbose)
