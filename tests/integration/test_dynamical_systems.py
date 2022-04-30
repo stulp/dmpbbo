@@ -83,26 +83,26 @@ def main(directory, **kwargs):
 
     # ExponentialSystem
     tau = 0.6  # Time constant
-    x_init_2D = np.array([0.5, 1.0])
-    x_attr_2D = np.array([0.8, 0.1])
-    x_init_1D = np.array([0.5])
-    x_attr_1D = np.array([0.8])
+    x_init_2d = np.array([0.5, 1.0])
+    x_attr_2d = np.array([0.8, 0.1])
+    x_init_1d = np.array([0.5])
+    x_attr_1d = np.array([0.8])
 
     alpha = 6.0
-    dyn_systems = {}
-    dyn_systems["ExponentialSystem_1D"] = ExponentialSystem(tau, x_init_1D, x_attr_1D, alpha)
-    dyn_systems["ExponentialSystem_2D"] = ExponentialSystem(tau, x_init_2D, x_attr_2D, alpha)
+    dyn_systems = {}  # noqa
+    dyn_systems["ExponentialSystem_1D"] = ExponentialSystem(tau, x_init_1d, x_attr_1d, alpha)
+    dyn_systems["ExponentialSystem_2D"] = ExponentialSystem(tau, x_init_2d, x_attr_2d, alpha)
 
     # SigmoidSystem
     max_rate = -10
     inflection_ratio = 0.8
-    dyn_systems["SigmoidSystem_1D"] = SigmoidSystem(tau, x_init_1D, max_rate, inflection_ratio)
-    dyn_systems["SigmoidSystem_2D"] = SigmoidSystem(tau, x_init_2D, max_rate, inflection_ratio)
+    dyn_systems["SigmoidSystem_1D"] = SigmoidSystem(tau, x_init_1d, max_rate, inflection_ratio)
+    dyn_systems["SigmoidSystem_2D"] = SigmoidSystem(tau, x_init_2d, max_rate, inflection_ratio)
 
     # SpringDamperSystem
     alpha = 12.0
-    dyn_systems["SpringDamperSystem_1D"] = SpringDamperSystem(tau, x_init_1D, x_attr_1D, alpha)
-    dyn_systems["SpringDamperSystem_2D"] = SpringDamperSystem(tau, x_init_2D, x_attr_2D, alpha)
+    dyn_systems["SpringDamperSystem_1D"] = SpringDamperSystem(tau, x_init_1d, x_attr_1d, alpha)
+    dyn_systems["SpringDamperSystem_2D"] = SpringDamperSystem(tau, x_init_2d, x_attr_2d, alpha)
 
     # TimeSystem
     dyn_systems["TimeSystem"] = TimeSystem(tau)
@@ -186,8 +186,8 @@ def main(directory, **kwargs):
             fig3.suptitle(f"{name}System - Runge-Kutta")
 
         if save:
-            fig1.savefig(Path(directory, f"{name}System_analytical.png"))
-            fig2.savefig(Path(directory, f"{name}System_euler.png"))
+            fig1.savefig(Path(directory, f"{name}System_analytical.png"))  # noqa
+            fig2.savefig(Path(directory, f"{name}System_euler.png"))  # noqa
             fig2.savefig(Path(directory, f"{name}System_rungekutta.png"))
 
     if show:

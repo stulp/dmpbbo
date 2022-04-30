@@ -72,7 +72,7 @@ def main():
     samples = distribution.generate_samples(n_samples)
 
     if args.show or args.save:
-        ax2 = fig.add_subplot(132)
+        ax2 = fig.add_subplot(132)  # noqa
         distribution.plot(ax2)
         ax2.plot(samples[:, 0], samples[:, 1], "o", color="#999999")
     
@@ -98,9 +98,9 @@ def main():
         cost_vars = perform_rollouts(dmp, "python_simulation", directory)
         
         if args.show or args.save:
-            lines, _ = traj_sample.plot([ax1])
+            lines, _ = traj_sample.plot([ax1])  # noqa
             plt.setp(lines, color="#999999", alpha=0.5)
-            task.plot_rollout(cost_vars, ax3)
+            task.plot_rollout(cost_vars, ax3)  # noqa
 
     if args.save:
         filename = "exploration.png"
