@@ -64,6 +64,14 @@ class DynamicalSystem(ABC):
         self._tau = new_tau
 
     @property
+    def dim_x(self):
+        return self._dim_x
+
+    @property
+    def dim_y(self):
+        return self._dim_y
+
+    @property
     def x_init(self):
         """ Get the initial state of the dynamical system.
         """
