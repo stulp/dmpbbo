@@ -80,7 +80,7 @@ class SpringDamperSystem(DynamicalSystem):
         z = x[self._dim_y :]
 
         # Compute yd and zd
-        # See  http://en.wikipedia.org/wiki/Damped_spring-mass_system#Example:mass_.E2.80.93spring.E2.80.93damper
+        # See  http://en.wikipedia.org/wiki/Damped_spring-mass_system
         # and equation 2.1 of http://www-clmc.usc.edu/publications/I/ijspeert-NC2013.pdf
         yd = z / self._tau
 

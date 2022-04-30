@@ -35,8 +35,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         y_init,
         y_attr,
         function_approximators,
-        phase_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
-        gating_system=None,  # Will be initialized later, depends on tau (https://peps.python.org/pep-0671/)
+        phase_system=None,  # Initialized later, depends on tau (https://peps.python.org/pep-0671/)
+        gating_system=None,  # Initialized later, depends on tau (https://peps.python.org/pep-0671/)
         **kwargs,
     ):
         """Initialize a DMP with function approximators and subsystems
@@ -267,14 +267,14 @@ class Dmp(DynamicalSystem, Parameterizable):
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
 
         Returns:
-            xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times (the length of
-            'ts'), and D the size of the state (i.e. dim())
-            xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is the number of times
+            xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times
             (the length of 'ts'), and D the size of the state (i.e. dim())
+            xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is
+            the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
 
-        The output xs and xds will be of size D x T only if the matrix x you pass as an argument of size D x T.
-        In all other cases (i.e. including passing an empty matrix) the size of x will be T x D. This feature has
-        been added so that you may pass matrices of either size.
+        The output xs and xds will be of size D x T only if the matrix x you pass as an argument
+        of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x
+        will be T x D. This feature has been added so that you may pass matrices of either size.
         """
         if ts is None:
             if self._ts_train is None:
@@ -407,8 +407,8 @@ class Dmp(DynamicalSystem, Parameterizable):
     def _compute_targets(self, trajectory):
         """Given a trajectory, compute the inputs and targets for the function approximators.
 
-        For a standard Dmp the inputs will be the phase over time, and the targets will be the forcing term (with the
-        gating function factored out).
+        For a standard Dmp the inputs will be the phase over time, and the targets will be the
+        forcing term (with the gating function factored out).
 
         Args:
             trajectory - Trajectory, e.g. a demonstration.
@@ -468,10 +468,11 @@ class Dmp(DynamicalSystem, Parameterizable):
     def states_as_trajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
 
-        As it is a dynamical system, the state vector of a DMP contains the output of the goal, spring, phase and
-        gating system. What we are most interested in is the output of the spring system. This function extracts that
-        information, and also computes the accelerations of the spring system, which are only stored implicitly in
-        xd_in because second order systems are converted to first order systems with expanded state.
+        As it is a dynamical system, the state vector of a DMP contains the output of the goal,
+        spring, phase and gating system. What we are most interested in is the output of the
+        spring system. This function extracts that information, and also computes the
+        accelerations of the spring system, which are only stored implicitly in xd_in because
+        second order systems are converted to first order systems with expanded state.
 
         Args:
             ts    - A vector of times

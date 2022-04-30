@@ -26,8 +26,8 @@ class TaskSolver(ABC):
 
     @abstractmethod
     def perform_rollout(self, sample):
-        """ Perform rollouts, that is, given a set of samples, determine all the variables that are relevant to
-        evaluating the cost function.
+        """ Perform rollouts, that is, given a set of samples, determine all the variables that
+        are relevant to evaluating the cost function.
 
 
         Args:

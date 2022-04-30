@@ -116,7 +116,7 @@ class FunctionApproximator(Parameterizable):
 
         if len(values) != self.get_param_vector_size():
             raise ValueError(
-                f"values ({len(values)}) should have same size as size of selected parameters vector"
+                f"values ({len(values)}) should have same size as size of selected parameter vector"
                 f"({self.get_param_vector_size()}) "
             )
 
@@ -174,7 +174,8 @@ class FunctionApproximator(Parameterizable):
 
     @staticmethod
     def _plot_grid_values(inputs, activations, ax, n_samples_per_dim):
-        """Plot basis functions activations, whilst being smart about the dimensionality of input data."""
+        """Plot basis functions activations, whilst being smart about the dimensionality of input
+        data. """
 
         n_dims = len(np.atleast_1d(inputs[0]))
         if n_dims == 1:

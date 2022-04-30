@@ -28,7 +28,8 @@ class FunctionApproximatorRBFN(FunctionApproximator):
 
         Args:
             n_bfs_per_dim Number of basis functions per input dimension.
-            intersection_height Relative value at which two neighbouring basis functions will intersect (default=0.7)
+            intersection_height Relative value at which two neighbouring basis functions
+            will intersect (default=0.7)
             regularization Regularization parameter (default=0.0)
         """
         meta_params = {

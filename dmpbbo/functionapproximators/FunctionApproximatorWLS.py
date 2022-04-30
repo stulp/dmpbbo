@@ -65,7 +65,8 @@ class FunctionApproximatorWLS(FunctionApproximator):
 
         # Compute beta
         # 1 x n_betas
-        # = inv( (n_betas x n_sam)*(n_sam x n_sam)*(n_sam*n_betas) )*( (n_betas x n_sam)*(n_sam x n_sam)*(n_sam * 1) )
+        # = inv( (n_betas x n_sam)*(n_sam x n_sam)*(n_sam*n_betas) )*
+        #                                          ( (n_betas x n_sam)*(n_sam x n_sam)*(n_sam * 1) )
         # = inv(n_betas x n_betas)*(n_betas x 1)
         #
         # Least squares is a one-liner

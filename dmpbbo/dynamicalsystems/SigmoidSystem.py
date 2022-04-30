@@ -138,8 +138,8 @@ class SigmoidSystem(DynamicalSystem):
         for dd in range(len(N_0s)):
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
-        # If Ks is too close to N_0===initial_state, then the differential equation will always return 0
-        # See differential_equation below
+        # If Ks is too close to N_0===initial_state, then the differential equation will always
+        # return 0. See differential_equation below
         #   xd = max_rate_*x*(1-(x/Ks))
         # For initial_state this is
         #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
@@ -153,9 +153,9 @@ class SigmoidSystem(DynamicalSystem):
         div = np.divide(N_0s, self._Ks_cached) - 1.0
         if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
             print(
-                f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors during numerical "
-                f"integration. Recommended solution: choose a lower magnitude for the maximum rate of change ("
-                f"currently it is {r}) "
+                f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors "
+                f"during numerical integration. Recommended solution: choose a lower magnitude "
+                f"for the maximum rate of change (currently it is {r}) "
             )
 
         return self._Ks_cached

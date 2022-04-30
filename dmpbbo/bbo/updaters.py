@@ -82,14 +82,15 @@ class UpdaterMean(Updater):
 
 
 class UpdaterCovarDecay(Updater):
-    """ Updater that updates the mean of the distribution, and decays the covariance matrix of the distribution."""
+    """ Updater that updates the mean of the distribution, and decays the covariance matrix of
+    the distribution. """
 
     def __init__(self, **kwargs):
         """ Initialize an UpdaterCovarDecay object.
 
         kwargs:
             eliteness: The eliteness parameter (see costs_to_weights(...))
-            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM', see costs_to_weights(...))
+            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM')
             covar_decay_factor: Factor with which to decay the covariance matrix (i.e.
             covar_decay_factor*covar_decay_factor*C at each update)
         """
@@ -126,8 +127,8 @@ class UpdaterCovarDecay(Updater):
 
 
 class UpdaterCovarAdaptation(Updater):
-    """ Updater that updates the mean of the distribution, and uses covariance matrix adaptation to update the
-    covariance matrix of the distribution. """
+    """ Updater that updates the mean of the distribution, and uses covariance matrix adaptation
+    to update the covariance matrix of the distribution. """
 
     def __init__(self, **kwargs):
         """ Constructor
@@ -136,10 +137,12 @@ class UpdaterCovarAdaptation(Updater):
             eliteness: The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
             weighting_method: ('PI-BB' = PI^2 style weighting)
             diagonal_max: Max eigen value allowed along diagonals
-            diagonal_min: Small covariance matrix that is added after each update to avoid premature convergence
-            diag_only: Update only the diagonal of the covariance matrix (true) or the full matrix (false)
-            learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0] with 0.0 = no updating,
-            1.0  = complete update by ignoring previous covar matrix.
+            diagonal_min: Small covariance matrix that is added after each update to avoid premature
+            convergence
+            diag_only: Update only the diagonal of the covariance matrix (true) or the
+            full matrix (false)
+            learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0]
+            with 0.0 = no updating, anad 1.0  = complete update by ignoring previous covar matrix.
         """
         self.eliteness = kwargs.get("eliteness", 10)
         self.weighting_method = kwargs.get("weighting_method", "PI-BB")

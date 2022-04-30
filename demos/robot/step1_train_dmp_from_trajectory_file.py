@@ -113,9 +113,10 @@ def main():
 
             h_demo, axs = traj.plot()
             h_repr, _ = traj_reproduced.plot(axs)
-            plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label="demonstration")
+            d = "demonstration"
+            plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label=d)
             plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
-            plt.gcf().canvas.set_window_title(f"Comparison demonstration/reproduced  (n_bfs={n_bfs})")
+            plt.gcf().canvas.set_window_title(f"Comparison {d}/reproduced  (n_bfs={n_bfs})")
             plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
             plt.legend()
 

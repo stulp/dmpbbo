@@ -44,8 +44,8 @@ class Gaussian(BasisFunction):
             inputs: The input data (size: n_samples X n_dims)
             normalized_basis_functions: Whether to normalize the basis functions (default=False)
 
-        Returns: The kernel activations, computed for each of the samples in the input data (size: n_samples X
-        n_basis_functions)
+        Returns: The kernel activations, computed for each of the samples in the input data
+        (size: n_samples X n_basis_functions)
         """
 
         n_samples = inputs.shape[0]
@@ -101,8 +101,8 @@ class Gaussian(BasisFunction):
         Args:
             inputs: The input data (size: n_samples X n_dims)
             n_bfs_per_dim: Number of basis functions per input dimension.
-            intersection_height: The relative value at which two neighbouring basis functions will intersect (
-            default=0.7)
+            intersection_height: The relative value at which two neighbouring basis functions
+            will intersect (default=0.7)
 
         Returns:
             centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
@@ -131,8 +131,8 @@ class Gaussian(BasisFunction):
             cur_widths = np.ones(n_bfs)
             h = intersection_height
             if n_bfs > 1:
-                # Consider two neighbouring basis functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
-                # Assuming the widths are the same for both, they are certain to intersect at x = 0.5(c0+c1)
+                # Consider 2 neighbouring functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
+                # Assumming same widths, they are certain to intersect at x = 0.5(c0+c1)
                 # And we want the activation at x to be 'intersection'. So
                 #            y = exp(-0.5(x-c0)^2/w^2)
                 # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)

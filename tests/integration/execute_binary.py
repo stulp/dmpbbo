@@ -39,6 +39,6 @@ def execute_binary(executable_name, arguments, print_command=False):
             return
 
     raise ValueError(
-        f"Executable '{executable_name}' does not exist in any bin directory above. Please call 'make install' in the "
-        f"build directory first. "
+        f"Executable '{executable_name}' does not exist in any bin directory. Please call 'make "
+        f"install' in the build directory first. "
     )

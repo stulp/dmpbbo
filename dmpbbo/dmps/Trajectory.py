@@ -144,12 +144,14 @@ class Trajectory:
         if as_times:
             if start > self._ts[-1]:
                 print(
-                    "WARNING: Argument 'fro' out of range, because {fro} > {self._ts[-1]}. Not cropping"
+                    "WARNING: Argument 'fro' out of range, because {fro} > {self._ts[-1]}. Not "
+                    "cropping"
                 )
                 return
             if end < self._ts[0]:
                 print(
-                    "WARNING: Argument 'fro' out of range, because {to} < {self._ts[-1]}. Not cropping"
+                    "WARNING: Argument 'fro' out of range, because {to} < {self._ts[-1]}. Not "
+                    "cropping"
                 )
                 return
 

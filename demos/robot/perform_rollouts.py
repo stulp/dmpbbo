@@ -31,8 +31,8 @@ def execute_binary(executable_name, arguments, print_command=False):
 
     if not os.path.isfile(executable_name):
         raise ValueError(
-            f"Executable '{executable_name}' does not exist. Please call 'make install' in the build "
-            f"directory first."
+            f"Executable '{executable_name}' does not exist. Please call 'make install' in the "
+            f"build directory first."
         )
 
     command = f"{executable_name} {arguments}"
