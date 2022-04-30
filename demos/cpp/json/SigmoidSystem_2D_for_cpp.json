@@ -1,0 +1,13 @@
+{
+  "class": "SigmoidSystem",
+  "_tau": 0.6,
+  "_dim_y": 2,
+  "_dim_x": 2,
+  "_x_init": [
+    0.5,
+    1.0
+  ],
+  "_max_rate": -10,
+  "_inflection_ratio": 0.8,
+  "_Ks_cached": null
+}

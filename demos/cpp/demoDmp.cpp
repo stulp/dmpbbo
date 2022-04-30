@@ -44,9 +44,13 @@ int main(int n_args, char** args)
   if (n_args > 1) directory = string(args[1]);
 
   // Test JSON
-  string filename_dmp = "../../../demos/json/Dmp.json";
+  string filename_dmp = "../demos/cpp/json/Dmp_for_cpp.json";
   cout << "* Reading and parsing: " << filename_dmp << endl;
   ifstream file(filename_dmp);
+  if (file.fail()) {
+    cerr << "ERROR: Could not find file: " << filename_dmp << endl;
+    return -1;
+  }    
   json j = json::parse(file);
   cout << j << endl;
 

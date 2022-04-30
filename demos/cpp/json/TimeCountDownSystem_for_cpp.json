@@ -1,0 +1,10 @@
+{
+  "class": "TimeSystem",
+  "_count_down": true,
+  "_tau": 0.6,
+  "_dim_y": 1,
+  "_dim_x": 1,
+  "_x_init": [
+    1.0
+  ]
+}

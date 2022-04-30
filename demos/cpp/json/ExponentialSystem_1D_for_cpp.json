@@ -1,0 +1,13 @@
+{
+  "class": "ExponentialSystem",
+  "_tau": 0.6,
+  "_dim_y": 1,
+  "_dim_x": 1,
+  "_x_init": [
+    0.5
+  ],
+  "_x_attr": [
+    0.8
+  ],
+  "alpha": 6.0
+}

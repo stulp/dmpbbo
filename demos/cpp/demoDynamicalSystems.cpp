@@ -45,13 +45,13 @@ int main(int n_args, char** args)
   if (n_args == 1) {
     // No directories and filename provided, add the files from the json
     // directory
-    string input_directory = "../../../demos/json/";
+    string input_directory = "../demos/cpp/json/";
     for (string system : {"Exponential", "Sigmoid", "SpringDamper"})
       for (string dim : {"1D", "2D"})
         filenames.push_back(input_directory + system + "System_" + dim +
-                            ".json");
-    filenames.push_back(input_directory + "TimeSystem.json");
-    filenames.push_back(input_directory + "TimeSystemCountDown.json");
+                            "_for_cpp.json");
+    filenames.push_back(input_directory + "TimeSystem_for_cpp.json");
+    filenames.push_back(input_directory + "TimeCountDownSystem_for_cpp.json");
 
   } else {
     for (int i_args = 1; i_args < n_args; i_args++)
@@ -60,10 +60,14 @@ int main(int n_args, char** args)
 
   for (string filename : filenames) {
     cout << "========================================================" << endl;
-    cout << filename << endl;
+    cout << "Loading: " << filename << endl;
 
     cout << "===============" << endl;
     ifstream file(filename);
+    if (file.fail()) {
+      cerr << "ERROR: Could not find file: " << filename << endl;
+      return -1;
+    }    
     json j = json::parse(file);
     cout << j << endl;
 

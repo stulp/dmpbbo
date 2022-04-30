@@ -38,9 +38,7 @@ def main(directory, **kwargs):
     save = kwargs.get("save",False)
     verbose = kwargs.get("verbose",False)
     
-    
-    directory = directory / "test_dmp_data"
-    directory.mkdir(exist_ok=True)
+    directory.mkdir(parents=True,exist_ok=True)
 
     ################################
     # Read trajectory and train DMP with it.
@@ -169,6 +167,7 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
+    parser.add_argument("--directory", help="directory to write results to",default="/tmp/dmpbbo/test_dmp_data")
     args = parser.parse_args()
 
-    main(Path("/tmp"), show=True, save=args.save, verbose=True)
+    main(Path(args.directory), show=True, save=args.save, verbose=True)

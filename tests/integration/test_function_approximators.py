@@ -101,7 +101,10 @@ def train(directory, fa_name, n_dims, **kwargs):
 
     outputs_grid_cpp = np.loadtxt(os.path.join(directory, f"{basename}_outputs.txt"))
 
-    assert np.max(np.abs(outputs_grid-outputs_grid_cpp)) < 10e-7
+    max_diff = np.max(np.abs(outputs_grid-outputs_grid_cpp))
+    if verbose:
+        print(f"    max_diff = {max_diff}  ({fa_name}, {n_dims}D)")
+    assert max_diff < 10e-7
 
     if show or save:
         h_pyt, ax = fa.plot(inputs, targets=targets)
@@ -131,8 +134,7 @@ def test_function_approximators(tmp_path):
     main(tmp_path)
 
 def main(directory, **kwargs):
-    directory = directory / "test_function_approximators_data"
-    directory.mkdir(exist_ok=True)
+    directory.mkdir(parents=True,exist_ok=True)
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
             train(directory, fa_name, n_dims, **kwargs)
@@ -145,9 +147,10 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
+    parser.add_argument("--directory", help="directory to write results to", default="/tmp/dmpbbo/test_function_approximators_data")
     args = parser.parse_args()
-
-    main(Path("/tmp"), show=True, save=args.save, verbose=True)
+    
+    main(Path(args.directory), show=True, save=args.save, verbose=True)
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]

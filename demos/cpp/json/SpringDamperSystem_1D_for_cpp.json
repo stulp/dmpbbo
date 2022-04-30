@@ -1,0 +1,16 @@
+{
+  "class": "SpringDamperSystem",
+  "_tau": 0.6,
+  "_dim_y": 1,
+  "_dim_x": 2,
+  "_x_init": [
+    0.5,
+    0.0
+  ],
+  "_y_attr": [
+    0.8
+  ],
+  "damping_coefficient": 12.0,
+  "mass": 1.0,
+  "spring_constant": 36.0
+}

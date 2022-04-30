@@ -75,31 +75,41 @@ def main(directory, **kwargs):
     save = kwargs.get("save",False)
     verbose = kwargs.get("verbose",False)
 
+    directory.mkdir(parents=True,exist_ok=True)
+
     ###########################################################################
     # Create all systems and add them to a dictionary
 
     # ExponentialSystem
     tau = 0.6  # Time constant
-    x_init = np.array([0.5, 1.0])
-    x_attr = np.array([0.8, 0.1])
-    alpha = 6.0  # Decay factor
-    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}  # noqa
-
-    # TimeSystem
-    dyn_systems["Time"] = TimeSystem(tau)
-
-    # TimeSystem (but counting down instead of up)
-    count_down = True
-    dyn_systems["TimeCountDown"] = TimeSystem(tau, count_down)
+    x_init_2D = np.array([0.5, 1.0])
+    x_attr_2D = np.array([0.8, 0.1])
+    x_init_1D = np.array([0.5])
+    x_attr_1D = np.array([0.8])
+    
+    alpha = 6.0
+    dyn_systems = {}
+    dyn_systems["ExponentialSystem_1D"] = ExponentialSystem(tau, x_init_1D, x_attr_1D, alpha)
+    dyn_systems["ExponentialSystem_2D"] = ExponentialSystem(tau, x_init_2D, x_attr_2D, alpha)
 
     # SigmoidSystem
     max_rate = -10
     inflection_ratio = 0.8
-    dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
+    dyn_systems["SigmoidSystem_1D"] = SigmoidSystem(tau, x_init_1D, max_rate, inflection_ratio)
+    dyn_systems["SigmoidSystem_2D"] = SigmoidSystem(tau, x_init_2D, max_rate, inflection_ratio)
 
     # SpringDamperSystem
     alpha = 12.0
-    dyn_systems["SpringDamper"] = SpringDamperSystem(tau, x_init, x_attr, alpha)
+    dyn_systems["SpringDamperSystem_1D"] = SpringDamperSystem(tau, x_init_1D, x_attr_1D, alpha)
+    dyn_systems["SpringDamperSystem_2D"] = SpringDamperSystem(tau, x_init_2D, x_attr_2D, alpha)
+
+    # TimeSystem
+    dyn_systems["TimeSystem"] = TimeSystem(tau)
+
+    # TimeSystem (but counting down instead of up)
+    count_down = True
+    dyn_systems["TimeCountDownSystem"] = TimeSystem(tau, count_down)
+
 
     ###########################################################################
     # Start integration of all systems
@@ -134,7 +144,7 @@ def main(directory, **kwargs):
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_analytical.txt"))
         max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
         if verbose:
-            print(f"    max_diff = {max_diff}  (Analytical)")
+            print(f"    max_diff = {max_diff}  ({name}System, Analytical)")
         assert max_diff < 10e-7
         if save or show:
             fig1 = plt.figure(figsize=(10, 10))
@@ -151,7 +161,7 @@ def main(directory, **kwargs):
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_euler.txt"))
         max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
         if verbose:
-            print(f"    max_diff = {max_diff}  (Euler)")
+            print(f"    max_diff = {max_diff}  ({name}System, Euler)")
         assert max_diff < 10e-7
         if save or show:
             fig2 = plt.figure(figsize=(10, 10))
@@ -168,7 +178,7 @@ def main(directory, **kwargs):
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
         max_diff = np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape)))
         if verbose:
-            print(f"    max_diff = {max_diff}  (Runge-Kutta)")
+            print(f"    max_diff = {max_diff}  ({name}System, Runge-Kutta)")
         assert max_diff < 10e-7
         if save or show:
             fig3 = plt.figure(figsize=(10, 10))
@@ -189,6 +199,7 @@ if __name__ == "__main__":
     # parser.add_argument("--show", action="store_true", help="show plots")
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
+    parser.add_argument("--directory", help="directory to write results to",default="/tmp/dmpbbo/test_dynamical_systems_data")
     args = parser.parse_args()
 
-    main(Path("/tmp"), show=True, save=args.save, verbose=True)
+    main(Path(args.directory), show=True, save=args.save, verbose=True)

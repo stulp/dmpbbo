@@ -36,21 +36,21 @@ using namespace nlohmann;
 
 int main(int n_args, char** args)
 {
-  string directory = "../../../demos//json/";
+  string directory = "../demos/cpp/json/";
 
   for (int n_dims : {1, 2}) {
     for (string fa_name : {"RBFN", "LWR"}) {
       string label = fa_name + "_" + to_string(n_dims) + "D";
-      string filename = directory + label + ".json";
+      string filename = directory + label + "_for_cpp.json";
 
       cout << "======================================================" << endl;
       cout << filename << endl;
 
       ifstream file(filename);
       if (file.fail()) {
-        cerr << "File not found: " << filename << endl;
-        continue;
-      }
+        cerr << "ERROR: Could not find file: " << filename << endl;
+        return -1;
+      }    
       json j = json::parse(file);
       cout << j << endl;
 

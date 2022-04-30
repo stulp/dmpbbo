@@ -1,0 +1,15 @@
+{
+  "class": "ExponentialSystem",
+  "_tau": 0.6,
+  "_dim_y": 2,
+  "_dim_x": 2,
+  "_x_init": [
+    0.5,
+    1.0
+  ],
+  "_x_attr": [
+    0.8,
+    0.1
+  ],
+  "alpha": 6.0
+}
