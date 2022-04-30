@@ -245,9 +245,7 @@ def costs_to_weights(costs, weighting_method, eliteness):
         if costs_range == 0:
             weights = np.full(costs.shape, 1.0)
         else:
-            costs_norm = np.asarray(
-                [-h * (x - min(costs)) / costs_range for x in costs]
-            )
+            costs_norm = np.asarray([-h * (x - min(costs)) / costs_range for x in costs])
             weights = np.exp(costs_norm)
 
     elif weighting_method == "CEM" or weighting_method == "CMA-ES":

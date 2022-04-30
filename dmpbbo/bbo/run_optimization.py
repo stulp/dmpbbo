@@ -20,12 +20,7 @@ from dmpbbo.bbo.LearningSession import LearningSession
 
 
 def run_optimization(
-    cost_function,
-    initial_distribution,
-    updater,
-    n_updates,
-    n_samples_per_update,
-    directory=None,
+    cost_function, initial_distribution, updater, n_updates, n_samples_per_update, directory=None
 ):
     """ Run an evolutionary optimization process, see \ref page_bbo
     
@@ -63,15 +58,11 @@ def run_optimization(
         costs = [cost_function.evaluate(sample) for sample in samples]
 
         # 3. Update the distribution
-        distribution_new, weights = updater.update_distribution(
-            distribution, samples, costs
-        )
+        distribution_new, weights = updater.update_distribution(distribution, samples, costs)
 
         # Bookkeeping
         session.add_eval(i_update, distribution.mean, cost_eval)
-        session.add_update(
-            i_update, distribution, samples, costs, weights, distribution_new
-        )
+        session.add_update(i_update, distribution, samples, costs, weights, distribution_new)
 
         distribution = distribution_new
 

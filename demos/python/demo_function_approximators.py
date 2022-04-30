@@ -18,9 +18,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
 
 
@@ -77,9 +75,7 @@ def train(fa_name, n_dims):
     outputs = fa.predict(inputs)  # noqa
 
     # Plotting
-    (h, ax) = fa.plot(
-        inputs, targets=targets, plot_residuals=True, plot_model_parameters=True
-    )
+    (h, ax) = fa.plot(inputs, targets=targets, plot_residuals=True, plot_model_parameters=True)
     ax.set_title(f"{fa_name} {n_dims}D")
     plt.gcf().canvas.set_window_title(f"{fa_name} {n_dims}D")
 

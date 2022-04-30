@@ -160,9 +160,7 @@ def main():
         print("Python Integrating with Runge-Kutta")
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
-                dt, xs[ii - 1, :]
-            )
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         xs_cpp = np.loadtxt(os.path.join(directory, "xs_rungekutta.txt"))
         xds_cpp = np.loadtxt(os.path.join(directory, "xds_rungekutta.txt"))
         fig3 = plt.figure(fig_count + 2, figsize=(10, 10))

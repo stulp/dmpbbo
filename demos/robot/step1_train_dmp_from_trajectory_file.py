@@ -26,21 +26,15 @@ from matplotlib import pyplot as plt
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("trajectory_file", help="file to read trajectory from")
-    parser.add_argument(
-        "output_directory", help="directory to write dmp and other results to"
-    )
-    parser.add_argument(
-        "--n", help="max number of basis functions", type=int, default=15
-    )
+    parser.add_argument("output_directory", help="directory to write dmp and other results to")
+    parser.add_argument("--n", help="max number of basis functions", type=int, default=15)
     parser.add_argument("--show", action="store_true", help="Show plots")
     args = parser.parse_args()
 
@@ -118,26 +112,10 @@ def main():
 
         h_demo, axs = traj.plot()
         h_repr, _ = traj_reproduced.plot(axs)
-        plt.setp(
-            h_demo,
-            linestyle="-",
-            linewidth=4,
-            color=(0.8, 0.8, 0.8),
-            label="demonstration",
-        )
-        plt.setp(
-            h_repr,
-            linestyle="--",
-            linewidth=2,
-            color=(0.0, 0.0, 0.5),
-            label="reproduced",
-        )
-        plt.gcf().canvas.set_window_title(
-            f"Comparison demonstration/reproduced  (n_bfs={n_bfs})"
-        )
-        plt.gcf().savefig(
-            Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png")
-        )
+        plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label="demonstration")
+        plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
+        plt.gcf().canvas.set_window_title(f"Comparison demonstration/reproduced  (n_bfs={n_bfs})")
+        plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
         plt.legend()
 
     if len(n_bfs_list) > 1:

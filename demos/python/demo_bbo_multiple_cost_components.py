@@ -64,9 +64,7 @@ def main():
     covar_init = 4.0 * np.eye(n_dims)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    updater = UpdaterCovarDecay(
-        eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8
-    )
+    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8)
 
     n_samples_per_update = 20
     n_updates = 40

@@ -217,9 +217,7 @@ class FunctionApproximator(Parameterizable):
     def plot_predictions_grid(self, inputs_min, inputs_max, **kwargs):
         ax = kwargs.get("ax") or self._get_axis()
 
-        inputs, n_samples_per_dim = FunctionApproximator._get_grid(
-            inputs_min, inputs_max
-        )
+        inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
         outputs = self.predict(inputs)
 
         h = []
@@ -230,11 +228,7 @@ class FunctionApproximator(Parameterizable):
             inputs_1_on_grid = np.reshape(inputs[:, 1], n_samples_per_dim)
             outputs_on_grid = np.reshape(outputs, n_samples_per_dim)
             h = ax.plot_wireframe(
-                inputs_0_on_grid,
-                inputs_1_on_grid,
-                outputs_on_grid,
-                rstride=1,
-                cstride=1,
+                inputs_0_on_grid, inputs_1_on_grid, outputs_on_grid, rstride=1, cstride=1
             )
         else:
             print("Cannot plot input data with a dimensionality of {self.dim_input()}")
@@ -276,23 +270,11 @@ class FunctionApproximator(Parameterizable):
             h_outputs = ax.plot(inputs[:, 0], inputs[:, 1], outputs, "o")
 
         else:
-            raise ValueError(
-                f"Cannot plot input data with dim_input() = {self.dim_input()}"
-            )
+            raise ValueError(f"Cannot plot input data with dim_input() = {self.dim_input()}")
 
         if len(targets) > 0:
-            plt.setp(
-                h_targets,
-                markeredgecolor=None,
-                markerfacecolor=[0.7, 0.7, 0.7],
-                markersize=8,
-            )
-        plt.setp(
-            h_outputs,
-            markeredgecolor=None,
-            markerfacecolor=[0.2, 0.2, 0.8],
-            markersize=6,
-        )
+            plt.setp(h_targets, markeredgecolor=None, markerfacecolor=[0.7, 0.7, 0.7], markersize=8)
+        plt.setp(h_outputs, markeredgecolor=None, markerfacecolor=[0.2, 0.2, 0.8], markersize=6)
         if len(targets) > 0:
             plt.setp(h_residuals, color=[0.8, 0.3, 0.3], linewidth=2)
 
@@ -308,7 +290,5 @@ class FunctionApproximator(Parameterizable):
         inputs_max = np.max(inputs, axis=0)
         if plot_model_parameters:
             self.plot_model_parameters(inputs_min, inputs_max, ax=ax)
-        self.plot_predictions(
-            inputs, targets=targets, ax=ax, plot_residuals=plot_residuals
-        )
+        self.plot_predictions(inputs, targets=targets, ax=ax, plot_residuals=plot_residuals)
         return self.plot_predictions_grid(inputs_min, inputs_max, ax=ax)

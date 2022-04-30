@@ -34,9 +34,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("dmp", help="input dmp")
     parser.add_argument("output_directory", help="directory to write results to")
-    parser.add_argument(
-        "--sigma", help="sigma of covariance matrix", type=float, default=3.0
-    )
+    parser.add_argument("--sigma", help="sigma of covariance matrix", type=float, default=3.0)
     parser.add_argument("--nsamples", help="number of samples", type=int, default=12)
     parser.add_argument("--show", action="store_true", help="show result plots")
     args = parser.parse_args()

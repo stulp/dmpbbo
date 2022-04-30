@@ -142,9 +142,7 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
 
 def main():
-    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-        FunctionApproximatorRBFN,
-    )
+    from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
     from TaskThrowBall import TaskThrowBall
 

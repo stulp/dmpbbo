@@ -25,9 +25,7 @@ import numpy as np
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def execute_binary(executable_name, arguments, print_command=False):
@@ -141,9 +139,7 @@ def train(fa_name, n_dims):
 
     # Save the inputs to a directory
     filename = os.path.join(directory, f"{basename}_inputs.txt")
-    np.savetxt(
-        filename, inputs_grid
-    )  # noqa https://youtrack.jetbrains.com/issue/PY-35025
+    np.savetxt(filename, inputs_grid)  # noqa https://youtrack.jetbrains.com/issue/PY-35025
 
     # Call the binary, which does analytical_solution and integration in C++
     exec_name = "../../bin/compareFunctionApproximators"

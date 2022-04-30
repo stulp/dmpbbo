@@ -178,9 +178,7 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
 
     n_dims = len(distribution.mean)
     if n_dims == 1:
-        raise ValueError(
-            "Sorry, only know how to plot for n_dims==2, but you provided n_dims==1"
-        )
+        raise ValueError("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
 
     if n_dims >= 2:
         distr_mean = distribution.mean[0:2]
@@ -194,9 +192,7 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
             max_marker_size = 80
             for ii in range(len(weights)):
                 cur_marker_size = max_marker_size * weights[ii]
-                sample_handle = ax.plot(
-                    samples[ii, 0], samples[ii, 1], "o", color="green"
-                )
+                sample_handle = ax.plot(samples[ii, 0], samples[ii, 1], "o", color="green")
                 plt.setp(
                     sample_handle,
                     markersize=cur_marker_size,
@@ -213,9 +209,7 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
             )
 
         mean_handle = ax.plot(distr_mean[0], distr_mean[1], "o", label="old")
-        mean_handle_new = ax.plot(
-            distr_new_mean[0], distr_new_mean[1], "o", label="new"
-        )
+        mean_handle_new = ax.plot(distr_new_mean[0], distr_new_mean[1], "o", label="new")
         mean_handle_link = ax.plot(
             [distr_mean[0], distr_new_mean[0]], [distr_mean[1], distr_new_mean[1]], "-"
         )
@@ -276,9 +270,7 @@ class LearningSession:
         self.tell(eval_cost, "eval_cost", i_update)
         self.tell(eval_sample, "eval_sample", i_update)
 
-    def add_update(
-        self, i_update, distribution, samples, costs, weights, distribution_new=None
-    ):
+    def add_update(self, i_update, distribution, samples, costs, weights, distribution_new=None):
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
         self.tell(costs, "costs", i_update)

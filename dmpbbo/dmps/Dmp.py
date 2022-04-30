@@ -235,9 +235,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
             if self._scaling_amplitudes is None:
-                raise ValueError(
-                    "Cannot do AMPLITUDE_SCALING if not trained with trajectory."
-                )
+                raise ValueError("Cannot do AMPLITUDE_SCALING if not trained with trajectory.")
             forcing_term = forcing_term * self._scaling_amplitudes
 
         # Add forcing term to the ZD component of the spring state
@@ -259,9 +257,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         for i_fa in range(self.dim_dmp()):
             if self._function_approximators[i_fa].is_trained():
-                fa_output[:, i_fa] = self._function_approximators[i_fa].predict(
-                    phase_state
-                )
+                fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
         return fa_output
 
     def analytical_solution(self, ts=None):
@@ -312,9 +308,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             forcing_terms *= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            _scaling_amplitudes_rep = np.tile(
-                self._scaling_amplitudes, (n_time_steps, 1)
-            )
+            _scaling_amplitudes_rep = np.tile(self._scaling_amplitudes, (n_time_steps, 1))
             forcing_terms *= _scaling_amplitudes_rep
 
         # Get current delayed goal
@@ -342,9 +336,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Reset the dynamical system, and get the first state
         damping = self._spring_system.damping_coefficient
-        local_spring_system = SpringDamperSystem(
-            self._tau, self.y_init, self._y_attr, damping
-        )
+        local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state
         local_spring_system.y_attr = xs_goal[0, :]
@@ -432,9 +424,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         if self.dim_dmp() != dim_data:
             raise ValueError("dims of trajectory data and dmp must be the same")
 
-        (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analytical_solution(
-            trajectory.ts
-        )
+        (xs_ana, xds_ana, forcing_terms, fa_outputs) = self.analytical_solution(trajectory.ts)
         xs_goal = xs_ana[:, self.GOAL]
         xs_gating = xs_ana[:, self.GATING]
         xs_phase = xs_ana[:, self.PHASE]
@@ -468,19 +458,13 @@ class Dmp(DynamicalSystem, Parameterizable):
             f_target /= g_minus_y0_rep
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            _scaling_amplitudes_rep = np.tile(
-                self._scaling_amplitudes, (n_time_steps, 1)
-            )
+            _scaling_amplitudes_rep = np.tile(self._scaling_amplitudes, (n_time_steps, 1))
             f_target /= _scaling_amplitudes_rep
 
         return fa_inputs_phase, f_target
 
     def states_as_pos_vel_acc(self, x_in, xd_in):
-        return (
-            x_in[self.SPRING_Y],
-            xd_in[self.SPRING_Y],
-            xd_in[self.SPRING_Z] / self._tau,
-        )
+        return (x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z] / self._tau)
 
     def states_as_trajectory(self, ts, x_in, xd_in):
         """Get the output of a DMP dynamical system as a trajectory.
@@ -500,10 +484,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         # Left column is time
         return Trajectory(
-            ts,
-            x_in[:, self.SPRING_Y],
-            xd_in[:, self.SPRING_Y],
-            xd_in[:, self.SPRING_Z] / self._tau,
+            ts, x_in[:, self.SPRING_Y], xd_in[:, self.SPRING_Y], xd_in[:, self.SPRING_Z] / self._tau
         )
 
     @DynamicalSystem.tau.setter

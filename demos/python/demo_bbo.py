@@ -83,12 +83,7 @@ def main():
             cur_directory = Path(directory, name)
 
         session = run_optimization(
-            cost_function,
-            distribution,
-            updater,
-            n_updates,
-            n_samples_per_update,
-            cur_directory,
+            cost_function, distribution, updater, n_updates, n_samples_per_update, cur_directory
         )
         fig = session.plot()
         fig.canvas.set_window_title(f"Optimization with covar_update={name}")

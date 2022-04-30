@@ -30,11 +30,7 @@ def run_optimization_task(
 ):
 
     session = LearningSessionTask(
-        n_samples_per_update,
-        directory,
-        task=task,
-        task_solver=task_solver,
-        updater=updater,
+        n_samples_per_update, directory, task=task, task_solver=task_solver, updater=updater
     )
 
     distribution = initial_distribution
@@ -68,14 +64,10 @@ def run_optimization_task(
             session.add_rollout(i_update, i_sample, sample, cost_vars, cur_cost)
 
         # 3. Update parameters
-        distribution_new, weights = updater.update_distribution(
-            distribution, samples, costs
-        )
+        distribution_new, weights = updater.update_distribution(distribution, samples, costs)
 
         # Bookkeeping
-        session.add_update(
-            i_update, distribution, samples, costs, weights, distribution_new
-        )
+        session.add_update(i_update, distribution, samples, costs, weights, distribution_new)
 
         distribution = distribution_new
 

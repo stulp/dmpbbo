@@ -27,9 +27,7 @@ from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def run_demo(directory, n_dims):
@@ -85,9 +83,7 @@ def run_demo(directory, n_dims):
     covar_init = 1000.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    updater = UpdaterCovarDecay(
-        eliteness=10, weighting_method="PI_BB", covar_decay_factor=0.9
-    )
+    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI_BB", covar_decay_factor=0.9)
 
     n_samples_per_update = 10
     n_updates = 20

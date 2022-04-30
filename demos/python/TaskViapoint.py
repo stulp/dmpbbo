@@ -55,9 +55,7 @@ class TaskViapoint(Task):
                 # minimum distance
 
                 # Compute all distances along trajectory
-                viapoint_repeat = np.repeat(
-                    np.atleast_2d(self.viapoint), n_time_steps, axis=0
-                )
+                viapoint_repeat = np.repeat(np.atleast_2d(self.viapoint), n_time_steps, axis=0)
                 dists = np.linalg.norm(ys - viapoint_repeat, axis=1)
 
                 # Get minimum distance
@@ -67,9 +65,7 @@ class TaskViapoint(Task):
                 # Get integer time step at t=viapoint_time
                 viapoint_time_step = np.argmax(ts >= self.viapoint_time)
                 if viapoint_time_step == 0:
-                    print(
-                        "WARNING: viapoint_time_step=0, maybe viapoint_time is too large?"
-                    )
+                    print("WARNING: viapoint_time_step=0, maybe viapoint_time is too large?")
                 # Compute distance at that time step
                 y_via = cost_vars[viapoint_time_step, 1 : 1 + n_dims]
                 dist_to_viapoint = np.linalg.norm(y_via - self.viapoint)
@@ -91,9 +87,7 @@ class TaskViapoint(Task):
             ys_after_goal = ys[after_goal_indices, :]
             n_time_steps = ys_after_goal.shape[0]
             goal_repeat = np.repeat(np.atleast_2d(self.goal), n_time_steps, axis=0)
-            delay_cost_mean = np.mean(
-                np.linalg.norm(ys_after_goal - goal_repeat, axis=1)
-            )
+            delay_cost_mean = np.mean(np.linalg.norm(ys_after_goal - goal_repeat, axis=1))
 
         costs = np.zeros(1 + 3)
         costs[1] = self.viapoint_weight * dist_to_viapoint
@@ -129,9 +123,7 @@ class TaskViapoint(Task):
             ax.plot(y[-1, 0], y[-1, 1], "go", label="end")
             ax.plot(self.viapoint[0], self.viapoint[1], "ko", label="viapoint")
             if self.viapoint_radius > 0.0:
-                circle = plt.Circle(
-                    self.viapoint, self.viapoint_radius, color="k", fill=False
-                )
+                circle = plt.Circle(self.viapoint, self.viapoint_radius, color="k", fill=False)
                 ax.add_artist(circle)
             ax.axis("equal")
             ax.set_xlabel("y_1")

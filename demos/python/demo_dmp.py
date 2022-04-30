@@ -19,9 +19,7 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def main():
@@ -35,9 +33,7 @@ def main():
     ts = np.linspace(0, tau, n_time_steps)
     y_yd_ydd_viapoint = np.array([-0.2, 0.4, 0.0, 0.0, 0, 0])
     viapoint_time = 0.4 * ts[-1]
-    traj = Trajectory.from_viapoint_polynomial(
-        ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr
-    )
+    traj = Trajectory.from_viapoint_polynomial(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
 
     dmp_types = ["IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]
     for dmp_type in dmp_types:
@@ -63,13 +59,7 @@ def main():
 
         print("Plotting")
 
-        dmp.plot(
-            ts,
-            xs_ana,
-            xds_ana,
-            forcing_terms=forcing_terms_ana,
-            fa_outputs=fa_outputs_ana,
-        )
+        dmp.plot(ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana)
         plt.gcf().canvas.set_window_title(f"Analytical integration ({dmp_type})")
 
         dmp.plot(ts, xs_step, xds_step)

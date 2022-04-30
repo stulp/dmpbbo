@@ -26,9 +26,7 @@ from matplotlib import pyplot as plt
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def execute_binary(executable_name, arguments, print_command=False):
@@ -80,9 +78,7 @@ def main():
     xds_step[0, :] = xd
     for tt in range(1, n_time_steps):
         dt = ts[tt] - ts[tt - 1]
-        xs_step[tt, :], xds_step[tt, :] = dmp.integrate_step_runge_kutta(
-            dt, xs_step[tt - 1, :]
-        )
+        xs_step[tt, :], xds_step[tt, :] = dmp.integrate_step_runge_kutta(dt, xs_step[tt - 1, :])
 
     ################################################
     # Call the binary, which does analytical_solution and numerical integration in C++
@@ -110,12 +106,7 @@ def main():
     save_png = True
 
     h_pyt, axs1 = Dmp.plot(
-        dmp.tau,
-        ts,
-        xs_ana,
-        xds_ana,
-        forcing_terms=forcing_terms_ana,
-        fa_outputs=fa_outputs_ana,
+        dmp.tau, ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana
     )
     h_cpp, _ = Dmp.plot(
         dmp.tau,

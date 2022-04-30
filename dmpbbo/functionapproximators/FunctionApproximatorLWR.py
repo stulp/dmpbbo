@@ -80,10 +80,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
             inputs (numpy.ndarray): Input values of the query.
         """
         return Gaussian.activations(
-            inputs,
-            centers=model_params["centers"],
-            widths=model_params["widths"],
-            normalized=True,
+            inputs, centers=model_params["centers"], widths=model_params["widths"], normalized=True
         )
 
     @staticmethod
@@ -121,9 +118,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
     def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
 
-        inputs, n_samples_per_dim = FunctionApproximator._get_grid(
-            inputs_min, inputs_max
-        )
+        inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
         activations = self._activations(inputs, self._model_params)
 
         ax = kwargs.get("ax") or self._get_axis()

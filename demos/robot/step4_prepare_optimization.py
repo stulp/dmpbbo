@@ -60,13 +60,7 @@ def main():
 
     task_solver = None
     run_one.run_optimization_task_prepare(
-        args.directory,
-        task,
-        task_solver,
-        distribution_init,
-        n_samples_per_update,
-        updater,
-        dmp,
+        args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp
     )
 
 

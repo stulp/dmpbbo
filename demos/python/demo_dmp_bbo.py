@@ -27,9 +27,7 @@ from dmpbbo.bbo.updaters import UpdaterMean, UpdaterCovarDecay, UpdaterCovarAdap
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.bbo_for_dmps.run_optimization_task import run_optimization_task
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.functionapproximators.FunctionApproximatorRBFN import (
-    FunctionApproximatorRBFN,
-)
+from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
 def run_demo(directory, n_dims):
@@ -89,9 +87,7 @@ def run_demo(directory, n_dims):
     if covar_update == "none":
         updater = UpdaterMean(eliteness=10, weighting_method="PI-BB")
     elif covar_update == "decay":
-        updater = UpdaterCovarDecay(
-            eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9
-        )
+        updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
     else:
         updater = UpdaterCovarAdaptation(
             eliteness=10,
@@ -106,13 +102,7 @@ def run_demo(directory, n_dims):
     n_updates = 40
 
     session = run_optimization_task(
-        task,
-        task_solver,
-        distribution,
-        updater,
-        n_updates,
-        n_samples_per_update,
-        directory,
+        task, task_solver, distribution, updater, n_updates, n_samples_per_update, directory
     )
     fig = session.plot()
     fig.canvas.set_window_title(f"Optimization with covar_update={covar_update}")

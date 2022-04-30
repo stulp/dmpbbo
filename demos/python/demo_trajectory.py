@@ -33,9 +33,7 @@ def main():
     traj_min_jerk.plot()
     plt.gcf().canvas.set_window_title("min-jerk trajectory")
 
-    traj = Trajectory.from_polynomial(
-        ts, y_first, yd_first, ydd_first, y_last, yd_last, ydd_last
-    )
+    traj = Trajectory.from_polynomial(ts, y_first, yd_first, ydd_first, y_last, yd_last, ydd_last)
     traj.plot()
     plt.gcf().canvas.set_window_title("polynomial trajectory")
 

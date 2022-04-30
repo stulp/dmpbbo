@@ -90,9 +90,7 @@ def main():
         # Runge-kutta integration
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
-                dt, xs[ii - 1, :]
-            )
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "rungekutta")
 
@@ -100,9 +98,7 @@ def main():
         dyn_system.tau = 1.5 * tau
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
-            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
-                dt, xs[ii - 1, :]
-            )
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "tau")
         dyn_system.tau = tau
@@ -112,9 +108,7 @@ def main():
         for ii in range(1, n_time_steps):
             if ii == int(np.ceil(0.3 * n_time_steps)):
                 xs[ii - 1, :] = xs[ii - 1, :] - 0.2
-            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
-                dt, xs[ii - 1, :]
-            )
+            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         lines = dyn_system.plot(ts, xs, xds, axs=axs)
         set_style(lines, "perturb")
 
@@ -123,9 +117,7 @@ def main():
             dyn_system.y_attr = x_attr - 0.2
             xs[0, :], xds[0, :] = dyn_system.integrate_start()
             for ii in range(1, n_time_steps):
-                xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(
-                    dt, xs[ii - 1, :]
-                )
+                xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
             lines = dyn_system.plot(ts, xs, xds, axs=axs)
             set_style(lines, "attractor")
             dyn_system.y_attr = x_attr

@@ -30,10 +30,7 @@ class Gaussian(BasisFunction):
     @staticmethod
     def activations(inputs, **kwargs):
         return Gaussian._activations(
-            inputs,
-            kwargs.get("centers"),
-            kwargs.get("widths"),
-            kwargs.get("normalized"),
+            inputs, kwargs.get("centers"), kwargs.get("widths"), kwargs.get("normalized")
         )
 
     @staticmethod
@@ -80,9 +77,7 @@ class Gaussian(BasisFunction):
                 w = widths[bb, i_dim]
                 for i_s in range(n_samples):
                     x = inputs[i_s, i_dim]
-                    kernel_activations[i_s, bb] *= np.exp(
-                        -0.5 * np.square(x - c) / (w * w)
-                    )
+                    kernel_activations[i_s, bb] *= np.exp(-0.5 * np.square(x - c) / (w * w))
 
         if normalized_basis_functions:
             # Normalize the basis value; they should sum to 1.0 for each time step.
@@ -146,10 +141,7 @@ class Gaussian(BasisFunction):
                 # intersection = exp(-0.125((c1-c0)^2/w^2))
                 #            w = sqrt((c1-c0)^2/-8*ln(intersection))
                 for cc in range(n_bfs - 1):
-                    w = np.sqrt(
-                        np.square(cur_centers[cc + 1] - cur_centers[cc])
-                        / (-8 * np.log(h))
-                    )
+                    w = np.sqrt(np.square(cur_centers[cc + 1] - cur_centers[cc]) / (-8 * np.log(h)))
                     cur_widths[cc] = w
 
                 cur_widths[n_bfs - 1] = cur_widths[n_bfs - 2]

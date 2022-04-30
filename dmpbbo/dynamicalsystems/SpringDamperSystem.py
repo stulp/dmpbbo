@@ -84,9 +84,9 @@ class SpringDamperSystem(DynamicalSystem):
         # and equation 2.1 of http://www-clmc.usc.edu/publications/I/ijspeert-NC2013.pdf
         yd = z / self._tau
 
-        zd = (
-            -self.spring_constant * (y - self._y_attr) - self.damping_coefficient * z
-        ) / (self.mass * self._tau)
+        zd = (-self.spring_constant * (y - self._y_attr) - self.damping_coefficient * z) / (
+            self.mass * self._tau
+        )
 
         xd = np.concatenate((yd, zd))
 
@@ -107,16 +107,12 @@ class SpringDamperSystem(DynamicalSystem):
         # Closed form solution to 2nd order canonical system
         # This system behaves like a critically damped spring-damper system
         # http://en.wikipedia.org/wiki/Damped_spring-mass_system
-        omega_0 = (
-            np.sqrt(self.spring_constant / self.mass) / self._tau
-        )  # natural frequency
+        omega_0 = np.sqrt(self.spring_constant / self.mass) / self._tau  # natural frequency
         zeta = self.damping_coefficient / (
             2 * np.sqrt(self.mass * self.spring_constant)
         )  # damping ratio
         if zeta != 1.0:
-            print(
-                f"WARNING: Spring-damper system is not critically damped, zeta={zeta}"
-            )
+            print(f"WARNING: Spring-damper system is not critically damped, zeta={zeta}")
 
         for i_dim in range(self._dim_y):
             y0 = self._x_init[i_dim] - self._y_attr[i_dim]
