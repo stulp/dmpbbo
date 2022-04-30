@@ -13,26 +13,10 @@ namespace DmpBBO {
 
 \section sec_cui_bono What the doxygen documentation is for
 
-This is the doxygen documentation of the C++ of the dmpbbo library. Its main aim
-is to document the C++ API, describe the implemenation, and provide rationale
-management (see \ref page_design) for developers:
+This is the doxygen documentation of the C++ of the dmpbbo library. Its aim
+is to document the C++ API.
 
-\li If you want to get started quickly with the C++ implementation only, the <a
-href="https://github.com/stulp/dmpbbo/blob/master/demos_cpp">demos</a> would be
-the right place.
-
-\li If you are more interested in the theory behind dynamical
-movement primitives and their optimization, the <a
-href="https://github.com/stulp/dmpbbo/blob/master/tutorial">tutorials</a> is the
-place to go for you.
-
-\li If you would like to train function approximators and DMPs, please do so
-in the Python code, and export the result to json with jsonpickle. This C++
-library can read those json files and execute the resulting DMPs. See also the
-page on <a
-href="https://github.com/stulp/dmpbbo/blob/master/tutorial/python_cpp.md">Python
-and C++</a>.
-
+A broader overview of the dmpbbo software, including the Python implementations, can be found in the main README: https://github.com/stulp/dmpbbo
 
 \section sec_overview_modules Overview of the modules/libraries
 

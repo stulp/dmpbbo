@@ -54,11 +54,12 @@ class Dmp : public DynamicalSystem {
    *  \param y_init          Initial state
    *  \param y_attr          Attractor state
    *  \param alpha_spring_damper \f$\alpha\f$ in the spring-damper system of the
-   * dmp \param goal_system     Dynamical system to compute delayed goal \param
-   * phase_system    Dynamical system to compute the phase \param gating_system
-   * Dynamical system to compute the gating term \param function_approximators
-   * Function approximators for the forcing term \param scaling         Which
-   * method to use for scaling the forcing term ("NO_SCALING",
+   * dmp 
+   * \param goal_system     Dynamical system to compute delayed goal 
+   * \param phase_system    Dynamical system to compute the phase
+   * \param gating_system Dynamical system to compute the gating term 
+   * \param function_approximators  Function approximators for the forcing term 
+   * \param scaling Which method to use for scaling the forcing term ("NO_SCALING",
    * "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING")
    */
   Dmp(double tau, Eigen::VectorXd y_init, Eigen::VectorXd y_attr,

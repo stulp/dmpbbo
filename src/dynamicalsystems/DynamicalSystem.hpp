@@ -230,10 +230,22 @@ class DynamicalSystem {
 
   /**
    * Get the dimensionality of the dynamical system, i.e. the length of its
-   * state vector. \return Dimensionality of the dynamical system
+   * state vector.
+   * \return Dimensionality of the dynamical system
    */
   inline int dim(void) const { return dim_x_; }
+  
+  /**
+   * Get the dimensionality of the dynamical system, i.e. the length of its
+   * state vector. 
+   * \return Dimensionality of the dynamical system
+   */
   inline int dim_x(void) const { return dim_x_; }
+  
+  /**
+   * Get the dimensionality of the y-part of the dynamical system, where x = [y z]. 
+   * \return Dimensionality of the y-part of the dynamical system
+   */
   inline int dim_y(void) const { return dim_y_; }
 
   /**
@@ -418,7 +430,7 @@ dynamical system is not stored as a member (except for the initial state).
 accurate, but requires 4 calls of DynamicalSystem::differentialEquation()
 instead of only 1 for Euler integration.
 
-\em \remark To numerically integrate a dynamical
+\em Remark. To numerically integrate a dynamical
 system, one must carefully choose the integration time dt. Choosing it too low
 leads to inaccurate integration, and the numerical integration will diverge from
 the "true" solution acquired through analytical solution. See

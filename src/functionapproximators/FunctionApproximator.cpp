@@ -1,5 +1,6 @@
 /**
  * @file   FunctionApproximator.cpp
+ * @brief  FunctionApproximator class source file.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the

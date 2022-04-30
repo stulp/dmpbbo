@@ -58,8 +58,8 @@ class FunctionApproximator {
 
   /** Query the function approximator to make a prediction.
    *
-   *  \param[in]  inputs   Input value of the query (1 x n_input_dims)
-   *  \param[out] outputs  Predicted output values (n_output_dims x 1)
+   *  \param[in]  input   Input value of the query (1 x n_input_dims)
+   *  \param[out] output  Predicted output values (n_output_dims x 1)
    *
    * This function is real-time; there will be no memory allocation. In
    * constrast to predict(), this function make a prediction for one input only.

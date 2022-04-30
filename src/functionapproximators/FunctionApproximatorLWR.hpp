@@ -45,11 +45,11 @@ class FunctionApproximatorLWR : public FunctionApproximator {
    *  \param[in] widths  Widths of the basis functions.
    *  \param[in] slopes  Slopes of the line segments.
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the
-   * line segment at its intersection with the y-axis. \param[in]
-   * asymmetric_kernels Whether to use asymmetric kernels or not, cf
-   * MetaParametersLWR::asymmetric_kernels() \param[in]
-   * lines_pivot_at_max_activation Whether line models should pivot at x=0
-   * (false), or at the center of the kernel (x=x_c)
+   * line segment at its intersection with the y-axis. 
+   * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not, cf
+   * MetaParametersLWR::asymmetric_kernels(). 
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0
+   * (false), or at the center of the kernel (x=x_c).
    */
   FunctionApproximatorLWR(const Eigen::MatrixXd& centers,
                           const Eigen::MatrixXd& widths,
@@ -69,8 +69,8 @@ class FunctionApproximatorLWR : public FunctionApproximator {
 
   /** Query the function approximator to make a prediction.
    *
-   *  \param[in]  inputs   Input value of the query (1 x n_input_dims)
-   *  \param[out] outputs  Predicted output values (n_output_dims x 1)
+   *  \param[in]  input   Input value of the query (1 x n_input_dims)
+   *  \param[out] output  Predicted output values (n_output_dims x 1)
    *
    * This function is real-time; there will be no memory allocation. In
    * constrast to predict(), this function make a prediction for one input only.

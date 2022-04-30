@@ -1,5 +1,6 @@
 /**
  * @file   eigen_json.hpp
+ * @brief Header file for input/output of Eigen matrices to json.
  * @author Freek Stulp
  *
  * This file is part of DmpBbo, a set of libraries and programs for the

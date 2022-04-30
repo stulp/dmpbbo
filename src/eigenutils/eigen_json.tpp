@@ -1,6 +1,13 @@
-// Below code was adapted from
-// https://gitlab.com/Simox/simox/-/blob/master/SimoxUtility/json/eigen_conversion.h
-// I added functionality for the appropriate resizing of matrices.
+/**
+ * @file eigen_json.tpp
+ * @brief Source file for input/output of Eigen matrices to json.
+ *
+ * The Below code was adapted from
+ * https://gitlab.com/Simox/simox/-/blob/master/SimoxUtility/json/eigen_conversion.h
+ *
+ * I added functionality for the appropriate resizing of matrices.
+ */
+
 
 template <typename Derived>
 void from_json(const nlohmann::json& j, Eigen::MatrixBase<Derived>& matrix)
