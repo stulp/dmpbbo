@@ -92,6 +92,15 @@ def main(show=False, save=False, verbose=False):
     xs_step_cpp = np.loadtxt(os.path.join(d, "xs_step.txt"))
     xds_step_cpp = np.loadtxt(os.path.join(d, "xds_step.txt"))
 
+    max_diff_ana = np.max(np.abs(xs_ana - np.reshape(xs_ana_cpp, xs_ana.shape))) 
+    max_diff_step = np.max(np.abs(xs_step - np.reshape(xs_step_cpp, xs_step.shape))) 
+    if verbose:
+        print(f"    max_diff_ana = {max_diff_ana}")
+        print(f"    max_diff_step = {max_diff_step}")
+    assert max_diff_ana < 10e-7
+    assert max_diff_step < 10e-7
+
+
     # Plotting
 
     if verbose:

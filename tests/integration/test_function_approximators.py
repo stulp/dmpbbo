@@ -113,14 +113,14 @@ def train(fa_name, n_dims, save=False):
     # Train function approximator with data
     fa.train(inputs, targets)
 
-    # Make predictions for the targets
-    outputs = fa.predict(inputs)  # noqa
-
     # Make predictions on a grid
     n_samples_per_dim_grid = 200 if n_dims == 1 else [30, 30]
     inputs_grid, _ = target_function(n_samples_per_dim_grid)
 
-    # Save the dynamical system to a json file
+    # Make predictions for the targets
+    outputs_grid = fa.predict(inputs_grid)
+    
+    # Save the function approximator to a json file
     basename = f"{fa_name}_{n_dims}D"
     jc.savejson(Path(directory, f"{basename}.json"), fa)
     jc.savejson_for_cpp(Path(directory, f"{basename}_for_cpp.json"), fa)
@@ -135,6 +135,8 @@ def train(fa_name, n_dims, save=False):
     execute_binary(exec_name, arguments)
 
     outputs_grid_cpp = np.loadtxt(os.path.join(directory, f"{basename}_outputs.txt"))
+
+    assert np.max(np.abs(outputs_grid-outputs_grid_cpp)) < 10e-7
 
     h_pyt, ax = fa.plot(inputs, targets=targets)
 

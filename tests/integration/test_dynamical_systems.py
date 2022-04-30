@@ -131,6 +131,7 @@ def main(show=False, save=False, verbose=False):
         fig1 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig1)
         fig1.suptitle(f"{name}System - Analytical")
+        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
 
         if verbose:
             print("===============")
@@ -143,6 +144,7 @@ def main(show=False, save=False, verbose=False):
         fig2 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig2)
         fig2.suptitle(f"{name}System - Euler")
+        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
 
         if verbose:
             print("===============")
@@ -155,6 +157,7 @@ def main(show=False, save=False, verbose=False):
         fig3 = plt.figure(figsize=(10, 10))
         plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig3)
         fig3.suptitle(f"{name}System - Runge-Kutta")
+        assert np.max(np.abs(xs - np.reshape(xs_cpp, xs.shape))) < 10e-7
 
         if save:
             fig1.savefig(Path(directory, f"{name}System_analytical.png"))
