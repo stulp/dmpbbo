@@ -10,10 +10,10 @@ build_debug:
 	cd build_dir_debug && cmake .. -DCMAKE_BUILD_TYPE=Debug -DREALTIME_CHECKS=1
 	make -C build_dir_debug -j 5 
 
-install:
+install: build
 	make -C build_dir install
 	
-install_debug:
+install_debug: build_debug
 	make -C build_dir_debug install
 	
 test:
