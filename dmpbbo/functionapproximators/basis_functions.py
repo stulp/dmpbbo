@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for different basis function classes. """
 
 from abc import ABC, abstractmethod
 
@@ -21,15 +22,30 @@ import numpy as np
 
 
 class BasisFunction(ABC):
+    """ Abstract class for basis functions.
+    """
+
     @staticmethod
     @abstractmethod
     def activations(inputs, **kwargs):
+        """ Compute the activations of the basis function.
+
+        @param inputs: The input values (n_samples X n_input_dims)
+        @param kwargs: Optional arguments; depends on basis function implementation.
+        """
         pass
 
 
 class Gaussian(BasisFunction):
+    """ Gaussian basis function. """
+
     @staticmethod
     def activations(inputs, **kwargs):
+        """ Compute the activations of the basis function.
+
+        @param inputs: The input values (n_samples X n_input_dims)
+        @param kwargs: Should contain "centers", "widths" and "normalized"
+        """
         return Gaussian._activations(
             inputs, kwargs.get("centers"), kwargs.get("widths"), kwargs.get("normalized")
         )
@@ -132,7 +148,7 @@ class Gaussian(BasisFunction):
             h = intersection_height
             if n_bfs > 1:
                 # Consider 2 neighbouring functions, exp(-0.5(x-c0)^2/w^2) and exp(-0.5(x-c1)^2/w^2)
-                # Assumming same widths, they are certain to intersect at x = 0.5(c0+c1)
+                # Assuming same widths, they are certain to intersect at x = 0.5(c0+c1)
                 # And we want the activation at x to be 'intersection'. So
                 #            y = exp(-0.5(x-c0)^2/w^2)
                 # intersection = exp(-0.5((0.5(c0+c1))-c0)^2/w^2)
@@ -178,6 +194,14 @@ class Gaussian(BasisFunction):
 
 
 class Cosine(BasisFunction):
+    """ Cosine basis function.
+    """
+
     @staticmethod
     def activations(inputs, **kwargs):
+        """ Compute the activations of the basis function.
+
+        @param inputs: The input values (n_samples X n_input_dims)
+        @param kwargs: Optional arguments; depends on basis function implementation.
+        """
         raise NotImplementedError("Sorry: Cosine BasisFunction not implemented yet.")

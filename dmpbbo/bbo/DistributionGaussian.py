@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the DistributionGaussian class. """
 
 
 import matplotlib.pyplot as plt
@@ -103,6 +104,11 @@ class DistributionGaussian:
         return f"N( {self.mean}, {self.covar})"
 
     def plot(self, ax=None):
+        """ Plot the Gaussian distribution.
+
+        @param ax: Axis to plot on (default: None => create a new axis)
+        @return: The axis on which plotting took place.
+        """
         if not ax:
             ax = plt.axes()
         return plot_error_ellipse(self.mean[:2], self.covar[:2, :2], ax)

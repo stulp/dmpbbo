@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the Task class. """
 
 from abc import ABC, abstractmethod
 
@@ -43,6 +44,12 @@ class Task(ABC):
         pass
 
     def plot_rollout(self, cost_vars, ax=None):
+        """ Plot a rollout (the cost-relevant variables).
+
+        @param cost_vars: Rollout to plot
+        @param ax: Axis to plot on (default: None, then a new axis a created)
+        @return: line handles and axis
+        """
         if not ax:
             ax = plt.axes()
         h = ax.plot(cost_vars, "-")

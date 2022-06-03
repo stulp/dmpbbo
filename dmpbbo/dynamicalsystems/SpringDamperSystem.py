@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
+""" Module for the SpringDamperSystem class. """
 
 import numpy as np
 
@@ -22,6 +23,9 @@ from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
 class SpringDamperSystem(DynamicalSystem):
+    """ A dynamical system representing a spring-damper system.
+    """
+
     def __init__(
         self,
         tau,

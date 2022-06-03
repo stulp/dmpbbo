@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+""" Module for the different distribution updater classes. """
 
 from abc import ABC, abstractmethod
 
@@ -142,7 +142,7 @@ class UpdaterCovarAdaptation(Updater):
             diag_only: Update only the diagonal of the covariance matrix (true) or the
             full matrix (false)
             learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0]
-            with 0.0 = no updating, anad 1.0  = complete update by ignoring previous covar matrix.
+            with 0.0 = no updating, and 1.0  = complete update by ignoring previous covar matrix.
         """
         self.eliteness = kwargs.get("eliteness", 10)
         self.weighting_method = kwargs.get("weighting_method", "PI-BB")

@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the FunctionApproximatorLWR class. """
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -23,6 +25,9 @@ from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproxi
 
 
 class FunctionApproximatorLWR(FunctionApproximator):
+    """ A locally weighted regression (LWR)  function approximator.
+    """
+
     def __init__(self, n_bfs_per_dim, intersection_height=0.5, regularization=0.0):
 
         meta_params = {
@@ -117,6 +122,12 @@ class FunctionApproximatorLWR(FunctionApproximator):
         return outputs
 
     def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
+        """ Plot a representation of the model parameters on a grid.
+
+        @param inputs_min: The min values for the grid
+        @param inputs_max:  The max values for the grid
+        @return: line handles and axis
+        """
 
         inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
         activations = self._activations(inputs, self._model_params)

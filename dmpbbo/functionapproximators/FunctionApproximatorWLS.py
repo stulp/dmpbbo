@@ -14,12 +14,17 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the FunctionApproximatorWLS class. """
+
 import numpy as np
 
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 
 
 class FunctionApproximatorWLS(FunctionApproximator):
+    """ A weighted least-squares (WLS)  function approximator.
+    """
+
     def __init__(self, use_offset=True, regularization=0.0):
         """Initialize a Least-Squares function approximator.
 
@@ -99,6 +104,12 @@ class FunctionApproximatorWLS(FunctionApproximator):
         return outputs
 
     def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
+        """ Plot a representation of the model parameters on a grid.
+
+        @param inputs_min: The min values for the grid
+        @param inputs_max:  The max values for the grid
+        @return:
+        """
         ax = kwargs.get("ax") or self._get_axis()
         # No model parameters to plot
         return [], ax

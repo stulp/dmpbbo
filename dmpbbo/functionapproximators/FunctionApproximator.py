@@ -37,6 +37,12 @@ class FunctionApproximator(Parameterizable):
         self._selected_param_names = None
 
     def train(self, inputs, targets, **kwargs):
+        """ Train the function approximator with data.
+
+        @param inputs: Input data (n_samples X n_dims_input)
+        @param targets: Target data (n_samples X n_dims_output)
+        @return: Model parameters of the function approximator.
+        """
         # Ensure second dimension, i.e. shape = (30,) => (30,1)
         inputs = inputs.reshape(inputs.shape[0], -1)
         self._model_params = self._train(inputs, targets, self._meta_params, **kwargs)
@@ -44,6 +50,11 @@ class FunctionApproximator(Parameterizable):
         return self._model_params
 
     def predict(self, inputs):
+        """ Make predictions for (new) input data.
+
+        @param inputs: Input data (n_samples X n_dims_input)
+        @return: Predictions (n_samples X n_dims_output)
+        """
         if not self.is_trained():
             raise ValueError("Calling predict() on untrained function approx.")
 

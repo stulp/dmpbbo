@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
+""" Module for the TimeSystem class. """
 
 import numpy as np
 
@@ -22,6 +23,9 @@ from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
 class TimeSystem(DynamicalSystem):
+    """ A dynamical system with constant velocity, representing the linear passage of time.
+    """
+
     def __init__(self, tau, count_down=False):
         """ Initialize a TimeSystem
 
@@ -36,6 +40,10 @@ class TimeSystem(DynamicalSystem):
 
     @property
     def count_down(self):
+        """ Get whether this TimeSystem counts down or up.
+
+        @return: true if counting down, false if counting up
+        """
         return self._count_down
 
     @count_down.setter

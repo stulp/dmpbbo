@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
+""" Module for the DynamicalSystem class. """
 
 from abc import ABC, abstractmethod
 
@@ -23,6 +24,9 @@ import numpy as np
 
 
 class DynamicalSystem(ABC):
+    """ Dynamical systems, which can be numerically integrated or analytically solved.
+    """
+
     def __init__(self, order, tau, y_init, n_dims_x=None):
         """ Initialize a first or second order dynamical system.
 
@@ -65,10 +69,20 @@ class DynamicalSystem(ABC):
 
     @property
     def dim_x(self):
+        """ Get the dimensionality of the state of the dynamical system.
+
+        @return: The dimensionality of the state of the dynamical system.
+        """
         return self._dim_x
 
     @property
     def dim_y(self):
+        """ Get the dimensionality of the y-part of the state of the dynamical system.
+
+        This is for systems which have a state representation x = [y z]
+
+        @return: The dimensionality of the y-part state of the dynamical system.
+        """
         return self._dim_y
 
     @property

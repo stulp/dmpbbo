@@ -14,6 +14,9 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the FunctionApproximatorRBFN class. """
+
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -23,6 +26,9 @@ from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproxi
 
 
 class FunctionApproximatorRBFN(FunctionApproximator):
+    """ A radial basis function network (RBFN)  function approximator.
+    """
+
     def __init__(self, n_bfs_per_dim, intersection_height=0.7, regularization=0.0):
         """Initialize an RBNF function approximator.
 
@@ -79,6 +85,12 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         return weighted_acts.sum(axis=1)
 
     def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
+        """ Plot a representation of the model parameters on a grid.
+
+        @param inputs_min: The min values for the grid
+        @param inputs_max:  The max values for the grid
+        @return: line handles and axis
+        """
         inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
         activations = self._activations(inputs, self._model_params)
 

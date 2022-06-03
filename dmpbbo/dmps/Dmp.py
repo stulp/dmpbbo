@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
+""" Module for the DMP class. """
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -29,6 +30,14 @@ from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 
 class Dmp(DynamicalSystem, Parameterizable):
+    """ Dynamical Movement Primitive
+
+    Inherits from DynamicalSystem because it is a dynamical system that can be integrated, and from
+    Parameterizable because the model parameters of the function approximators for the forcing
+    term can be changed.
+
+    """
+
     def __init__(
         self,
         tau,
@@ -91,6 +100,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         self.GATING = np.arange(3 * d + 1, 3 * d + 1 + 1)
 
     def dim_dmp(self):
+        """ Get the dimensionality of the dmp (y-part)
+
+        @return: Dimensionality of the dmp (y-part)
+        """
         return self._dim_y
 
     @classmethod
@@ -463,6 +476,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         return fa_inputs_phase, f_target
 
     def states_as_pos_vel_acc(self, x_in, xd_in):
+        """ Convert the dynamical system states into positions, velocities and accelerations.
+
+        @param x_in:  State (n_samples X dim_x)
+        @param xd_in:  Derivative of state (n_samples X dim_x)
+        @return: positions, velocities and accelerations over time (each n_samples X dim_y)
+        """
         return x_in[self.SPRING_Y], xd_in[self.SPRING_Y], xd_in[self.SPRING_Z] / self._tau
 
     def states_as_trajectory(self, ts, x_in, xd_in):
@@ -489,7 +508,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
+        """ Set the time constant tau
 
+        @param new_tau: The new time constant
+        """
         self._tau = new_tau  # noqa defined inside __init__ of DynamicalSystem
 
         # Set value in all relevant subsystems also
@@ -501,6 +523,10 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @DynamicalSystem.y_init.setter
     def y_init(self, y_init_new):
+        """ Set the initial state (y-part)
+
+        @param y_init_new: New initial state (y-part)
+        """
         if y_init_new.size != self.dim_dmp():
             raise ValueError("y_init must have same size {self.dim_dmp()}")
         self._y_init = y_init_new  # noqa defined inside DynamicalSystem.__init__ of
@@ -533,9 +559,17 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @property
     def ts_train(self):
+        """ Get the time steps of the trajectory on which the DMP was trained.
+
+        @return: Time steps of the trajectory on which the DMP was trained.
+        """
         return self._ts_train
 
     def set_selected_param_names(self, names):
+        """ Get the names of the parameters that have been selected.
+
+        @param names: Names of the parameters that have been selected.
+        """
         if isinstance(names, str):
             names = [names]  # Convert to list
 
@@ -549,6 +583,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             fa.set_selected_param_names(names)
 
     def get_param_vector(self):
+        """Get a vector containing the values of the selected parameters."""
         values = np.empty(0)
         for fa in self._function_approximators:
             if fa.is_trained():
@@ -558,6 +593,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return values
 
     def set_param_vector(self, values):
+        """Set a vector containing the values of the selected parameters."""
         size = self.get_param_vector_size()
         if len(values) != size:
             raise ValueError("values must have size {size}")
@@ -572,6 +608,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             self.y_attr = values[offset : offset + self.dim_dmp()]
 
     def get_param_vector_size(self):
+        """Get the size of the vector containing the values of the selected parameters."""
         size = 0
         for fa in self._function_approximators:
             if fa.is_trained():
@@ -582,6 +619,11 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     @staticmethod
     def get_dmp_axes(has_fa_output=False):
+        """ Get matplotlib axes on which to plot the output of a DMP.
+
+        @param has_fa_output: Whether the output of the function approximators is available.
+        @return: 3 X 5 axes (or 2 X 5 axes if has_fa_output is false)
+        """
         n_cols = 5
         n_rows = 3 if has_fa_output else 2
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
@@ -590,6 +632,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         return axs
 
     def plot(self, ts, xs, xds, **kwargs):
+        """ Plot the output of the DMP.
+
+        @param ts: Time steps
+        @param xs: States
+        @param xds: Derivative of states
+
+        @return: The axes on which the plots were made.
+        """
         forcing_terms = kwargs.get("forcing_terms", [])
         fa_outputs = kwargs.get("fa_outputs", [])
         ext_dims = kwargs.get("ext_dims", [])

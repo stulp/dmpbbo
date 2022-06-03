@@ -14,11 +14,25 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the Parameterizable class. """
 
 from abc import ABC, abstractmethod
 
 
 class Parameterizable(ABC):
+    """ Interface for providing access to a model's parameters as a vector.
+
+    Different function approximators have different types of model parameters. For instance,
+    LWR has the centers and widths of basis functions, along with the slopes of each line segment.
+    get_param_vector provides a means to access these parameters as one vector.
+
+    Which parameters are returned can be set with set_selected_param_names, e.g.
+    set_selected_param_names(["slopes","offsets"])
+
+    This may be useful for instance when optimizing the model parameters with black-box
+    optimization, which is agnostic about the semantics of the model parameters.
+    """
+
     @abstractmethod
     def set_selected_param_names(self, selected_values_labels):
         """Set the selected parameters."""
@@ -31,6 +45,8 @@ class Parameterizable(ABC):
 
     @abstractmethod
     def set_param_vector(self, values):
+        """Get a vector containing the values of the selected parameters."""
+        """Get a vector containing the values of the selected parameters."""
         """Set a vector containing the values of the selected parameters."""
         pass
 
