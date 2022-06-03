@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+""" Module with a function to run the optimization of a task. """
 
 from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
@@ -28,7 +28,17 @@ def run_optimization_task(
     n_samples_per_update,
     directory=None,
 ):
+    """ Run the optimization of a task with a task solver
 
+    @param task:  The task to solve
+    @param task_solver: The task solver which solves the task
+    @param initial_distribution:  The initial distribution from which to sample.
+    @param updater:  The updater to update the distribution.
+    @param n_updates: The number of updates in the optimization.
+    @param n_samples_per_update:  The number of samples for one update
+    @param directory:  The directory to save results to (default: None)
+    @return: The learning session (see LearningSessionTask)
+    """
     session = LearningSessionTask(
         n_samples_per_update, directory, task=task, task_solver=task_solver, updater=updater
     )

@@ -34,8 +34,11 @@ class Parameterizable(ABC):
     """
 
     @abstractmethod
-    def set_selected_param_names(self, selected_values_labels):
-        """Set the selected parameters."""
+    def set_selected_param_names(self, names):
+        """ Set the selected parameters.
+
+        @param names: Name of the parameter to select.
+        """
         pass
 
     @abstractmethod
@@ -45,8 +48,6 @@ class Parameterizable(ABC):
 
     @abstractmethod
     def set_param_vector(self, values):
-        """Get a vector containing the values of the selected parameters."""
-        """Get a vector containing the values of the selected parameters."""
         """Set a vector containing the values of the selected parameters."""
         pass
 

@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module with functions to save to/load from json. """
 
 import json
 from json import JSONEncoder
@@ -33,7 +34,15 @@ import numpy as np
 
 
 class DmpBboJSONEncoder(JSONEncoder):
+    """ Custom encoder for converting objects to JSON.
+    """
+
     def default(self, obj):
+        """ Override the default implementation for encoding.
+
+        @param obj:  Object to encode
+        @return: JSON representation
+        """
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         elif hasattr(obj, "__dict__"):
@@ -45,6 +54,11 @@ class DmpBboJSONEncoder(JSONEncoder):
 
 
 def savejson_for_cpp(filename, obj):
+    """ Save an object to a file that can be read by the C++ implementation of dmpbbo.
+
+    @param filename: Name of the file to save to.
+    @param obj: Object to save.
+    """
     # Save a simple JSON version that can be read by the C++ code.
     filename = str(filename)  # In case it is path
     j = json.dumps(obj, cls=DmpBboJSONEncoder, indent=2)
@@ -53,6 +67,11 @@ def savejson_for_cpp(filename, obj):
 
 
 def savejson(filename, obj):
+    """ Save an object to a json file with jsonpickle.
+
+    @param filename: Name of the file to save to.
+    @param obj: Object to save.
+    """
     # Save to standard jsonpickle file
     j = jsonpickle.encode(obj)
     with open(filename, "w") as out_file:
@@ -60,6 +79,11 @@ def savejson(filename, obj):
 
 
 def loadjson(filename):
+    """ Load an object from a file with json with jsonpickle.
+
+    @param filename: Name of the file to load from.
+    @return Object that was loaded.
+    """
     # Load from standard jsonpickle file
     with open(filename, "r") as in_file:
         j = in_file.read()

@@ -622,7 +622,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         """ Get matplotlib axes on which to plot the output of a DMP.
 
         @param has_fa_output: Whether the output of the function approximators is available.
-        @return: 3 X 5 axes (or 2 X 5 axes if has_fa_output is false)
+        @return: list of axes on which the DMP was plotted
         """
         n_cols = 5
         n_rows = 3 if has_fa_output else 2

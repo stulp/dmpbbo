@@ -30,10 +30,7 @@ class TaskSolver(ABC):
         """ Perform rollouts, that is, given a set of samples, determine all the variables that
         are relevant to evaluating the cost function.
 
-
-        Args:
-            sample The sample
-        Returns:
-            The variables relevant to computing the cost.
+        @param sample: The sample to perform the rollout for
+        @return: The variables relevant to computing the cost.
         """
         pass

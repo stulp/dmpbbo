@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the FunctionApproximator class. """
 
 from abc import abstractmethod
 
@@ -108,11 +109,16 @@ class FunctionApproximator(Parameterizable):
         pass
 
     def set_selected_param_names(self, names):
+        """ Set the selected parameters.
+
+        @param names: Name of the parameter to select.
+        """
         if isinstance(names, str):
             names = [names]  # Convert to list
         self._selected_param_names = names
 
     def get_param_vector(self):
+        """Get a vector containing the values of the selected parameters."""
         if not self.is_trained():
             raise ValueError("FunctionApproximator is not trained.")
 
@@ -122,6 +128,7 @@ class FunctionApproximator(Parameterizable):
         return np.asarray(values)
 
     def set_param_vector(self, values):
+        """Set a vector containing the values of the selected parameters."""
         if not self.is_trained():
             raise ValueError("FunctionApproximator is not trained.")
 
@@ -140,6 +147,7 @@ class FunctionApproximator(Parameterizable):
             offset += cur_n_values
 
     def get_param_vector_size(self):
+        """Get the size of the vector containing the values of the selected parameters."""
         size = 0
         for label in self._selected_param_names:
             if label in self._model_params:
@@ -224,9 +232,21 @@ class FunctionApproximator(Parameterizable):
 
     @abstractmethod
     def plot_model_parameters(self, inputs_min, inputs_max, **kwargs):
+        """ Plot a representation of the model parameters on a grid.
+
+        @param inputs_min: The min values for the grid
+        @param inputs_max:  The max values for the grid
+        @return: line handles and axis
+        """
         pass
 
     def plot_predictions_grid(self, inputs_min, inputs_max, **kwargs):
+        """ Plot the predictions of the function approximator on a grid of input values.
+
+        @param inputs_min: The min values for the grid
+        @param inputs_max:  The max values for the grid
+        @return: line handles and axis
+        """
         ax = kwargs.get("ax") or self._get_axis()
 
         inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
@@ -250,6 +270,11 @@ class FunctionApproximator(Parameterizable):
         return h, ax
 
     def plot_predictions(self, inputs, **kwargs):
+        """ Plot the predictions of a function approximator for given inputs.
+
+        @param inputs: The input samples (n_samples X n_input_dims )
+        @return: line handles and axis
+        """
         targets = kwargs.get("targets", [])
         ax = kwargs.get("ax") or self._get_axis()
         plot_residuals = kwargs.get("plot_residuals", True)
@@ -293,6 +318,11 @@ class FunctionApproximator(Parameterizable):
         return h_outputs, ax
 
     def plot(self, inputs, **kwargs):
+        """ Plot the predictions of a function approximator for given inputs.
+
+        @param inputs: The input samples (n_samples X n_input_dims )
+        @return: line handles and axis
+        """
         ax = kwargs.get("ax") or self._get_axis()
         targets = kwargs.get("targets", [])
         plot_residuals = kwargs.get("plot_residuals", True)

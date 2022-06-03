@@ -23,6 +23,9 @@ from scipy.signal import butter, filtfilt
 
 
 class Trajectory:
+    """ Class to represent trajectory, i.e. positions, velocities and accelerations over time.
+    """
+
     def __init__(self, ts, ys, yds=None, ydds=None, misc=None):
 
         n_time_steps = ts.size
@@ -59,7 +62,16 @@ class Trajectory:
 
     @classmethod
     def from_matrix(cls, matrix, n_dims_misc=0):
+        """ Initialize a trajectory from a matrix.
 
+        Each row in the matrix contains the following:
+
+        [t  y_1 .. y_N  yd_1 .. yd_N  ydd_1 .. ydd_N  misc_1 .. misc_N ]
+
+        @param matrix: Matrix of values, with one row for each time step.
+        @param n_dims_misc:  Number of dimensions for misc variables (default: 0)
+        @return: A trajectory
+        """
         (n_time_steps, n_cols) = matrix.shape
         n_dims = (n_cols - 1 - n_dims_misc) // 3
 
@@ -73,22 +85,42 @@ class Trajectory:
 
     @property
     def ts(self):
+        """ Get the times at which the measurements were made.
+
+        @return: Times at which the measurements were made.
+        """
         return self._ts
 
     @property
     def ys(self):
+        """ Get the positions over time.
+
+        @return: Positions over time.
+        """
         return self._ys
 
     @property
     def yds(self):
+        """ Get the velocities over time.
+
+        @return: Velocities over time.
+        """
         return self._yds
 
     @property
     def ydds(self):
+        """ Get the accelerations over time.
+
+        @return: Accelerations over time.
+        """
         return self._ydds
 
     @property
     def misc(self):
+        """ Get the miscellaneous variables over time.
+
+        @return: Miscellaneous variables over time.
+        """
         return self._misc
 
     @misc.setter
@@ -99,18 +131,34 @@ class Trajectory:
 
     @property
     def length(self):
+        """ Get the length of the trajectory, i.e. the number of time steps.
+
+        @return: Length of the trajectory.
+        """
         return self._ts.shape[0]
 
     @property
     def duration(self):
+        """ Get th duration of the trajectory.
+
+        @return: Duration of the trajectory.
+        """
         return self._ts[-1] - self._ts[0]
 
     @property
     def dim(self):
+        """ Get the number of dimensions of the trajectory, i.e. dim(y)
+
+        @return: The number of dimensions of the trajectory, i.e. dim(y)
+        """
         return self._dim
 
     @property
     def dim_misc(self):
+        """ Get the number of dimensions of the miscellaneous variables in the trajectory.
+
+        @return: The number of dimensions of the miscellaneous variables in the trajectory.
+        """
         if self._misc is None:
             return 0
         else:
@@ -118,22 +166,43 @@ class Trajectory:
 
     @property
     def y_init(self):
+        """ Get the initial position at the first time step.
+
+        @return: Initial position at the first time step.
+        """
         return self._ys[0]
 
     @property
     def y_final(self):
+        """ Get the final position at the last time step.
+
+        @return: Final position at the last time step.
+        """
         return self._ys[-1]
 
     def set_start_time_to_zero(self):
+        """ Reset all times so that the first time step is 0.0
+        """
         self._ts = self._ts - self._ts[0]
 
     def get_range_per_dim(self):
+        """ Get the ranges of the position of dimension.
+
+        @return: Ranges of the position of dimension.
+        """
         return self._ys.max(axis=0) - self._ys.min(axis=0)
 
     def crop(self, start, end, as_times=False):
-        # Crop trajectory from 'start' to 'end'
-        # if as_times is False, 'start' to 'end' are interpreted as indices
-        # if as_times is True, 'start' to 'end' are interpreted as times
+        """ Crop trajectory from 'start' to 'end'
+
+        if as_times is False, 'start' to 'end' are interpreted as indices
+        if as_times is True, 'start' to 'end' are interpreted as times
+
+        @param start: Start time or index
+        @param end: End time or index
+        @param as_times:  True => start/end are times. False => they are indices
+        @return:
+        """
 
         # No need to crop empty trajectory
         if self._ts.size == 0:
