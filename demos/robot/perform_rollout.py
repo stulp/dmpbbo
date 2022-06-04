@@ -52,7 +52,8 @@ def perform_rollout(dmp, mode="python_simulation", directory="."):
     """ Perform a rollout with a DMP.
 
     @param dmp: The DMP to integrate.
-    @param mode: How to integrate it ("python_simulation", "robot_executes_dmp", "'robot_executes_trajectory'")
+    @param mode: How to integrate it ("python_simulation", "robot_executes_dmp",
+    "robot_executes_trajectory")
     @param directory: Directory to save results to
     @return: The cost-relevant variables in a matrix.
     """
