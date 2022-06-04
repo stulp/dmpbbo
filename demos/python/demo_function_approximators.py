@@ -25,6 +25,11 @@ from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproxi
 
 
 def target_function(n_samples_per_dim):
+    """ Target-function for training
+
+    @param n_samples_per_dim: Number of samples for each dimension
+    @return: inputs and corresponding targets
+    """
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
     if n_dims == 1:

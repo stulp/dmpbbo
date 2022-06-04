@@ -41,6 +41,12 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         self.regularization_weight = regularization_weight
 
     def evaluate(self, sample):
+        """ Evaluate one sample with the cost function.
+
+        @param sample: The sample to evaluate
+        @return: distance from sample to point and a regularization term
+        """
+
         # Compute distance from sample to point
         dist = np.linalg.norm(sample - self.point)
         # Regularization term
@@ -48,6 +54,12 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         return [dist + regularization, dist, regularization]
 
     def get_cost_labels(self):
+        """Labels for the different cost components.
+
+        CostFunction.evaluate() may return an array of costs. The first one cost[0] is
+        always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function
+        optionally returns labels for the individual cost components.
+        """
         return ["dist", "regularization"]
 
 

@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the example task TaskViapoint. """
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,6 +23,7 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 
 class TaskViapoint(Task):
+    """ Task in which a trajectory has to pass through a viapoint."""
     def __init__(self, viapoint, **kwargs):
         self.viapoint = viapoint
         self.viapoint_time = kwargs.get("viapoint_time", None)
@@ -37,9 +39,29 @@ class TaskViapoint(Task):
                 raise ValueError("goal and viapoint must have the same shape")
 
     def get_cost_labels(self):
+        """Labels for the different cost components.
+
+        CostFunction.evaluate() may return an array of costs. The first one cost[0] is
+        always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function
+        optionally returns labels for the individual cost components.
+        """
         return ["viapoint", "acceleration", "goal"]
 
     def evaluate_rollout(self, cost_vars, sample):
+        """The cost function which defines the task.
+
+
+        Args:
+            cost_vars: All the variables relevant to computing the cost. These are determined by
+            TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_for_dmp".
+            sample: The sample from which the rollout was generated. Passing this to the cost
+            function is useful when performing regularization on the sample.
+
+         Returns:
+            costs The scalar cost components for the sample. The first item costs[0] should
+            contain the total cost.
+        """
+
         n_dims = self.viapoint.shape[0]
         n_time_steps = cost_vars.shape[0]
 
@@ -97,10 +119,16 @@ class TaskViapoint(Task):
         return costs
 
     def plot_rollout(self, cost_vars, ax=None):
+        """ Plot a rollout (the cost-relevant variables).
+
+        @param cost_vars: Rollout to plot
+        @param ax: Axis to plot on (default: None, then a new axis a created)
+        @return: line handles and axis
+        """
+
         if not ax:
             ax = plt.axes()
 
-        """Simple script to plot y of DMP trajectory"""
         n_dims = self.viapoint.shape[0]
         t = cost_vars[:, 0]
         y = cost_vars[:, 1 : n_dims + 1]

@@ -32,6 +32,12 @@ from TaskViapoint import TaskViapoint
 
 
 def run_demo(directory, n_dims):
+    """ Run one demo for bbo_for_dmps.
+
+    @param directory: Directory to save results to
+    @param n_dims: Number of dimensions of the task (i.e. the viapoint)
+    """
+
     # Some DMP parameters
     tau = 0.5
     y_init = np.linspace(1.8, 2.0, n_dims)

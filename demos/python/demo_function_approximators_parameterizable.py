@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-"""Script for function_approximators_parameterizable demo."""
+""" Script for function_approximators_parameterizable demo."""
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -24,6 +24,12 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 
 
 def target_function(n_samples_per_dim):
+    """ Target-function for training
+
+    @param n_samples_per_dim: Number of samples for each dimension
+    @return: inputs and corresponding targets
+    """
+
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
     if n_dims == 1:

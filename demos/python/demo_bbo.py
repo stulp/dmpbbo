@@ -40,7 +40,14 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         self.point = np.asarray(point)
 
     def evaluate(self, sample):
-        # Compute distance from sample to point
+        """The cost function which defines the cost_function.
+
+        Computes the distance from sample to point
+
+         Args: sample The sample
+         Returns: The scalar cost components for the sample. The first item costs[0] should contain
+         the total cost.
+        """
         return [np.linalg.norm(sample - self.point)]
 
 
