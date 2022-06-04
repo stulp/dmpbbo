@@ -494,10 +494,10 @@ class LearningSession:
         cost_labels = []
         if self.exists("cost_function"):
             cost_function = self.ask("cost_function")
-            cost_labels = cost_function.cost_labels
+            cost_labels = cost_function.get_cost_labels()
         elif self.exists("task"):
             task = self.ask("task")
-            cost_labels = task.cost_labels
+            cost_labels = task.get_cost_labels()
 
         return learning_curve, cost_labels
 

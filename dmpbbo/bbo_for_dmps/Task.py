@@ -55,7 +55,7 @@ class Task(ABC):
         h = ax.plot(cost_vars, "-")
         return h, ax
 
-    def cost_labels(self):
+    def get_cost_labels(self):
         """Labels for the different cost components.
 
         The cost function evaluateRollout may return an array of costs. The first one cost[0] is
