@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for dmp_parameterizable demo."""
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -23,6 +25,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 
 
 def main():
+    """ Main function of the script. """
     tau = 0.5
     n_dims = 2
     n_time_steps = 51

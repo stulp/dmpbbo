@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for dynamical systems demo."""
 
 
 import matplotlib.pyplot as plt
@@ -26,6 +27,7 @@ from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
 def main():
+    """ Main function of the script. """
     ###########################################################################
     # Create all systems and add them to a dictionary
 

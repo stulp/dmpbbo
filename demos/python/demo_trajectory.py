@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for trajectory demo."""
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -21,6 +23,7 @@ from dmpbbo.dmps.Trajectory import Trajectory
 
 
 def main():
+    """ Main function of the script. """
     ts = np.linspace(0, 0.5, 101)
     y_first = np.array([0.0, 1.0])
     yd_first = np.array([0.0, 0.0])

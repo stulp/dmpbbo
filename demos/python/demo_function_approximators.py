@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for function_approximators demo."""
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -48,6 +50,7 @@ def target_function(n_samples_per_dim):
 
 
 def train(fa_name, n_dims):
+    """ Main function of the script. """
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
     (inputs, targets) = target_function(n_samples_per_dim)

@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+"""Script for bbo demo."""
 
 import sys
 from pathlib import Path
@@ -45,6 +45,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 
 def main():
+    """ Main function of the script. """
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     n_dims = 2

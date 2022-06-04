@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for bbo_for_dmps demo."""
 
 
 import sys
@@ -109,6 +110,7 @@ def run_demo(directory, n_dims):
 
 
 def main():
+    """ Main function of the script. """
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     for n_dims in [1, 2]:
