@@ -1,3 +1,5 @@
+""" Module with the class TaskThrowBall """
+
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -5,6 +7,7 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 
 class TaskThrowBall(Task):
+    """ Task in which a ball is thrown towards a certain positions. """
     def __init__(self, x_goal, x_margin, y_floor, acceleration_weight=0.0001):
 
         self.x_goal = x_goal
@@ -13,9 +16,28 @@ class TaskThrowBall(Task):
         self.acceleration_weight = acceleration_weight
 
     def get_cost_labels(self):
+        """Labels for the different cost components.
+
+        The cost function evaluateRollout may return an array of costs. The first one cost[0] is
+        always the sum of the other ones, i.e. costs[0] = sum(costs[1:]). This function returns
+        labels for the individual cost components.
+        """
         return ["landing site", "acceleration"]
 
     def evaluate_rollout(self, cost_vars, sample):
+        """The cost function which defines the task.
+
+
+        Args:
+            cost_vars: All the variables relevant to computing the cost. These are determined by
+            TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_for_dmp".
+            sample: The sample from which the rollout was generated. Passing this to the cost
+            function is useful when performing regularization on the sample.
+
+         Returns:
+            costs The scalar cost components for the sample. The first item costs[0] should
+            contain the total cost.
+        """
         n_dims = 2
         n_time_steps = cost_vars.shape[0]
 
@@ -41,7 +63,13 @@ class TaskThrowBall(Task):
         return costs
 
     def plot_rollout(self, cost_vars, ax=None):
-        """Plot y of DMP trajectory"""
+        """ Plot a rollout (the cost-relevant variables).
+
+        @param cost_vars: Rollout to plot
+        @param ax: Axis to plot on (default: None, then a new axis a created)
+        @return: line handles and axis
+        """
+        
         if not ax:
             ax = plt.axes()
         # t = cost_vars[:, 0]
