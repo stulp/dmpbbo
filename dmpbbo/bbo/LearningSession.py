@@ -313,10 +313,8 @@ class LearningSession:
         else:
             update_dirs = sorted(glob(str(Path(self._root_dir, "update")) + "[0-9]*"))
             last_dir = update_dirs[-1]
-            last_dir = last_dir.replace("update", "")
-            last_dir = last_dir.replace(str(self._root_dir), "")
-            last_dir = last_dir.replace("/", "")
-            return int(last_dir)
+            update_str  = Path(last_dir).name.replace("update", "")
+            return int(update_str)
 
     @staticmethod
     def get_base_name(name, i_update=None, i_sample=None):
