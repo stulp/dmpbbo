@@ -26,7 +26,7 @@ from matplotlib import pyplot as plt
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from perform_rollouts import perform_rollouts
+from perform_rollout import perform_rollout
 from TaskThrowBall import TaskThrowBall
 
 
@@ -97,7 +97,7 @@ def main():
 
         (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)
-        cost_vars = perform_rollouts(dmp, "python_simulation", directory)
+        cost_vars = perform_rollout(dmp, "python_simulation", directory)
 
         if args.show or args.save:
             lines, _ = traj_sample.plot([ax1])  # noqa

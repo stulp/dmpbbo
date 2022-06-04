@@ -29,7 +29,12 @@ from dmpbbo.dmps.Trajectory import Trajectory
 
 
 def execute_binary(executable_name, arguments, print_command=False):
+    """ Execute a binary on the command line.
 
+    @param executable_name: Name of the executable
+    @param arguments: Optional arguments on the command line.
+    @param print_command: Whether to echo the command before executing it.
+    """
     if not os.path.isfile(executable_name):
         raise ValueError(
             f"Executable '{executable_name}' does not exist. Please call 'make install' in the "
@@ -43,8 +48,14 @@ def execute_binary(executable_name, arguments, print_command=False):
     subprocess.call(command, shell=True)
 
 
-def perform_rollouts(dmp, mode="python_simulation", directory="."):
+def perform_rollout(dmp, mode="python_simulation", directory="."):
+    """ Perform a rollout with a DMP.
 
+    @param dmp: The DMP to integrate.
+    @param mode: How to integrate it ("python_simulation", "robot_executes_dmp", "'robot_executes_trajectory'")
+    @param directory: Directory to save results to
+    @return: The cost-relevant variables in a matrix.
+    """
     if mode == "python_simulation":
         return run_python_simulation(dmp)
 
@@ -80,12 +91,17 @@ def perform_rollouts(dmp, mode="python_simulation", directory="."):
 
 
 def run_python_simulation(dmp, y_floor=-0.3):
+    """ Run a ball throwing simulation with a DMP.
 
+    @param dmp: The DMP to integrate.
+    @param y_floor:  The height of the floor
+    @return: The cost-relevant variables in a matrix.
+    """
     dt = 0.01
     ts = np.arange(0, 1.5 * dmp.tau, dt)
     n_time_steps = len(ts)
 
-    (x, xd) = dmp.integrate_start()
+    x, xd = dmp.integrate_start()
 
     # ts = cost_vars[:,0]
     # y = cost_vars[:,1:1+n_dims]
@@ -143,6 +159,8 @@ def run_python_simulation(dmp, y_floor=-0.3):
 
 
 def main():
+    """ Main function of the script. """
+
     from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
     from TaskThrowBall import TaskThrowBall
@@ -162,7 +180,7 @@ def main():
 
     for mode in modes:
 
-        cost_vars = perform_rollouts(dmp, mode)
+        cost_vars = perform_rollout(dmp, mode)
 
         x_goal = -0.70
         x_margin = 0.01
