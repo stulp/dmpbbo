@@ -55,7 +55,7 @@ def main():
         # Plotting
 
         # Original Dmp
-        h, axs = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
+        h, axs = dmp.plot(ts, xs, xds, forcing_terms=forcing, fa_outputs=fas)
         plt.setp(h, color=[0.7, 0.7, 1.0], linewidth=6)
 
         # Perturbed DMPs
@@ -65,8 +65,9 @@ def main():
             dmp.set_param_vector(new_values)
 
             xs, xds, forcing, fas = dmp.analytical_solution(ts)
-            h, _ = dmp.plotStatic(tau, ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs)
+            h, _ = dmp.plot(ts, xs, xds, forcing_terms=forcing, fa_outputs=fas, axs=axs)
             plt.setp(h, color=[0.6, 0.0, 0.0], linewidth=1)
+        plt.gcf().canvas.set_window_title(f"Perturbation of  {selected_param_names}")
 
     plt.show()
 
