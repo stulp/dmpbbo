@@ -46,8 +46,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
         regularization = self.regularization_weight * np.linalg.norm(sample)
         return [dist + regularization, dist, regularization]
 
-    @CostFunction.cost_labels.getter
-    def cost_labels(self):
+    def get_cost_labels(self):
         return ["dist", "regularization"]
 
 
