@@ -60,7 +60,7 @@ def main():
         for tt in range(1, n_time_steps):
             xs_step[tt, :], xds_step[tt, :] = dmp.integrate_step(dt, xs_step[tt - 1, :])
 
-        print("Plotting "+dmp_type+" DMP")
+        print("Plotting " + dmp_type + " DMP")
 
         dmp.plot(ts, xs_ana, xds_ana, forcing_terms=forcing_terms_ana, fa_outputs=fa_outputs_ana)
         plt.gcf().canvas.set_window_title(f"Analytical integration ({dmp_type})")

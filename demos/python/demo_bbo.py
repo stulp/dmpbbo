@@ -77,7 +77,7 @@ def main():
     )
 
     for name, updater in updaters.items():
-        print('Distribution updater: '+name)
+        print("Distribution updater: " + name)
 
         mean_init = np.full(n_dims, 5.0)
         covar_init = 1.0 * np.eye(n_dims)

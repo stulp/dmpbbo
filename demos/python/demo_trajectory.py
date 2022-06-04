@@ -68,7 +68,7 @@ def main():
     plt.setp(lines, linestyle="-", linewidth=2, color=(0.2, 0.8, 0.2))
     plt.setp(lines[0], label="filtered trajectory")
     axs[0].legend()
-    
+
     plt.gcf().canvas.set_window_title("low-pass filtering")
 
     plt.show()

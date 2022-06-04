@@ -120,7 +120,7 @@ def main():
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
     for n_dims in [1, 2]:
-        print(f'Optimization of {n_dims}-D task')
+        print(f"Optimization of {n_dims}-D task")
         run_demo(directory, n_dims)
 
     plt.show()

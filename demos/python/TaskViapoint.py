@@ -24,6 +24,7 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 class TaskViapoint(Task):
     """ Task in which a trajectory has to pass through a viapoint."""
+
     def __init__(self, viapoint, **kwargs):
         self.viapoint = viapoint
         self.viapoint_time = kwargs.get("viapoint_time", None)
