@@ -36,7 +36,7 @@ class TaskViapoint(Task):
             if self.goal.shape != self.viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
 
-    def cost_labels(self):
+    def get_cost_labels(self):
         return ["viapoint", "acceleration", "goal"]
 
     def evaluate_rollout(self, cost_vars, sample):
