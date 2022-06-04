@@ -239,6 +239,9 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
 
 
 class LearningSession:
+    """ Database for storing information about learning progress.
+    """
+
     def __init__(self, n_samples_per_update, root_directory=None, **kwargs):
 
         self._n_samples_per_update = n_samples_per_update
@@ -262,16 +265,36 @@ class LearningSession:
 
     @classmethod
     def from_dir(cls, directory):
+        """ Initialize a learning session from a directory.
+
+        @param directory: The directory to load from.
+        @return: The learning session stored in the directory.
+        """
         filename = str(Path(directory, "n_samples_per_update.txt"))
         n_samples_per_update = np.atleast_1d(np.loadtxt(filename))
         n_samples_per_update = int(n_samples_per_update[0])
         return cls(n_samples_per_update, directory)
 
     def add_eval(self, i_update, eval_sample, eval_cost):
+        """ Add an evaluation.
+
+        @param i_update: The update number for which this is the evaluation
+        @param eval_sample: The sample for which the evaluation was made.
+        @param eval_cost: The cost of the evaluation sample
+        """
         self.tell(eval_cost, "eval_cost", i_update)
         self.tell(eval_sample, "eval_sample", i_update)
 
     def add_update(self, i_update, distribution, samples, costs, weights, distribution_new=None):
+        """ Add the information relevant to one distribution update.
+
+        @param i_update: The update number for which this is the evaluation
+        @param distribution: The distribution before the update.
+        @param samples: The samples evaluated in this update
+        @param costs: The costs for each sample
+        @param weights: The weights to perform the update (derived from the costs)
+        @param distribution_new: The distribution after the update (optional).
+        """
         self.tell(distribution, "distribution", i_update)
         self.tell(samples, "samples", i_update)
         self.tell(costs, "costs", i_update)
@@ -281,6 +304,10 @@ class LearningSession:
         self._last_update_added = i_update
 
     def get_n_updates(self):
+        """ Get the number of updates that have already been performed.
+
+        @return: The number of updates that have already been performed.
+        """
         if not self._root_dir:
             return self._last_update_added
         else:
@@ -293,7 +320,19 @@ class LearningSession:
 
     @staticmethod
     def get_base_name(name, i_update=None, i_sample=None):
+        """ Get the basename of a file, given the update and sample number
 
+        Examples:
+            get_base_name('foo',3,6) => 'update_00003/006_foo'
+            get_base_name('foo',1) => 'update_00003/foo'
+            get_base_name('foo') => 'foo'
+
+
+        @param name:  The name of the file
+        @param i_update:  The update number to be prepended
+        @param i_sample:  The sample number to be prepended
+        @return: The basename of a file.
+        """
         if isinstance(i_sample, int):
             basename = f"{i_sample:03d}_{name}"  # e.g. 0 => "000_name"
         elif i_sample:
@@ -308,6 +347,13 @@ class LearningSession:
         return basename
 
     def exists(self, name, i_update=None, i_sample=None):
+        """ Check whether certain information exists in the database.
+
+        @param name:  The name of the file
+        @param i_update:  The update number
+        @param i_sample:  The sample number
+        @return: True if the information is available, False otherwise.
+        """
         basename = self.get_base_name(name, i_update, i_sample)
         if basename in self._cache:
             return True
@@ -319,6 +365,13 @@ class LearningSession:
         return False
 
     def ask(self, name, i_update=None, i_sample=None):
+        """ Get an object from the database.
+
+        @param name:  The name of the file
+        @param i_update:  The update number
+        @param i_sample:  The sample number
+        @return: The object in the database.
+        """
 
         basename = self.get_base_name(name, i_update, i_sample)
 
@@ -346,6 +399,13 @@ class LearningSession:
             return obj
 
     def tell(self, obj, name, i_update=None, i_sample=None):
+        """ Add an object to the database.
+
+        @param obj:  The object to add
+        @param name:  The name of the file
+        @param i_update:  The update number
+        @param i_sample:  The sample number
+        """
         basename = self.get_base_name(name, i_update, i_sample)
         self._cache[basename] = copy.deepcopy(obj)
         if self._root_dir is not None:
@@ -353,6 +413,13 @@ class LearningSession:
 
     @staticmethod
     def save(obj, directory, basename):
+        """ Save an object to a file.
+
+        @param obj: The object to save.
+        @param directory: The directory to save it to.
+        @param basename: The basename of the file (".txt" or ".json" will be added to it)
+        @return:
+        """
         abs_basename = Path(directory, basename)
 
         # Make sure directory exists
@@ -368,10 +435,19 @@ class LearningSession:
         return filename
 
     def save_all(self, directory):
+        """ Save all objects in the database to a directory.
+
+        @param directory: The directory to save the objects to.
+        """
         for basename, obj in self._cache.items():
             LearningSession.save(obj, directory, basename)
 
     def get_eval_costs(self, i_update):
+        """ Get the evaluation cost for a given update.
+
+        @param i_update:  The update numbers
+        @return: The costs for that update.
+        """
         has_eval = self.exists("cost", 0, "eval")
         if has_eval:
             cost_eval = self.ask("cost", i_update, "eval")
@@ -385,6 +461,11 @@ class LearningSession:
         return cost_eval, i_sample
 
     def get_sample_costs(self, i_update):
+        """ Get the costs (one for each sample) for a given update.
+
+        @param i_update:  The update numbers
+        @return: The costs for that update.
+        """
         if self.exists("costs", i_update):
             # Everything in one file
             sample_costs = self.ask("costs", i_update)
@@ -395,6 +476,14 @@ class LearningSession:
         return np.array(sample_costs)
 
     def get_learning_curve(self):
+        """ Get the learning curve from this learning session.
+
+        The learning curve is of size n_updates X (1 + n_costs), where n_costs is the number of
+        sub-costs. Only the first one is used for updating. Plotting the other ones is useful for
+        debugging.
+
+        @return: The learning curve, and the names of the cost labels.
+        """
         learning_curve = []
         n_updates = self.get_n_updates()
         for i_update in range(n_updates):
@@ -413,11 +502,15 @@ class LearningSession:
         return learning_curve, cost_labels
 
     def plot_learning_curve(self, ax=None):
+        """ Plot the learning curve of this learning session.
+
+        @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @return: the line handles and the axis handle
         """
-        has eval or not
-        has cost components or not
-        saved in costs or 000_cost...
-        """
+        # has eval or not
+        # has cost components or not
+        # saved in costs or 000_cost...
+
         if not ax:
             ax = plt.axes()
 
@@ -433,6 +526,11 @@ class LearningSession:
         return plot_learning_curve(learning_curve, ax=ax, cost_labels=cost_labels)
 
     def plot_exploration_curve(self, ax=None):
+        """ Plot the exploration curve of this learning session.
+
+        @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @return: the line handles and the axis handle
+        """
         n_updates = self.get_n_updates()
         curve = np.zeros((n_updates, 2))
         for i_update in range(n_updates):
@@ -446,6 +544,11 @@ class LearningSession:
         return plot_exploration_curve(curve, ax=ax)
 
     def plot_distribution_updates(self, ax=None):
+        """ Visualize the updates of the distribution during learning.
+
+        @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @return: the line handles and the axis handle
+        """
         if not ax:
             ax = plt.axes()
 
@@ -458,6 +561,12 @@ class LearningSession:
         return all_lines, ax
 
     def plot_distribution_update(self, i_update, ax=None, **kwargs):
+        """ Visualize one update of the distribution.
+
+        @param i_update: The update number to plot
+        @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @return: the line handles and the axis handle
+        """
         # ax = kwargs.get("ax") or plt.axes()
         highlight = kwargs.get("highlight", False)
         plot_samples = kwargs.get("plot_samples", False)
@@ -481,6 +590,11 @@ class LearningSession:
         )
 
     def plot(self, fig=None):
+        """ Plot the distribution updates, exploration curve and learning curve in one figure.
+
+        @param fig:  The figure to plot in (default: None, then a new figure is initialized)
+        @return: The figure handle
+        """
         if not fig:
             fig = plt.figure(figsize=(15, 5))
         axs = [fig.add_subplot(131 + sp) for sp in range(3)]
@@ -489,12 +603,13 @@ class LearningSession:
         self.plot_learning_curve(axs[2])
         return fig
 
-    @staticmethod
-    def plot_multiple(sessions):
-        pass
+    # @staticmethod
+    # def plot_multiple(sessions):
+    #     pass
 
 
 def main():
+    """ Main function of the script. """
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "directory", type=str, help="directory from which to read the learning session"

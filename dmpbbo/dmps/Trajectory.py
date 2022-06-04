@@ -66,7 +66,7 @@ class Trajectory:
 
         Each row in the matrix contains the following:
 
-        [t  y_1 .. y_N  yd_1 .. yd_N  ydd_1 .. ydd_N  misc_1 .. misc_N ]
+        [t  y_1 ... y_N  yd_1 ... yd_N  ydd_1 ... ydd_N  misc_1 ... misc_N ]
 
         @param matrix: Matrix of values, with one row for each time step.
         @param n_dims_misc:  Number of dimensions for misc variables (default: 0)
@@ -249,7 +249,17 @@ class Trajectory:
 
     @classmethod
     def from_polynomial(cls, ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
+        """ Generate a polynomial trajectory.
 
+        @param ts: Time steps for which to generate trajectory
+        @param y_from: Initial positions
+        @param yd_from: Initial velocities
+        @param ydd_from: Initial accelerations
+        @param y_to: Final positions
+        @param yd_to: Final velocities
+        @param ydd_to: Final accelerations
+        @return:
+        """
         a0 = y_from
         a1 = yd_from
         a2 = ydd_from / 2
@@ -282,7 +292,15 @@ class Trajectory:
 
     @classmethod
     def from_viapoint_polynomial(cls, ts, y_from, y_yd_ydd_viapoint, viapoint_time, y_to):
+        """
 
+        @param ts: Time steps for which to generate trajectory
+        @param y_from: The initial position
+        @param y_yd_ydd_viapoint: the pos/vel/acc of the viapoint
+        @param viapoint_time: The time at which the viapoint should be traversed.
+        @param y_to: The final position
+        @return: A polynomial trajectory through the viapoint.
+        """
         n_time_steps = ts.size
         n_dims = y_from.size
 
@@ -320,6 +338,13 @@ class Trajectory:
 
     @classmethod
     def from_min_jerk(cls, ts, y_from, y_to):
+        """ Initialize a minimum-jerk trajectory.
+
+        @param ts: Time steps for which to generate trajectory
+        @param y_from: Initial position
+        @param y_to: Final position
+        @return: A minimum-jerk trajectory
+        """
         n_time_steps = ts.size
         n_dims = y_from.size
 
@@ -346,6 +371,12 @@ class Trajectory:
         return cls(ts, ys, yds, ydds)
 
     def append(self, trajectory):
+        """ Append another trajectory to this one.
+
+        Whether the positions / velocities / acceleration are compatible is not checked.
+
+        @param trajectory:  The trajectory to append.
+        """
         self._ts = np.concatenate((self._ts, trajectory.ts))
         self._ys = np.concatenate((self._ys, trajectory.ys))
         self._yds = np.concatenate((self._yds, trajectory.yds))
@@ -356,16 +387,33 @@ class Trajectory:
             self._misc = np.concatenate((self._misc, trajectory.misc))
 
     def as_matrix(self):
+        """ Return the trajectory as a matrix.
+
+        Each row in the matrix has the following format.
+        [t  y_1 ... y_N  yd_1 ... yd_N  ydd_1 ... ydd_N  misc_1 ... misc_N ]
+
+        @return: A matrix representation of the trajectory.
+        """
         as_matrix = np.column_stack((self._ts, self._ys, self._yds, self._ydds))
         if self._misc is not None:
             np.column_stack((as_matrix, self._misc))
         return as_matrix
 
     def savetxt(self, filename):
+        """ Save a matrix representation of the trajectory to an ASCII file.
+
+        @param filename: The name of the file to save the trajectory to.
+        """
         np.savetxt(filename, self.as_matrix(), fmt="%1.7f")
 
     @staticmethod
     def loadtxt(filename, n_dims_misc=0):
+        """ Load a matrix representation of the trajectory from an ASCII file.
+
+        @param filename: The name of the file to load the matrix from.
+        @param n_dims_misc: The number of miscellaneous variables in the trajectory. This needs
+        to be specified, because it cannot be stored in the matrix.
+        """
         data = np.loadtxt(filename)
 
         (n_time_steps, n_cols) = data.shape
@@ -380,10 +428,21 @@ class Trajectory:
         return Trajectory(ts, ys, yds, ydds, misc)
 
     def recompute_derivatives(self):
+        """ Recompute the velocities and accelerations from the positions.
+
+        This is done using non-causal differentiation without filtering.
+        """
         self._yds = diffnc(self._ys, self._dt_mean)
         self._ydds = diffnc(self._yds, self._dt_mean)
 
     def apply_low_pass_filter(self, cutoff, order=3):
+        """ Apply a low-pass filter to the trajectory data.
+
+        This is done using non-causal differentiation without filtering.
+
+        @param cutoff:  Cutoff value for the Butterworth filter.
+        @param order:  Order of the Butterworth
+        """
         # Sample rate and desired cutoff frequencies (in Hz).
         _dt_mean = np.mean(np.diff(self._ts))
         sample_freq = 1.0 / _dt_mean
@@ -391,6 +450,17 @@ class Trajectory:
         self.recompute_derivatives()
 
     def plot(self, axs=None):
+        """ Plot the trajectory.
+
+        What is plotted depends on how many axes are passed:
+            1: only positions
+            2: velocities also
+            3: accelerations also
+            4: miscellaneous variables also
+
+        @param axs: Axes to plot on (default: None, then new axes are initialized)
+        @return: line_handles and axes
+        """
         if not axs:
             fig = plt.figure(figsize=(15, 4))
             axs = [fig.add_subplot(1, 3, i + 1) for i in range(3)]
@@ -444,6 +514,13 @@ def diffnc(xs, dt):
 
 
 def butter_low_pass(cutoff, fs, order=3):
+    """ Design a Butterworth low-pass filter.
+
+    @param cutoff:  The cut-off frequency
+    @param fs: The sampling frequency of the digital system.
+    @param order: The order of the filter.
+    @return: Numerator (b) and denominator (a) polynomials of the IIR filter.
+    """
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     nyq = 0.5 * fs
     cut = cutoff / nyq
@@ -452,6 +529,14 @@ def butter_low_pass(cutoff, fs, order=3):
 
 
 def butter_low_pass_filter(data, cutoff, fs, order=3):
+    """ Apply a low-pass Butterworth filter.
+
+    @param data: The time series
+    @param cutoff:  The cut-off frequency
+    @param fs: The sampling frequency of the digital system.
+    @param order: The order of the filter.
+    @return: The filtered data
+    """
     # http://scipy.github.io/old-wiki/pages/Cookbook/ButterworthBandpass
     b, a = butter_low_pass(cutoff, fs, order=order)
     y = filtfilt(b, a, data, axis=0)

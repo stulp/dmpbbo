@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module for the LearningSessionTask class. """
+
 import inspect
 from pathlib import Path
 
@@ -24,6 +26,9 @@ from dmpbbo.bbo.LearningSession import LearningSession
 
 
 class LearningSessionTask(LearningSession):
+    """ Database for storing information about learning progress for specific task (Task)
+    """
+
     def __init__(self, n_samples_per_update, directory=None, **kwargs):
         super().__init__(n_samples_per_update, directory, **kwargs)
         # self._task_solver = kwargs.get("task_solver", None)
@@ -37,6 +42,13 @@ class LearningSessionTask(LearningSession):
                 f.write(src)
 
     def tell(self, obj, name, i_update=None, i_sample=None):
+        """ Add an object to the database.
+
+        @param obj:  The object to add
+        @param name:  The name of the file
+        @param i_update:  The update number
+        @param i_sample:  The sample number
+        """
         # If it's a Dmp, save it in a C++-readable format also
         if "dmp" in name:
             if self._root_dir is not None:
@@ -49,11 +61,26 @@ class LearningSessionTask(LearningSession):
         return filename
 
     def add_rollout(self, i_update, i_sample, sample, cost_vars, cost):
+        """
+
+        @param i_update: The update number
+        @param i_sample:  The sample number
+        @param sample: The sample for this rollout
+        @param cost_vars: The cost-relevant variables for the rollout.
+        @param cost: The cost of the rollout
+        """
         self.tell(sample, "sample", i_update, i_sample)
         self.tell(cost_vars, "cost_vars", i_update, i_sample)
         self.tell(cost, "cost", i_update, i_sample)
 
     def add_eval_task(self, i_update, eval_sample, eval_cost_vars, eval_cost):
+        """ Add an evaluation of the task
+
+        @param i_update: The update number for which this is the evaluation
+        @param eval_cost_vars: The cost-relevant variables for the evaluation.
+        @param eval_sample: The sample for which the evaluation was made.
+        @param eval_cost: The cost of the evaluation sample
+        """
         super().add_eval(i_update, eval_sample, eval_cost)
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 
@@ -74,6 +101,11 @@ class LearningSessionTask(LearningSession):
             plt.setp(handle, color=cur_color, linewidth=2)
 
     def plot_rollouts(self, ax=None):
+        """ Plot all rollouts during the learning session
+
+        @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @return: the line handles and the axis handle
+        """
         if not ax:
             ax = plt.axes()
         all_lines = []
@@ -87,6 +119,11 @@ class LearningSessionTask(LearningSession):
         return all_lines, ax
 
     def plot_rollouts_update(self, i_update, **kwargs):
+        """ Plot the rollouts for one update
+
+        @param i_update: The update number to plot
+        @return: the line handles and the axis handle
+        """
         ax = kwargs.get("ax", None) or plt.axes()
         plot_eval = kwargs.get("plot_eval", True)
         plot_samples = kwargs.get("plot_samples", False)
@@ -116,6 +153,12 @@ class LearningSessionTask(LearningSession):
         return lines_eval, ax
 
     def plot(self, fig=None):
+        """ Plot the distribution updates, the rollouts, the exploration curve and learning curve in
+        one figure.
+
+        @param fig:  The figure to plot in (default: None, then a new figure is initialized)
+        @return: The figure handle
+        """
         if not fig:
             fig = plt.figure(figsize=(20, 5))
         axs = [fig.add_subplot(141 + sp) for sp in range(4)]
