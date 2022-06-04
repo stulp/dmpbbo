@@ -21,6 +21,7 @@ import sys
 
 import matplotlib.pyplot as plt
 import numpy as np
+import tempfile
 
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
@@ -65,7 +66,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 def main():
     """ Main function of the script. """
-    directory = "/tmp/dmpbbo/demoBboMultipleCostComponents"
+    directory = Path(tempfile.gettempdir(), 'dmpbbo', 'demoBboMultipleCostComponents')
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 

@@ -21,6 +21,7 @@ import sys
 
 from pathlib import Path
 import numpy as np
+import tempfile
 from matplotlib import pyplot as plt
 
 import dmpbbo.bbo_for_dmps.run_one_update as run_one
@@ -117,7 +118,8 @@ def run_demo(directory, n_dims):
 
 def main():
     """ Main function of the script. """
-    directory = Path("/tmp", "demo_bbo_for_dmps_single_updates")
+    directory = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_for_dmps_single_updates")
+    
     if len(sys.argv) > 1:
         directory = Path(sys.argv[1])
 

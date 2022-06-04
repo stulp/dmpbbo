@@ -22,6 +22,7 @@ from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
+import tempfile
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
@@ -168,7 +169,7 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
     parser.add_argument(
-        "--directory", help="directory to write results to", default="/tmp/dmpbbo/test_dmp_data"
+        "--directory", help="directory to write results to", default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_dmp_data')
     )
     args = parser.parse_args()
 

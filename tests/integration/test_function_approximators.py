@@ -22,6 +22,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+import tempfile
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
@@ -151,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         help="directory to write results to",
-        default="/tmp/dmpbbo/test_function_approximators_data",
+        default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_function_approximators_data'),
     )
     args = parser.parse_args()
 

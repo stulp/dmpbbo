@@ -19,6 +19,7 @@
 import argparse
 import os
 from pathlib import Path
+import tempfile
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -202,7 +203,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         help="directory to write results to",
-        default="/tmp/dmpbbo/test_dynamical_systems_data",
+        default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_dynamical_systems_data'),
     )
     args = parser.parse_args()
 
