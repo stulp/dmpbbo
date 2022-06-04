@@ -29,9 +29,8 @@ class TimeSystem(DynamicalSystem):
     def __init__(self, tau, count_down=False):
         """ Initialize a TimeSystem
 
-        Args:
-            tau - Time constant
-            count_down - Whether timer increases (False) or decreases (True)
+        @param tau: Time constant
+        @param count_down: Whether timer increases (False) or decreases (True)
         """
         # Count-down from 1 to 0 or count-up from 0 to 1
         self._count_down = count_down
@@ -57,8 +56,8 @@ class TimeSystem(DynamicalSystem):
 
         It relates state values to rates of change of those state values.
 
-        Args: x - current state
-        Returns: xd - rate of change in state
+        @param x: current state
+        @return: xd - rate of change in state
         """
         xd = np.zeros([1, 1])
         if self._count_down:
@@ -74,8 +73,8 @@ class TimeSystem(DynamicalSystem):
         """
          Return analytical solution of the system at certain times.
 
-         Args: ts - A vector of times for which to compute the analytical solutions
-         Returns: (xs, xds) - Sequence of states and their rates of change.
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
         """
 
         n_time_steps = ts.size

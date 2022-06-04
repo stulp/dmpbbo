@@ -35,8 +35,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
     def __init__(self, point, regularization_weight=1.0):
         """ Constructor.
 
-        Args:
-            point: Point to which distance must be minimized.
+        @param point: Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
         self.regularization_weight = regularization_weight
@@ -66,7 +65,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
 def main():
     """ Main function of the script. """
-    directory = Path(tempfile.gettempdir(), 'dmpbbo', 'demoBboMultipleCostComponents')
+    directory = Path(tempfile.gettempdir(), "dmpbbo", "demoBboMultipleCostComponents")
     if len(sys.argv) > 1:
         directory = sys.argv[1]
 

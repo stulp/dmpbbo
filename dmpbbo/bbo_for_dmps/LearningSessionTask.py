@@ -88,10 +88,9 @@ class LearningSessionTask(LearningSession):
     def _set_style(handle, i_update, n_updates):
         """ Set the color of an object, according to how far the optimization has proceeded.
 
-            Args:
-                handle: Handle to the object
-                i_update: Which update is the optimization at now?
-                n_updates: Which is the number of updates the optimization will run?
+        @param handle: Handle to the object
+        @param i_update: Which update is the optimization at now?
+        @param n_updates: Which is the number of updates the optimization will run?
         """
         if i_update == 0:
             plt.setp(handle, color=[0.8, 0.0, 0.0], linewidth=2)

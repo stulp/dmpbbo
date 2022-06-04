@@ -39,9 +39,8 @@ warnings.simplefilter("ignore", np.ComplexWarning)
 def plot_update_lines(n_samples_per_update, ax):
     """ Plot vertical lines when a parameter update occurred during the optimization.
 
-        Args:
-            n_samples_per_update Vector specifying how many samples were used between updates.
-            ax Axis object to plot the lines in.
+        @param n_samples_per_update: Vector specifying how many samples were used between updates.
+        @param ax: Axis object to plot the lines in.
     """
 
     # Find good number of horizontal update lines to plot
@@ -81,21 +80,15 @@ def plot_update_lines(n_samples_per_update, ax):
 def plot_learning_curve(learning_curve, **kwargs):
     """ Plot a learning curve.
 
-        Args:
-            learning_curve A learning curve that has the following format
+
+        @param learning_curve: A learning curve that has the following format
         #rows is number of optimization updates
         column 0: Number of samples at which the cost was evaluated
         column 1: The total cost
         column 2...: Individual cost components (column 1 is their sum)
-
-        Args:
-            ax Axis to plot the learning curve on.
-
-        Args:
-            costs_all Vector of costs of each sample (default=[])
-
-        Args:
-            cost_labels Vector of strings for the different cost components  (default=[]).
+        @param ax: Axis to plot the learning curve on.
+        @param costs_all: Vector of costs of each sample (default=[])
+        @param cost_labels: Vector of strings for the different cost components  (default=[]).
     """
 
     cost_labels = kwargs.get("cost_labels", None)
@@ -128,14 +121,11 @@ def plot_learning_curve(learning_curve, **kwargs):
 def plot_exploration_curve(exploration_curve, **kwargs):
     """ Plot an exploration curve.
 
-        Args:
-            exploration An exploration curve that has the following format
-        #rows is number of optimization updates
-        column 0: Number of samples at which the cost was evaluated
-        column 1: The exploration at that update
-
-        Args:
-            ax Axis to plot the learning curve on.
+        @param exploration: An exploration curve that has the following format
+            #rows is number of optimization updates
+            column 0: Number of samples at which the cost was evaluated
+            column 1: The exploration at that update
+        @param ax: Axis to plot the learning curve on.
     """
     ax = kwargs.get("ax") or plt.axes()
 
@@ -155,12 +145,11 @@ def plot_exploration_curve(exploration_curve, **kwargs):
 def plot_update(distribution, samples, weights, distribution_new, **kwargs):
     """ Save an optimization update to a directory.
 
-        Args:
-            distribution: Gaussian distribution before the update
-            samples: The samples in the search space
-            weights: The weight of each sample
-            distribution_new: Gaussian distribution after the update
-            kwargs: Can be the following:
+        @param distribution: Gaussian distribution before the update
+        @param samples: The samples in the search space
+        @param weights: The weight of each sample
+        @param distribution_new: Gaussian distribution after the update
+        @param kwargs: Can be the following:
                 ax: Axis to plot the update on.
                 highlight: Whether to highlight this update (default=False)
                 plot_samples: Whether to plot the individual samples (default=False)
@@ -313,7 +302,7 @@ class LearningSession:
         else:
             update_dirs = sorted(glob(str(Path(self._root_dir, "update")) + "[0-9]*"))
             last_dir = update_dirs[-1]
-            update_str  = Path(last_dir).name.replace("update", "")
+            update_str = Path(last_dir).name.replace("update", "")
             return int(update_str)
 
     @staticmethod

@@ -81,8 +81,7 @@ class FunctionApproximatorLWR(FunctionApproximator):
 
         Uses the centers and widths in the model parameters.
 
-        Args:
-            inputs (numpy.ndarray): Input values of the query.
+        @param inputs: Input values of the query.
         """
         return Gaussian.activations(
             inputs, centers=model_params["centers"], widths=model_params["widths"], normalized=True

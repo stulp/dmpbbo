@@ -32,11 +32,10 @@ class FunctionApproximatorRBFN(FunctionApproximator):
     def __init__(self, n_bfs_per_dim, intersection_height=0.7, regularization=0.0):
         """Initialize an RBNF function approximator.
 
-        Args:
-            n_bfs_per_dim Number of basis functions per input dimension.
-            intersection_height Relative value at which two neighbouring basis functions
+        @param n_bfs_per_dim: Number of basis functions per input dimension.
+        @param intersection_height: Relative value at which two neighbouring basis functions
             will intersect (default=0.7)
-            regularization Regularization parameter (default=0.0)
+        @param regularization: Regularization parameter (default=0.0)
         """
         meta_params = {
             "n_basis_functions_per_dim": np.atleast_1d(n_bfs_per_dim),

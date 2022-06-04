@@ -203,7 +203,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         help="directory to write results to",
-        default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_dynamical_systems_data'),
+        default=Path(tempfile.gettempdir(), "dmpbbo", "test_dynamical_systems_data"),
     )
     args = parser.parse_args()
 

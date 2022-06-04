@@ -29,11 +29,10 @@ class ExponentialSystem(DynamicalSystem):
     def __init__(self, tau, x_init, x_attr, alpha):
         """ Initialize an ExponentialSystem.
 
-        Args:
-            tau    - Time constant
-            x_init - Initial state
-            x_attr - Attractor state
-            alpha - Decay constant
+        @param tau: Time constant
+        @param x_init: Initial state
+        @param x_attr: Attractor state
+        @param alpha: Decay constant
         """
         super().__init__(1, tau, x_init)
         self._x_attr = x_attr
@@ -80,8 +79,8 @@ class ExponentialSystem(DynamicalSystem):
 
         It relates state values to rates of change of those state values.
 
-        Args: x - current state
-        Returns: xd - rate of change in state
+        @param x: current state
+        @return: xd - rate of change in state
         """
         xd = self.alpha * (self._x_attr - x) / self._tau
         return xd
@@ -90,8 +89,8 @@ class ExponentialSystem(DynamicalSystem):
         """
          Return analytical solution of the system at certain times.
 
-         Args: ts - A vector of times for which to compute the analytical solutions
-         Returns: (xs, xds) - Sequence of states and their rates of change.
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
         """
         n_ts = ts.size
 

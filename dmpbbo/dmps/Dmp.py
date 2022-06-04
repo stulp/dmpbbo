@@ -50,17 +50,16 @@ class Dmp(DynamicalSystem, Parameterizable):
     ):
         """Initialize a DMP with function approximators and subsystems
 
-        Args:
-            tau           : Time constant
-            y_init        : Initial state
-            y_attr        : Attractor state
-            function_approximators : Function approximators for the forcing term
-            forcing_term_scaling : Which method to use for scaling the forcing term
+        @param tau: Time constant
+        @param y_init: Initial state
+        @param y_attr: Attractor state
+        @param function_approximators: Function approximators for the forcing term
+        @param forcing_term_scaling: Which method to use for scaling the forcing term
                 ( "NO_SCALING", "G_MINUS_Y0_SCALING")
-            alpha_spring_damper : alpha in the spring-damper system of the dmp
-            goal_system   : Dynamical system to compute delayed goal
-            phase_system  : Dynamical system to compute the phase
-            gating_system : Dynamical system to compute the gating term
+        @param alpha_spring_damper: alpha in the spring-damper system of the dmp
+        @param goal_system: Dynamical system to compute delayed goal
+        @param phase_system: Dynamical system to compute the phase
+        @param gating_system: Dynamical system to compute the gating term
         """
 
         dim_dmp = 3 * y_init.size + 2
@@ -110,15 +109,14 @@ class Dmp(DynamicalSystem, Parameterizable):
     def from_traj(cls, trajectory, function_approximators, **kwargs):
         """Initialize a DMP by training it from a trajectory.
 
-        Args:
-            trajectory    - the trajectory to train on
-            function_approximators - Function approximators for the forcing term
-            dmp_type      - Type of the Dmp
+        @param trajectory: the trajectory to train on
+        @param function_approximators: Function approximators for the forcing term
+        @param dmp_type: Type of the Dmp
                 ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
-            forcing_term_scaling - Which method to use for scaling the forcing term
+        @param forcing_term_scaling: Which method to use for scaling the forcing term
                 ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
-            phase_system  - Dynamical system to compute the phase
-            gating_system - Dynamical system to compute the gating term
+        @param phase_system: Dynamical system to compute the phase
+        @param gating_system: Dynamical system to compute the gating term
         """
 
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
@@ -166,10 +164,8 @@ class Dmp(DynamicalSystem, Parameterizable):
     def integrate_start(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
 
-        Args:
-            y_init - The initial state vector (y part)
-        Returns:
-            x, xd - The first vector of state variables and their rates of change
+        @param y_init: The initial state vector (y part)
+        @return: x, xd - The first vector of state variables and their rates of change
         """
         if y_init:
             self.y_init = y_init
@@ -203,11 +199,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         It relates state values to rates of change of those state values
 
-        Args:
-            x - current state (column vector of size dim() X 1)
-
-        Returns:
-            Rate of change in state (column vector of size dim() X 1)
+        @param x: current state (column vector of size dim() X 1)
+        @return: Rate of change in state (column vector of size dim() X 1)
         """
 
         xd = np.zeros(x.shape)
@@ -258,11 +251,8 @@ class Dmp(DynamicalSystem, Parameterizable):
     def _compute_func_approx_predictions(self, phase_state):
         """Compute the outputs of the function approximators.
 
-        Args:
-            phase_state The phase states for which the outputs are computed.
-
-        Returns:
-            The outputs of the function approximators.
+        @param phase_state: The phase states for which the outputs are computed.
+        @return: The outputs of the function approximators.
         """
         n_time_steps = phase_state.size
         fa_output = np.zeros([n_time_steps, self.dim_dmp()])
@@ -275,12 +265,9 @@ class Dmp(DynamicalSystem, Parameterizable):
     def analytical_solution(self, ts=None):
         """Return analytical solution of the system at certain times
 
-        Args:
-            ts: A vector of times for which to compute the analytical solutions.
+        @param ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
-
-        Returns:
-            xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times
+        @return: xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times
             (the length of 'ts'), and D the size of the state (i.e. dim())
             xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is
             the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
@@ -392,8 +379,7 @@ class Dmp(DynamicalSystem, Parameterizable):
     def train(self, trajectory):
         """Train a DMP with a trajectory.
 
-        Args:
-            trajectory - The trajectory with which to train the DMP.
+        @param trajectory: The trajectory with which to train the DMP.
         """
         # Set tau, initial_state and attractor_state from the trajectory
         self.tau = trajectory.ts[-1]
@@ -423,11 +409,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         For a standard Dmp the inputs will be the phase over time, and the targets will be the
         forcing term (with the gating function factored out).
 
-        Args:
-            trajectory - Trajectory, e.g. a demonstration.
-
-        Returns:
-            fa_inputs_phase - The inputs for the function approximators (phase signal)
+        @param trajectory: Trajectory, e.g. a demonstration.
+        @return: fa_inputs_phase - The inputs for the function approximators (phase signal)
             fa_targets - The targets for the function approximators (forcing term)
         """
 
@@ -493,10 +476,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         accelerations of the spring system, which are only stored implicitly in xd_in because
         second order systems are converted to first order systems with expanded state.
 
-        Args:
-            ts    - A vector of times
-            x_in  - State vector over time
-            xd_in - State vector over time (rates of change)
+        @param ts: A vector of times
+        @param x_in: State vector over time
+        @param xd_in: State vector over time (rates of change)
 
         Return:
             Trajectory representation of the DMP state vector output.

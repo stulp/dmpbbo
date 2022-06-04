@@ -8,6 +8,7 @@ from dmpbbo.bbo_for_dmps.Task import Task
 
 class TaskThrowBall(Task):
     """ Task in which a ball is thrown towards a certain positions. """
+
     def __init__(self, x_goal, x_margin, y_floor, acceleration_weight=0.0001):
 
         self.x_goal = x_goal
@@ -27,15 +28,11 @@ class TaskThrowBall(Task):
     def evaluate_rollout(self, cost_vars, sample):
         """The cost function which defines the task.
 
-
-        Args:
-            cost_vars: All the variables relevant to computing the cost. These are determined by
+        @param cost_vars: All the variables relevant to computing the cost. These are determined by
             TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_for_dmp".
-            sample: The sample from which the rollout was generated. Passing this to the cost
+        @param sample: The sample from which the rollout was generated. Passing this to the cost
             function is useful when performing regularization on the sample.
-
-         Returns:
-            costs The scalar cost components for the sample. The first item costs[0] should
+        @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
         n_dims = 2
@@ -69,7 +66,7 @@ class TaskThrowBall(Task):
         @param ax: Axis to plot on (default: None, then a new axis a created)
         @return: line handles and axis
         """
-        
+
         if not ax:
             ax = plt.axes()
         # t = cost_vars[:, 0]

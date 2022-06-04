@@ -119,7 +119,7 @@ def run_demo(directory, n_dims):
 def main():
     """ Main function of the script. """
     directory = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_for_dmps_single_updates")
-    
+
     if len(sys.argv) > 1:
         directory = Path(sys.argv[1])
 

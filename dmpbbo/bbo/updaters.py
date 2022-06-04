@@ -31,13 +31,10 @@ class Updater(ABC):
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
 
-        Args:
-            distribution: Distribution before the update
-            samples: Samples in parameter space.
-            costs: The cost of each sample.
-
-        Returns:
-            The updated distribution.
+        @param distribution: Distribution before the update
+        @param samples: Samples in parameter space.
+        @param costs: The cost of each sample.
+        @return: The updated distribution.
         """
         pass
 
@@ -58,13 +55,10 @@ class UpdaterMean(Updater):
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
 
-        Args:
-            distribution: Distribution before the update
-            samples: Samples in parameter space.
-            costs: The cost of each sample.
-
-        Returns:
-            The updated distribution.
+        @param distribution: Distribution before the update
+        @param samples: Samples in parameter space.
+        @param costs: The cost of each sample.
+        @return: The updated distribution.
         """
 
         weights = costs_to_weights(costs, self.weighting_method, self.eliteness)
@@ -101,13 +95,10 @@ class UpdaterCovarDecay(Updater):
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
 
-        Args:
-            distribution: Distribution before the update
-            samples: Samples in parameter space.
-            costs: The cost of each sample.
-
-        Returns:
-            The updated distribution.
+        @param distribution: Distribution before the update
+        @param samples: Samples in parameter space.
+        @param costs: The cost of each sample.
+        @return: The updated distribution.
         """
 
         weights = costs_to_weights(costs, self.weighting_method, self.eliteness)
@@ -133,15 +124,12 @@ class UpdaterCovarAdaptation(Updater):
     def __init__(self, **kwargs):
         """ Constructor
 
-        Args:
-            eliteness: The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
-            weighting_method: ('PI-BB' = PI^2 style weighting)
-            diagonal_max: Max eigen value allowed along diagonals
-            diagonal_min: Small covariance matrix that is added after each update to avoid premature
-            convergence
-            diag_only: Update only the diagonal of the covariance matrix (true) or the
-            full matrix (false)
-            learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0]
+        @param eliteness: The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
+        @param weighting_method: ('PI-BB' = PI^2 style weighting)
+        @param diagonal_max: Max eigen value allowed along diagonals
+        @param diagonal_min: Small covariance matrix that is added after each update to avoid premature convergence
+        @param diag_only: Update only the diagonal of the covariance matrix (true) or the full matrix (false)
+        @param learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0]
             with 0.0 = no updating, and 1.0  = complete update by ignoring previous covar matrix.
         """
         self.eliteness = kwargs.get("eliteness", 10)
@@ -156,13 +144,10 @@ class UpdaterCovarAdaptation(Updater):
     def update_distribution(self, distribution, samples, costs):
         """ Update a distribution with reward-weighted averaging.
 
-        Args:
-            distribution: Distribution before the update
-            samples: Samples in parameter space.
-            costs: The cost of each sample.
-
-        Returns:
-            The updated distribution.
+        @param distribution: Distribution before the update
+        @param samples: Samples in parameter space.
+        @param costs: The cost of each sample.
+        @return: The updated distribution.
         """
 
         mean_cur = distribution.mean
@@ -228,12 +213,10 @@ class UpdaterCovarAdaptation(Updater):
 def costs_to_weights(costs, weighting_method, eliteness):
     """ Convert costs into weights using different weighting methods.
 
-        Args:
-            costs: A vector of costs.
-            weighting_method: The weighting method ('PI-BB','CMA-ES','CEM')
-            eliteness: The eliteness parameter (h in PI-BB, mu in CMA-ES)
-        Returns:
-            A vector of weights (they always sum to 1).
+        @param costs: A vector of costs.
+        @param weighting_method: The weighting method ('PI-BB','CMA-ES','CEM')
+        @param eliteness: The eliteness parameter (h in PI-BB, mu in CMA-ES)
+        @return: A vector of weights (they always sum to 1).
     """
 
     # Costs can be a 2D array or a list of lists. In this case, the first

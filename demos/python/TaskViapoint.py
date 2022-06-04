@@ -51,15 +51,11 @@ class TaskViapoint(Task):
     def evaluate_rollout(self, cost_vars, sample):
         """The cost function which defines the task.
 
-
-        Args:
-            cost_vars: All the variables relevant to computing the cost. These are determined by
+        @param cost_vars: All the variables relevant to computing the cost. These are determined by
             TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_for_dmp".
-            sample: The sample from which the rollout was generated. Passing this to the cost
+        @param sample: The sample from which the rollout was generated. Passing this to the cost
             function is useful when performing regularization on the sample.
-
-         Returns:
-            costs The scalar cost components for the sample. The first item costs[0] should
+        @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
 

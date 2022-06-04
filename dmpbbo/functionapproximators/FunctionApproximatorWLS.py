@@ -28,9 +28,8 @@ class FunctionApproximatorWLS(FunctionApproximator):
     def __init__(self, use_offset=True, regularization=0.0):
         """Initialize a Least-Squares function approximator.
 
-        Args:
-            use_offset: Use linear model "y = a*x + offset" instead of "y = a*x". Default: true.
-            regularization: Regularization term for regularized least squares. Default: 0.0.
+        @param use_offset: Use linear model "y = a*x + offset" instead of "y = a*x". Default: true.
+        @param regularization: Regularization term for regularized least squares. Default: 0.0.
         """
         meta_params = {"use_offset": use_offset, "regularization": regularization}
 

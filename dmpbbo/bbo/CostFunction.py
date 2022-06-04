@@ -28,8 +28,8 @@ class CostFunction(ABC):
     def evaluate(self, sample):
         """The cost function which defines the cost_function.
 
-         Args: sample The sample
-         Returns: The scalar cost components for the sample. The first item costs[0] should contain
+         @param sample: The sample
+         @return: The scalar cost components for the sample. The first item costs[0] should contain
          the total cost.
         """
         pass

@@ -37,13 +37,12 @@ class SpringDamperSystem(DynamicalSystem):
     ):
         """ Initialize a SpringDamperSystem.
 
-        Args:
-            tau    - Time constant
-            y_init - Initial state (y part, i.e. x = [y z])
-            y_attr - Attractor state (y part, i.e. x = [y z])
-            spring_constant - Spring constant. Can be set to "CRITICALLY_DAMPED" (str)
-            damping_coefficient - Damping coefficient
-            mass - Mass
+        @param tau: Time constant
+        @param y_init: Initial state (y part, i.e. x = [y z])
+        @param y_attr: Attractor state (y part, i.e. x = [y z])
+        @param spring_constant: Spring constant. Can be set to "CRITICALLY_DAMPED" (str)
+        @param damping_coefficient: Damping coefficient
+        @param mass: Mass
         """
         super().__init__(2, tau, y_init)
         self._y_attr = y_attr
@@ -73,8 +72,8 @@ class SpringDamperSystem(DynamicalSystem):
 
         It relates state values to rates of change of those state values.
 
-        Args: x - current state
-        Returns: xd - rate of change in state
+        @param x: current state
+        @return: xd - rate of change in state
         """
 
         # Spring-damper system was originally 2nd order, i.e. with [x xd xdd]
@@ -100,8 +99,8 @@ class SpringDamperSystem(DynamicalSystem):
         """
          Return analytical solution of the system at certain times.
 
-         Args: ts - A vector of times for which to compute the analytical solutions
-         Returns: (xs, xds) - Sequence of states and their rates of change.
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
         """
 
         n_time_steps = ts.size

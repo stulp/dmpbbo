@@ -72,9 +72,8 @@ class DistributionGaussian:
     def __init__(self, mean=0.0, covar=1.0):
         """ Construct the Gaussian distribution with a mean and covariance matrix.
 
-        Args:
-            mean: Mean of the distribution
-            covar: Covariance matrix of the distribution
+        @param mean: Mean of the distribution
+        @param covar: Covariance matrix of the distribution
         """
         self.mean = mean
         self.covar = covar
@@ -82,24 +81,22 @@ class DistributionGaussian:
     def generate_samples(self, n_samples=1):
         """ Generate samples from the distribution.
 
-        Args:
-            n_samples Number of samples to sample
-        Returns:
-            The samples themselves (size n_samples X dim(mean)
+        @param n_samples: Number of samples to sample
+        @return: The samples themselves (size n_samples X dim(mean)
         """
         return np.random.multivariate_normal(self.mean, self.covar, n_samples)
 
     def max_eigen_value(self):
         """ Get the largest eigenvalue of the covariance matrix of this distribution.
-        Returns:
-            largest eigenvalue of the covariance matrix of this distribution.
+
+        @return: largest eigenvalue of the covariance matrix of this distribution.
         """
         return max(np.linalg.eigvals(self.covar))
 
     def __str__(self):
         """ Get a string representation of an object of this class.
-        Returns:
-            A string representation of an object of this class.
+
+        @return: A string representation of an object of this class.
         """
         return f"N( {self.mean}, {self.covar})"
 

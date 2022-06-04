@@ -29,11 +29,10 @@ class SigmoidSystem(DynamicalSystem):
     def __init__(self, tau, x_init, max_rate, inflection_ratio):
         """ Initialize a SigmoidSystem.
 
-        Args:
-            tau    - Time constant
-            x_init - Initial state
-            max_rate - Maximum rate of change
-            inflection_ratio - Time at which maximum rate of change is
+        @param tau: Time constant
+        @param x_init: Initial state
+        @param max_rate: Maximum rate of change
+        @param inflection_ratio: Time at which maximum rate of change is
                                achieved, i.e. at inflection_ratio * tau
         """
         super().__init__(1, tau, x_init)
@@ -46,8 +45,7 @@ class SigmoidSystem(DynamicalSystem):
     def tau(self, new_tau):
         """ Set the time constant.
 
-         Args:
-            new_tau - Time constant
+        @param new_tau: Time constant
         """
         self._tau = new_tau
         self._Ks_cached = None  # Forces recomputing Ks
@@ -56,8 +54,7 @@ class SigmoidSystem(DynamicalSystem):
     def x_init(self, new_x_init):
         """ Set the initial state of the dynamical system.
 
-         Args:
-            new_x_init Initial state of the dynamical system.
+        @param new_x_init: Initial state of the dynamical system.
         """
         if new_x_init.size != self._dim_x:
             raise ValueError(f"x_init must have size {self._dim_x}")
@@ -68,8 +65,7 @@ class SigmoidSystem(DynamicalSystem):
     def y_init(self, new_y_init):
         """ Set the initial state of the dynamical system (y part)
 
-         Args:
-            new_y_init Initial state of the dynamical system. (y part)
+        @param new_y_init: Initial state of the dynamical system. (y part)
 
         Note that for an ExponentialSystem y is equivalent to x.
         """
@@ -81,8 +77,8 @@ class SigmoidSystem(DynamicalSystem):
 
         It relates state values to rates of change of those state values.
 
-        Args: x - current state
-        Returns: xd - rate of change in state
+        @param x: current state
+        @return: xd - rate of change in state
         """
         ks = self._get_ks()
         xd = self._max_rate * x * (1 - (np.divide(x, ks)))
@@ -92,8 +88,8 @@ class SigmoidSystem(DynamicalSystem):
         """
          Return analytical solution of the system at certain times.
 
-         Args: ts - A vector of times for which to compute the analytical solutions
-         Returns: (xs, xds) - Sequence of states and their rates of change.
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
         """
 
         # Auxiliary variables to improve legibility

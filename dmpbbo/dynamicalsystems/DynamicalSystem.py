@@ -30,11 +30,10 @@ class DynamicalSystem(ABC):
     def __init__(self, order, tau, y_init, n_dims_x=None):
         """ Initialize a first or second order dynamical system.
 
-        Args:
-            order    - Order of the system (1 or 2)
-            tau      - Time constant
-            y_init   - Initial state
-            n_dims_x - Dimensionality of the state (which may differ from the size  of y_init)
+        @param order: Order of the system (1 or 2)
+        @param tau: Time constant
+        @param y_init: Initial state
+        @param n_dims_x: Dimensionality of the state (which may differ from the size  of y_init)
         """
         if order < 1 or order > 2:
             raise ValueError("order should be 1 or 2")
@@ -54,7 +53,7 @@ class DynamicalSystem(ABC):
     def tau(self):
         """ Get the time constant.
 
-         Returns: Time constant
+         @return: Time constant
         """
         return self._tau
 
@@ -62,8 +61,7 @@ class DynamicalSystem(ABC):
     def tau(self, new_tau):
         """ Set the time constant.
 
-         Args:
-            new_tau - Time constant
+        @param new_tau: Time constant
         """
         self._tau = new_tau
 
@@ -95,8 +93,7 @@ class DynamicalSystem(ABC):
     def x_init(self, new_x_init):
         """ Set the initial state of the dynamical system.
 
-         Args:
-            new_x_init Initial state of the dynamical system.
+        @param new_x_init: Initial state of the dynamical system.
         """
         if new_x_init.size != self._dim_x:
             raise ValueError(f"x_init must have size {self._dim_x}")
@@ -107,7 +104,7 @@ class DynamicalSystem(ABC):
         """
          Get the y part of the initial state of the dynamical system.
 
-        Returns: Initial state of the dynamical system.
+        @return: Initial state of the dynamical system.
         """
         # if _dim_y==_dim_x, this returns all of x_init
         return self._x_init[: self._dim_y]
@@ -116,8 +113,7 @@ class DynamicalSystem(ABC):
     def y_init(self, y_init_new):
         """ Set the y part of the initial state of the dynamical system.
 
-        Args:
-            y_init_new Initial state of the dynamical system.
+        @param y_init_new: Initial state of the dynamical system.
         """
         if y_init_new.size != self._dim_y:
             raise ValueError(f"y_init_new must have size {self._dim_y}")
@@ -132,8 +128,8 @@ class DynamicalSystem(ABC):
 
         It relates state values to rates of change of those state values.
 
-        Args: x - current state
-        Returns: xd - rate of change in state
+        @param x: current state
+        @return: xd - rate of change in state
         """
         pass
 
@@ -142,18 +138,16 @@ class DynamicalSystem(ABC):
         """
          Return analytical solution of the system at certain times.
 
-         Args: ts - A vector of times for which to compute the analytical solutions
-         Returns: (xs, xds) - Sequence of states and their rates of change.
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
         """
         pass
 
     def integrate_start(self, y_init=None):
         """ Start integrating the system with a new initial state.
 
-        Args:
-            y_init - The initial state vector (y part)
-        Returns:
-            x, xd - The first vector of state variables and their rates of change
+        @param y_init: The initial state vector (y part)
+        @return: x, xd - The first vector of state variables and their rates of change
         """
         if y_init is not None:
             self.y_init = y_init
@@ -163,24 +157,18 @@ class DynamicalSystem(ABC):
     def integrate_step(self, dt, x):
         """ Integrate the system one time step.
 
-        Args:
-            dt - Duration of the time step
-            x - Current state
-
-        Returns:
-            (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
+        @param dt: Duration of the time step
+        @param x: Current state
+        @return: (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
         return self.integrate_step_runge_kutta(dt, x)
 
     def integrate_step_euler(self, dt, x):
         """ Integrate the system one time step using Euler integration.
 
-        Args:
-            dt - Duration of the time step
-            x - Current state
-
-        Returns:
-            (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
+        @param dt: Duration of the time step
+        @param x: Current state
+        @return: (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
         if x.size != self._dim_x:
             raise ValueError("x must have size {self._dim_x}")
@@ -194,12 +182,9 @@ class DynamicalSystem(ABC):
         See http://en.wikipedia.org/wiki/Runge-Kutta_method#The_Runge.E2.80.93Kutta_method
 
 
-        Args:
-            dt - Duration of the time step
-            x - Current state
-
-        Returns:
-            (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
+        @param dt: Duration of the time step
+        @param x: Current state
+        @return: (x_updated, xd_updated) - Updated state and its rate of change, dt time later.
         """
 
         if x.size != self._dim_x:
@@ -220,9 +205,9 @@ class DynamicalSystem(ABC):
     def plot(self, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
 
-        Args:
-            ts - Times at which the state was determined (size: n_time_steps)
-            xs, xds - System states and its rates of change (shape: n_time_steps X n_dim_x)
+        @param ts: Times at which the state was determined (size: n_time_steps)
+        @param xs: System states (shape: n_time_steps X n_dim_x)
+        @param xds: Rates of change of system states (shape: n_time_steps X n_dim_x)
 
         Kwargs:
             dim_y - Dimensionality of y part of state, i.e. x = [y z]. Default: dim_y = dim_x

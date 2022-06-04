@@ -34,8 +34,7 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
     def __init__(self, point):
         """ Constructor.
 
-        Args:
-            point: Point to which distance must be minimized.
+        @param point: Point to which distance must be minimized.
         """
         self.point = np.asarray(point)
 
@@ -44,8 +43,8 @@ class DemoCostFunctionDistanceToPoint(CostFunction):
 
         Computes the distance from sample to point
 
-         Args: sample The sample
-         Returns: The scalar cost components for the sample. The first item costs[0] should contain
+         @param sample: The sample
+         @return: The scalar cost components for the sample. The first item costs[0] should contain
          the total cost.
         """
         return [np.linalg.norm(sample - self.point)]

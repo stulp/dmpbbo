@@ -169,7 +169,9 @@ if __name__ == "__main__":
     parser.add_argument("--save", action="store_true", help="save plots")
     # parser.add_argument("--verbose", action="store_true", help="print output")
     parser.add_argument(
-        "--directory", help="directory to write results to", default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_dmp_data')
+        "--directory",
+        help="directory to write results to",
+        default=Path(tempfile.gettempdir(), "dmpbbo", "test_dmp_data"),
     )
     args = parser.parse_args()
 

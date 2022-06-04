@@ -152,7 +152,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--directory",
         help="directory to write results to",
-        default=Path(tempfile.gettempdir(), 'dmpbbo', 'test_function_approximators_data'),
+        default=Path(tempfile.gettempdir(), "dmpbbo", "test_function_approximators_data"),
     )
     args = parser.parse_args()
 
