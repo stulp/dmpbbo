@@ -25,17 +25,6 @@ from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
 
-def set_style(lines, label):
-    if label == "analytical":
-        plt.setp(lines, linestyle="-", linewidth=5, color=(0.8, 0.8, 0.8))
-    elif label == "euler":
-        plt.setp(lines, linestyle="--", linewidth=2, color=(0.8, 0.0, 0.0))
-    elif label == "rungekutta":
-        plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.0))
-
-    plt.setp(lines[0], label=label)
-
-
 def main():
     ###########################################################################
     # Create all systems and add them to a dictionary
@@ -78,29 +67,33 @@ def main():
         # Analytical solution
         xs, xds = dyn_system.analytical_solution(ts)
         lines, axs = dyn_system.plot(ts, xs, xds)
-        set_style(lines, "analytical")
+        plt.setp(lines, linestyle="-", linewidth=5, color=(0.8, 0.8, 0.8))
+        plt.setp(lines[0], label="analytical")
 
         # Euler integration
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_euler(dt, xs[ii - 1, :])
         lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
-        set_style(lines, "euler")
+        plt.setp(lines, linestyle="--", linewidth=2, color=(0.8, 0.0, 0.0))
+        plt.setp(lines[0], label="Euler")
 
         # Runge-kutta integration
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
-        set_style(lines, "rungekutta")
+        plt.setp(lines, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.2))
+        plt.setp(lines[0], label="Runge-Kutta")
 
         # Runge-kutta integration with different tau
         dyn_system.tau = 1.5 * tau
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
-        lines = dyn_system.plot(ts, xs, xds, axs=axs)
-        set_style(lines, "tau")
+        lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
+        plt.setp(lines, linestyle="-", linewidth=1, color=(0.2, 0.8, 0.2))
+        plt.setp(lines[0], label="tau")
         dyn_system.tau = tau
 
         # Runge-kutta integration with a perturbation
@@ -109,8 +102,9 @@ def main():
             if ii == int(np.ceil(0.3 * n_time_steps)):
                 xs[ii - 1, :] = xs[ii - 1, :] - 0.2
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
-        lines = dyn_system.plot(ts, xs, xds, axs=axs)
-        set_style(lines, "perturb")
+        lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
+        plt.setp(lines, linestyle="-", linewidth=1, color=(0.2, 0.2, 0.8))
+        plt.setp(lines[0], label="perturbation")
 
         # Runge-kutta integration with a different attractor
         if name == "Exponential" or name == "SpringDamper":
@@ -118,8 +112,9 @@ def main():
             xs[0, :], xds[0, :] = dyn_system.integrate_start()
             for ii in range(1, n_time_steps):
                 xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
-            lines = dyn_system.plot(ts, xs, xds, axs=axs)
-            set_style(lines, "attractor")
+            lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
+            plt.setp(lines, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.8))
+            plt.setp(lines[0], label="attractor")
             dyn_system.y_attr = x_attr
 
         axs[0].legend()
