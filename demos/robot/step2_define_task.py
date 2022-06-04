@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Script for defining the task. """
 
 import argparse
 import os
@@ -25,6 +26,7 @@ from TaskThrowBall import TaskThrowBall
 
 
 def main():
+    """ Main function that is called when executing the script. """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write task to")

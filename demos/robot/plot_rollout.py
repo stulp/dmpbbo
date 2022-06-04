@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Script for plotting one rollout. """
 
 import argparse
 
@@ -23,6 +24,7 @@ import numpy as np
 
 
 def main():
+    """ Main function that is called when executing the script. """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("filename", help="file (txt) to read cost vars from")

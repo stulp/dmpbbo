@@ -12,7 +12,7 @@ class TaskThrowBall(Task):
         self.y_floor = y_floor
         self.acceleration_weight = acceleration_weight
 
-    def cost_labels(self):
+    def get_cost_labels(self):
         return ["landing site", "acceleration"]
 
     def evaluate_rollout(self, cost_vars, sample):

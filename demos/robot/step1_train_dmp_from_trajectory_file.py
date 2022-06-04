@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Script for training a DMP from a trajectory. """
 
 
 import argparse
@@ -30,6 +31,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 
 
 def main():
+    """ Main function that is called when executing the script. """
 
     parser = argparse.ArgumentParser()
     parser.add_argument("trajectory_file", help="file to read trajectory from")

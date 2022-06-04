@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Script for preparing the optimization. """
 
 import argparse
 from pathlib import Path
@@ -25,6 +26,8 @@ from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, Updat
 
 
 def main():
+    """ Main function that is called when executing the script. """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write results to")
     args = parser.parse_args()
