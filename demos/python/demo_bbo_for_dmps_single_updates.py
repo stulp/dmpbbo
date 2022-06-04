@@ -14,10 +14,12 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script for bbo_for_dmps demo (with single updates saved to file)."""
 
 
 import sys
 
+from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -83,7 +85,7 @@ def run_demo(directory, n_dims):
     covar_init = 1000.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI_BB", covar_decay_factor=0.9)
+    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
 
     n_samples_per_update = 10
     n_updates = 20
@@ -108,9 +110,10 @@ def run_demo(directory, n_dims):
 
 
 def main():
-    directory = "/tmp/demoDmpBboSingleUpdates"
+    """ Main function of the script. """
+    directory = Path("/tmp", "demo_bbo_for_dmps_single_updates")
     if len(sys.argv) > 1:
-        directory = sys.argv[1]
+        directory = Path(sys.argv[1])
 
     for n_dims in [1]:
         run_demo(directory, n_dims)
