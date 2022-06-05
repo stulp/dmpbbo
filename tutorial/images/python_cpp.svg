@@ -1,0 +1,693 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="261.10745mm"
+   height="153.88284mm"
+   viewBox="0 0 925.18379 545.25417"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
+   sodipodi:docname="python_cpp.svg"
+   inkscape:export-filename="./python_cpp.png"
+   inkscape:export-xdpi="89.958046"
+   inkscape:export-ydpi="89.958046">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path1437"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         id="path1443"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-6"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-8"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-0-3"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-7-1"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-0-9"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-7-2"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-06"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-89"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-64"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-9"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-0-0"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-7-4"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-2"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-2"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-0-6"
+       style="overflow:visible"
+       inkscape:isstock="true">
+      <path
+         inkscape:connector-curvature="0"
+         id="path1437-7-10"
+         d="M 0,0 5,-5 -12.5,0 5,5 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.00000003pt;stroke-opacity:1"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.8646996"
+     inkscape:cx="786.14489"
+     inkscape:cy="21.288256"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1844"
+     inkscape:window-height="1016"
+     inkscape:window-x="76"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:snap-global="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(98.642097,-424.88986)">
+    <g
+       id="g1285">
+      <rect
+         transform="matrix(0,1,1,0,0,0)"
+         y="-13.698833"
+         x="494.34882"
+         height="337.90457"
+         width="118.69176"
+         id="rect4723-5"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#94bce4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+      <flowRoot
+         transform="matrix(0.93749999,0,0,0.93749999,27.767841,232.64882)"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot848"
+         xml:space="preserve"><flowRegion
+           id="flowRegion850"><rect
+             y="279.99686"
+             x="-25.181364"
+             height="122.90908"
+             width="324.95947"
+             id="rect852" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara854">inputs = np.loadtxt('inputs.txt')</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara856">targets = np.loadtxt('targets.txt')</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara858">fa = FunctionApproximatorRBFN([9])   </flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara860">fa.train(inputs,targets)</flowPara><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara862" /><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara864">savejson_for_cpp('fa_for_cpp.json'), fa)</flowPara></flowRoot>      <rect
+         transform="matrix(0,1,1,0,0,0)"
+         y="-13.698833"
+         x="470.64923"
+         height="337.90454"
+         width="23.699564"
+         id="rect4723-36-1"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#007dc5;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+      <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot848-3"
+         xml:space="preserve"
+         transform="matrix(0.93749999,0,0,0.93749999,17.057392,211.72677)"><flowRegion
+           id="flowRegion850-6"><rect
+             y="279.99686"
+             x="-25.181364"
+             height="128.30507"
+             width="395.10757"
+             id="rect852-7" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1"
+           id="flowPara864-9">Training in Python (need not be real-time)</flowPara></flowRoot>    </g>
+    <g
+       id="g4254"
+       transform="translate(45,-25.857645)">
+      <g
+         transform="translate(-2.1609502,88.495066)"
+         id="g1357">
+        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#94bce4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-5-2"
+           width="25.868881"
+           height="337.90457"
+           x="431.71136"
+           y="364.20853"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           xml:space="preserve"
+           id="flowRoot848-7"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           transform="matrix(0.93749999,0,0,0.93749999,405.6813,170.01139)"><flowRegion
+             id="flowRegion850-0"><rect
+               id="rect852-9"
+               width="324.95947"
+               height="122.90908"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-6"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">outputs = fa.predict(inputs) </flowPara></flowRoot>        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#007dc5;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-36-1-1"
+           width="23.699564"
+           height="337.90454"
+           x="408.01181"
+           y="364.20853"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           transform="matrix(0.93749999,0,0,0.93749999,394.15909,149.08933)"
+           xml:space="preserve"
+           id="flowRoot848-3-8"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+             id="flowRegion850-6-7"><rect
+               id="rect852-7-9"
+               width="395.10757"
+               height="128.30507"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-9-2"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1">Prediction in Python (not real-time)</flowPara></flowRoot>      </g>
+      <g
+         transform="translate(-2.1609502,42.257674)"
+         id="g1345">
+        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#bdc9b0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.19999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-5-2-0"
+           width="79.670677"
+           height="419.49411"
+           x="545.52289"
+           y="364.20853"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           xml:space="preserve"
+           id="flowRoot848-7-2"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           transform="matrix(0.93749999,0,0,0.93749999,405.59586,283.82288)"><flowRegion
+             id="flowRegion850-0-3"><rect
+               id="rect852-9-7"
+               width="428.49527"
+               height="84.131851"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara1376"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">json j = json::parse(ifstream(&quot;fa_for_cpp.json&quot;));</flowPara><flowPara
+             id="flowPara1372"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">FunctionApproximator* fa;</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1087">fa = j.get&lt;FunctionApproximator*&gt;();</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1095">fa-&gt;predict(inputs, outputs); // Real-time call</flowPara></flowRoot>        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#70925b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.19999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-36-1-1-9"
+           width="23.699564"
+           height="419.49405"
+           x="521.8233"
+           y="364.20853"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           transform="matrix(0.93749999,0,0,0.93749999,394.15909,262.90082)"
+           xml:space="preserve"
+           id="flowRoot848-3-8-2"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+             id="flowRegion850-6-7-2"><rect
+               id="rect852-7-9-8"
+               width="395.10757"
+               height="128.30507"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-9-2-9"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1">Prediction in C++ (real-time)</flowPara></flowRoot>      </g>
+    </g>
+    <g
+       id="g5307">
+      <rect
+         transform="matrix(0,1,1,0,0,0)"
+         y="-16.750162"
+         x="770.5155"
+         height="337.90457"
+         width="86.856186"
+         id="rect4723-5-6"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#94bce4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+      <flowRoot
+         transform="matrix(0.93749999,0,0,0.93749999,24.7165,508.8155)"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot848-1"
+         xml:space="preserve"><flowRegion
+           id="flowRegion850-2"><rect
+             y="279.99686"
+             x="-25.181364"
+             height="125.75437"
+             width="361.38181"
+             id="rect852-93" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+           id="flowPara864-4">demonstration = Trajectory.loadtxt(file)</flowPara><flowPara
+           id="flowPara1243"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">dmp = Dmp.from_traj(demonstration, ...)   </flowPara><flowPara
+           id="flowPara1245"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'" /><flowPara
+           id="flowPara1247"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">savejson_for_cpp('dmp_for_cpp.json'), dmp)</flowPara></flowRoot>      <rect
+         transform="matrix(0,1,1,0,0,0)"
+         y="-16.750162"
+         x="746.81592"
+         height="337.90454"
+         width="23.699564"
+         id="rect4723-36-1-5"
+         style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#007dc5;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate" />
+      <flowRoot
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot848-3-0"
+         xml:space="preserve"
+         transform="matrix(0.93749999,0,0,0.93749999,14.00605,487.89344)"><flowRegion
+           id="flowRegion850-6-3"><rect
+             y="279.99686"
+             x="-25.181364"
+             height="128.30507"
+             width="395.10757"
+             id="rect852-7-6" /></flowRegion><flowPara
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1"
+           id="flowPara864-9-1">Training in Python (need not be real-time)</flowPara></flowRoot>    </g>
+    <g
+       id="g2985"
+       transform="translate(-550.8245,284.72591)">
+      <g
+         transform="translate(596.71488,-222.08846)"
+         id="g1330">
+        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#94bce4;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-5-2-06"
+           width="60.285717"
+           height="337.90457"
+           x="707.87805"
+           y="361.1572"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           xml:space="preserve"
+           id="flowRoot848-7-3"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           transform="matrix(0.93749999,0,0,0.93749999,402.62996,446.17806)"><flowRegion
+             id="flowRegion850-0-2"><rect
+               id="rect852-9-0"
+               width="324.95947"
+               height="122.90908"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-6-6"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">x, xd = dmp.integrate_start()</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1249">for t in range(500):</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1251">    x, xd = dmp.integrate_step(dt,x)</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1253" /></flowRoot>        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#007dc5;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-36-1-1-1"
+           width="23.699564"
+           height="337.90454"
+           x="684.17847"
+           y="361.1572"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           transform="matrix(0.93749999,0,0,0.93749999,391.10774,425.256)"
+           xml:space="preserve"
+           id="flowRoot848-3-8-5"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+             id="flowRegion850-6-7-5"><rect
+               id="rect852-7-9-4"
+               width="395.10757"
+               height="128.30507"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-9-2-7"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1">Integration in Python (not real-time)</flowPara></flowRoot>      </g>
+      <g
+         transform="translate(514.16932,-288.97597)"
+         id="g2935">
+        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#bdc9b0;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.19999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-5-2-0-6"
+           width="97.637512"
+           height="419.49411"
+           x="876.75653"
+           y="443.70276"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           xml:space="preserve"
+           id="flowRoot848-7-2-5"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+           transform="matrix(0.93749999,0,0,0.93749999,485.09007,615.0565)"><flowRegion
+             id="flowRegion850-0-3-6"><rect
+               id="rect852-9-7-9"
+               width="426.98605"
+               height="102.68973"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara1386"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">json j = json::parse(ifstream(&quot;dmp_for_cpp.json&quot;));</flowPara><flowPara
+             id="flowPara1384"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'">Dmp* dmp = j.get&lt;Dmp*&gt;();</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1264">dmp-&gt;integrateStart(x, xd);</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1266">for (int t = 1; t &lt; 500; t++)</flowPara><flowPara
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13.33333302px;font-family:'Courier New';-inkscape-font-specification:'Courier New'"
+             id="flowPara1268">    dmp-&gt;integrateStep(dt, x, x, xd); // Real-time</flowPara></flowRoot>        <rect
+           style="color:#000000;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;vector-effect:none;fill:#70925b;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.19999999;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+           id="rect4723-36-1-1-9-2"
+           width="23.699564"
+           height="419.49405"
+           x="853.05695"
+           y="443.70276"
+           transform="matrix(0,1,1,0,0,0)" />
+        <flowRoot
+           transform="matrix(0.93749999,0,0,0.93749999,473.6533,594.13444)"
+           xml:space="preserve"
+           id="flowRoot848-3-8-2-5"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:16px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"><flowRegion
+             id="flowRegion850-6-7-2-4"><rect
+               id="rect852-7-9-8-7"
+               width="395.10757"
+               height="128.30507"
+               x="-25.181364"
+               y="279.99686" /></flowRegion><flowPara
+             id="flowPara864-9-2-9-4"
+             style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1">Integration in C++ (real-time)</flowPara></flowRoot>      </g>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="234.57683"
+       y="439.45041"
+       id="text1406"><tspan
+         sodipodi:role="line"
+         id="tspan1404"
+         x="234.57683"
+         y="439.45041"
+         style="font-size:20px;stroke-width:0.9375">Training</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.25;font-family:Arial;-inkscape-font-specification:'Arial Bold';letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="418.7175"
+       y="439.45041"
+       id="text1406-4"><tspan
+         sodipodi:role="line"
+         id="tspan1404-3"
+         x="418.7175"
+         y="439.45041"
+         style="font-size:20px;stroke-width:0.9375">Prediction / Integration</tspan></text>
+    <g
+       id="g7864">
+      <path
+         sodipodi:nodetypes="ccc"
+         inkscape:connector-curvature="0"
+         id="path1426"
+         d="m 308.3703,600.5026 h 26.73606 l 81.19356,-26.57425"
+         style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend)" />
+      <path
+         sodipodi:nodetypes="ccc"
+         inkscape:connector-curvature="0"
+         id="path1426-8"
+         d="m 187.63756,561.24203 h 147.4688 l 81.19356,-55.32626"
+         style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-0)" />
+      <text
+         transform="rotate(-35.358819)"
+         id="text1406-7"
+         y="647.7182"
+         x="-9.015008"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+           y="647.7182"
+           x="-9.015008"
+           id="tspan1404-1"
+           sodipodi:role="line">Python</tspan><tspan
+           id="tspan7817"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+           y="664.2182"
+           x="-9.015008"
+           sodipodi:role="line">object</tspan></text>
+      <text
+         transform="rotate(-19.619008)"
+         id="text1406-7-7"
+         y="673.91119"
+         x="148.75407"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+         xml:space="preserve"><tspan
+           id="tspan7817-7"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+           y="673.91119"
+           x="148.75407"
+           sodipodi:role="line">json</tspan><tspan
+           id="tspan7842"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+           y="690.41119"
+           x="148.75407"
+           sodipodi:role="line">file</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-2)"
+       d="m 317.70371,838.24193 h 18.12084 l 81.19356,42.75773"
+       id="path1426-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-0-6)"
+       d="m 297.48182,801.0326 h 38.34273 l 81.19356,-17.99366"
+       id="path1426-8-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="145.27861"
+       y="859.0647"
+       id="text1406-7-9"
+       transform="rotate(-15.757814)"><tspan
+         sodipodi:role="line"
+         id="tspan1404-1-4"
+         x="145.27861"
+         y="859.0647"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375">Python</tspan><tspan
+         sodipodi:role="line"
+         x="145.27861"
+         y="875.5647"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan7817-9">object</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="771.4408"
+       y="520.46161"
+       id="text1406-7-7-0"
+       transform="rotate(32.395027)"><tspan
+         sodipodi:role="line"
+         x="771.4408"
+         y="520.46161"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan7817-7-9">json</tspan><tspan
+         sodipodi:role="line"
+         x="771.4408"
+         y="536.96161"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan7842-1">file</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="-542.32831"
+       y="-62.325691"
+       id="text1406-77"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         id="tspan1404-11"
+         x="-542.32831"
+         y="-62.325691"
+         style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375">function</tspan><tspan
+         sodipodi:role="line"
+         x="-542.32831"
+         y="-40.325691"
+         style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan8976">approximator</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
+       x="-802.58698"
+       y="-84.325691"
+       id="text1406-77-5"
+       transform="rotate(-90)"><tspan
+         sodipodi:role="line"
+         x="-802.58698"
+         y="-84.325691"
+         style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan8976-7">dynamical</tspan><tspan
+         sodipodi:role="line"
+         x="-802.58698"
+         y="-62.325691"
+         style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan9001">movement</tspan><tspan
+         sodipodi:role="line"
+         x="-802.58698"
+         y="-40.325691"
+         style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
+         id="tspan9003">primitive</tspan></text>
+  </g>
+</svg>
