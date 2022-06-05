@@ -76,7 +76,7 @@ def main(directory, **kwargs):
     xs_step = np.zeros([n_time_steps, dim_x])
     xds_step = np.zeros([n_time_steps, dim_x])
 
-    (x, xd) = dmp.integrate_start()
+    x, xd = dmp.integrate_start()
     xs_step[0, :] = x
     xds_step[0, :] = xd
     for tt in range(1, n_time_steps):
