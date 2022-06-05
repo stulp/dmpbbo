@@ -83,14 +83,14 @@ class FunctionApproximatorLWR : public FunctionApproximator {
    * the y-axis. \param[in] lines_pivot_at_max_activation Whether to pivot
    * around the mode or not.
    *
-   */
   void set_lines_pivot_at_max_activation(bool lines_pivot_at_max_activation);
+   */
 
   /** Whether to return slopes as angles or slopes
    * \param[in] slopes_as_angles Whether to return as slopes (true) or angles
-   * (false) \todo Implement and document
-   */
+   * (false)
   void set_slopes_as_angles(bool slopes_as_angles);
+   */
 
   /** Read an object from json.
    *  \param[in]  j   json input
