@@ -22,6 +22,7 @@ import sys
 import matplotlib.pyplot as plt
 import numpy as np
 import tempfile
+from pathlib import Path
 
 from dmpbbo.bbo.CostFunction import CostFunction
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
