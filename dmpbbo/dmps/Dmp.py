@@ -111,12 +111,13 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param trajectory: the trajectory to train on
         @param function_approximators: Function approximators for the forcing term
-        @param dmp_type: Type of the Dmp
-                ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING", "COUNTDOWN_2013")
-        @param forcing_term_scaling: Which method to use for scaling the forcing term
+        @param kwargs:
+        - dmp_type: Type of the Dmp ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING",
+        "COUNTDOWN_2013")
+        - forcing_term_scaling: Which method to use for scaling the forcing term
                 ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
-        @param phase_system: Dynamical system to compute the phase
-        @param gating_system: Dynamical system to compute the gating term
+        - phase_system: Dynamical system to compute the phase
+        - gating_system: Dynamical system to compute the gating term
         """
 
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
@@ -267,10 +268,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
-        @return: xs: Sequence of state vectors. T x D or D x T matrix, where T is the number of times
-            (the length of 'ts'), and D the size of the state (i.e. dim())
-            xds: Sequence of state vectors (rates of change). T x D or D x T matrix, where T is
-            the number of times (the length of 'ts'), and D the size of the state (i.e. dim())
+        @return: xs, xds: Sequence of state vectors and their rates of change. T x D or D x T
+        matrix, where T is the number of times (the length of 'ts'), and D the size of the state
+        (i.e. dim())
 
         The output xs and xds will be of size D x T only if the matrix x you pass as an argument
         of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x
@@ -289,10 +289,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         # INTEGRATE SYSTEMS ANALYTICALLY AS MUCH AS POSSIBLE
 
         # Integrate phase
-        (xs_phase, xds_phase) = self._phase_system.analytical_solution(ts)
+        xs_phase, xds_phase = self._phase_system.analytical_solution(ts)
 
         # Compute gating term
-        (xs_gating, xds_gating) = self._gating_system.analytical_solution(ts)
+        xs_gating, xds_gating = self._gating_system.analytical_solution(ts)
 
         # Compute the output of the function approximator
         fa_outputs = self._compute_func_approx_predictions(xs_phase)
@@ -341,7 +341,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         local_spring_system.y_attr = xs_goal[0, :]
 
         # Start integrating spring damper system
-        (x_spring, xd_spring) = local_spring_system.integrate_start()
+        x_spring, xd_spring = local_spring_system.integrate_start()
 
         # For convenience
         SPRING = self.SPRING  # noqa
@@ -368,9 +368,8 @@ class Dmp(DynamicalSystem, Parameterizable):
             xds[tt, SPRING] = local_spring_system.differential_equation(xs[tt, SPRING])
 
             # Add forcing term to the acceleration of the spring state
-            xds[tt, SPRING_Z] = (
-                xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
-            )  # + perturbation
+            xds[tt, SPRING_Z] = xds[tt, SPRING_Z] + forcing_terms[tt, :] / self._tau
+
             # Compute y component from z
             xds[tt, SPRING_Y] = xs[tt, SPRING_Z] / self._tau
 

@@ -127,8 +127,10 @@ class UpdaterCovarAdaptation(Updater):
         @param eliteness: The eliteness parameter ('mu' in CMA-ES, 'h' in PI^2)
         @param weighting_method: ('PI-BB' = PI^2 style weighting)
         @param diagonal_max: Max eigen value allowed along diagonals
-        @param diagonal_min: Small covariance matrix that is added after each update to avoid premature convergence
-        @param diag_only: Update only the diagonal of the covariance matrix (true) or the full matrix (false)
+        @param diagonal_min: Small covariance matrix that is added after each update to avoid
+        premature convergence
+        @param diag_only: Update only the diagonal of the covariance matrix (true) or the full
+        matrix (false)
         @param learning_rate: Low pass filter on the covariance updates. In range [0.0-1.0]
             with 0.0 = no updating, and 1.0  = complete update by ignoring previous covar matrix.
         """

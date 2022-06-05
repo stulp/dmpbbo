@@ -117,8 +117,8 @@ class Gaussian(BasisFunction):
         @param n_bfs_per_dim: Number of basis functions per input dimension.
         @param intersection_height: The relative value at which two neighbouring basis functions
             will intersect (default=0.7)
-        @return: centers: Centers of the basis functions (matrix of size n_basis_functions X n_input_dims
-            widths: Widths of the basis functions (matrix of size n_basis_functions X n_input_dims
+        @return: centers: Centers of the basis functions (n_basis_functions X n_input_dims)
+            widths: Widths of the basis functions (n_basis_functions X n_input_dims)
         """
         min_vals = inputs.min(axis=0)
         max_vals = inputs.max(axis=0)

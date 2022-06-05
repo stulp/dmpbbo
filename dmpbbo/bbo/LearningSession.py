@@ -86,9 +86,10 @@ def plot_learning_curve(learning_curve, **kwargs):
         column 0: Number of samples at which the cost was evaluated
         column 1: The total cost
         column 2...: Individual cost components (column 1 is their sum)
-        @param ax: Axis to plot the learning curve on.
-        @param costs_all: Vector of costs of each sample (default=[])
-        @param cost_labels: Vector of strings for the different cost components  (default=[]).
+        @param kwargs:
+        - ax: Axis to plot the learning curve on.
+        - costs_all: Vector of costs of each sample (default=[])
+        - cost_labels: Vector of strings for the different cost components  (default=[]).
     """
 
     cost_labels = kwargs.get("cost_labels", None)
@@ -121,11 +122,12 @@ def plot_learning_curve(learning_curve, **kwargs):
 def plot_exploration_curve(exploration_curve, **kwargs):
     """ Plot an exploration curve.
 
-        @param exploration: An exploration curve that has the following format
+        @param exploration_curve: An exploration curve that has the following format
             #rows is number of optimization updates
             column 0: Number of samples at which the cost was evaluated
             column 1: The exploration at that update
-        @param ax: Axis to plot the learning curve on.
+        @param kwargs:
+        - ax: Axis to plot the learning curve on.
     """
     ax = kwargs.get("ax") or plt.axes()
 
