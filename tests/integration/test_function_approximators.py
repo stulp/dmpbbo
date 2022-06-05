@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Tests for function approximators package """
 
 
 import argparse
@@ -31,6 +32,11 @@ from tests.integration.execute_binary import execute_binary
 
 
 def target_function(n_samples_per_dim):
+    """ Target-function for training
+
+    @param n_samples_per_dim: Number of samples for each dimension
+    @return: inputs and corresponding targets
+    """
     n_dims = 1 if np.isscalar(n_samples_per_dim) else len(n_samples_per_dim)
 
     if n_dims == 1:
@@ -56,13 +62,20 @@ def target_function(n_samples_per_dim):
 
 
 def train(directory, fa_name, n_dims, **kwargs):
+    """ Train a function approximator and plot it
+
+    @param directory: Directory to write data to.
+    @param fa_name: Name of the function approximator
+    @param n_dims: Dimensionality of the input
+    @param kwargs: The booleans "show", "save" and "verbose"
+    """
     show = kwargs.get("show", False)
     save = kwargs.get("save", False)
     verbose = kwargs.get("verbose", False)
 
     # Generate training data
     n_samples_per_dim = 30 if n_dims == 1 else [10, 10]
-    (inputs, targets) = target_function(n_samples_per_dim)
+    inputs, targets = target_function(n_samples_per_dim)
 
     n_rfs = 9 if n_dims == 1 else [5, 5]  # Number of basis functions. To be used later.
 
@@ -132,10 +145,12 @@ def train(directory, fa_name, n_dims, **kwargs):
 
 
 def test_function_approximators(tmp_path):
+    """ Function called for test. """
     main(tmp_path)
 
 
 def main(directory, **kwargs):
+    """ Main function of the script. """
     directory.mkdir(parents=True, exist_ok=True)
     for fa_name in ["RBFN", "LWR"]:
         for n_dims in [1, 2]:
@@ -157,37 +172,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(Path(args.directory), show=True, save=args.save, verbose=True)
-
-
-def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
-    axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
-
-    # plt.rc("text", usetex=True)
-    # plt.rc("font", family="serif")
-
-    h_cpp = []
-    h_pyt = []
-    h_diff = []
-
-    h_pyt.extend(axs[0].plot(ts, xs, label="Python"))
-    h_cpp.extend(axs[0].plot(ts, xs_cpp, label="C++"))
-    axs[0].set_ylabel("x")
-
-    h_pyt.extend(axs[1].plot(ts, xds, label="Python"))
-    h_cpp.extend(axs[1].plot(ts, xds_cpp, label="C++"))
-    axs[1].set_ylabel("dx")
-
-    # Reshape needed when xs_cpp has shape (T,)
-    h_diff.extend(axs[2].plot(ts, xs - np.reshape(xs_cpp, xs.shape), label="diff"))
-    axs[2].set_ylabel("diff x")
-
-    h_diff.extend(axs[3].plot(ts, xds - np.reshape(xds_cpp, xds.shape), label="diff"))
-    axs[3].set_ylabel("diff xd")
-
-    plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-    plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
-    plt.setp(h_diff, linestyle="-", linewidth=1, color=(0.8, 0.2, 0.2))
-
-    for ax in axs:
-        ax.set_xlabel("$t$")
-        ax.legend()
