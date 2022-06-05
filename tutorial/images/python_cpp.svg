@@ -9,9 +9,9 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="261.10745mm"
-   height="153.88284mm"
-   viewBox="0 0 925.18379 545.25417"
+   width="261.10742mm"
+   height="142.24117mm"
+   viewBox="0 0 925.18368 504.00413"
    id="svg2"
    version="1.1"
    inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)"
@@ -194,9 +194,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.8646996"
-     inkscape:cx="786.14489"
-     inkscape:cy="21.288256"
+     inkscape:zoom="0.65763959"
+     inkscape:cx="493.43137"
+     inkscape:cy="246.8022"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -218,7 +218,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -379,7 +379,8 @@
              style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Arial;-inkscape-font-specification:Arial;fill:#ffffff;fill-opacity:1">Prediction in C++ (real-time)</flowPara></flowRoot>      </g>
     </g>
     <g
-       id="g5307">
+       id="g5307"
+       transform="translate(0,-41.249999)">
       <rect
          transform="matrix(0,1,1,0,0,0)"
          y="-16.750162"
@@ -429,7 +430,7 @@
            id="flowPara864-9-1">Training in Python (need not be real-time)</flowPara></flowRoot>    </g>
     <g
        id="g2985"
-       transform="translate(-550.8245,284.72591)">
+       transform="translate(-550.8245,243.47591)">
       <g
          transform="translate(596.71488,-222.08846)"
          id="g1330">
@@ -606,48 +607,48 @@
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-2)"
-       d="m 317.70371,838.24193 h 18.12084 l 81.19356,42.75773"
+       d="m 317.70371,796.99193 h 18.12084 l 81.19356,42.75773"
        id="path1426-1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1.875;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow1Mend-0-6)"
-       d="m 297.48182,801.0326 h 38.34273 l 81.19356,-17.99366"
+       d="m 297.48182,759.7826 h 38.34273 l 81.19356,-17.99366"
        id="path1426-8-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccc" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
-       x="145.27861"
-       y="859.0647"
+       x="156.48103"
+       y="819.3656"
        id="text1406-7-9"
        transform="rotate(-15.757814)"><tspan
          sodipodi:role="line"
          id="tspan1404-1-4"
-         x="145.27861"
-         y="859.0647"
+         x="156.48103"
+         y="819.3656"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375">Python</tspan><tspan
          sodipodi:role="line"
-         x="145.27861"
-         y="875.5647"
+         x="156.48103"
+         y="835.8656"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan7817-9">object</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
-       x="771.4408"
-       y="520.46161"
+       x="749.34143"
+       y="485.63141"
        id="text1406-7-7-0"
        transform="rotate(32.395027)"><tspan
          sodipodi:role="line"
-         x="771.4408"
-         y="520.46161"
+         x="749.34143"
+         y="485.63141"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan7817-7-9">json</tspan><tspan
          sodipodi:role="line"
-         x="771.4408"
-         y="536.96161"
+         x="749.34143"
+         y="502.13141"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.5px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan7842-1">file</tspan></text>
     <text
@@ -670,22 +671,22 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:15px;line-height:1.10000002;font-family:Arial;-inkscape-font-specification:'Arial Bold';text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.9375"
-       x="-802.58698"
+       x="-761.33698"
        y="-84.325691"
        id="text1406-77-5"
        transform="rotate(-90)"><tspan
          sodipodi:role="line"
-         x="-802.58698"
+         x="-761.33698"
          y="-84.325691"
          style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan8976-7">dynamical</tspan><tspan
          sodipodi:role="line"
-         x="-802.58698"
+         x="-761.33698"
          y="-62.325691"
          style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan9001">movement</tspan><tspan
          sodipodi:role="line"
-         x="-802.58698"
+         x="-761.33698"
          y="-40.325691"
          style="font-size:20px;line-height:1.10000002;text-align:center;text-anchor:middle;stroke-width:0.9375"
          id="tspan9003">primitive</tspan></text>
