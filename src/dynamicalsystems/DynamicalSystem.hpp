@@ -424,7 +424,7 @@ delete dyn_sys;
 const, i.e. they do not change the DynamicalSystem itself. The state of the
 dynamical system is not stored as a member (except for the initial state).
 
-\em Remark. DynamicalSystem::integrateStep() uses either Euler integration
+\em Remark. A DynamicalSystem can be integrated both with Euler integration
 (DynamicalSystem::integrateStepEuler()), or 4-th order Runge-Kutta
 (DynamicalSystem::integrateStepRungeKutta()).  Runge-Kutta is much more
 accurate, but requires 4 calls of DynamicalSystem::differentialEquation()
