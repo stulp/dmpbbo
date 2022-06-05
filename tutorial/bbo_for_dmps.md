@@ -143,16 +143,10 @@ Again the robot reads "000_dmp.json", "001_dmp.json" etc, executes them, and wri
 
 The LearningSession (in bbo) and LearningSessionTask (in bbo_for_dmps) provide a database interface for the save and load functions in the code above. It is responsible for file management and correct file names, e.g. "results/update00004/001_dmp.json" etc.  
 
-This approach has been implemented in run_one_update.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
+This approach, illustrated below, has been implemented in run_one_update.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
 
-TODO
+![Optimization in Python with DMP execution in C++](images/python_cpp_dmp_bbo.png)
 
-Inversion of control
-
-rlaas.__init__(task, initial_distribution, updater, n_samples_per_update, directory=None)
-
-rlaas.get_sample()
-rlaas.add_rollout(cost_vars)
 
 ### Why ASCII files?!
 
