@@ -157,13 +157,15 @@ It's important to realize that dmpbbo is tailored for use on real robots. It's n
 <a name="sec_cost_components"></a>
 ## Cost components
 
-`Task.evaluate_rollout(cost_vars)` returns a vector of costs. The first element is the total scalar cost (also known as "return" in RL). This is the only value used for optimization. For debugging purposes, I've found it very useful to plot the individual cost components in the learning curve. For instance, consider a task where the costs consist of going through a viapoint with minimal acceleration. In this case, the cost components are: 1) distance to the viapoint and 2) sum of acceleration. Then 
+`Task.evaluate_rollout(cost_vars)` returns a vector of costs. The first element is the total scalar cost (also known as "return" in RL). This is the only value used for optimization. For debugging purposes, I've found it very useful to plot the individual cost components in the learning curve. For instance, consider TaskThrowBall in `demos/robot`. In this case, the cost components are: 1) distance to the landing site and 2) mean of squared accelerations over time. Then 
 
 * cost[0] = sum(cost[1:])
-* cost[1] = distance to the viapoint 
+* cost[1] = landing site 
 * cost[2] = acceleration
 
-TODO: Show learning curve
+Below is an example learning curve with a visualization of the separate cost components:
+
+![Learning curve with multiple cost components](images/multiple_cost_components.png)
 
 <a name="sec_parallel_optimization"></a>
 ## Optimizing DMP DOFs in parallel
