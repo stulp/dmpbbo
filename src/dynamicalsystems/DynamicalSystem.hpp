@@ -234,17 +234,17 @@ class DynamicalSystem {
    * \return Dimensionality of the dynamical system
    */
   inline int dim(void) const { return dim_x_; }
-  
+
   /**
    * Get the dimensionality of the dynamical system, i.e. the length of its
-   * state vector. 
+   * state vector.
    * \return Dimensionality of the dynamical system
    */
   inline int dim_x(void) const { return dim_x_; }
-  
+
   /**
-   * Get the dimensionality of the y-part of the dynamical system, where x = [y z]. 
-   * \return Dimensionality of the y-part of the dynamical system
+   * Get the dimensionality of the y-part of the dynamical system, where x = [y
+   * z]. \return Dimensionality of the y-part of the dynamical system
    */
   inline int dim_y(void) const { return dim_y_; }
 

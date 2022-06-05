@@ -16,7 +16,8 @@ namespace DmpBBO {
 This is the doxygen documentation of the C++ of the dmpbbo library. Its aim
 is to document the C++ API.
 
-A broader overview of the dmpbbo software, including the Python implementations, can be found in the main README: https://github.com/stulp/dmpbbo
+A broader overview of the dmpbbo software, including the Python implementations,
+can be found in the main README: https://github.com/stulp/dmpbbo
 
 \section sec_overview_modules Overview of the modules/libraries
 

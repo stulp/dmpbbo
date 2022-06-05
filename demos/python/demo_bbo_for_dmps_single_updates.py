@@ -18,10 +18,10 @@
 
 
 import sys
-
-from pathlib import Path
-import numpy as np
 import tempfile
+from pathlib import Path
+
+import numpy as np
 from matplotlib import pyplot as plt
 
 import dmpbbo.bbo_for_dmps.run_one_update as run_one

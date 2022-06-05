@@ -8,7 +8,6 @@
  * I added functionality for the appropriate resizing of matrices.
  */
 
-
 template <typename Derived>
 void from_json(const nlohmann::json& j, Eigen::MatrixBase<Derived>& matrix)
 {

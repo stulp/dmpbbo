@@ -19,11 +19,11 @@
 
 import argparse
 import os
+import tempfile
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import tempfile
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR

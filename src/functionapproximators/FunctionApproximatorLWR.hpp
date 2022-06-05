@@ -45,11 +45,11 @@ class FunctionApproximatorLWR : public FunctionApproximator {
    *  \param[in] widths  Widths of the basis functions.
    *  \param[in] slopes  Slopes of the line segments.
    *  \param[in] offsets Offsets of the line segments, i.e. the value of the
-   * line segment at its intersection with the y-axis. 
+   * line segment at its intersection with the y-axis.
    * \param[in] asymmetric_kernels Whether to use asymmetric kernels or not, cf
-   * MetaParametersLWR::asymmetric_kernels(). 
-   * \param[in] lines_pivot_at_max_activation Whether line models should pivot at x=0
-   * (false), or at the center of the kernel (x=x_c).
+   * MetaParametersLWR::asymmetric_kernels().
+   * \param[in] lines_pivot_at_max_activation Whether line models should pivot
+   * at x=0 (false), or at the center of the kernel (x=x_c).
    */
   FunctionApproximatorLWR(const Eigen::MatrixXd& centers,
                           const Eigen::MatrixXd& widths,

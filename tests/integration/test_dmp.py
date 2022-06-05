@@ -18,11 +18,11 @@
 
 import argparse
 import os
+import tempfile
 from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
-import tempfile
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.dmps.Dmp import Dmp
