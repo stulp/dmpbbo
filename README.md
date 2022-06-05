@@ -54,7 +54,7 @@ The core functionality is in the Python module <a href="dmpbbo/">dmpbbo/</a>. It
 
 + <a href="dmpbbo/dmp">dmpbbo/dmp</a> : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
 
-+ <a href="dmpbbo/bbo">dmpbbo/</a> : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
++ <a href="dmpbbo/bbo">dmpbbo/bbo</a> : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
 
 + <a href="dmpbbo/bbo_for_dmps">dmpbbo/bbo_for_dmps</a> : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
 
