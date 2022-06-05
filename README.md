@@ -62,19 +62,7 @@ The function approximators are trained with input and target data, and a DMP is 
 
 As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_for_dmps` subpackages have not been implemented in C++. Summarizing:
 
-
-| functionality                      | package                  | package             | 
-| ---- | ----  | ---- | 
-|                                    | `functionapproximators/` | `bbo/`              | 
-|                                    | `dynamicalsystems/`      | `bbo_for_dmps/`     |
-|                                    | `dmp/`                   |                     |
-|                                    | **language**             | **language**        |
-|                                    | Python                   |                     |
-| *training*                         | Python                   |                     |
-| *prediction/integration*           | Python / C++             |                     |
-| *real-time prediction/integration* | C++                      |                     |
-| *optimization*                     |                          | Python              |
-
+![Training and prediction/integration in Python/C++](tutorial/images/python_cpp.png)
 
 To see how the Python and C++ implementations are intended to work together, please see `demos/robot/`. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
 
