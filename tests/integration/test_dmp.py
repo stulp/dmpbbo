@@ -14,7 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-
+""" Test for dmp package """
 
 import argparse
 import os
@@ -32,10 +32,13 @@ from tests.integration.get_trajectory import get_trajectory
 
 
 def test_dmp(tmp_path):
+    """ Function called for test. """
     main(tmp_path)
 
 
 def main(directory, **kwargs):
+    """ Main function of the script. """
+
     show = kwargs.get("show", False)
     save = kwargs.get("save", False)
     verbose = kwargs.get("verbose", False)

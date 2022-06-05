@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Tests for dynamical systems package """
 
 
 import argparse
@@ -33,6 +34,15 @@ from tests.integration.execute_binary import execute_binary
 
 
 def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
+    """ Plot the comparison between Python and C++ output
+
+    @param ts: Time steps
+    @param xs: System states over time. Python output.
+    @param xds: System states over time (rates of change). Python output.
+    @param xs_cpp: System states over time. C++ output.
+    @param xds_cpp: System states over time (rates of change). C++ output.
+    @param fig: Figure to plot the comparison on
+    """
     axs = [fig.add_subplot(2, 2, p + 1) for p in range(4)]
 
     # plt.rc("text", usetex=True)
@@ -69,10 +79,12 @@ def plot_comparison(ts, xs, xds, xs_cpp, xds_cpp, fig):
 
 
 def test_dynamical_systems(tmp_path):
+    """ Function called for test. """
     main(tmp_path)
 
 
 def main(directory, **kwargs):
+    """ Main function of the script. """
     show = kwargs.get("show", False)
     save = kwargs.get("save", False)
     verbose = kwargs.get("verbose", False)

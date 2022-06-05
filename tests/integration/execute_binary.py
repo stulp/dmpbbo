@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+""" Module with a function to execute a binary on the command line. """
 
 import os
 import subprocess
@@ -21,6 +22,12 @@ from pathlib import Path
 
 
 def execute_binary(executable_name, arguments, print_command=False):
+    """ Execute a binary on the command line.
+
+    @param executable_name: Name of the executable
+    @param arguments: Optional arguments on the command line.
+    @param print_command: Whether to echo the command before executing it.
+    """
 
     # This is a workaround to find the bin directory...
     # I did not find another way to make the test scripts compatible with pytest

@@ -1,9 +1,12 @@
+""" Module with a function to get a trajectory. """
+
 import numpy as np
 
 from dmpbbo.dmps.Trajectory import Trajectory
 
 
 def get_trajectory():
+    """ Get a demonstration trajectory. """
     matrix = np.array(
         [
             [0.000, 0.001018, 0.079681, 0.009, -0.007200, 0.690, -0.560000],
