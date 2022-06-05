@@ -96,54 +96,6 @@ for functions, which are camelCased, for consistency with the C++ code.
 
 */
 
-/** \page page_todo Todo
-
-\todo Documentation: Write a related pages with a table on which functionality
-is implemented in Python/Cpp
-
-\todo Documentation: document Python classes/functions
-
-\todo Documentation: Update documentation for parallel (No need for parallel in
-python, because only decay has been implemented for now)
-
-\todo Plotting: setColor on ellipses?
-
-\todo delay_cost in C++ not the same as in Python. Take the mean (as in Python)
-rather than the sum.
-
-\todo Check documentation of dmp_bbo_robot
-
-
-\todo demoOptimizationTaskWrapper.py: should there be a Task there also?
-\todo clean up demoImitationAndOptimization
-\todo clean up demoOptimizationDmpParallel: remove deprecated, only covar
-updates matter, make a flag \todo FunctionApproximator::saveGridData in Python
-also \todo further compare scripts \todo testTrainingCompareCppPython.py => move
-part of it into demos/python/functionapproximators
-
-\todo Table showing which functionality is available in Python/C++
-
-\todo Consistent interfaces and helps for demos (e.g. with argparse)
-
-\todo Please note that this doxygen documentation only documents the C++ API of
-the libraries (in src/), not the demos. For explanations of the demos, please
-see the md files in the dmpbbo/demos_cpp/ directory.  => Are there md files
-everywhere?
-
-\todo What exactly goes in tutorial and what in implementation?
-
-\todo Include design rationale for txt files (in design_rationale.md) in
-dmp_bbo_bbo.md
-
-\todo Make Python scripts robust against missing data, e.g. cost_vars
-
-\todo Check if true: "An example is given in TaskViapoint, which implements a
-Task in which the first N columns in cost_vars should represent a N-D
-trajectory. This convention is respected by TaskSolverDmp, which is able to
-generate such trajectories."
-
- */
-
 /** \defgroup Demos Demos
  */
 
