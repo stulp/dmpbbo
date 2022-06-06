@@ -14,51 +14,32 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-""" Script for plotting one rollout. """
+""" Script for plotting the optimization. """
 
 import argparse
-import os
-from glob import glob
 from pathlib import Path
 
-import jsonpickle
-import matplotlib.pyplot as plt
-import numpy as np
+from matplotlib import pyplot as plt
+
+from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
 
 
 def main():
     """ Main function that is called when executing the script. """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="file (txt) or directory to read cost vars from")
-    parser.add_argument("task", help="file (json) with task")
+    parser.add_argument("directory", type=str, help="directory to read results from")
     #parser.add_argument("--show", action="store_true", help="show result plots")
     parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
-    if os.path.isdir(args.input):
-        directory = args.input
-        cost_vars_filenames = glob(str(Path(directory,"*cost_vars*.txt")))
-    else:
-        cost_vars_filenames = [args.input]
-
-    task = None
-    if args.task is not None:
-        with open(args.task, "r") as f:
-            task = jsonpickle.decode(f.read())
-
-
-    fig = plt.figure(1)
-    n_subplots = 1
-    ax = fig.add_subplot(1, n_subplots, n_subplots)
-    for filename in cost_vars_filenames:
-        cost_vars = np.loadtxt(filename)
-        task.plot_rollout(cost_vars, ax)
-
-    if (args.save):
-        filename = Path(directory,"plot_rollouts.png")
-        print(f"Saving to file: {filename}")
-        fig.savefig(filename)
+    session = LearningSessionTask.from_dir(args.directory)
+    session.plot()
+    if args.save:
+        plt.gcf().suptitle(args.directory)
+        filename = Path(args.directory, 'optimization.png')
+        print(f'Saving png to: {filename}')
+        plt.gcf().savefig(filename)
     else:
         plt.show()
 

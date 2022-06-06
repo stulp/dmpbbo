@@ -121,6 +121,7 @@ def main():
             plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
             plt.legend()
             plt.gcf().canvas.set_window_title(f"Comparison {d}/reproduced  (n_bfs={n_bfs})")
+            plt.gcf().suptitle(f"Comparison {d}/reproduced  (n_bfs={n_bfs})")
             if args.save:
                 plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
 

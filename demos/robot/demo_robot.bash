@@ -24,7 +24,7 @@ for i_sample in $(seq -f "%02g" 0 9)
 do # Run the sampled DMPs on the robot
   ../../bin/robotExecuteDmp ${DU}/${i_sample}_dmp_for_cpp.json ${DU}/${i_sample}_cost_vars.txt
 done
-python3 plot_rollout.py ${DU} ${D}/task.json --save # Save the results as a png
+python3 plot_rollouts.py ${DU} ${D}/task.json --save # Save the results as a png
 
 # Medium exploration noise
 python3 step3_tune_exploration.py ${D}/dmp_initial.json ${D}/tune_exploration  --n 10 --sigma  10.0
@@ -33,7 +33,7 @@ for i_sample in $(seq -f "%02g" 0 9)
 do # Run the sampled DMPs on the robot
   ../../bin/robotExecuteDmp ${DU}/${i_sample}_dmp_for_cpp.json ${DU}/${i_sample}_cost_vars.txt
 done
-python3 plot_rollout.py ${DU} ${D}/task.json --save # Save the results as a png
+python3 plot_rollouts.py ${DU} ${D}/task.json --save # Save the results as a png
 
 # Low exploration noise
 python3 step3_tune_exploration.py ${D}/dmp_initial.json ${D}/tune_exploration  --n 10 --sigma 100.0
@@ -42,7 +42,7 @@ for i_sample in $(seq -f "%02g" 0 9)
 do # Run the sampled DMPs on the robot
   ../../bin/robotExecuteDmp ${DU}/${i_sample}_dmp_for_cpp.json ${DU}/${i_sample}_cost_vars.txt
 done
-python3 plot_rollout.py ${DU} ${D}/task.json --save # Save the results as a png
+python3 plot_rollouts.py ${DU} ${D}/task.json --save # Save the results as a png
 
 
 # # 10.0 looks good; choose it as initial distribution
@@ -73,4 +73,4 @@ do
   
 done
   
-python3 step6_plot_optimization.py ${D}
+python3 plot_optimization.py ${D}
