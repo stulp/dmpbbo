@@ -351,6 +351,16 @@ void Dmp::statesAsTrajectory(const Eigen::MatrixXd& x_in,
   // ydd_out = zd_out/tau();
 }
 
+void Dmp::stateAsPosVelAcc(const Eigen::VectorXd& x_in,
+                           const Eigen::VectorXd& xd_in,
+                           Eigen::VectorXd& y_out, Eigen::VectorXd& yd_out,
+                           Eigen::VectorXd& ydd_out) const
+{
+  y_out = x_in.SPRING_Y;
+  yd_out = xd_in.SPRING_Y;
+  ydd_out = xd_in.SPRING_Z / tau();
+}
+
 void Dmp::statesAsTrajectory(const Eigen::VectorXd& ts,
                              const Eigen::MatrixXd& x_in,
                              const Eigen::MatrixXd& xd_in,

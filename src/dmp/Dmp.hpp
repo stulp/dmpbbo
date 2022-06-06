@@ -246,6 +246,12 @@ class Dmp : public DynamicalSystem {
                                   Eigen::MatrixXd& yd_out,
                                   Eigen::MatrixXd& ydd_out) const;
 
+  virtual void stateAsPosVelAcc(const Eigen::VectorXd& x_in,
+                                const Eigen::VectorXd& xd_in,
+                                Eigen::VectorXd& y_out,
+                                Eigen::VectorXd& yd_out,
+                                Eigen::VectorXd& ydd_out) const;
+
   /** Get the output of a DMP dynamical system as a trajectory.
    *  As a dynamical system, the state vector of a DMP contains the output of
    * the goal, spring, phase and gating system. What we are most interested in
