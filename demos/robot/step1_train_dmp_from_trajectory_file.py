@@ -38,6 +38,7 @@ def main():
     parser.add_argument("output_directory", help="directory to write dmp and other results to")
     parser.add_argument("--n", help="max number of basis functions", type=int, default=15)
     parser.add_argument("--show", action="store_true", help="Show plots")
+    parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
     os.makedirs(args.output_directory, exist_ok=True)
@@ -105,24 +106,25 @@ def main():
 
         traj_reproduced = dmp.states_as_trajectory(ts, xs_step, xds_step)
 
-        if args.show:
+        if args.show or args.save:
             ################################################
             # Plot results
 
             # h, axs = dmp.plot(dmp.tau,ts,xs_step,xds_step)
-            # plt.gcf().canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
-            # plt.gcf().savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
+            # fig.canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
+            # fig.savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
 
             h_demo, axs = traj.plot()
             h_repr, _ = traj_reproduced.plot(axs)
             d = "demonstration"
             plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label=d)
             plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5), label="reproduced")
-            plt.gcf().canvas.set_window_title(f"Comparison {d}/reproduced  (n_bfs={n_bfs})")
-            plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
             plt.legend()
+            plt.gcf().canvas.set_window_title(f"Comparison {d}/reproduced  (n_bfs={n_bfs})")
+            if args.save:
+                plt.gcf().savefig(Path(args.output_directory, f"trajectory_comparison_{n_bfs}.png"))
 
-    if args.show:
+    if args.show or args.save:
         if len(n_bfs_list) > 1:
             # Plot the mean absolute error
             ax = plt.figure().add_subplot(111)
@@ -132,9 +134,12 @@ def main():
             ax.set_xlabel("number of basis functions")
             ax.set_ylabel("mean absolute error between demonstration and reproduced")
             filename = "mean_absolute_errors.png"
-            plt.gcf().savefig(Path(args.output_directory, filename))
+            if args.save:
+                plt.gcf().savefig(Path(args.output_directory, filename))
 
+    if args.show:
         plt.show()
+            
 
 
 if __name__ == "__main__":

@@ -94,3 +94,70 @@ class TaskThrowBall(Task):
         ax.set_ylim([-0.4, 0.3])
 
         return line_handles, ax
+
+def run_python_simulation(dmp, y_floor=-0.3):
+    """ Run a ball throwing simulation with a DMP.
+
+    @param dmp: The DMP to integrate.
+    @param y_floor:  The height of the floor
+    @return: The cost-relevant variables in a matrix.
+    """
+    dt = 0.01
+    ts = np.arange(0, 1.5 * dmp.tau, dt)
+    n_time_steps = len(ts)
+
+    x, xd = dmp.integrate_start()
+
+    # ts = cost_vars[:,0]
+    # y = cost_vars[:,1:1+n_dims]
+    # ydd = cost_vars[:,1+n_dims*2:1+n_dims*3]
+    # ball = cost_vars[:,-2:]
+    n_dims_y = dmp.dim_dmp()
+    ys = np.zeros([n_time_steps, n_dims_y])
+    yds = np.zeros([n_time_steps, n_dims_y])
+    ydds = np.zeros([n_time_steps, n_dims_y])
+    ys_ball = np.zeros([n_time_steps, n_dims_y])
+    yd_ball = np.zeros([1, n_dims_y])
+    ydd_ball = np.zeros([1, n_dims_y])
+
+    (ys[0, :], yds[0, :], ydds[0, :]) = dmp.states_as_pos_vel_acc(x, xd)
+    ys_ball[0, :] = ys[0, :]
+
+    ball_in_hand = True
+    ball_in_air = False
+    for ii in range(1, n_time_steps):
+        (x, xd) = dmp.integrate_step(dt, x)
+        (ys[ii, :], yds[ii, :], ydds[ii, :]) = dmp.states_as_pos_vel_acc(x, xd)
+
+        if ball_in_hand:
+            # If the ball is in your hand, it moves along with your hand
+            ys_ball[ii, :] = ys[ii, :]
+            yd_ball = yds[ii, :]
+            ydd_ball = ydds[ii, :]  # noqa
+
+            if ts[ii] > 0.6:
+                # Release the ball to throw it!
+                ball_in_hand = False
+                ball_in_air = True
+
+        elif ball_in_air:
+            # Ball is flying through the air
+            ydd_ball[0] = 0.0  # No friction
+            ydd_ball[1] = -9.81  # Gravity
+
+            # Euler integration
+            yd_ball = yd_ball + dt * ydd_ball
+            ys_ball[ii, :] = ys_ball[ii - 1, :] + dt * yd_ball
+
+            if ys_ball[ii, 1] < y_floor:
+                # Ball hits the floor (floor is at -0.3)
+                ball_in_air = False
+                ys_ball[ii, 1] = y_floor
+
+        else:
+            # Ball on the floor: does not move anymore
+            ys_ball[ii, :] = ys_ball[ii - 1, :]
+
+    ts = np.atleast_2d(ts).T
+    cost_vars = np.concatenate((ts, ys, yds, ydds, ys_ball), axis=1)
+    return cost_vars

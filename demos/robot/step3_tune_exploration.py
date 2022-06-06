@@ -26,8 +26,6 @@ from matplotlib import pyplot as plt
 
 import dmpbbo.json_for_cpp as jc
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from perform_rollout import perform_rollout
-from TaskThrowBall import TaskThrowBall
 
 
 def main():
@@ -37,7 +35,7 @@ def main():
     parser.add_argument("dmp", help="input dmp")
     parser.add_argument("output_directory", help="directory to write results to")
     parser.add_argument("--sigma", help="sigma of covariance matrix", type=float, default=3.0)
-    parser.add_argument("--nsamples", help="number of samples", type=int, default=12)
+    parser.add_argument("--n", help="number of samples", type=int, default=10)
     parser.add_argument("--show", action="store_true", help="show result plots")
     parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
@@ -48,20 +46,10 @@ def main():
     filename = args.dmp
     print(f"Loading DMP from: {filename}")
     dmp = jc.loadjson(filename)
-
     ts = dmp.ts_train
-    xs, xds, _, _ = dmp.analytical_solution(ts)
-    traj_mean = dmp.states_as_trajectory(ts, xs, xds)
-
-    if args.show or args.save:
-        fig = plt.figure(1)
-        ax1 = fig.add_subplot(131)
-        lines, _ = traj_mean.plot([ax1])
-        plt.setp(lines, linewidth=3)
-
     parameter_vector = dmp.get_param_vector()
 
-    n_samples = args.nsamples
+    n_samples = args.n
     sigma = args.sigma
     covar_init = sigma * sigma * np.eye(parameter_vector.size)
     distribution = DistributionGaussian(parameter_vector, covar_init)
@@ -74,38 +62,41 @@ def main():
     samples = distribution.generate_samples(n_samples)
 
     if args.show or args.save:
-        ax2 = fig.add_subplot(132)  # noqa
-        distribution.plot(ax2)
-        ax2.plot(samples[:, 0], samples[:, 1], "o", color="#999999")
-
-        ax3 = fig.add_subplot(133)
-
-    y_floor = -0.3
-    x_goal = -0.70
-    x_margin = 0.01
-    acceleration_weight = 0.001
-    task = TaskThrowBall(x_goal, x_margin, y_floor, acceleration_weight)
+        fig = plt.figure()
+        
+        ax1 = fig.add_subplot(121)  # noqa
+        distribution.plot(ax1)
+        ax1.plot(samples[:, 0], samples[:, 1], "o", color="#BBBBBB")
+        
+        ax2 = fig.add_subplot(122)
+        
+        xs, xds, _, _ = dmp.analytical_solution()
+        traj_mean = dmp.states_as_trajectory(ts, xs, xds)
+        lines, _ = traj_mean.plot([ax2])
+        plt.setp(lines, linewidth=4, color="#007700")
+        
 
     for i_sample in range(n_samples):
 
         dmp.set_param_vector(samples[i_sample, :])
 
-        filename = Path(directory, f"dmp_sample_{i_sample}.json")
-        print(f"Saving sampled DMP to: {filename}")
-        jc.savejson(Path(directory, f"dmp_sample_{i_sample}.json"), dmp)
-        jc.savejson_for_cpp(Path(directory, f"dmp_sample_{i_sample}_for_cpp.json"), dmp)
+        filename = Path(directory, f'{i_sample:02}_dmp')
+        print(f"Saving sampled DMP to: {filename}.json")
+        jc.savejson(str(filename)+'.json', dmp)
+        jc.savejson_for_cpp(str(filename)+'_for_cpp.json', dmp)
 
-        (xs, xds, forcing, fa_outputs) = dmp.analytical_solution()
+        xs, xds, forcing, fa_outputs = dmp.analytical_solution()
         traj_sample = dmp.states_as_trajectory(ts, xs, xds)
-        cost_vars = perform_rollout(dmp, "python_simulation", directory)
+        filename = Path(directory, f'{i_sample:02}_traj.txt')
+        print(f"Saving sampled trajectory to: {filename}")
+        traj_sample.savetxt(filename)
 
         if args.show or args.save:
-            lines, _ = traj_sample.plot([ax1])  # noqa
-            plt.setp(lines, color="#999999", alpha=0.5)
-            task.plot_rollout(cost_vars, ax3)  # noqa
+            lines, _ = traj_sample.plot([ax2])  # noqa
+            plt.setp(lines, color="#BBBBBB", alpha=0.5)
 
     if args.save:
-        filename = "exploration.png"
+        filename = "exploration_dmp_traj.png"
         fig.savefig(Path(directory, filename))
 
     if args.show:

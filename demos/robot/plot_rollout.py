@@ -17,6 +17,9 @@
 """ Script for plotting one rollout. """
 
 import argparse
+import os
+from glob import glob
+from pathlib import Path
 
 import jsonpickle
 import matplotlib.pyplot as plt
@@ -27,26 +30,37 @@ def main():
     """ Main function that is called when executing the script. """
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("filename", help="file (txt) to read cost vars from")
+    parser.add_argument("input", help="file (txt) or directory to read cost vars from")
     parser.add_argument("task", help="file (json) with task")
+    #parser.add_argument("--show", action="store_true", help="show result plots")
+    parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
-    cost_vars = np.loadtxt(args.filename)
+    if os.path.isdir(args.input):
+        directory = args.input
+        cost_vars_filenames = glob(str(Path(directory,"*cost_vars*.txt")))
+    else:
+        cost_vars_filenames = [args.input]
+
     task = None
     if args.task is not None:
         with open(args.task, "r") as f:
             task = jsonpickle.decode(f.read())
 
+
     fig = plt.figure(1)
     n_subplots = 1
     ax = fig.add_subplot(1, n_subplots, n_subplots)
-    task.plot_rollout(cost_vars, ax)
+    for filename in cost_vars_filenames:
+        cost_vars = np.loadtxt(filename)
+        task.plot_rollout(cost_vars, ax)
 
-    #filename = "plotRollout.png"
-    #print(f"Saving to file: {filename}")
-    #fig.savefig(filename)
-
-    plt.show()
+    if (args.save):
+        filename = Path(directory,"plot_rollouts.png")
+        print(f"Saving to file: {filename}")
+        fig.savefig(filename)
+    else:
+        plt.show()
 
 
 if __name__ == "__main__":
