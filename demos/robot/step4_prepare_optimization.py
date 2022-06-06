@@ -51,17 +51,18 @@ def main():
     if updater_name == "mean":
         updater = UpdaterMean(eliteness=10, weighting="PI-BB")
     elif updater_name == "decay":
-        updater = UpdaterCovarDecay(eliteness=10, weighting="PI-BB", decay=0.9)
+        updater = UpdaterCovarDecay(eliteness=10, weighting="PI-BB", covar_decay_factor=0.8)
     else:
         updater = UpdaterCovarAdaptation(
             eliteness=10,
             weighting="PI-BB",
-            max_level=3.0,
-            min_level=0.3,
+            max_level=20.0,
+            min_level=0.1,
             diag_only=False,
             learning_rate=0.5,
         )
 
+    print(updater.covar_decay_factor)
     task_solver = None
     run_optimization_task_prepare(
         args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp, args.traj
