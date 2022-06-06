@@ -21,8 +21,8 @@ from pathlib import Path
 
 import jsonpickle
 
-from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_prepare
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
+from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_prepare
 
 
 def main():
@@ -65,7 +65,14 @@ def main():
     print(updater.covar_decay_factor)
     task_solver = None
     run_optimization_task_prepare(
-        args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp, args.traj
+        args.directory,
+        task,
+        task_solver,
+        distribution_init,
+        n_samples_per_update,
+        updater,
+        dmp,
+        args.traj,
     )
 
 

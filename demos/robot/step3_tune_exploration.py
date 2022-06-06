@@ -64,34 +64,32 @@ def main():
 
     if args.show or args.save:
         fig = plt.figure()
-        
+
         ax1 = fig.add_subplot(121)  # noqa
         distribution.plot(ax1)
         ax1.plot(samples[:, 0], samples[:, 1], "o", color="#BBBBBB")
-        
+
         ax2 = fig.add_subplot(122)
-        
+
         xs, xds, _, _ = dmp.analytical_solution()
         traj_mean = dmp.states_as_trajectory(ts, xs, xds)
         lines, _ = traj_mean.plot([ax2])
         plt.setp(lines, linewidth=4, color="#007700")
-        
 
     for i_sample in range(n_samples):
 
         dmp.set_param_vector(samples[i_sample, :])
 
-        filename = Path(directory, f'{i_sample:02}_dmp')
+        filename = Path(directory, f"{i_sample:02}_dmp")
         print(f"Saving sampled DMP to: {filename}.json")
-        jc.savejson(str(filename)+'.json', dmp)
-        jc.savejson_for_cpp(str(filename)+'_for_cpp.json', dmp)
-
+        jc.savejson(str(filename) + ".json", dmp)
+        jc.savejson_for_cpp(str(filename) + "_for_cpp.json", dmp)
 
         if args.show or args.save or args.traj:
             xs, xds, forcing, fa_outputs = dmp.analytical_solution()
             traj_sample = dmp.states_as_trajectory(ts, xs, xds)
             if args.traj:
-                filename = Path(directory, f'{i_sample:02}_traj.txt')
+                filename = Path(directory, f"{i_sample:02}_traj.txt")
                 print(f"Saving sampled trajectory to: {filename}")
                 traj_sample.savetxt(filename)
             if args.show or args.save:

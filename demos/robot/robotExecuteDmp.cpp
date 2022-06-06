@@ -73,7 +73,7 @@ int main(int n_args, char** args)
   // Integrate DMP longer than the tau with which it was trained
   double integration_time = 1.5 * dmp->tau();
   double dt = 0.01;
-  int n_time_steps = floor(integration_time/dt);
+  int n_time_steps = floor(integration_time / dt);
 
   // Prepare simulation
   int dim_x = dmp->dim_x();
@@ -81,20 +81,20 @@ int main(int n_args, char** args)
   VectorXd x(dim_x), xd(dim_x);
   // Trajectory pos/vel/acc
   VectorXd y_des(2), yd_des(2), ydd_des(2);
-  
-  MatrixXd cost_vars = MatrixXd(n_time_steps, 1 + 6*2 + 1);
+
+  MatrixXd cost_vars = MatrixXd(n_time_steps, 1 + 6 * 2 + 1);
 
   // Run simulation
   ThrowBallSimulator simulator;
-  dmp->integrateStart(x,xd);
+  dmp->integrateStart(x, xd);
   for (int ii = 0; ii < n_time_steps; ii++) {
-    dmp->stateAsPosVelAcc(x,xd,y_des,yd_des,ydd_des);
+    dmp->stateAsPosVelAcc(x, xd, y_des, yd_des, ydd_des);
     simulator.integrateStep(dt, y_des, yd_des, ydd_des);
     cost_vars.row(ii) = simulator.getState();
-    dmp->integrateStep(dt,x,x,xd);
+    dmp->integrateStep(dt, x, x, xd);
   }
 
-  // Save cost_vars to file 
+  // Save cost_vars to file
   bool overwrite = true;
   cout << "C++ Writing   -> " << cost_vars_filename << endl;
   saveMatrix("./", cost_vars_filename, cost_vars, overwrite);

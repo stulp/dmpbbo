@@ -24,9 +24,10 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_one_update, run_optimization_task_prepare
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
+from dmpbbo.bbo_for_dmps.run_one_update import (run_optimization_task_one_update,
+                                                run_optimization_task_prepare)
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN

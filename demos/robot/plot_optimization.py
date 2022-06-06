@@ -29,7 +29,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", type=str, help="directory to read results from")
-    #parser.add_argument("--show", action="store_true", help="show result plots")
+    # parser.add_argument("--show", action="store_true", help="show result plots")
     parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
@@ -37,8 +37,8 @@ def main():
     session.plot()
     if args.save:
         plt.gcf().suptitle(args.directory)
-        filename = Path(args.directory, 'optimization.png')
-        print(f'Saving png to: {filename}')
+        filename = Path(args.directory, "optimization.png")
+        print(f"Saving png to: {filename}")
         plt.gcf().savefig(filename)
 
     plt.show()

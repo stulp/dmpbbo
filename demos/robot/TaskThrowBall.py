@@ -99,6 +99,7 @@ class TaskThrowBall(Task):
 
         return line_handles, ax
 
+
 def run_python_simulation(dmp, y_floor=-0.3):
     """ Run a ball throwing simulation with a DMP.
 

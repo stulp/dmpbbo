@@ -140,7 +140,6 @@ def main():
 
     if args.show:
         plt.show()
-            
 
 
 if __name__ == "__main__":

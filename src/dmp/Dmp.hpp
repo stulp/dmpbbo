@@ -248,8 +248,7 @@ class Dmp : public DynamicalSystem {
 
   virtual void stateAsPosVelAcc(const Eigen::VectorXd& x_in,
                                 const Eigen::VectorXd& xd_in,
-                                Eigen::VectorXd& y_out,
-                                Eigen::VectorXd& yd_out,
+                                Eigen::VectorXd& y_out, Eigen::VectorXd& yd_out,
                                 Eigen::VectorXd& ydd_out) const;
 
   /** Get the output of a DMP dynamical system as a trajectory.

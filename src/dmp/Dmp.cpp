@@ -352,8 +352,8 @@ void Dmp::statesAsTrajectory(const Eigen::MatrixXd& x_in,
 }
 
 void Dmp::stateAsPosVelAcc(const Eigen::VectorXd& x_in,
-                           const Eigen::VectorXd& xd_in,
-                           Eigen::VectorXd& y_out, Eigen::VectorXd& yd_out,
+                           const Eigen::VectorXd& xd_in, Eigen::VectorXd& y_out,
+                           Eigen::VectorXd& yd_out,
                            Eigen::VectorXd& ydd_out) const
 {
   y_out = x_in.SPRING_Y;
