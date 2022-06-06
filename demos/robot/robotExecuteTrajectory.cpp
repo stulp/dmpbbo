@@ -65,13 +65,30 @@ int main(int n_args, char** args)
   cout << "C++    |     Reading traj from file '" << traj_filename << "'"
        << endl;
 
+  // Load trajectory
   Trajectory trajectory;
   trajectory = Trajectory::readFromFile(traj_filename);
 
-  MatrixXd cost_vars;
-  runSimulationThrowBall(&trajectory, cost_vars);
+  // Prepare simulation
+  VectorXd ts = trajectory.ts();
+  MatrixXd y_des = trajectory.ys();
+  MatrixXd yd_des = trajectory.yds();
+  MatrixXd ydd_des = trajectory.ydds();
+  int n_time_steps = trajectory.length();
+  MatrixXd cost_vars = MatrixXd(n_time_steps, 1 + 6*2 + 1);
 
+  // Run simulation
+  ThrowBallSimulator simulator;
+  double dt = ts[1] - ts[0];
+  for (int ii = 0; ii < n_time_steps; ii++) {
+    if (ii>=1) dt = ts[ii] - ts[ii-1];
+    simulator.integrateStep(dt, y_des.row(ii), yd_des.row(ii), ydd_des.row(ii));
+    cost_vars.row(ii) = simulator.getState();
+  }
+
+  // Save cost_vars to file 
   bool overwrite = true;
+  cout << "C++ Writing   -> " << cost_vars_filename << endl;
   saveMatrix("./", cost_vars_filename, cost_vars, overwrite);
 
   return 0;

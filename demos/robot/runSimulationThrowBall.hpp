@@ -34,7 +34,7 @@ class Dmp;
 class ThrowBallSimulator {
 public:
   ThrowBallSimulator(void);
-  void integrate(double dt, Eigen::VectorXd y_des, Eigen::VectorXd yd_des, Eigen::VectorXd ydd_des);
+  void integrateStep(double dt, Eigen::VectorXd y_des, Eigen::VectorXd yd_des, Eigen::VectorXd ydd_des);
   int getStateSize(void);
   Eigen::VectorXd getState(void);
 
@@ -49,9 +49,5 @@ private:
   bool ball_in_hand;
   double y_floor;
 };
-
-void runSimulationThrowBall(Trajectory* trajectory, Eigen::MatrixXd& cost_vars);
-
-void runSimulationThrowBall(Dmp* dmp, Eigen::MatrixXd& cost_vars);
 
 }  // namespace DmpBbo

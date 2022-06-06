@@ -63,26 +63,38 @@ int main(int n_args, char** args)
   string dmp_filename = string(args[1]);
   string cost_vars_filename = string(args[2]);
 
-  cout << "C++ Reading <-   " << dmp_filename << endl;
+  cout << "C++ Reading Dmp <-   " << dmp_filename << endl;
 
+  // Load DMP
   ifstream file(dmp_filename);
   json j = json::parse(file);
-
   Dmp* dmp = j.get<Dmp*>();
 
   // Integrate DMP longer than the tau with which it was trained
   double integration_time = 1.5 * dmp->tau();
-  double frequency_Hz = 100.0;
-  int n_time_steps = floor(frequency_Hz * integration_time);
-  VectorXd ts =
-      VectorXd::LinSpaced(n_time_steps, 0, integration_time);  // Time steps
+  double dt = 0.01;
+  int n_time_steps = floor(integration_time/dt);
 
-  Trajectory trajectory;
-  dmp->analyticalSolution(ts, trajectory);
+  // Prepare simulation
+  int dim_x = dmp->dim_x();
+  // DMP state
+  VectorXd x(dim_x), xd(dim_x);
+  // Trajectory pos/vel/acc
+  VectorXd y_des(2), yd_des(2), ydd_des(2);
+  
+  MatrixXd cost_vars = MatrixXd(n_time_steps, 1 + 6*2 + 1);
 
-  MatrixXd cost_vars;
-  runSimulationThrowBall(&trajectory, cost_vars);
+  // Run simulation
+  ThrowBallSimulator simulator;
+  dmp->integrateStart(x,xd);
+  for (int ii = 0; ii < n_time_steps; ii++) {
+    dmp->stateAsPosVelAcc(x,xd,y_des,yd_des,ydd_des);
+    simulator.integrateStep(dt, y_des, yd_des, ydd_des);
+    cost_vars.row(ii) = simulator.getState();
+    dmp->integrateStep(dt,x,x,xd);
+  }
 
+  // Save cost_vars to file 
   bool overwrite = true;
   cout << "C++ Writing   -> " << cost_vars_filename << endl;
   saveMatrix("./", cost_vars_filename, cost_vars, overwrite);

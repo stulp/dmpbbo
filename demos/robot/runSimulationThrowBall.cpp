@@ -27,6 +27,7 @@
 #include <fstream>
 #include <iostream>
 
+#include "dmp/Dmp.hpp"
 #include "dmp/Trajectory.hpp"
 
 using namespace std;
@@ -50,7 +51,7 @@ ThrowBallSimulator::ThrowBallSimulator(void)
   y_floor = -0.3;
 }
 
-void ThrowBallSimulator::integrate(double dt, Eigen::VectorXd y_des, Eigen::VectorXd yd_des, Eigen::VectorXd ydd_des)
+void ThrowBallSimulator::integrateStep(double dt, Eigen::VectorXd y_des, Eigen::VectorXd yd_des, Eigen::VectorXd ydd_des)
 {
 
     // Simple version without dynamics for now: end_eff = end_eff_des
@@ -132,28 +133,6 @@ Eigen::VectorXd ThrowBallSimulator::getState(void)
   state(13) = (ball_in_hand ? 1.0 : 0.0);
   
   return state;
-}
-
-
-void runSimulationThrowBall(Trajectory* trajectory, MatrixXd& cost_vars)
-{
-  
-  VectorXd ts = trajectory->ts();
-  MatrixXd y_des = trajectory->ys();
-  MatrixXd yd_des = trajectory->yds();
-  MatrixXd ydd_des = trajectory->ydds();
-
-  int n_time_steps = trajectory->length();
-  cost_vars = MatrixXd(n_time_steps, 1 + 6*2 + 1);
-
-  ThrowBallSimulator simulator;
-  double dt = ts[1] - ts[0];
-  for (int ii = 0; ii < n_time_steps; ii++) {
-    if (ii>=1) dt = ts[ii] - ts[ii-1];
-    simulator.integrate(dt, y_des.row(ii), yd_des.row(ii), ydd_des.row(ii));
-    cost_vars.row(ii) = simulator.getState();
-  }
-    
 }
 
 }  // namespace DmpBbo
