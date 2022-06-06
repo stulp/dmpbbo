@@ -1,5 +1,5 @@
 /**
- * \file robotExecuteDmp.cpp
+ * \file runSimulationThrowBall.cpp
  * \author Freek Stulp
  *
  * \ingroup Demos
@@ -32,50 +32,63 @@
 using namespace std;
 using namespace Eigen;
 namespace DmpBbo {
+  
+ThrowBallSimulator::ThrowBallSimulator(void) 
+{  
+  time = 0.0;
 
-void runSimulationThrowBall(Trajectory* trajectory, MatrixXd& cost_vars)
+  y_endeff = VectorXd::Zero(2);
+  yd_endeff = VectorXd::Zero(2);
+  ydd_endeff = VectorXd::Zero(2);
+  
+  y_ball = VectorXd::Zero(2);
+  yd_ball = VectorXd::Zero(2);
+  ydd_ball = VectorXd::Zero(2);
+
+  ball_in_hand = true;
+  
+  y_floor = -0.3;
+}
+
+void ThrowBallSimulator::integrate(double dt, Eigen::VectorXd y_des, Eigen::VectorXd yd_des, Eigen::VectorXd ydd_des)
 {
-  VectorXd ts = trajectory->ts();
-  MatrixXd y_endeff = trajectory->ys();
-  MatrixXd yd_endeff = trajectory->yds();
-  MatrixXd ydd_endeff = trajectory->ydds();
-  int n_time_steps = y_endeff.rows();
-  MatrixXd y_ball(n_time_steps, 2);
-  MatrixXd yd_ball(n_time_steps, 2);
-  MatrixXd ydd_ball(n_time_steps, 2);
 
-  double dt = trajectory->duration() / n_time_steps;
-
-  bool ball_in_hand = true;
-
-  for (int ii = 0; ii < n_time_steps; ii++) {
+    // Simple version without dynamics for now: end_eff = end_eff_des
+    y_endeff = y_des;
+    yd_endeff = yd_des;
+    ydd_endeff = ydd_des;
+    
+    
     if (ball_in_hand) {
       // If the ball is in your hand, it moves along with your hand
-      y_ball.row(ii) = y_endeff.row(ii);
-      yd_ball.row(ii) = yd_endeff.row(ii);
-      ydd_ball.row(ii) = ydd_endeff.row(ii);
+      y_ball = y_endeff;
+      yd_ball = yd_endeff;
+      ydd_ball = ydd_endeff;
 
-      if (ts(ii) > 0.6) {
+      if (time > 0.6) {
         // Release the ball to throw it!
         ball_in_hand = false;
       }
-    } else  // ball_in_hand is false => ball is flying through the air
+    } 
+    else  // ball_in_hand is false => ball is flying through the air
     {
-      ydd_ball(ii, 0) = 0.0;
-      ydd_ball(ii, 1) = -9.81;  // Gravity
+      ydd_ball(0) = 0.0;
+      ydd_ball(1) = -9.81;  // Gravity
 
       // Euler integration
-      yd_ball.row(ii) = yd_ball.row(ii - 1) + dt * ydd_ball.row(ii);
-      y_ball.row(ii) = y_ball.row(ii - 1) + dt * yd_ball.row(ii);
+      yd_ball = yd_ball + dt * ydd_ball;
+      y_ball = y_ball + dt * yd_ball;
 
-      if (y_ball(ii, 1) < -0.3) {
-        // Ball hits the floor (floor is at -0.3)
-        y_ball(ii, 1) = -0.3;
-        yd_ball.row(ii) = VectorXd::Zero(2);
-        ydd_ball.row(ii) = VectorXd::Zero(2);
+      if (y_ball(1) < y_floor) {
+        // Ball hits the floor
+        y_ball(1) = y_floor;
+        // No more movement
+        yd_ball = VectorXd::Zero(2);
+        ydd_ball = VectorXd::Zero(2);
       }
     }
-
+    
+    time += dt;
     // if x(t_i-1,BALL_IN_CUP)
     //  % If the ball is in the cup, it does not move
     //  x(t_i,BALL_X:BALL_Y) = x(t_i-1,BALL_X:BALL_Y);
@@ -100,11 +113,47 @@ void runSimulationThrowBall(Trajectory* trajectory, MatrixXd& cost_vars)
     //    x(t_i-1,BALL_X:BALL_Y) + dt*x(t_i,BALL_XD:BALL_YD);
     //
     //  end
+}
+
+int ThrowBallSimulator::getStateSize(void) {
+  return 1 +  6*2 + 1;
+}
+
+Eigen::VectorXd ThrowBallSimulator::getState(void) 
+{
+  VectorXd state(getStateSize());
+  state(0) = time;
+  state.segment(1,2) = y_endeff;
+  state.segment(3,2) = yd_endeff;
+  state.segment(5,2) = ydd_endeff;
+  state.segment(7,2) = y_ball;
+  state.segment(9,2) = yd_ball;
+  state.segment(11,2) = ydd_ball;
+  state(13) = (ball_in_hand ? 1.0 : 0.0);
+  
+  return state;
+}
+
+
+void runSimulationThrowBall(Trajectory* trajectory, MatrixXd& cost_vars)
+{
+  
+  VectorXd ts = trajectory->ts();
+  MatrixXd y_des = trajectory->ys();
+  MatrixXd yd_des = trajectory->yds();
+  MatrixXd ydd_des = trajectory->ydds();
+
+  int n_time_steps = trajectory->length();
+  cost_vars = MatrixXd(n_time_steps, 1 + 6*2 + 1);
+
+  ThrowBallSimulator simulator;
+  double dt = ts[1] - ts[0];
+  for (int ii = 0; ii < n_time_steps; ii++) {
+    if (ii>=1) dt = ts[ii] - ts[ii-1];
+    simulator.integrate(dt, y_des.row(ii), yd_des.row(ii), ydd_des.row(ii));
+    cost_vars.row(ii) = simulator.getState();
   }
-
-  trajectory->set_misc(y_ball);
-
-  trajectory->asMatrix(cost_vars);
+    
 }
 
 }  // namespace DmpBbo

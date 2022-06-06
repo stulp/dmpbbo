@@ -35,9 +35,9 @@ do # Run the sampled DMPs on the robot
 done
 python3 plot_rollouts.py ${DU} ${D}/task.json --save # Save the results as a png
 
-# Low exploration noise
-python3 step3_tune_exploration.py ${D}/dmp_initial.json ${D}/tune_exploration --save --n 10 --sigma 100.0
-DU="${D}/tune_exploration/sigma_100.000"
+# High exploration noise
+python3 step3_tune_exploration.py ${D}/dmp_initial.json ${D}/tune_exploration --save --n 10 --sigma 20.0
+DU="${D}/tune_exploration/sigma_20.000"
 for i_sample in $(seq -f "%02g" 0 9)
 do # Run the sampled DMPs on the robot
   ../../bin/robotExecuteDmp ${DU}/${i_sample}_dmp_for_cpp.json ${DU}/${i_sample}_cost_vars.txt

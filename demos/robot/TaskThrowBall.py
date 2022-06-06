@@ -41,7 +41,7 @@ class TaskThrowBall(Task):
         # ts = cost_vars[:,0]
         # y = cost_vars[:,1:1+n_dims]
         ydd = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
-        ball = cost_vars[:, -2:]
+        ball = cost_vars[:, 7:9]
         ball_final_x = ball[-1, 0]
 
         dist_to_landing_site = abs(ball_final_x - self.x_goal)
@@ -69,9 +69,13 @@ class TaskThrowBall(Task):
 
         if not ax:
             ax = plt.axes()
+        # Indexing
+        #   t = 0
+        #   y, yd, ydd = 1, 3, 5
+        #   y_ball, yd_ball, ydd_ball = 7, 9, 11
         # t = cost_vars[:, 0]
         y = cost_vars[:, 1:3]
-        ball = cost_vars[:, -2:]
+        ball = cost_vars[:, 7:9]
 
         line_handles = ax.plot(y[:, 0], y[:, 1], linewidth=0.5)
         line_handles_ball_traj = ax.plot(ball[:, 0], ball[:, 1], "-")
