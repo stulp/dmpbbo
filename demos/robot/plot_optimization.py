@@ -40,8 +40,8 @@ def main():
         filename = Path(args.directory, 'optimization.png')
         print(f'Saving png to: {filename}')
         plt.gcf().savefig(filename)
-    else:
-        plt.show()
+
+    plt.show()
 
 
 if __name__ == "__main__":

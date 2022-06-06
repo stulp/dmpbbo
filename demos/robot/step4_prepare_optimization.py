@@ -30,6 +30,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", help="directory to write results to")
+    parser.add_argument("--traj", action="store_true", help="integrate DMP and save trajectory")
     args = parser.parse_args()
 
     filename = Path(args.directory, "task.json")
@@ -50,7 +51,7 @@ def main():
     if updater_name == "mean":
         updater = UpdaterMean(eliteness=10, weighting="PI-BB")
     elif updater_name == "decay":
-        updater = UpdaterCovarDecay(eliteness=10, weighting="PI-BB", decay=0.85)
+        updater = UpdaterCovarDecay(eliteness=10, weighting="PI-BB", decay=0.9)
     else:
         updater = UpdaterCovarAdaptation(
             eliteness=10,
@@ -63,7 +64,7 @@ def main():
 
     task_solver = None
     run_one.run_optimization_task_prepare(
-        args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp
+        args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp, args.traj
     )
 
 

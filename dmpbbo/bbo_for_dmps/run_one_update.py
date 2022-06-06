@@ -27,6 +27,7 @@ def run_optimization_task_prepare(
     n_samples_per_update,
     updater,
     dmp_initial=None,
+    save_trajectory=False
 ):
     """ Run the optimization of a task with a task solver
 
@@ -37,6 +38,7 @@ def run_optimization_task_prepare(
     @param updater:  The updater to update the distribution.
     @param n_samples_per_update:  The number of samples for one update
     @param dmp_initial: The initial DMP.
+    @param save_trajectory: Whether to save trajectories also, or only DMPs
     @return: The learning session (see LearningSessionTask)
     """
 
@@ -50,13 +52,13 @@ def run_optimization_task_prepare(
     # Generate first batch of samples
     i_update = 0
     _run_optimization_task_generate_samples(
-        session, distribution_initial, n_samples_per_update, i_update
+        session, distribution_initial, n_samples_per_update, i_update, save_trajectory
     )
 
     return session
 
 
-def _run_optimization_task_generate_samples(session, distribution, n_samples, i_update):
+def _run_optimization_task_generate_samples(session, distribution, n_samples, i_update, save_trajectory=False):
 
     samples = distribution.generate_samples(n_samples)
 
@@ -79,17 +81,23 @@ def _run_optimization_task_generate_samples(session, distribution, n_samples, i_
             dmp.set_param_vector(samples[i_sample, :])
 
         f = session.tell(dmp, "dmp", i_update, i_sample)
+        if save_trajectory:
+            ts = dmp.ts_train
+            xs, xds, _, _ = dmp.analytical_solution(ts)
+            traj = dmp.states_as_trajectory(ts, xs, xds)
+            f = session.tell(traj.as_matrix(), "traj", i_update, i_sample)
         filenames.append(f)
 
     print("ROLLOUTS NOW REQUIRED ON FOLLOWING FILES:")
     print("  " + "\n  ".join(filenames))
 
 
-def run_optimization_task_one_update(session, i_update):
+def run_optimization_task_one_update(session, i_update, save_trajectory=False):
     """ Do one update for the optimization of a task
 
     @param session:  The learning session (LearningSessionTask)
     @param i_update: The update number (how many updates so far?)
+    @param save_trajectory: Whether to save trajectories also, or only DMPs
     """
     print("======================================================")
     print(f"i_update = {i_update}")
@@ -131,4 +139,4 @@ def run_optimization_task_one_update(session, i_update):
     # Update done: generate new samples
     print("GENERATE NEW SAMPLES")
     i_update += 1  # Next batch of samples are for the next update.
-    _run_optimization_task_generate_samples(session, distribution_new, n_samples, i_update)
+    _run_optimization_task_generate_samples(session, distribution_new, n_samples, i_update, save_trajectory)

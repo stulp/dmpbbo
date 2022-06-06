@@ -36,6 +36,7 @@ def main():
     parser.add_argument("output_directory", help="directory to write results to")
     parser.add_argument("--sigma", help="sigma of covariance matrix", type=float, default=3.0)
     parser.add_argument("--n", help="number of samples", type=int, default=10)
+    parser.add_argument("--traj", action="store_true", help="integrate DMP and save trajectory")
     parser.add_argument("--show", action="store_true", help="show result plots")
     parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
@@ -85,15 +86,17 @@ def main():
         jc.savejson(str(filename)+'.json', dmp)
         jc.savejson_for_cpp(str(filename)+'_for_cpp.json', dmp)
 
-        xs, xds, forcing, fa_outputs = dmp.analytical_solution()
-        traj_sample = dmp.states_as_trajectory(ts, xs, xds)
-        filename = Path(directory, f'{i_sample:02}_traj.txt')
-        print(f"Saving sampled trajectory to: {filename}")
-        traj_sample.savetxt(filename)
 
-        if args.show or args.save:
-            lines, _ = traj_sample.plot([ax2])  # noqa
-            plt.setp(lines, color="#BBBBBB", alpha=0.5)
+        if args.show or args.save or args.traj:
+            xs, xds, forcing, fa_outputs = dmp.analytical_solution()
+            traj_sample = dmp.states_as_trajectory(ts, xs, xds)
+            if args.traj:
+                filename = Path(directory, f'{i_sample:02}_traj.txt')
+                print(f"Saving sampled trajectory to: {filename}")
+                traj_sample.savetxt(filename)
+            if args.show or args.save:
+                lines, _ = traj_sample.plot([ax2])  # noqa
+                plt.setp(lines, color="#BBBBBB", alpha=0.5)
 
     if args.save:
         filename = "exploration_dmp_traj.png"

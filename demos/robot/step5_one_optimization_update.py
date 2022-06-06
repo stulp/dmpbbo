@@ -29,11 +29,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("directory", type=str, help="directory to write results to")
     parser.add_argument("update", type=int, help="update number")
+    parser.add_argument("--traj", action="store_true", help="integrate DMP and save trajectory")
     args = parser.parse_args()
 
     session = LearningSessionTask.from_dir(args.directory)
 
-    run_one.run_optimization_task_one_update(session, args.update)
+    run_one.run_optimization_task_one_update(session, args.update, args.traj)
 
 
 if __name__ == "__main__":
