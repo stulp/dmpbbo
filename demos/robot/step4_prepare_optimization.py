@@ -21,7 +21,7 @@ from pathlib import Path
 
 import jsonpickle
 
-import dmpbbo.bbo_for_dmps.run_one_update as run_one
+from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_prepare
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 
 
@@ -63,7 +63,7 @@ def main():
         )
 
     task_solver = None
-    run_one.run_optimization_task_prepare(
+    run_optimization_task_prepare(
         args.directory, task, task_solver, distribution_init, n_samples_per_update, updater, dmp, args.traj
     )
 

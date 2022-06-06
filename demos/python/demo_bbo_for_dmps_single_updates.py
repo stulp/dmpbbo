@@ -24,7 +24,7 @@ from pathlib import Path
 import numpy as np
 from matplotlib import pyplot as plt
 
-import dmpbbo.bbo_for_dmps.run_one_update as run_one
+from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_one_update, run_optimization_task_prepare
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
 from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
@@ -97,7 +97,7 @@ def run_demo(directory, n_dims):
     n_samples_per_update = 10
     n_updates = 20
 
-    session = run_one.run_optimization_task_prepare(
+    session = run_optimization_task_prepare(
         directory, task, task_solver, distribution, n_samples_per_update, updater, dmp
     )
 
@@ -111,7 +111,7 @@ def run_demo(directory, n_dims):
             cost_vars = task_solver.perform_rollout_dmp(dmp_sample)
             session.tell(cost_vars, "cost_vars", i_update, i_sample)
 
-        run_one.run_optimization_task_one_update(session, i_update)
+        run_optimization_task_one_update(session, i_update)
 
     return session.plot()
 
