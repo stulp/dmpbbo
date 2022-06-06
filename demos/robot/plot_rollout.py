@@ -42,9 +42,9 @@ def main():
     ax = fig.add_subplot(1, n_subplots, n_subplots)
     task.plot_rollout(cost_vars, ax)
 
-    filename = "plotRollout.png"
-    print(f"Saving to file: {filename}")
-    fig.savefig(filename)
+    #filename = "plotRollout.png"
+    #print(f"Saving to file: {filename}")
+    #fig.savefig(filename)
 
     plt.show()
 
