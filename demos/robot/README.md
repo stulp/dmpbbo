@@ -9,7 +9,7 @@ You can run all the steps below automatically by calling the `demo_robot.bash` s
 
 In the task considered in this tutorial, the robot has to throw a ball into a certain area, as illustrated below. The "robot" makes an elliptical movement with its end-effector (blue trajectory), releases the ball (black circles) after 0.6 seconds, so that the ball flies through the air (green trajectory) until it hits the ground. The aim is to throw the ball to a particular position (the green marker on the "floor"). There is a margin of error, illustrated by the dent in the floor.
 
-![alt text](images/task_throw_ball.png  "Illustration of the ball throwing task.")
+![](images/task_throw_ball.png  "Illustration of the ball throwing task.")
 
 
 ## Step 1: Train the DMP with a demonstration
@@ -107,58 +107,60 @@ The value 1.0 is probably too low, because there is hardly any variation in the 
 cp results/tune_exploration/sigma_20.000/distribution.json results/distribution_initial.json
 ```
 
-If you are performing the optimization with covariance matrix adapation (CMA), i.e. with the UpdaterCovarAdaptation, I would set the initial sigma to 10.0, max_level to 20.0 (so that the exploration is not adapted to more than 20.0) and min_level 1.0 (to avoid premature convergence along one of the dimensions). These parameters are set in `step4_prepare_optimization.py`, which we turn to next.
-
 ## Step 4: Prepare the optimization
 
 Whereas Step 1 has defined the search space (with `dmp.set_selected_param_names("weights")`), and Step 3 has determined the initial distribution for the optimization, Step 4 defines how the distribution is updated over time. It does so by initializing an `Updater`, e.g. `UpdaterCovarDecay` or `UpdaterCovarAdaptation`.
 
-Also, it calls `run_optimization_task_prepare`, which sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
+`step4_prepare_optimization.py` is mainly concerned with such parameter settings. The hard work is done in the call to `dmpbbo.run_one_update.run_optimization_task_prepare`. It sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
+
+## Step 5: Run the optimization update-per-update
+
+Now we have trained a dmp (stored in `dmp_initial.json`), specified the task (stored in `task.json`), tuned the exploration (stored in `distribution_initial.json`), and speficied the distribution update method (in `updater.json`). Now it's time to run the optimization! This is an iterative process with two main steps (and an optional step of plotting intermediate results). Each iteration is called an "update", as it involves one update of the policy parameters. The overall loop (copied and simplified from `demo_robot.bash` to avoid the bash loop syntax which may not be familiar to everyone) is:
+
+Note that the first batch of samples DMPs (`000_dmp_for_cpp.json`, etc) have already been generated in Step 4.
+
+```
+for D in results/update00000, results/update00001, results/update00002, etc.
+do
+  
+  # Run the previously sampled DMPs on the robot
+  # Evaluation rollout
+  ../../bin/robotExecuteDmp ${D}/eval_dmp_for_cpp.json ${D}/eval_cost_vars.txt
+  # Samples rollouts
+  ../../bin/robotExecuteDmp ${D}/000_dmp_for_cpp.json ${D}/001_cost_vars.txt
+  ../../bin/robotExecuteDmp ${D}/001_dmp_for_cpp.json ${D}/002_cost_vars.txt
+  ../../bin/robotExecuteDmp ${D}/002_dmp_for_cpp.json ${D}/003_cost_vars.txt
+  etc.
+  
+  # Update the distribution (given the cost_vars above), and generate the
+  # next batch of samples
+  python3 step5_one_optimization_update.py ${D} 
+  
+done
+```
+### Step 5A: Executing the DMPs
+
+In this loop, each call of `../../bin/robotExecuteDmp` is what in real experiments would be the execution of one DMP on the real robot. `robotExecuteDmp` will then likely not be compiled C++ executable, but some (Python?) script, ROS-based solution, etc. As long as it sticks to the conventions in the directory structure with updates in the `update00084/` directories and DMPs and costvars in the appropriate files, `dmpbbo` is applicable.
+
+### Step 5B: Update the distribution 
+
+In the above, `step5_one_optimization_update.py` is essentially a wrapper around the function `dmpbbo.run_one_update.run_optimization_task_one_update`. It reads the `cost_vars`
+
+This reads all `cost_vars` file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
 
 
-## Step 5: Run the optimization step-by-step
+### Plotting intermediate results
 
-Now we have trained a dmp (stored in `dmp_initial.json`), specified the task (stored in `task.json`), and tuned the exploration (stored in `distribution_initial.json`). Now it's time to run the optimization! This is an iterative process with two main steps (and an optional step of plotting intermediate results). Each iteration is called an "update", as it involves one update of the policy parameters.
+Plotting (intermediate) results of the optimization can be done with:
 
-### Step 5A: Update parameters 
+```
+python3 plot_optimization.py ${D} --save
+```
 
-This is a highly automized process, which is called as follows
+The `--save` flag additional saves the graph to a png file. This script automatically determine what the last update directory is, and plot the optimization process so far, as shown below. 
 
-    python3 step4A_oneOptimizationUpdate.py  results/
+![](images/optimization.png  "Optimization results after 15 updates.")
 
-This will automatically find the most recent update (e.g. `results/update0083/`) and read all cost_vars in the rollouts in this update directory (which are stored in `update0083/rollout001/cost_vars.txt`, `update0083/rollout002/cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluateRollout(...)`), and updates the policy parameters. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update0084/rollout001/policy_parameters.txt`, `update0084/rollout002/policy_parameters.txt`, etc.)
-
-Note: on the first call this script only writes the samples, but does not read the rollouts, as there are none yet.
-
-### Step 5B: Perform rollouts
-
-Performing the rollouts on the robot is done with the same `./robotPerformRollout` executable as above. There is a convenience bash script
-
-    robotPerformRollouts.bash results/dmp.xml results/update00084/
-
-which loops over all `rolloutNNNN/` directories and calls `./robotPerformRollout` on each. Finally, the `step4B_performRollouts.bash` determines the current update (e.g. `update0084/`), calls `robotPerformRollouts.bash` with this directory
-
-    ./step4B_performRollouts.bash results/
-
-Note that all of the scripts/programs in Step 4B will be very specific to your robot. For instance, you may have a Simulink model that implements the policy, and instead of robotPerformRollouts.bash you may have a python script or some ROS-based solution. As long as it sticks to the conventions in the directory structure with updates in `update00084/` directories, rollouts in `rollout001/`, policy parameters read from `policy_parameters.txt` and cost-relevant variables written to `cost_vars.txt` in these directories, all is good.
-
-### Step 4C: Plotting intermediate results
-
-Iteratively executing the two steps above iteratively leads to (you'll probably have this scripted somehow)
-
-    python3 step4A_oneOptimizationUpdate.py results/ 
-    ./step4B_performRollouts.bash results/
-    python3 step4A_oneOptimizationUpdate.py results/
-    ./step4B_performRollouts.bash results/
-    python3 step4A_oneOptimizationUpdate.py results/
-    ./step4B_performRollouts.bash results/
-
-If you are curious about intermediate results, you can visualize them with
-
-    python3 plot_optimization.py results/
-
-This will automatically determine what the last update directory is, and plot the optimization process so far, as shown below. The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.9, which is specified in `step4A_oneOptimizationUpdate.py`. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
-
-![alt text](images/optimization.png  "Optimization results after 15 updates.")
+The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in `step4_prepare_optimization.py`. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
 
 We see that after 15 rollouts, the "robot" has learned to throw the ball in the specified area. The accelerations have increased slightly because the movement to do this requires slightly higher velocities than those in the demonstration.

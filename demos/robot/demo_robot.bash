@@ -69,6 +69,8 @@ do
     ../../bin/robotExecuteDmp ${DU}/${i}_dmp_for_cpp.json ${DU}/${i}_cost_vars.txt
   done
   
+  # Update the distribution (given the cost_vars above), and generate the
+  # next batch of samples
   python3 step5_one_optimization_update.py ${D} ${i_update}
   
 done
