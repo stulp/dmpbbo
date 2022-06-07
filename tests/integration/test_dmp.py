@@ -128,8 +128,9 @@ def main(directory, **kwargs):
             forcing_terms=forcing_terms_ana_cpp,
             fa_outputs=fa_outputs_ana_cpp,
         )
-        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label='Python')
+        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8), label='C++')
+        axs1[0].legend()
         plt.gcf().suptitle("Analytical solution")
 
         if save:
@@ -150,8 +151,9 @@ def main(directory, **kwargs):
 
         h_pyt, axs2 = dmp.plot(ts, xs_step, xds_step)
         h_cpp, _ = dmp.plot(ts, xs_step_cpp, xds_step_cpp, axs=axs2)
-        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8))
+        plt.setp(h_pyt, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8), label='Python')
+        plt.setp(h_cpp, linestyle="--", linewidth=2, color=(0.2, 0.2, 0.8), label='C++')
+        axs2[0].legend()
         plt.gcf().suptitle("Numerical integration")
         if save:
             plt.gcf().savefig(Path(directory, "numerical.png"))
