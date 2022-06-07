@@ -62,7 +62,6 @@ def main():
             learning_rate=0.5,
         )
 
-    print(updater.covar_decay_factor)
     task_solver = None
     run_optimization_task_prepare(
         args.directory,

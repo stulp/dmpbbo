@@ -111,9 +111,12 @@ If you are performing the optimization with covariance matrix adapation (CMA), i
 
 ## Step 4: Prepare the optimization
 
+Whereas Step 1 has defined the search space (with `dmp.set_selected_param_names("weights")`), and Step 3 has determined the initial distribution for the optimization, Step 4 defines how the distribution is updated over time. It does so by initializing an `Updater`, e.g. `UpdaterCovarDecay` or `UpdaterCovarAdaptation`.
+
+Also, it calls `run_optimization_task_prepare`, which sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
 
 
-## Step 5: Run the optimization (step by step)
+## Step 5: Run the optimization step-by-step
 
 Now we have trained a dmp (stored in `dmp_initial.json`), specified the task (stored in `task.json`), and tuned the exploration (stored in `distribution_initial.json`). Now it's time to run the optimization! This is an iterative process with two main steps (and an optional step of plotting intermediate results). Each iteration is called an "update", as it involves one update of the policy parameters.
 
