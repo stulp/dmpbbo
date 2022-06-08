@@ -29,7 +29,8 @@ In the task considered in this tutorial, the robot has to throw a ball into a ce
 
 It is common practice to initialize a DMP with a demonstrated trajectory, so that the optimization does not have to start from scratch. Given that the optimization algorithms are local, such an initialization is essential to avoid local minima that do not solve the task.
 
-Training is done with the following command:
+Training is done with 
+<a href="step1_train_dmp_from_trajectory_file.py">`step1_train_dmp_from_trajectory_file.py`</a> in the following command:
 
 ```
 python3 step1_train_dmp_from_trajectory_file.py trajectory.txt results/training --n 15 --save
@@ -58,18 +59,18 @@ cp results/training/dmp_trained_10.json results/dmp_initial.json
 
 ## Step 2: Define the task (i.e. cost function) and implement executing rollouts on the robot
 
-Defining the task requires you to make a class that inherits from `dmp_bbo.Task`, and implements the following functions:
+Defining the task requires you to make a class that inherits from <a href="../../dmpbbo/bbo_for_dmps/Task.py">`Task`</a>, and implements the following functions:
 
 * `evaluate_rollout(cost_vars, sample)`. This is the cost function, which takes the cost-relevant variables (`cost_vars`) as an input (and the sample for regularization), and returns the cost associated with the rollout. `cost_vars` thus defines the variables the robot needs to record when performing a rollout, as these variables are required to compute the cost.
 * `plot_rollout(cost_vars)`. This function visualizes one rollout.
 
-The task, in this case `TaskThrowBall` is save to file as JSON with the following script:
+The task, in this case <a href="TaskThrowBall.py">`TaskThrowBall`</a> is saved to file as JSON with the following script:
 
 ```
 python3 step2_define_task.py results/
 ```
     
-The task converts cost-relevant variables into a cost. The robot, which is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the user must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In this demo, this interface is the executable `robotExecuteDmp` (compiled from `robotExecuteDmp.cpp`). Executing and plotting the initial DMP can be done with:
+The task converts cost-relevant variables into a cost. The robot, which is responsible for executing the rollouts, should write the cost-relevant variable to a file. Therefore, the user must write an interface to the robot that reads a dmp, executes it, and writes the results to a file containing the cost-relevant variables. In this demo, this interface is the executable `robotExecuteDmp` (compiled from <a href="robotExecuteDmp.cpp">`robotExecuteDmp.cpp`</a>). Executing and plotting the initial DMP can be done with:
 
 ```
 # Execute the DMP on your robot, and write cost-vars
@@ -77,17 +78,17 @@ The task converts cost-relevant variables into a cost. The robot, which is respo
 # Plot the cost-vars (which required knowledge of the task)
 python3 plot_rollouts.py tmp_cost_vars.txt results/task.json
 ```
-Note that there are often two JSON versions of the DMP, e.g. `dmp_trained_10.json` and `dmp_trained_10_for_cpp.json`. The former is written with `jsonpickle` (which makes it easier to read into Python with `jsonpickle`) and the latter is a simpler custom JSON format (which is easier to read into C++). See `dmpbbo/dmbbo/json_for_cpp.py` for details. 
+Note that there are often two JSON versions of the DMP, e.g. `dmp_trained_10.json` and `dmp_trained_10_for_cpp.json`. The former is written with `jsonpickle` (which makes it easier to read into Python with `jsonpickle`) and the latter is a simpler custom JSON format (which is easier to read into C++). See <a href="../../dmpbbo/json_for_cpp.py">`json_for_cpp.py` for details. 
 
 For the cost function of this task, the only relevant variables are the landing position of the ball, and the accelerations at each time step (accelerations are also penalized). In practice however, I usually store more information in cost_vars for visualization purposes, e.g. the end-effector trajectory and the ball trajectory. These are not needed to compute the cost with `evaluate_rollout(cost_vars, sample)`, but certainly help to provide sensible plots with `plot_rollout(cost_vars)`
 
-Gathering the information for cost-vars can be non-trivial in practice. For instance, for the ball-in-cup experiments on the Meka robot, the end-effector position was recorded by the robot, and stored at each time step. The ball trajectory was recorded with an external camera, passed to the robot, which stored it inside the `cost_vars` matrix alongside the end-effector positions. All of these aspect have been simulated in `robotExecuteDmp.cpp`.
+Gathering the information for cost-vars can be non-trivial in practice. For instance, for the ball-in-cup experiments on the Meka robot, the end-effector position was recorded by the robot, and stored at each time step. The ball trajectory was recorded with an external camera, passed to the robot, which stored it inside the `cost_vars` matrix alongside the end-effector positions. All of these aspect have been simulated in <a href="robotExecuteDmp.cpp">`robotExecuteDmp.cpp`</a>.
 
 ## Step 3: Tune the exploration noise for the optimization
 
 During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution. The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning.
 
-In this demo, we tune the weights of the radial basis function networks in the DMP, which has been set with `dmp.set_selected_param_names("weights")` in `step1_train_dmp_from_trajectory_file.py`. The function `set_selected_param_names` is part of the `Parameterizable` class from which `Dmp` inherits.
+In this demo, we tune the weights of the radial basis function networks in the DMP, which has been set with `dmp.set_selected_param_names("weights")` in `step1_train_dmp_from_trajectory_file.py`. The function `set_selected_param_names` is part of the <a href="../../dmpbbo/functionapproximators/Parameterizable.py">`Parameterizable`</a> class from which `Dmp` inherits.
 
 The covariance matrix of the sampling distributions determines the magnitude of exploration. This magnitude is defined in terms of sigma, where the diagonal of the covariance matrix is initialized with sigma^2. Sigma should not be too low, otherwise the stochasticity of the exploration may be smaller than that of the robot movement itself, and no learning can take place. It should also not be too high for safety reasons; your robot may reach acceleration limits, joint limits, or unexpectedly bump into the environment. 
 
@@ -122,9 +123,9 @@ cp results/tune_exploration/sigma_20.000/distribution.json results/distribution_
 
 ## Step 4: Prepare the optimization
 
-Whereas Step 1 has defined the search space (with `dmp.set_selected_param_names("weights")`), and Step 3 has determined the initial distribution for the optimization, Step 4 defines how the distribution is updated over time. It does so by initializing an `Updater`, e.g. `UpdaterCovarDecay` or `UpdaterCovarAdaptation`.
+Whereas Step 1 has defined the search space (with `dmp.set_selected_param_names("weights")`), and Step 3 has determined the initial distribution for the optimization, Step 4 defines how the distribution is updated over time. It does so by initializing an <a href="../../dmpbbo/bbo/updaters.py">`Updater`</a>, e.g. `UpdaterCovarDecay` or `UpdaterCovarAdaptation`.
 
-`step4_prepare_optimization.py` is mainly concerned with such parameter settings. The hard work is done in the call to `dmpbbo.run_one_update.run_optimization_task_prepare`. It sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
+<a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a> is mainly concerned with such parameter settings. The hard work is done in the call to `dmpbbo.run_one_update.run_optimization_task_prepare`. It sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
 
 ## Step 5: Run the optimization update-per-update
 
@@ -157,9 +158,8 @@ In this loop, each call of `../../bin/robotExecuteDmp` is what in real experimen
 
 ### Step 5B: Update the distribution 
 
-In the above, `step5_one_optimization_update.py` is essentially a wrapper around the function `dmpbbo.run_one_update.run_optimization_task_one_update`. It reads the `cost_vars`
 
-This reads all `cost_vars` file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
+In the above, <a href="step5_one_optimization_update.py">`step5_one_optimization_update.py`</a> is essentially a wrapper around the function `dmpbbo.run_one_update.run_optimization_task_one_update`. It reads the `cost_vars` data from file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
 
 Step 5 is illustrated in the figure below:
 
@@ -179,6 +179,6 @@ The `--save` flag additional saves the graph to a png file. This script automati
 
 ![](images/optimization.png  "Optimization results after 15 updates.")
 
-The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in `step4_prepare_optimization.py`. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
+The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in <a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a>. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
 
 We see that after 15 rollouts, the "robot" has learned to throw the ball in the specified area. The accelerations have increased slightly because the movement to do this requires slightly higher velocities than those in the demonstration.
