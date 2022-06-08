@@ -8,7 +8,7 @@ This tutorial will describe the steps involved in training and optimizing a DMP 
 The steps are:
 
 * Step 1: Train the DMP with a demonstration
-* Step 2: Define the task and implement executing rollouts on the robot
+* Step 2: Define the task and implement executing DMPs on the robot
 * Step 3: Tune the exploration noise for the optimization
 * Step 4: Prepare the optimization
 * Step 5: Run the optimization update-per-update
