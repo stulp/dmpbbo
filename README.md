@@ -10,7 +10,7 @@ of dynamical movement primitives.
 
 ## News: Version 2 
 
-Version 2 of dmpbbo was released in June 2022. If you still require the previous API, or the C++ implementations of training and optimization that used XML as the serialization format, please use v1.0.0: https://github.com/stulp/dmpbbo/tree/v1.1.0
+Version 2 of dmpbbo was released in June 2022. If you still require the previous API, or the C++ implementations of training and optimization that used XML as the serialization format, please use v1.0.0: https://github.com/stulp/dmpbbo/tree/v1.0.0
 
 
 # For whom?
