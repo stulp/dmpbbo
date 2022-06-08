@@ -19,7 +19,7 @@
 from dmpbbo.bbo_of_dmps.LearningSessionTask import LearningSessionTask
 
 
-def run_optimization_task_prepare(
+def prepare_optimization(
     directory,
     task,
     task_solver,
@@ -51,14 +51,14 @@ def run_optimization_task_prepare(
 
     # Generate first batch of samples
     i_update = 0
-    _run_optimization_task_generate_samples(
+    _generate_samples(
         session, distribution_initial, n_samples_per_update, i_update, save_trajectory
     )
 
     return session
 
 
-def _run_optimization_task_generate_samples(
+def _generate_samples(
     session, distribution, n_samples, i_update, save_trajectory=False
 ):
 
@@ -94,7 +94,7 @@ def _run_optimization_task_generate_samples(
     print("  " + "\n  ".join(filenames))
 
 
-def run_optimization_task_one_update(session, i_update, save_trajectory=False):
+def update_step(session, i_update, save_trajectory=False):
     """ Do one update for the optimization of a task
 
     @param session:  The learning session (LearningSessionTask)
@@ -141,6 +141,6 @@ def run_optimization_task_one_update(session, i_update, save_trajectory=False):
     # Update done: generate new samples
     print("GENERATE NEW SAMPLES")
     i_update += 1  # Next batch of samples are for the next update.
-    _run_optimization_task_generate_samples(
+    _generate_samples(
         session, distribution_new, n_samples, i_update, save_trajectory
     )

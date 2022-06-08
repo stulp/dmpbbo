@@ -26,8 +26,8 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
-from dmpbbo.bbo_of_dmps.run_one_update import (run_optimization_task_one_update,
-                                                run_optimization_task_prepare)
+from dmpbbo.bbo_of_dmps.step_by_step_optimization import (update_step,
+                                                prepare_optimization)
 from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
@@ -98,7 +98,7 @@ def run_demo(directory, n_dims):
     n_samples_per_update = 10
     n_updates = 20
 
-    session = run_optimization_task_prepare(
+    session = prepare_optimization(
         directory, task, task_solver, distribution, n_samples_per_update, updater, dmp
     )
 
@@ -112,14 +112,14 @@ def run_demo(directory, n_dims):
             cost_vars = task_solver.perform_rollout_dmp(dmp_sample)
             session.tell(cost_vars, "cost_vars", i_update, i_sample)
 
-        run_optimization_task_one_update(session, i_update)
+        update_step(session, i_update)
 
     return session.plot()
 
 
 def main():
     """ Main function of the script. """
-    directory = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_of_dmps_single_updates")
+    directory = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_of_dmps_step_by_step")
 
     if len(sys.argv) > 1:
         directory = Path(sys.argv[1])

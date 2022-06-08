@@ -20,7 +20,7 @@ This library may be useful for you if you
 
 + want to develop and contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
-# Example code
+## Example code
 
 Here is a quick look at the code functionality for training and real-time execution of dynamical movement primitives (see <a href="demos/python/demo_dmp_training.py">demo_dmp_training.py</a> for the full source code):
 

@@ -125,7 +125,7 @@ cp results/tune_exploration/sigma_20.000/distribution.json results/distribution_
 
 Whereas Step 1 has defined the search space (with `dmp.set_selected_param_names("weights")`), and Step 3 has determined the initial distribution for the optimization, Step 4 defines how the distribution is updated over time. It does so by initializing an <a href="../../dmpbbo/bbo/updaters.py">`Updater`</a>, e.g. `UpdaterCovarDecay` or `UpdaterCovarAdaptation`.
 
-<a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a> is mainly concerned with such parameter settings. The hard work is done in the call to `dmpbbo.run_one_update.run_optimization_task_prepare`. It sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
+<a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a> is mainly concerned with such parameter settings. The hard work is done in the call to `dmpbbo.optimization_step_by_step.prepare_optimization`. It sets up various directories, and does a first batch of samples for the optimization process in Step 5. 
 
 ## Step 5: Run the optimization update-per-update
 
@@ -159,7 +159,7 @@ In this loop, each call of `../../bin/robotExecuteDmp` is what in real experimen
 ### Step 5B: Update the distribution 
 
 
-In the above, <a href="step5_one_optimization_update.py">`step5_one_optimization_update.py`</a> is essentially a wrapper around the function `dmpbbo.run_one_update.run_optimization_task_one_update`. It reads the `cost_vars` data from file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
+In the above, <a href="step5_one_optimization_update.py">`step5_one_optimization_update.py`</a> is essentially a wrapper around the function `dmpbbo.optimization_step_by_step.update_step`. It reads the `cost_vars` data from file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
 
 Step 5 is illustrated in the figure below:
 

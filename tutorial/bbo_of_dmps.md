@@ -98,13 +98,13 @@ This nicely separates the non-real time optimization scripts from the real-time 
 
 ```Python
 # INITIALIZE OPTIMIZATION
-# Function names run_optimization... can be found in "run_one_update.py"
-# run_optimization_task_prepare(...)
+# Function names run_optimization... can be found in "optimization_step_by_step.py"
+# prepare_optimization(...)
 save(task,"task.json")
 save(distribution_initial,"distribution_initial.json")
 save(dmp_initial,"dmp_initial.json")
 
-# _run_optimization_task_generate_samples(...)
+# _generate_samples(...)
 samples = distribution.generate_samples(n_samples)
 save(samples,"samples.txt")
 dmp = dmp_initial
@@ -118,7 +118,7 @@ Now the robot has, one after the other, to load "000_dmp.json", "001_dmp.json" e
 ```Python
 # DO ONE DISTRIBUTION UPDATE
 
-# run_optimization_task_one_update
+# update_step
 samples = load("samples.txt")
 costs = []
 for i_sample, sample in enumerate(samples):
@@ -130,7 +130,7 @@ for i_sample, sample in enumerate(samples):
 distribution = updater.update_distribution(distribution, samples, costs)
 
 # Generate new samples and dmps for execution on the robot.
-# _run_optimization_task_generate_samples(...)
+# _generate_samples(...)
 samples = distribution.generate_samples(n_samples)
 save(samples,"samples.txt")
 dmp = dmp_initial
@@ -143,7 +143,7 @@ Again the robot reads "000_dmp.json", "001_dmp.json" etc, executes them, and wri
 
 The LearningSession (in bbo) and LearningSessionTask (in bbo_of_dmps) provide a database interface for the save and load functions in the code above. It is responsible for file management and correct file names, e.g. "results/update00004/001_dmp.json" etc.  
 
-This approach, illustrated below, has been implemented in run_one_update.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
+This approach, illustrated below, has been implemented in optimization_step_by_step.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
 
 ![Optimization in Python with DMP execution in C++](images/python_cpp_dmp_bbo.png)
 
