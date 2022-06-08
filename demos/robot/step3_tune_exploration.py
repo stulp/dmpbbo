@@ -98,7 +98,7 @@ def main():
 
     if args.save:
         filename = "exploration_dmp_traj.png"
-        fig.savefig(Path(directory, filename))
+        plt.gcf().savefig(Path(directory, filename))
 
     if args.show:
         plt.show()
