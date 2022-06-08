@@ -41,6 +41,7 @@ def main():
     xs, xds, _, _ = dmp.analytical_solution(traj.ts)
     traj_reproduced = dmp.states_as_trajectory(traj.ts, xs, xds)
 
+    # Numerical integration
     dt = 0.001
     n_time_steps = int(1.3 * traj.duration / dt)
     x, xd = dmp.integrate_start()

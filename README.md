@@ -20,6 +20,46 @@ This library may be useful for you if you
 
 + want to develop and contribute. If you want to delve deeper into the functionality of the code, the **doxygen documentation of the API** is for you. See the [INSTALL.md](INSTALL.md) on how to generate it.
 
+# Example code
+
+Here is a quick look at the code functionality for training and real-time execution of dynamical movement primitives (see <a href="demos/python/demo_dmp_training.py">demo_dmp_training.py</a> for the full source code):
+
+```Python
+# Train a DMP with a trajectory
+traj = Trajectory.loadtxt("trajectory.txt")
+function_apps = [ FunctionApproximatorRBFN(10, 0.7) for _ in range(traj.dim) ]
+dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
+
+# Numerical integration
+dt = 0.001
+n_time_steps = int(1.3 * traj.duration / dt)
+x, xd = dmp.integrate_start()
+for tt in range(1, n_time_steps):
+    x, xd = dmp.integrate_step(dt, x)
+    # Convert complete DMP state to end-eff state
+    y, yd, ydd = dmp.states_as_pos_vel_acc(x, xd)
+
+# Save the DMP to a json file that can be read in C++
+json_for_cpp.savejson_for_cpp("dmp_for_cpp.json", dmp)
+```
+
+The json file saved above can be read into C++ and be integrated in real-time as follows (see <a href="demos/cpp/demoDmp.cpp">`demoDmp.cpp`</a> for the full source code including memory allocation)
+
+```C++
+ifstream file("dmp_for_cpp.json");
+Dmp* dmp = json::parse(file).get<Dmp*>();
+
+// Allocate memory for x/xd/y/yd/ydd
+dmp->integrateStart(x, xd);
+double dt = 0.001;
+for (double t = 0.0; t < 2.0; t+=dt) {
+    dmp->integrateStep(dt, x, x, xd);
+    // Convert complete DMP state to end-eff state
+    dmp->stateAsPosVelAcc(x, xd, y, yd, ydd);
+}
+```
+
+
 # Why?
 
 For our own use, the aims of coding this were the following:
