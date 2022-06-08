@@ -22,7 +22,7 @@ from pathlib import Path
 import jsonpickle
 
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
-from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_prepare
+from dmpbbo.bbo_of_dmps.run_one_update import run_optimization_task_prepare
 
 
 def main():

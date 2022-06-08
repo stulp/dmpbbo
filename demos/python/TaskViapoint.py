@@ -19,7 +19,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from dmpbbo.bbo_for_dmps.Task import Task
+from dmpbbo.bbo_of_dmps.Task import Task
 
 
 class TaskViapoint(Task):
@@ -52,7 +52,7 @@ class TaskViapoint(Task):
         """The cost function which defines the task.
 
         @param cost_vars: All the variables relevant to computing the cost. These are determined by
-            TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_for_dmp".
+            TaskSolver.perform_rollout(). For further information see the tutorial on "bbo_of_dmps".
         @param sample: The sample from which the rollout was generated. Passing this to the cost
             function is useful when performing regularization on the sample.
         @return: costs The scalar cost components for the sample. The first item costs[0] should

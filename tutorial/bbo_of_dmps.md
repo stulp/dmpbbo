@@ -1,4 +1,4 @@
-# Black-Box Optimization of Dynamical Movement Primitives (bbo_for_dmps)
+# Black-Box Optimization of Dynamical Movement Primitives (bbo_of_dmps)
 
 *It is assumed that you have already read the tutorials on <a href="bbo.md">Black Box Optimization</a> and <a href="dmp.md">Dynamical Movement Primitives</a>.* 
 
@@ -45,7 +45,7 @@ The roles of the Task/TaskSolver are:
 
 `cost_vars` should thus contain all variables that are relevant to computing the cost. This depends entirely on the task at hand. Whatever `cost_vars` contains, it should be made sure that a `Task` and its `TaskSolver` are compatible, i.e. the output of `TaskSolver` is the direct input to `Task`. In dmpbbo, this matrix is of size n_time_steps X n_cost_vars, i.e. a vector of cost_vars for each time step. An example is given in `TaskViapoint`, which implements a `Task` in which the first N columns in cost_vars should represent a N-D trajectory. This convention is respected by `TaskSolverDmp`, which is able to generate such trajectories with a DMP.
 
-With this approach, the optimization loop above becomes (simplified from `bbo_for_dmps/run_optimization_task.py`):
+With this approach, the optimization loop above becomes (simplified from `bbo_of_dmps/run_optimization_task.py`):
 
 ```Python
 def run_optimization_task(...):
@@ -141,7 +141,7 @@ for i_sample, sample in enumerate(samples):
 
 Again the robot reads "000_dmp.json", "001_dmp.json" etc, executes them, and writes to "000_cost_vars.json", "001_cost_vars.json", and the "DO ONE DISTRIBUTION UPDATE" step is performed iteratively.
 
-The LearningSession (in bbo) and LearningSessionTask (in bbo_for_dmps) provide a database interface for the save and load functions in the code above. It is responsible for file management and correct file names, e.g. "results/update00004/001_dmp.json" etc.  
+The LearningSession (in bbo) and LearningSessionTask (in bbo_of_dmps) provide a database interface for the save and load functions in the code above. It is responsible for file management and correct file names, e.g. "results/update00004/001_dmp.json" etc.  
 
 This approach, illustrated below, has been implemented in run_one_update.py. The demos/robot demo shows the entire approach, including the reading/writing in Python and C++.
 

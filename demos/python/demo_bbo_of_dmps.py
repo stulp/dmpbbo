@@ -14,28 +14,25 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-"""Script for bbo_for_dmps demo (with single updates saved to file)."""
+"""Script for bbo_of_dmps demo."""
 
 
 import sys
-import tempfile
-from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
 
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-from dmpbbo.bbo.updaters import UpdaterCovarDecay
-from dmpbbo.bbo_for_dmps.run_one_update import (run_optimization_task_one_update,
-                                                run_optimization_task_prepare)
-from dmpbbo.bbo_for_dmps.TaskSolverDmp import TaskSolverDmp
+from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
+from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
+from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from TaskViapoint import TaskViapoint
 
 
 def run_demo(directory, n_dims):
-    """ Run one demo for bbo_for_dmps (with single updates)
+    """ Run one demo for bbo_of_dmps.
 
     @param directory: Directory to save results to
     @param n_dims: Number of dimensions of the task (i.e. the viapoint)
@@ -93,38 +90,37 @@ def run_demo(directory, n_dims):
     covar_init = 1000.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
+    covar_update = "cma"
+    if covar_update == "none":
+        updater = UpdaterMean(eliteness=10, weighting_method="PI-BB")
+    elif covar_update == "decay":
+        updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
+    else:
+        updater = UpdaterCovarAdaptation(
+            eliteness=10,
+            weighting_method="PI-BB",
+            max_level=None,
+            min_level=1.0,
+            diag_only=False,
+            learning_rate=0.5,
+        )
 
     n_samples_per_update = 10
-    n_updates = 20
+    n_updates = 40
 
-    session = run_optimization_task_prepare(
-        directory, task, task_solver, distribution, n_samples_per_update, updater, dmp
+    session = run_optimization_task(
+        task, task_solver, distribution, updater, n_updates, n_samples_per_update, directory
     )
-
-    for i_update in range(n_updates):
-        dmp_eval = session.ask("dmp", i_update, "eval")
-        cost_vars_eval = task_solver.perform_rollout_dmp(dmp_eval)
-        session.tell(cost_vars_eval, "cost_vars", i_update, "eval")
-
-        for i_sample in range(n_samples_per_update):
-            dmp_sample = session.ask("dmp", i_update, i_sample)
-            cost_vars = task_solver.perform_rollout_dmp(dmp_sample)
-            session.tell(cost_vars, "cost_vars", i_update, i_sample)
-
-        run_optimization_task_one_update(session, i_update)
-
-    return session.plot()
+    fig = session.plot()
+    fig.canvas.set_window_title(f"Optimization with covar_update={covar_update}")
 
 
 def main():
     """ Main function of the script. """
-    directory = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_for_dmps_single_updates")
+    directory = sys.argv[1] if len(sys.argv) > 1 else None
 
-    if len(sys.argv) > 1:
-        directory = Path(sys.argv[1])
-
-    for n_dims in [1]:
+    for n_dims in [1, 2]:
+        print(f"Optimization of {n_dims}-D task")
         run_demo(directory, n_dims)
 
     plt.show()

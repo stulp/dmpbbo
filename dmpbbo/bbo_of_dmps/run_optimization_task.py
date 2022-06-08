@@ -16,7 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Module with a function to run the optimization of a task. """
 
-from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
+from dmpbbo.bbo_of_dmps.LearningSessionTask import LearningSessionTask
 
 
 def run_optimization_task(

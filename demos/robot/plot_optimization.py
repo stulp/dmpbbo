@@ -21,7 +21,7 @@ from pathlib import Path
 
 from matplotlib import pyplot as plt
 
-from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
+from dmpbbo.bbo_of_dmps.LearningSessionTask import LearningSessionTask
 
 
 def main():

@@ -31,7 +31,7 @@ Further reading
 ---------------
 
 The next tutorials to go to would be:
-* <a href="bbo_for_dmps.md">Black-Box Optimizaton for Dynamical Movement Primitives</a> (if you already know about dynamical movement primitives)
+* <a href="bbo_of_dmps.md">Black-Box Optimizaton for Dynamical Movement Primitives</a> (if you already know about dynamical movement primitives)
 * <a href="dmp.md">Dynamical Movement Primitives</a> (if you don't)
 
 

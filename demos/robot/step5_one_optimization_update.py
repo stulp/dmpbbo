@@ -19,8 +19,8 @@
 
 import argparse
 
-from dmpbbo.bbo_for_dmps.LearningSessionTask import LearningSessionTask
-from dmpbbo.bbo_for_dmps.run_one_update import run_optimization_task_one_update
+from dmpbbo.bbo_of_dmps.LearningSessionTask import LearningSessionTask
+from dmpbbo.bbo_of_dmps.run_one_update import run_optimization_task_one_update
 
 
 def main():

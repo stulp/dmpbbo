@@ -13,7 +13,7 @@ To understand DMPs:
 To understand the optimization of DMPs:
 
 4. <a href="bbo.md">Black-Box Optimization</a>
-5. <a href="bbo_for_dmps.md">Black-Box Optimization for Dynamical Movement Primitives</a>
+5. <a href="bbo_of_dmps.md">Black-Box Optimization for Dynamical Movement Primitives</a>
 
 To understand how to apply this to a real robot:
 

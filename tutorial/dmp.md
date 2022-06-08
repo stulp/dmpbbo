@@ -191,6 +191,6 @@ Further reading: dmpbbo tutorials
 ---------------
 
 The next tutorials to go to would be:
-* <a href="bbo_for_dmps.md">Black-Box Optimizaton for Dynamical Movement Primitives</a> (if you already know about black-box optimization)
+* <a href="bbo_of_dmps.md">Black-Box Optimizaton for Dynamical Movement Primitives</a> (if you already know about black-box optimization)
 * <a href="bbo.md">Black-Box Optimizaton</a> (if you don't)
 

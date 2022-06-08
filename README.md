@@ -56,11 +56,11 @@ The core functionality is in the Python module <a href="dmpbbo/">dmpbbo/</a>. It
 
 + <a href="dmpbbo/bbo">dmpbbo/bbo</a> : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
 
-+ <a href="dmpbbo/bbo_for_dmps">dmpbbo/bbo_for_dmps</a> : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
++ <a href="dmpbbo/bbo_of_dmps">dmpbbo/bbo_of_dmps</a> : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
 
 The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/">src/</a> (with <a href="https://github.com/nlohmann/json">nlohmann::json</a>). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.".
 
-As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_for_dmps` subpackages have not been implemented in C++. Summarizing:
+As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_of_dmps` subpackages have not been implemented in C++. Summarizing:
 
 ![Training and prediction/integration in Python/C++](tutorial/images/python_cpp.png)
 

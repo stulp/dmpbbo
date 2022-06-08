@@ -1,7 +1,7 @@
 Step-by-step howto for training and optimizing a DMP on a real robot
 ===============
 
-*It is assumed that you have already read the tutorial on <a href="../../tutorial/bbo_for_dmps.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
+*It is assumed that you have already read the tutorial on <a href="../../tutorial/bbo_of_dmps.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
 
 This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva demos/robot mycode`, and adapt the cpp and py files to your robot and task.
 
@@ -59,7 +59,7 @@ cp results/training/dmp_trained_10.json results/dmp_initial.json
 
 ## Step 2: Define the task (i.e. cost function) and implement executing rollouts on the robot
 
-Defining the task requires you to make a class that inherits from <a href="../../dmpbbo/bbo_for_dmps/Task.py">`Task`</a>, and implements the following functions:
+Defining the task requires you to make a class that inherits from <a href="../../dmpbbo/bbo_of_dmps/Task.py">`Task`</a>, and implements the following functions:
 
 * `evaluate_rollout(cost_vars, sample)`. This is the cost function, which takes the cost-relevant variables (`cost_vars`) as an input (and the sample for regularization), and returns the cost associated with the rollout. `cost_vars` thus defines the variables the robot needs to record when performing a rollout, as these variables are required to compute the cost.
 * `plot_rollout(cost_vars)`. This function visualizes one rollout.
