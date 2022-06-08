@@ -1,5 +1,4 @@
-Step-by-step howto for training and optimizing a DMP on a real robot
-===============
+# Step-by-step howto for training and optimizing a DMP on a real robot
 
 *It is assumed that you have already read the tutorial on <a href="../../tutorial/bbo_of_dmps.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
 
@@ -182,3 +181,13 @@ The `--save` flag additional saves the graph to a png file. This script automati
 The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in <a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a>. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
 
 We see that after 15 rollouts, the "robot" has learned to throw the ball in the specified area. The accelerations have increased slightly because the movement to do this requires slightly higher velocities than those in the demonstration.
+
+## Executing trajectories (open-loop) instead of DMPs (closed-loop)
+
+In the demo above, the DMP was executed "on the robot" in the `robotExecuteDmp.cpp`. In principle, it is also possible to integrate the DMP off-line before task execution and save it to a trajectory, and then to execute the trajectory on the robot open-loop. The advantage of this is that you may already have functionality to execute pre-determined trajectories on your robot. Applying `dmpbbo` by executing trajectories open-loop would then be more straight-forward than integration the C++ code for real-time DMP integration on your robot.
+
+This approach been implemented in <a href="demo_robot_with_trajectories.bash">`demo_robot_with_trajectories.bash`</a>. It's almost identical to <a href="demo_robot.bash">`demo_robot.bash`</a>, except that  
+<a href="robotExecuteDmp.cpp">`robotExecuteDmp`</a> has been replaced with 
+<a href="robotExecuteTrajectory.cpp">`robotExecuteTrajectory`</a>, and some of the Python scripts are passed the `--traj` flag. The latter makes the scripts integrate the DMP, and save the resulting trajectory alongside the saved DMP. This trajectory is then read by `robotExecuteTrajectory`.
+
+Note that one of the main advantages of DMPs is their ability to react to perturbations or changes of the goal. This is because they are dynamical systems. If you compute a trajectory off-line and execute the trajectory open-loop, all these advantages are lost! You might as well use splines to pre-compute a trajectory and integrate that. On the other hand, you may argue that the aim of your experiment is to optimize a DMP, and that the on-line adaptation to perturbations is only necessary after the optimization. In any case, `dmpbbo` allows you to do both.
