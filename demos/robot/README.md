@@ -16,7 +16,7 @@ The steps are:
     * Step 5B: Update the distribution 
     * Plotting intermediate results
 
-You can run all the steps below automatically by calling the `demo_robot.bash` script in this directory.
+You can run all the steps below automatically by calling the <a href="demo_robot.bash">`demo_robot.bash`</a> script in this directory.
 
 ## ThrowBall task
 
