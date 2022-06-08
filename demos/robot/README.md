@@ -7,6 +7,8 @@ This tutorial will describe the steps involved in training and optimizing a DMP 
 
 You can run all the steps below automatically by calling the `demo_robot.bash` script in this directory.
 
+## ThrowBall task
+
 In the task considered in this tutorial, the robot has to throw a ball into a certain area, as illustrated below. The "robot" makes an elliptical movement with its end-effector (blue trajectory), releases the ball (black circles) after 0.6 seconds, so that the ball flies through the air (green trajectory) until it hits the ground. The aim is to throw the ball to a particular position (the green marker on the "floor"). There is a margin of error, illustrated by the dent in the floor.
 
 ![](images/task_throw_ball.png  "Illustration of the ball throwing task.")
