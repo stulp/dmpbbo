@@ -49,6 +49,7 @@ def main():
         x, xd = dmp.integrate_step(dt, x)
         # Convert complete DMP state to end-eff state
         y, yd, ydd = dmp.states_as_pos_vel_acc(x, xd)
+        print(y)
 
     # Save the DMP to a json file that can be read in C++
     json_for_cpp.savejson_for_cpp("dmp_for_cpp.json", dmp)
