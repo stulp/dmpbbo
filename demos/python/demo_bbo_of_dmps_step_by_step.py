@@ -26,8 +26,7 @@ from matplotlib import pyplot as plt
 
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
-from dmpbbo.bbo_of_dmps.step_by_step_optimization import (update_step,
-                                                prepare_optimization)
+from dmpbbo.bbo_of_dmps.step_by_step_optimization import prepare_optimization, update_step
 from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN

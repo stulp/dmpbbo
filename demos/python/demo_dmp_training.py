@@ -34,7 +34,7 @@ def main():
 
     # Train a DMP with a trajectory
     traj = Trajectory.loadtxt("trajectory.txt")
-    function_apps = [ FunctionApproximatorRBFN(10, 0.7) for _ in range(traj.dim) ]
+    function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(traj.dim)]
     dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
 
     # Compute analytical solution
@@ -52,9 +52,7 @@ def main():
 
     # Save the DMP to a json file that can be read in C++
     json_for_cpp.savejson_for_cpp("dmp_for_cpp.json", dmp)
-    
-    
-    
-    
+
+
 if __name__ == "__main__":
     main()

@@ -58,9 +58,7 @@ def prepare_optimization(
     return session
 
 
-def _generate_samples(
-    session, distribution, n_samples, i_update, save_trajectory=False
-):
+def _generate_samples(session, distribution, n_samples, i_update, save_trajectory=False):
 
     samples = distribution.generate_samples(n_samples)
 
@@ -141,6 +139,4 @@ def update_step(session, i_update, save_trajectory=False):
     # Update done: generate new samples
     print("GENERATE NEW SAMPLES")
     i_update += 1  # Next batch of samples are for the next update.
-    _generate_samples(
-        session, distribution_new, n_samples, i_update, save_trajectory
-    )
+    _generate_samples(session, distribution_new, n_samples, i_update, save_trajectory)

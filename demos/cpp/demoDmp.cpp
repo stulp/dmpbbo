@@ -51,7 +51,7 @@ int main(int n_args, char** args)
 
   dmp->integrateStart(x, xd);
   double dt = 0.001;
-  for (double t = 0.0; t < 2.0; t+=dt) {
+  for (double t = 0.0; t < 2.0; t += dt) {
     dmp->integrateStep(dt, x, x, xd);
     // Convert complete DMP state to end-eff state
     dmp->stateAsPosVelAcc(x, xd, y, yd, ydd);
