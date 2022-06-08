@@ -1,9 +1,20 @@
 Step-by-step howto for training and optimizing a DMP on a real robot
 ===============
 
-*It is assumed that you have already read the tutorials on <a href="../../tutorial/bbo_for_dmps.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
+*It is assumed that you have already read the tutorial on <a href="../../tutorial/bbo_for_dmps.md">Black Box Optimization of Dynamical Movement Primitives</a>.* 
 
 This tutorial will describe the steps involved in training and optimizing a DMP on a real robot. Probably the easiest way to get dmpbbo running for your robot is to copy this directory `cp -uva demos/robot mycode`, and adapt the cpp and py files to your robot and task.
+
+The steps are:
+
+* Step 1: Train the DMP with a demonstration
+* Step 2: Define the task and implement executing rollouts on the robot
+* Step 3: Tune the exploration noise for the optimization
+* Step 4: Prepare the optimization
+* Step 5: Run the optimization update-per-update
+    * Step 5A: Executing the DMPs
+    * Step 5B: Update the distribution 
+    * Plotting intermediate results
 
 You can run all the steps below automatically by calling the `demo_robot.bash` script in this directory.
 
