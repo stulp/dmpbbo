@@ -78,7 +78,7 @@ The task converts cost-relevant variables into a cost. The robot, which is respo
 # Plot the cost-vars (which required knowledge of the task)
 python3 plot_rollouts.py tmp_cost_vars.txt results/task.json
 ```
-Note that there are often two JSON versions of the DMP, e.g. `dmp_trained_10.json` and `dmp_trained_10_for_cpp.json`. The former is written with `jsonpickle` (which makes it easier to read into Python with `jsonpickle`) and the latter is a simpler custom JSON format (which is easier to read into C++). See <a href="../../dmpbbo/json_for_cpp.py">`json_for_cpp.py` for details. 
+Note that there are often two JSON versions of the DMP, e.g. `dmp_trained_10.json` and `dmp_trained_10_for_cpp.json`. The former is written with `jsonpickle` (which makes it easier to read into Python with `jsonpickle`) and the latter is a simpler custom JSON format (which is easier to read into C++). See <a href="../../dmpbbo/json_for_cpp.py">`json_for_cpp.py`</a> for details. 
 
 For the cost function of this task, the only relevant variables are the landing position of the ball, and the accelerations at each time step (accelerations are also penalized). In practice however, I usually store more information in cost_vars for visualization purposes, e.g. the end-effector trajectory and the ball trajectory. These are not needed to compute the cost with `evaluate_rollout(cost_vars, sample)`, but certainly help to provide sensible plots with `plot_rollout(cost_vars)`
 
