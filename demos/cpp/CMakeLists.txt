@@ -13,3 +13,7 @@ install(TARGETS demoTrajectory DESTINATION bin)
 add_executable(demoDmp demoDmp.cpp)
 target_link_libraries(demoDmp dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES})
 install(TARGETS demoDmp DESTINATION bin)
+
+add_executable(demoDmpSimple demoDmpSimple.cpp)
+target_link_libraries(demoDmpSimple dmp dynamicalsystems functionapproximators ${Boost_LIBRARIES})
+install(TARGETS demoDmpSimple DESTINATION bin)
