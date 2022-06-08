@@ -88,7 +88,7 @@ Gathering the information for cost-vars can be non-trivial in practice. For inst
 
 During the stochastic optimization, the parameters of the DMP will be sampled from a Gaussian distribution. The mean of this distribution will be the parameters that resulted from training the DMP with a demonstration through supervised learning.
 
-In this demo, we tune the weights of the radial basis function networks in the DMP, which has been set with `dmp.set_selected_param_names("weights")` in `step1_train_dmp_from_trajectory_file.py`. The function `set_selected_param_names` is part of the <a href="../../dmpbbo/functionapproximators/Parameterizable.py">`Parameterizable`</a> class from which <a href="../../dmpbbo/dmp/Dmp.py">`Dmp`</a> inherits.
+In this demo, we tune the weights of the radial basis function networks in the DMP, which has been set with `dmp.set_selected_param_names("weights")` in `step1_train_dmp_from_trajectory_file.py`. The function `set_selected_param_names` is part of the <a href="../../dmpbbo/functionapproximators/Parameterizable.py">`Parameterizable`</a> class from which <a href="../../dmpbbo/dmps/Dmp.py">`Dmp`</a> inherits.
 
 The covariance matrix of the sampling distributions determines the magnitude of exploration. This magnitude is defined in terms of sigma, where the diagonal of the covariance matrix is initialized with sigma^2. Sigma should not be too low, otherwise the stochasticity of the exploration may be smaller than that of the robot movement itself, and no learning can take place. It should also not be too high for safety reasons; your robot may reach acceleration limits, joint limits, or unexpectedly bump into the environment. 
 
