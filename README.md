@@ -8,6 +8,11 @@ function approximators,
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
+## News: Version 2 
+
+Version 2 of dmpbbo was released in June 2022. If you still require the previous API, or the C++ implementations of training and optimization that used XML as the serialization format, please use v1.0.0: https://github.com/stulp/dmpbbo/tree/v1.1.0
+
+
 # For whom?
 
 This library may be useful for you if you
@@ -105,10 +110,6 @@ As the optimization algorithm responsible for generating exploratory samples and
 ![Training and prediction/integration in Python/C++](tutorial/images/python_cpp.png)
 
 To see how the Python and C++ implementations are intended to work together, please see `demos/robot/`. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
-
-#### Relation to v1 of dmpbbo
-
-If you still require the previous C++ implementations of training and optimization that used XML as the serialization format, please use the previous releases https://github.com/stulp/dmpbbo/tree/v1.1.0 or https://github.com/stulp/dmpbbo/tree/v1.0.0
 
 
 ##  Research background
