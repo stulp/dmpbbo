@@ -89,7 +89,7 @@ How to install the libraries/binaries/documentation is described in [INSTALL.md]
 
 # Code structure
 
-The core functionality is in the Python module <a href="dmpbbo/">dmpbbo/</a>. It contains five subpackages:
+The core functionality is in the Python package <a href="dmpbbo/">dmpbbo/</a>. It contains five subpackages:
 
 + <a href="dmpbbo/functionapproximators">dmpbbo/functionapproximators</a> : defines a generic interface for function approximators, as well as several specific implementations (weighted least-squares regression (WLS), radial basis function networks (RBFN), and locally-weighted regression (LWR).
     
@@ -103,13 +103,14 @@ The core functionality is in the Python module <a href="dmpbbo/">dmpbbo/</a>. It
 
 + <a href="dmpbbo/bbo_of_dmps">dmpbbo/bbo_of_dmps</a> : examples and helper functions for applying black-box optimization to the optimization of DMP parameters.
 
-The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/">src/</a> (with <a href="https://github.com/nlohmann/json">nlohmann::json</a>). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.".
+The function approximators are trained with input and target data, and a DMP is trained with a demonstrated trajectory. These trained model can be saved to the json format, and then be read by the C++ code in  <a href="src/">src/</a> (with <a href="https://github.com/nlohmann/json">nlohmann::json</a>). The DMP integration functions that are called inside the control loop are all real-time, in the sense that they do not dynamically allocate memory, and not computationally intensive (mainly the multiplication of small matrices). The design pattern behind dmpbbo is thus "Train in Python. Execute in C++.", as illustrated in the image below.
 
-As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_of_dmps` subpackages have not been implemented in C++. Summarizing:
+As the optimization algorithm responsible for generating exploratory samples and updating the DMP parameters need not be real-time, requires intermediate visualization for monitoring purposes, and is more easily implemented in a script, the `bbo` and `bbo_of_dmps` subpackages have not been implemented in C++.
+
+To see a concrete example of how the Python and C++ implementations are intended to work together, please see <a href="demos/robot/">`demos/robot/`</a>. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
 
 ![Training and prediction/integration in Python/C++](tutorial/images/python_cpp.png)
 
-To see how the Python and C++ implementations are intended to work together, please see `demos/robot/`. Here, the optimization is done in Python, but a simulated "robot" executes the DMPs in C++.
 
 
 ##  Research background
