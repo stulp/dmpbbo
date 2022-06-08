@@ -148,6 +148,11 @@ In the above, `step5_one_optimization_update.py` is essentially a wrapper around
 
 This reads all `cost_vars` file in the update directory (which are stored in `update00003/000_cost_vars.txt`, `update00003/001_cost_vars.txt`, etc.). It then computes the costs from each cost_vars (with `task.evaluate_rollout(cost_vars)`), and updates the policy parameters based on these costs. Finally, it samples new policy parameters, and saves them in a new update directory (i.e. `update00004/000_dmp_for_cpp.txt`, `update00004/001_dmp_for_cpp.txt`, etc.)
 
+Step 5 is illustrated in the figure below:
+
+![](../../tutorial/images/python_cpp_dmp_bbo.png  "Optimization in Python with DMP execution in C++")
+
+
 
 ### Plotting intermediate results
 
