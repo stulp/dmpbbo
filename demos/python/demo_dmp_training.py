@@ -24,7 +24,7 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 
 def main():
     """ Main function for script. """
-    
+
     # Train a DMP with a trajectory
     traj = Trajectory.loadtxt("trajectory.txt")
     function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(traj.dim)]

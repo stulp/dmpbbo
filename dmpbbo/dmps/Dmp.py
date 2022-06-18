@@ -38,34 +38,27 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     """
 
-    def __init__(
-        self,
-        tau,
-        y_init,
-        y_attr,
-        function_approximators,
-        phase_system=None,  # Initialized later, depends on tau (https://peps.python.org/pep-0671/)
-        gating_system=None,  # Initialized later, depends on tau (https://peps.python.org/pep-0671/)
-        **kwargs,
-    ):
+    def __init__(self, tau, y_init, y_attr, function_approximators, **kwargs):
         """Initialize a DMP with function approximators and subsystems
 
         @param tau: Time constant
         @param y_init: Initial state
         @param y_attr: Attractor state
         @param function_approximators: Function approximators for the forcing term
-        @param forcing_term_scaling: Which method to use for scaling the forcing term
-                ( "NO_SCALING", "G_MINUS_Y0_SCALING")
-        @param phase_system: Dynamical system to compute the phase
-        @param gating_system: Dynamical system to compute the gating term
         @param kwargs:
-            - alpha_spring_damper: alpha in the spring-damper system of the dmp (default: 20.0)
+            - alpha_spring_damper: alpha in the spring-damper system (default: 20.0)
+            - dmp_type: Type of the Dmp, i.e. "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING",
+            "COUNTDOWN_2013" (default: "KULVICIUS_2012_JOINING"). This will set the subsystems to
+            good default values for that Dmp type. These defaults can be overridden with the
+            phase/gating/goals_system kwargs below.
+            - phase_system: Dynamical system to compute the phase
+            - gating_system: Dynamical system to compute the gating term
             - goal_system: Dynamical system to compute delayed goal (default: None)
-            - forcing_term_scaling: Scaling method for the forcing terms (default: NO_SCALING)
-            - scaling_amplitudes: Amplitudes for each dimension. Necessary if
-            forcing_term_scaling=AMPLITUDE_SCALING
-            - sigmoid_max_rate: Max rate for sigmoid phase system. Only used if gating_system is
-            not set (default: -15)
+            - forcing_term_scaling: Scaling method for the forcing terms, i.e. "NO_SCALING",
+            "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" (default: "NO_SCALING")
+            - scaling_amplitudes: Amplitudes for each dimension for
+            forcing_term_scaling = AMPLITUDE_SCALING. Need not be set if Dmp will be trained with a
+            trajectory later on.
         """
 
         dim_dmp = 3 * y_init.size + 2
@@ -74,24 +67,33 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._y_attr = y_attr
         self._function_approximators = function_approximators
 
-        # Initialize subsystems
         alpha = kwargs.get("alpha_spring_damper", 20.0)
         self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
-        self._phase_system = phase_system or TimeSystem(tau)
+        # Get sensible defaults for subsystems
+        dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
+        if dmp_type == "IJSPEERT_2002_MOVEMENT":
+            goal_system_default = None
+            gating_system_default = ExponentialSystem(tau, 1, 0, 4)
+            phase_system_default = ExponentialSystem(tau, 1, 0, 4)
 
-        self._gating_system = gating_system or SigmoidSystem(
-            tau, np.ones(1), kwargs.get("sigmoid_max_rate", -15), 0.85
-        )
+        elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
+            goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
+            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.85)
+            count_down = dmp_type == "COUNTDOWN_2013"
+            phase_system_default = TimeSystem(tau, count_down)
 
-        self._goal_system = kwargs.get("goal_system", None)
+        else:
+            raise ValueError(f"Unknown dmp_type: {dmp_type}")
+
+        # Check if subsystems are specified in kwargs. If not, use default.
+        self._phase_system = kwargs.get("phase_system", phase_system_default)
+        self._gating_system = kwargs.get("gating_system", gating_system_default)
+        self._goal_system = kwargs.get("goal_system", goal_system_default)
 
         # Initialize variables related to scaling of the forcing term
         self._forcing_term_scaling = kwargs.get("forcing_term_scaling", "NO_SCALING")
-        if self._forcing_term_scaling == "AMPLITUDE_SCALING":
-            self._scaling_amplitudes = kwargs.get("scaling_amplitudes", None)
-            if self._scaling_amplitudes is None:
-                raise ValueError("Cannot do AMPLITUDE_SCALING without scaling amplitudes.")
+        self._scaling_amplitudes = kwargs.get("scaling_amplitudes", None)
 
         self._ts_train = None
 
@@ -105,59 +107,32 @@ class Dmp(DynamicalSystem, Parameterizable):
         self.PHASE = np.arange(3 * d + 0, 3 * d + 0 + 1)
         self.GATING = np.arange(3 * d + 1, 3 * d + 1 + 1)
 
-    def dim_dmp(self):
-        """ Get the dimensionality of the dmp (y-part)
-
-        @return: Dimensionality of the dmp (y-part)
-        """
-        return self._dim_y
-
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
         """Initialize a DMP by training it from a trajectory.
 
         @param trajectory: the trajectory to train on
         @param function_approximators: Function approximators for the forcing term
-        @param kwargs:
-        - dmp_type: Type of the Dmp ( "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING",
-        "COUNTDOWN_2013")
-        - forcing_term_scaling: Which method to use for scaling the forcing term
-                ( "NO_SCALING", "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" )
+        @param kwargs: All kwargs are passed to the Dmp constructor.
         """
-
-        dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
-        forcing_term_scaling = kwargs.get("forcing_term_scaling", "AMPLITUDE_SCALING")
 
         # Relevant variables from trajectory
         tau = trajectory.ts[-1]
         y_init = trajectory.ys[0, :]
         y_attr = trajectory.ys[-1, :]
 
-        # Initialize dynamical systems
-
-        if dmp_type == "IJSPEERT_2002_MOVEMENT":
-            goal_system = None
-            phase_system = ExponentialSystem(tau, 1, 0, 4)
-            gating_system = ExponentialSystem(tau, 1, 0, 4)
-
-        elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
-            goal_system = ExponentialSystem(tau, y_init, y_attr, 15)
-            sigmoid_max_rate = -15
-            gating_system = SigmoidSystem(tau, 1, sigmoid_max_rate, 0.85)
-            count_down = dmp_type == "COUNTDOWN_2013"
-            phase_system = TimeSystem(tau, count_down)
-
-        else:
-            raise ValueError(f"Unknown dmp_type: {dmp_type}")
-
-        kwargs["goal_system"] = goal_system
-        dmp = cls(
-            tau, y_init, y_attr, function_approximators, phase_system, gating_system, **kwargs
-        )
+        dmp = cls(tau, y_init, y_attr, function_approximators, **kwargs)
 
         dmp.train(trajectory)
 
         return dmp
+
+    def dim_dmp(self):
+        """ Get the dimensionality of the dmp (y-part)
+
+        @return: Dimensionality of the dmp (y-part)
+        """
+        return self._dim_y
 
     def integrate_start(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
@@ -237,6 +212,8 @@ class Dmp(DynamicalSystem, Parameterizable):
             forcing_term = forcing_term * g_minus_y0
 
         elif self._forcing_term_scaling == "AMPLITUDE_SCALING":
+            if self._scaling_amplitudes is None:
+                raise ValueError("Cannot do AMPLITUDE_SCALING without scaling amplitudes.")
             forcing_term = forcing_term * self._scaling_amplitudes
 
         # Add forcing term to the ZD component of the spring state
