@@ -16,14 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Script for training a DMP from a trajectory. """
 
-
-import argparse
-import os
-from pathlib import Path
-
-import numpy as np
-from matplotlib import pyplot as plt
-
 import dmpbbo.json_for_cpp as json_for_cpp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
@@ -31,7 +23,8 @@ from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApprox
 
 
 def main():
-
+    """ Main function for script. """
+    
     # Train a DMP with a trajectory
     traj = Trajectory.loadtxt("trajectory.txt")
     function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(traj.dim)]
@@ -39,7 +32,7 @@ def main():
 
     # Compute analytical solution
     xs, xds, _, _ = dmp.analytical_solution(traj.ts)
-    traj_reproduced = dmp.states_as_trajectory(traj.ts, xs, xds)
+    traj_reproduced = dmp.states_as_trajectory(traj.ts, xs, xds)  # noqa
 
     # Numerical integration
     dt = 0.001
