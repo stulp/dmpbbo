@@ -37,7 +37,7 @@ class DmpWithSchedules(Dmp):
         self._func_apps_schedules = func_apps_schedules
 
     @classmethod
-    def from_traj_with_schedules(cls, trajectory, func_apps_dmp, func_apps_schedules, **kwargs):
+    def from_traj_sched(cls, trajectory, func_apps_dmp, func_apps_schedules, **kwargs):
         """Initialize a DMP with schedules by training it from a trajectory (with schedules)
 
         @param trajectory: the trajectory to train on
@@ -56,7 +56,7 @@ class DmpWithSchedules(Dmp):
         dmp = cls(tau, y_init, y_attr, func_apps_dmp, func_apps_schedules, **kwargs)
 
         schedules = kwargs.pop("schedules", None)
-        dmp.train_with_schedules(trajectory, schedules)
+        dmp.train_sched(trajectory, schedules)
 
         return dmp
 
@@ -67,7 +67,7 @@ class DmpWithSchedules(Dmp):
         """
         return len(self._func_apps_schedules)
 
-    def train_with_schedules(self, trajectory, schedules=None):
+    def train_sched(self, trajectory, schedules=None):
         """ Train the Dmp with schedules with a trajectory
 
         @param trajectory: The trajectory with which to train the DMP.
@@ -95,7 +95,7 @@ class DmpWithSchedules(Dmp):
         for i_dim in range(len(self._func_apps_schedules)):
             self._func_apps_schedules[i_dim].train(inputs, targets[:, i_dim])
 
-    def analytical_solution_with_schedules(self, ts=None):
+    def analytical_solution_sched(self, ts=None):
         """Return analytical solution of the system at certain times
 
         @param ts: A vector of times for which to compute the analytical solutions.
@@ -121,7 +121,7 @@ class DmpWithSchedules(Dmp):
 
         return xs, xds, schedules, forcing_terms, fa_outputs
 
-    def integrate_start_with_schedules(self, y_init=None):
+    def integrate_start_sched(self, y_init=None):
         """ Start integrating the DMP with schedules with a new initial state.
 
         @param y_init: The initial state vector (y part)
@@ -137,7 +137,7 @@ class DmpWithSchedules(Dmp):
 
         return xs, xds, schedules
 
-    def integrate_step_with_schedules(self, dt, x):
+    def integrate_step_sched(self, dt, x):
         """ Integrate the system one time step.
 
         @param dt: Duration of the time step
@@ -153,7 +153,7 @@ class DmpWithSchedules(Dmp):
 
         return x, xd, schedules
 
-    def states_as_trajectory_with_schedules(self, ts, x_in, xd_in, schedules):
+    def states_as_trajectory_sched(self, ts, x_in, xd_in, schedules):
         """Get the output of a DMP dynamical system as a trajectory, including schedules.
 
         As it is a dynamical system, the state vector of a DMP contains the output of the goal,
@@ -176,7 +176,7 @@ class DmpWithSchedules(Dmp):
         traj.misc = schedules
         return traj
 
-    def plot_with_schedules(self, ts, xs, xds, schedules, **kwargs):
+    def plot_sched(self, ts, xs, xds, schedules, **kwargs):
         """ Plot the output of the DMP.
 
         @param ts: Time steps

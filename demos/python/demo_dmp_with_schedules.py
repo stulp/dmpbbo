@@ -48,14 +48,14 @@ def main():
 
     function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
     function_apps_schedules = [FunctionApproximatorRBFN(10, 0.95) for _ in range(n_dims)]
-    dmp = DmpWithSchedules.from_traj_with_schedules(traj, function_apps, function_apps_schedules)
+    dmp = DmpWithSchedules.from_traj_sched(traj, function_apps, function_apps_schedules)
 
     tau_exec = 0.7
     n_time_steps = 71
     ts = np.linspace(0, tau_exec, n_time_steps)
 
     xs_ana, xds_ana, schedules_ana, forcing_terms_ana, fa_outputs_ana = \
-        dmp.analytical_solution_with_schedules(ts)
+        dmp.analytical_solution_sched(ts)
 
     dt = ts[1]
     dim_x = xs_ana.shape[1]
@@ -63,26 +63,26 @@ def main():
     xds_step = np.zeros([n_time_steps, dim_x])
     schs_step = np.zeros([n_time_steps, dmp.dim_schedules()])
 
-    x, xd, sch = dmp.integrate_start_with_schedules()
+    x, xd, sch = dmp.integrate_start_sched()
     xs_step[0, :] = x
     xds_step[0, :] = xd
     schs_step[0, :] = sch
     for tt in range(1, n_time_steps):
         xs_step[tt, :], xds_step[tt, :], schs_step[tt, :] = \
-            dmp.integrate_step_with_schedules(dt, xs_step[tt - 1, :])
+            dmp.integrate_step_sched(dt, xs_step[tt - 1, :])
 
-    dmp.plot_with_schedules(ts, xs_ana, xds_ana, schedules_ana, forcing_terms=forcing_terms_ana,
+    dmp.plot_sched(ts, xs_ana, xds_ana, schedules_ana, forcing_terms=forcing_terms_ana,
                             fa_outputs=fa_outputs_ana)
     plt.gcf().canvas.set_window_title(f"Analytical integration")
 
-    dmp.plot_with_schedules(ts, xs_step, xds_step, schs_step)
+    dmp.plot_sched(ts, xs_step, xds_step, schs_step)
     plt.gcf().canvas.set_window_title(f"Step-by-step integration")
 
     lines, axs = traj.plot()
     plt.setp(lines, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
     plt.setp(lines, label="demonstration")
 
-    traj_reproduced = dmp.states_as_trajectory_with_schedules(ts, xs_step, xds_step, schs_step)
+    traj_reproduced = dmp.states_as_trajectory_sched(ts, xs_step, xds_step, schs_step)
     lines, _ = traj_reproduced.plot(axs)
     plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
     plt.setp(lines, label="reproduced")
