@@ -176,6 +176,61 @@ class DmpWithSchedules(Dmp):
         traj.misc = schedules
         return traj
 
+    def set_selected_param_names(self, names):
+        """ Get the names of the parameters that have been selected.
+
+        @param names: Names of the parameters that have been selected.
+        """
+        if isinstance(names, str):
+            names = [names]  # Convert to list
+
+        # Pass all names starting with "sched_" to the function approximators
+        # (but without the prefix "sched_")
+        sched_names = [n[len("sched_"):] for n in names if "sched_" in n]
+        for fa in self._func_apps_schedules:
+            fa.set_selected_param_names(sched_names)
+
+        # Pass all names not starting with "sched_" to the Dmp superclass
+        other_names = [n for n in names if "sched_" not in n]
+        super().set_selected_param_names(other_names)
+
+    def get_param_vector(self):
+        """Get a vector containing the values of the selected parameters."""
+        values = super().get_param_vector()
+        for fa in self._func_apps_schedules:
+            if fa.is_trained():
+                values = np.append(values, fa.get_param_vector())
+        return values
+
+    def set_param_vector(self, values):
+        """Set a vector containing the values of the selected parameters."""
+        size = self.get_param_vector_size()
+        if len(values) != size:
+            raise ValueError("values must have size {size}")
+
+        # First, pass values to superclass Dmp
+        size_super = super().get_param_vector_size()
+        if size_super > 0:
+            super().set_param_vector(values[:size_super])
+
+        # Second, set values for local func_apps for the schedules
+        values_schedules = values[size_super:]
+        offset = 0
+        for fa in self._func_apps_schedules:
+            if fa.is_trained():
+                cur_size = fa.get_param_vector_size()
+                cur_values = values_schedules[offset : offset + cur_size]
+                fa.set_param_vector(cur_values)
+                offset += cur_size
+
+    def get_param_vector_size(self):
+        """Get the size of the vector containing the values of the selected parameters."""
+        size = super().get_param_vector_size()
+        for fa in self._func_apps_schedules:
+            if fa.is_trained():
+                size += fa.get_param_vector_size()
+        return size
+
     def plot_sched(self, ts, xs, xds, schedules, **kwargs):
         """ Plot the output of the DMP.
 
