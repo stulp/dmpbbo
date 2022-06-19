@@ -129,6 +129,13 @@ class Trajectory:
             raise ValueError("new_misc.shape[0] must have size {self.length}")
         self._misc = new_misc
 
+    def has_misc(self):
+        """ Get whether the trajectory the miscellaneous variables over time.
+
+        @return: true if trajectoriy has miscellaneous variables, false otherwise.
+        """
+        return self._misc is not None
+
     @property
     def length(self):
         """ Get the length of the trajectory, i.e. the number of time steps.
@@ -462,8 +469,9 @@ class Trajectory:
         @return: line_handles and axes
         """
         if not axs:
-            fig = plt.figure(figsize=(15, 4))
-            axs = [fig.add_subplot(1, 3, i + 1) for i in range(3)]
+            n_plots = 4 if self.has_misc() else 3
+            fig = plt.figure(figsize=(5*n_plots, 4))
+            axs = [fig.add_subplot(1, n_plots, i + 1) for i in range(n_plots)]
 
         """Plot a trajectory"""
         all_handles = axs[0].plot(self._ts, self._ys, "-")
@@ -480,7 +488,7 @@ class Trajectory:
             axs[2].set_xlabel("time (s)")
             axs[2].set_ylabel("ydd")
 
-        if self._misc and len(axs) > 3:
+        if self.has_misc() and len(axs) > 3:
             h = axs[3].plot(self._ts, self._misc, "-")
             all_handles.extend(h)
             axs[3].set_xlabel("time (s)")
