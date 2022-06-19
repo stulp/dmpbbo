@@ -21,6 +21,7 @@ import numpy as np
 
 from dmpbbo.dmps.Dmp import Dmp
 
+
 class DmpWithSchedules(Dmp):
     """
     Dynamical Movement Primitives with extra "schedules", e.g. gain or force schedules.
@@ -30,15 +31,7 @@ class DmpWithSchedules(Dmp):
 
     """
 
-    def __init__(
-        self,
-        tau,
-        y_init,
-        y_attr,
-        function_approximators,
-        func_apps_schedules,
-        **kwargs,
-    ):
+    def __init__(self, tau, y_init, y_attr, function_approximators, func_apps_schedules, **kwargs):
         super().__init__(tau, y_init, y_attr, function_approximators, **kwargs)
 
         self._func_apps_schedules = func_apps_schedules
@@ -62,12 +55,16 @@ class DmpWithSchedules(Dmp):
 
         dmp = cls(tau, y_init, y_attr, func_apps_dmp, func_apps_schedules, **kwargs)
 
-        schedules = kwargs.pop('schedules', None)
+        schedules = kwargs.pop("schedules", None)
         dmp.train_with_schedules(trajectory, schedules)
 
         return dmp
 
     def dim_schedules(self):
+        """ Get the dimensionality of the schedules.
+
+        @return: Dimensionality of the schedules.
+        """
         return len(self._func_apps_schedules)
 
     def train_with_schedules(self, trajectory, schedules=None):
@@ -84,8 +81,9 @@ class DmpWithSchedules(Dmp):
         targets = schedules or trajectory.misc
 
         if targets is None:
-            raise ValueError("targets is None. This means neither scheduls nur trajectory.misc "
-                             "was available")
+            raise ValueError(
+                "targets is None. This means neither schedules nur trajectory.misc " "was available"
+            )
 
         if targets.shape[1] != len(self._func_apps_schedules):
             raise ValueError(
@@ -117,33 +115,63 @@ class DmpWithSchedules(Dmp):
         n_time_steps = ts.size
         xs, xds, forcing_terms, fa_outputs = super().analytical_solution(ts)
 
-        schedules = np.ndarray((n_time_steps,len(self._func_apps_schedules)))
+        schedules = np.ndarray((n_time_steps, len(self._func_apps_schedules)))
         for i_dim in range(len(self._func_apps_schedules)):
-            schedules[:,i_dim] = self._func_apps_schedules[i_dim].predict(xs[:,self.PHASE])
+            schedules[:, i_dim] = self._func_apps_schedules[i_dim].predict(xs[:, self.PHASE])
 
         return xs, xds, schedules, forcing_terms, fa_outputs
 
-
     def integrate_start_with_schedules(self, y_init=None):
+        """ Start integrating the DMP with schedules with a new initial state.
+
+        @param y_init: The initial state vector (y part)
+        @return: x, xd , schedules - The first vector of state variables and their rates of
+        change, as well as the first values for the schedules.
+        """
         xs, xds = super().integrate_start(y_init)
 
         n_schedules = len(self._func_apps_schedules)
-        schedules = np.ndarray(n_schedules)
+        schedules = np.ndarray((n_schedules,))
         for i_dim in range(n_schedules):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(xs[self.PHASE])
 
         return xs, xds, schedules
 
     def integrate_step_with_schedules(self, dt, x):
+        """ Integrate the system one time step.
+
+        @param dt: Duration of the time step
+        @param x: Current state
+        @return: x_updated, xd_updated, schedules - Updated state and its rate of change,
+        as well as the schedules, dt time later
+        """
         x, xd = super().integrate_step(dt, x)
 
-        schedules = np.ndarray(len(self._func_apps_schedules))
+        schedules = np.ndarray((len(self._func_apps_schedules),))
         for i_dim in range(len(self._func_apps_schedules)):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(x[self.PHASE])
 
         return x, xd, schedules
 
     def states_as_trajectory_with_schedules(self, ts, x_in, xd_in, schedules):
+        """Get the output of a DMP dynamical system as a trajectory, including schedules.
+
+        As it is a dynamical system, the state vector of a DMP contains the output of the goal,
+        spring, phase and gating system. What we are most interested in is the output of the
+        spring system. This function extracts that information, and also computes the
+        accelerations of the spring system, which are only stored implicitly in xd_in because
+        second order systems are converted to first order systems with expanded state.
+
+        The schedules are added as misc variables to the trajectory.
+
+        @param ts: A vector of times
+        @param x_in: State vector over time
+        @param xd_in: State vector over time (rates of change)
+        @param schedules: Gain/force schedules over time
+
+        Return:
+            Trajectory representation of the DMP state vector output.
+        """
         traj = super().states_as_trajectory(ts, x_in, xd_in)
         traj.misc = schedules
         return traj
