@@ -240,13 +240,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
-        @return: xs, xds: Sequence of state vectors and their rates of change. T x D or D x T
+        @return: xs, xds: Sequence of state vectors and their rates of change. T x D
         matrix, where T is the number of times (the length of 'ts'), and D the size of the state
-        (i.e. dim())
-
-        The output xs and xds will be of size D x T only if the matrix x you pass as an argument
-        of size D x T. In all other cases (i.e. including passing an empty matrix) the size of x
-        will be T x D. This feature has been added so that you may pass matrices of either size.
+        (i.e. dim_x())
         """
         if ts is None:
             if self._ts_train is None:
@@ -352,6 +348,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param trajectory: The trajectory with which to train the DMP.
         """
+
         # Set tau, initial_state and attractor_state from the trajectory
         self.tau = trajectory.ts[-1]
         self.y_init = trajectory.ys[0, :]
@@ -363,7 +360,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Do not train function approximators if there are none
         if self._function_approximators is not None:
-            (fa_input_phase, f_target) = self._compute_targets(trajectory)
+            fa_input_phase, f_target = self._compute_targets(trajectory)
 
             for dd in range(self.dim_dmp()):
                 fa_target = f_target[:, dd]
