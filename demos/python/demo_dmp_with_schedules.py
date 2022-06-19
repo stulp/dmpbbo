@@ -42,8 +42,9 @@ def main():
     sch_end = np.linspace(5, 7, n_dims)
     sch_viapoint = np.array([4, 8, 0.0, 0.0, 0, 0])
     sch_via_time = 0.5 * ts[-1]
-    traj_schedule = Trajectory.from_viapoint_polynomial(ts, sch_begin, sch_viapoint, sch_via_time,
-                                                        sch_end)
+    traj_schedule = Trajectory.from_viapoint_polynomial(
+        ts, sch_begin, sch_viapoint, sch_via_time, sch_end
+    )
     traj.misc = traj_schedule.ys
 
     function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
@@ -54,8 +55,9 @@ def main():
     n_time_steps = 71
     ts = np.linspace(0, tau_exec, n_time_steps)
 
-    xs_ana, xds_ana, schedules_ana, forcing_terms_ana, fa_outputs_ana = \
-        dmp.analytical_solution_sched(ts)
+    xs_ana, xds_ana, schedules_ana, forcing_terms_ana, fa_outputs_ana = dmp.analytical_solution_sched(
+        ts
+    )
 
     dt = ts[1]
     dim_x = xs_ana.shape[1]
@@ -68,11 +70,18 @@ def main():
     xds_step[0, :] = xd
     schs_step[0, :] = sch
     for tt in range(1, n_time_steps):
-        xs_step[tt, :], xds_step[tt, :], schs_step[tt, :] = \
-            dmp.integrate_step_sched(dt, xs_step[tt - 1, :])
+        xs_step[tt, :], xds_step[tt, :], schs_step[tt, :] = dmp.integrate_step_sched(
+            dt, xs_step[tt - 1, :]
+        )
 
-    dmp.plot_sched(ts, xs_ana, xds_ana, schedules_ana, forcing_terms=forcing_terms_ana,
-                            fa_outputs=fa_outputs_ana)
+    dmp.plot_sched(
+        ts,
+        xs_ana,
+        xds_ana,
+        schedules_ana,
+        forcing_terms=forcing_terms_ana,
+        fa_outputs=fa_outputs_ana,
+    )
     plt.gcf().canvas.set_window_title(f"Analytical integration")
 
     dmp.plot_sched(ts, xs_step, xds_step, schs_step)

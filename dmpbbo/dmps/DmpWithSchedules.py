@@ -186,7 +186,7 @@ class DmpWithSchedules(Dmp):
 
         # Pass all names starting with "sched_" to the function approximators
         # (but without the prefix "sched_")
-        sched_names = [n[len("sched_"):] for n in names if "sched_" in n]
+        sched_names = [n[len("sched_") :] for n in names if "sched_" in n]
         for fa in self._func_apps_schedules:
             fa.set_selected_param_names(sched_names)
 

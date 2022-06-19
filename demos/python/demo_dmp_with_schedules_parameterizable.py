@@ -42,8 +42,9 @@ def main():
     sch_end = np.linspace(5, 7, n_dims)
     sch_viapoint = np.array([4, 8, 0.0, 0.0, 0, 0])
     sch_via_time = 0.5 * ts[-1]
-    traj_schedule = Trajectory.from_viapoint_polynomial(ts, sch_begin, sch_viapoint, sch_via_time,
-                                                        sch_end)
+    traj_schedule = Trajectory.from_viapoint_polynomial(
+        ts, sch_begin, sch_viapoint, sch_via_time, sch_end
+    )
     traj.misc = traj_schedule.ys
 
     function_apps = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
@@ -73,8 +74,9 @@ def main():
             dmp.set_param_vector(new_values)
 
             xs, xds, scheds, forcing, fas = dmp.analytical_solution_sched(ts)
-            h, _ = dmp.plot_sched(ts, xs, xds, scheds, forcing_terms=forcing, fa_outputs=fas,
-                                  axs=axs)
+            h, _ = dmp.plot_sched(
+                ts, xs, xds, scheds, forcing_terms=forcing, fa_outputs=fas, axs=axs
+            )
             plt.setp(h, color=[0.6, 0.0, 0.0], linewidth=1)
         plt.gcf().canvas.set_window_title(f"Perturbation of  {selected_param_names}")
 
