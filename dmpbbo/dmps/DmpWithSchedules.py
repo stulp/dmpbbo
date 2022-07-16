@@ -34,7 +34,17 @@ class DmpWithSchedules(Dmp):
     def __init__(self, tau, y_init, y_attr, function_approximators, func_apps_schedules, **kwargs):
         super().__init__(tau, y_init, y_attr, function_approximators, **kwargs)
 
+        self.min_schedules = kwargs.pop("min_schedules", None)
+        self.max_schedules = kwargs.pop("max_schedules", None)
+
         self._func_apps_schedules = func_apps_schedules
+
+        n_dims = len(self._func_apps_schedules)
+        if np.isscalar(self.min_schedules):
+            self.min_schedules = np.full(n_dims, self.min_schedules)
+        if np.isscalar(self.max_schedules):
+            self.max_schedules = np.full(n_dims, self.max_schedules)
+
 
     @classmethod
     def from_traj_sched(cls, trajectory, func_apps_dmp, func_apps_schedules, **kwargs):
@@ -43,9 +53,12 @@ class DmpWithSchedules(Dmp):
         @param trajectory: the trajectory to train on
         @param func_apps_dmp: Function approximators for the forcing term of the Dmp
         @param func_apps_schedules: Function approximators for the schedules
-        @param kwargs: All kwargs (except "schedules") are eventually passed to the Dmp constructor.
+        @param kwargs:
         - schedules: A matrix of (gain/force) schedules. If it is None, it is assumed the
         schedules are stored in the "misc" property of the trajectory.
+        - min_schedules: min values for the schedules (scalar or array, one for each dimension)
+        - max_schedules: max values per the schedules (scalar or array, one for each dimension)
+        - All kwargs are eventually passed to the Dmp constructor.
         """
 
         # Relevant variables from trajectory
@@ -118,6 +131,10 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((n_time_steps, len(self._func_apps_schedules)))
         for i_dim in range(len(self._func_apps_schedules)):
             schedules[:, i_dim] = self._func_apps_schedules[i_dim].predict(xs[:, self.PHASE])
+            min_sched = self.min_schedules[i_dim]
+            max_sched = self.max_schedules[i_dim]
+            schedules[:, i_dim] = np.clip(schedules[:, i_dim], min_sched, max_sched)
+
 
         return xs, xds, schedules, forcing_terms, fa_outputs
 
