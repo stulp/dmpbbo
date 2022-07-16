@@ -194,6 +194,7 @@ class DmpWithSchedules(Dmp):
         other_names = [n for n in names if "sched_" not in n]
         super().set_selected_param_names(other_names)
 
+
     def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
         values = super().get_param_vector()
@@ -225,7 +226,7 @@ class DmpWithSchedules(Dmp):
 
     def get_param_vector_size(self):
         """Get the size of the vector containing the values of the selected parameters."""
-        size = super().get_param_vector_size()
+        size = self._get_param_vector_size_local()
         for fa in self._func_apps_schedules:
             if fa.is_trained():
                 size += fa.get_param_vector_size()
