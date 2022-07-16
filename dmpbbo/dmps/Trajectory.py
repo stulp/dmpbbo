@@ -403,7 +403,7 @@ class Trajectory:
         """
         as_matrix = np.column_stack((self._ts, self._ys, self._yds, self._ydds))
         if self._misc is not None:
-            np.column_stack((as_matrix, self._misc))
+            as_matrix = np.column_stack((as_matrix, self._misc))
         return as_matrix
 
     def savetxt(self, filename):
