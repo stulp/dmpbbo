@@ -164,7 +164,7 @@ def main():
 
     ts = np.linspace(0, tau, n_time_steps)
     traj = Trajectory.from_min_jerk(ts, y_init, y_attr)
-    schedule = numpy.full((n_time_steps, n_dims), 0.1)
+    schedule = np.full((n_time_steps, n_dims), 0.1)
     traj.misc = schedule
 
     function_apps = [FunctionApproximatorRBFN(8, 0.95) for _ in range(n_dims)]
@@ -183,7 +183,7 @@ def main():
 
     # Make the task
     task = TaskViapointPerturbed(
-        numpy.full((1, n_dims), 0.6),
+        np.full((1, n_dims), 0.6),
         0.5,
         1.0,
         10.0,
