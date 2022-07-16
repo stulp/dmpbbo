@@ -151,6 +151,10 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((n_schedules,))
         for i_dim in range(n_schedules):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(xs[self.PHASE])
+            min_sched = self.min_schedules[i_dim]
+            max_sched = self.max_schedules[i_dim]
+            schedules[i_dim] = np.clip(schedules[i_dim], min_sched, max_sched)
+
 
         return xs, xds, schedules
 
@@ -167,6 +171,9 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((len(self._func_apps_schedules),))
         for i_dim in range(len(self._func_apps_schedules)):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(x[self.PHASE])
+            min_sched = self.min_schedules[i_dim]
+            max_sched = self.max_schedules[i_dim]
+            schedules[i_dim] = np.clip(schedules[i_dim], min_sched, max_sched)
 
         return x, xd, schedules
 
