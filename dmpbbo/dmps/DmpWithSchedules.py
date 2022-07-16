@@ -194,7 +194,6 @@ class DmpWithSchedules(Dmp):
         other_names = [n for n in names if "sched_" not in n]
         super().set_selected_param_names(other_names)
 
-
     def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
         values = super().get_param_vector()

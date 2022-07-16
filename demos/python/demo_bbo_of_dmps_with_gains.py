@@ -18,19 +18,19 @@
 import copy
 import sys
 
-import numpy
 import numpy as np
 from matplotlib import pyplot as plt
 
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
-from dmpbbo.bbo_of_dmps.TaskSolver import TaskSolver
 from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
 from dmpbbo.bbo_of_dmps.Task import Task
+from dmpbbo.bbo_of_dmps.TaskSolver import TaskSolver
 from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.DmpWithSchedules import DmpWithSchedules
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
+
 
 class TaskViapointPerturbed(Task):
     """ Task in which a 2D trajectory has to pass through a viapoint. It is perturbed by a force
@@ -73,7 +73,6 @@ class TaskViapointPerturbed(Task):
         ydds = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
         gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
 
-
         # Get integer time step at t=viapoint_time
         viapoint_time_step = np.argmax(ts >= self.viapoint_time)
         # Compute distance at that time step
@@ -84,7 +83,9 @@ class TaskViapointPerturbed(Task):
         costs = np.zeros(1 + 3)
         costs[1] = self.viapoint_weight * dist_to_viapoint
         costs[2] = self.acceleration_weight * np.sum(np.abs(ydds)) / n_time_steps
-        costs[3] = self.gain_weight * ((np.sum(gains)-self.min_gain) / (n_time_steps*self.max_gain))
+        costs[3] = self.gain_weight * (
+            (np.sum(gains) - self.min_gain) / (n_time_steps * self.max_gain)
+        )
         costs[0] = np.sum(costs[1:])
         return costs
 
@@ -105,15 +106,16 @@ class TaskViapointPerturbed(Task):
         gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
         scaling = 0.5
         line_handles = ax.plot(t, y, linewidth=0.5)
-        ax.plot(t, y + scaling*gains, linewidth=0.2)
-        ax.plot(t, y - scaling*gains, linewidth=0.2)
-        #ax.plot(t[0], y[0], "bo", label="start")
-        #ax.plot(t[-1], y[-1], "go", label="end")
+        ax.plot(t, y + scaling * gains, linewidth=0.2)
+        ax.plot(t, y - scaling * gains, linewidth=0.2)
+        # ax.plot(t[0], y[0], "bo", label="start")
+        # ax.plot(t[-1], y[-1], "go", label="end")
         ax.plot(self.viapoint_time, self.viapoint, "ok", label="viapoint")
         ax.set_xlabel("time (s)")
         ax.set_ylabel("y")
 
         return line_handles, ax
+
 
 class TaskSolverDmpWithGains(TaskSolver):
     """ TaskSolver that integrates a DMP.
@@ -148,6 +150,7 @@ class TaskSolverDmpWithGains(TaskSolver):
         self._dmp_sched.set_param_vector(sample)
         return self.perform_rollout_dmp_sched(self._dmp_sched)
 
+
 def main():
     """ Main function of the script. """
     directory = sys.argv[1] if len(sys.argv) > 1 else None
@@ -168,9 +171,9 @@ def main():
     function_apps_schedules = [FunctionApproximatorRBFN(5, 0.95) for _ in range(n_dims)]
     dmp = DmpWithSchedules.from_traj_sched(traj, function_apps, function_apps_schedules)
 
-    #xs, xds, sched, _, _ = dmp.analytical_solution_sched(ts)
-    #dmp.plot_sched(ts, xs, xds, sched)
-    #plt.show()
+    # xs, xds, sched, _, _ = dmp.analytical_solution_sched(ts)
+    # dmp.plot_sched(ts, xs, xds, sched)
+    # plt.show()
 
     dmp.set_selected_param_names(["weights"])
     n_search_traj = dmp.get_param_vector_size()
@@ -197,7 +200,9 @@ def main():
     mean_init = dmp.get_param_vector()
     sigma_traj = 10
     sigma_gains = 1
-    sigmas = np.concatenate((np.full(n_search_traj, sigma_traj), np.full(n_search_gains, sigma_gains)))
+    sigmas = np.concatenate(
+        (np.full(n_search_traj, sigma_traj), np.full(n_search_gains, sigma_gains))
+    )
     covar_init = np.diag(np.square(sigmas))
     distribution = DistributionGaussian(mean_init, covar_init)
     updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.85)
@@ -210,6 +215,7 @@ def main():
     )
     fig = session.plot()
     plt.show()
+
 
 if __name__ == "__main__":
     main()

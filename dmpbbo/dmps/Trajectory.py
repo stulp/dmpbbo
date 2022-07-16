@@ -470,7 +470,7 @@ class Trajectory:
         """
         if not axs:
             n_plots = 4 if self.has_misc() else 3
-            fig = plt.figure(figsize=(5*n_plots, 4))
+            fig = plt.figure(figsize=(5 * n_plots, 4))
             axs = [fig.add_subplot(1, n_plots, i + 1) for i in range(n_plots)]
 
         """Plot a trajectory"""
