@@ -134,7 +134,9 @@ class Trajectory:
 
         @return: true if trajectoriy has miscellaneous variables, false otherwise.
         """
-        return self._misc is not None
+        if self._misc:
+            return True
+        return False
 
     @property
     def length(self):
@@ -166,10 +168,10 @@ class Trajectory:
 
         @return: The number of dimensions of the miscellaneous variables in the trajectory.
         """
-        if self._misc is None:
-            return 0
-        else:
+        if self.has_misc():
             return self._misc.shape[1]
+        else:
+            return 0
 
     @property
     def y_init(self):
