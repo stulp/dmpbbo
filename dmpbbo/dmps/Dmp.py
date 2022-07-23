@@ -230,9 +230,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         n_time_steps = phase_state.size
         fa_output = np.zeros([n_time_steps, self.dim_dmp()])
 
-        for i_fa in range(self.dim_dmp()):
-            if self._function_approximators[i_fa].is_trained():
-                fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
+        if self._function_approximators:
+            for i_fa in range(self.dim_dmp()):
+                if self._function_approximators[i_fa].is_trained():
+                    fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
         return fa_output
 
     def analytical_solution(self, ts=None):
