@@ -69,9 +69,9 @@ class TaskViapointPerturbed(Task):
         n_time_steps = cost_vars.shape[0]
 
         ts = cost_vars[:, 0]
-        ys = cost_vars[:, 1 : 1 + n_dims]
-        ydds = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
-        gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
+        ys = cost_vars[:, 1: 1 + n_dims]
+        ydds = cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
+        gains = cost_vars[:, 1 + n_dims * 3: 1 + n_dims * 4]
 
         # Get integer time step at t=viapoint_time
         viapoint_time_step = np.argmax(ts >= self.viapoint_time)
@@ -84,7 +84,7 @@ class TaskViapointPerturbed(Task):
         costs[1] = self.viapoint_weight * dist_to_viapoint
         costs[2] = self.acceleration_weight * np.sum(np.abs(ydds)) / n_time_steps
         costs[3] = self.gain_weight * (
-            (np.sum(gains) - self.min_gain) / (n_time_steps * self.max_gain)
+                (np.sum(gains) - self.min_gain) / (n_time_steps * self.max_gain)
         )
         costs[0] = np.sum(costs[1:])
         return costs
@@ -100,16 +100,23 @@ class TaskViapointPerturbed(Task):
         if not ax:
             ax = plt.axes()
 
+        # cost_vars:
+        #   0  1      2       3        4      5      6       7
+        #   t, y_des, yd_des, ydd_des, gains, y_cur, yd_cur, ydd_cur
+        print(cost_vars.shape)
         n_dims = self.viapoint.shape[0]
         t = cost_vars[:, 0]
-        y = cost_vars[:, 1 : n_dims + 1]
-        gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
+        y_cur = cost_vars[:, 1: n_dims + 1]
+        gains = cost_vars[:, 1 + n_dims * 3: 1 + n_dims * 4]
+        y_des = cost_vars[:, 1 + n_dims * 4: 1 + n_dims * 5]
         scaling = 1.0
-        line_handles = ax.plot(t, y, linewidth=0.5)
-        #ax.plot(t, y + scaling * gains, linewidth=0.2)
-        #ax.plot(t, y - scaling * gains, linewidth=0.2)
-        lh = ax.plot(t, scaling * gains, linewidth=1)
-        line_handles.extend(lh)
+        line_handles = ax.plot(t, y_des, '--', linewidth=0.4)
+        lh1 = ax.plot(t, y_cur, linewidth=0.5)
+        # ax.plot(t, y_des + scaling * gains, linewidth=0.2)
+        # ax.plot(t, y_des - scaling * gains, linewidth=0.2)
+        lh2 = ax.plot(t, scaling * gains, linewidth=1)
+        line_handles.extend(lh1)
+        line_handles.extend(lh2)
         # ax.plot(t[0], y[0], "bo", label="start")
         # ax.plot(t[-1], y[-1], "go", label="end")
         ax.plot(self.viapoint_time, self.viapoint, "ok", label="viapoint")
@@ -138,22 +145,42 @@ class TaskSolverDmpWithGains(TaskSolver):
         ts = np.linspace(0.0, self._integrate_time, self._n_time_steps)
         dt = ts[1]
 
-        x, xd, sch = dmp_sched.integrate_start_sched()
-        xs = np.zeros([self._n_time_steps, len(x)])
-        xds = np.zeros([self._n_time_steps, len(x)])
-        schedules = np.zeros([self._n_time_steps, len(sch)])
+        ys_des = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+        yds_des = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+        ydds_des = np.zeros([self._n_time_steps, dmp_sched.dim_y])
 
-        xs[0, :] = x
-        xds[0, :] = xd
-        schedules[0, :] = sch
+        schedules = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+
+        ys_cur = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+        yds_cur = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+        ydds_cur = np.zeros([self._n_time_steps, dmp_sched.dim_y])
+
+        x_des, xd_des, sch = dmp_sched.integrate_start_sched()
+        tt = 0
+        ys_des[tt, :], yds_des[tt, :], ydds_des[tt, :] = dmp_sched.states_as_pos_vel_acc(x_des,
+                                                                                         xd_des)
+        schedules[tt, :] = sch
+        ys_cur[tt, :] = ys_des[tt, :]
+        yds_cur[tt, :] = yds_des[tt, :]
+        ydds_cur[tt, :] = ydds_des[tt, :]
         for tt in range(1, self._n_time_steps):
-            xs[tt, :], xds[tt, :], schedules[tt, :] = dmp_sched.integrate_step_sched(dt, xs[tt - 1,
-                                                                                  :])
+            x_des, xd_des, sch = dmp_sched.integrate_step_sched(dt, x_des)
+            ys_des[tt, :], yds_des[tt, :], ydds_des[tt, :] = dmp_sched.states_as_pos_vel_acc(x_des,
+                                                                                             xd_des)
+            # Compute error terms
+            y_err = ys_cur[tt - 1, :] - ys_des[tt - 1, :]
+            yd_err = yds_cur[tt - 1, :] - yds_des[tt - 1, :]
 
-        # Analytical solution
-        # xs, xds, schedules, _, _ = dmp_sched.analytical_solution_sched(ts)
-        traj = dmp_sched.states_as_trajectory_sched(ts, xs, xds, schedules)
-        cost_vars = traj.as_matrix()
+            # Force due to PD-controller
+            gain = 100.0
+            ydds_cur[tt, :] = -gain * y_err - np.sqrt(gain) * yd_err
+            # Euler integration
+            yds_cur[tt, :] = yds_cur[tt - 1, :] + dt * ydds_cur[tt, :]
+            ys_cur[tt, :] = ys_cur[tt - 1, :] + dt * yds_cur[tt, :]
+
+        cost_vars = np.column_stack((ts, ys_cur, yds_cur, ydds_cur, schedules,
+                                     ys_des, yds_des, ydds_des))
+
         return cost_vars
 
     def perform_rollout(self, sample, **kwargs):
@@ -210,8 +237,8 @@ def main():
     )
 
     # Make task solver, based on a Dmp
-    dt = 0.01
-    integrate_dmp_beyond_tau_factor = 1.5
+    dt = 0.05
+    integrate_dmp_beyond_tau_factor = 1.2
     task_solver = TaskSolverDmpWithGains(dmp, dt, integrate_dmp_beyond_tau_factor)
 
     mean_init = dmp.get_param_vector()
@@ -225,7 +252,7 @@ def main():
     updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.95)
 
     n_samples_per_update = 10
-    n_updates = 10
+    n_updates = 20
 
     session = run_optimization_task(
         task, task_solver, distribution, updater, n_updates, n_samples_per_update, directory
