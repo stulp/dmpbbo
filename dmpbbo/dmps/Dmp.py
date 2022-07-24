@@ -653,3 +653,20 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_ylabel(r"unknown")
 
         return all_handles, axs
+
+    def plot_comparison(self, trajectory, **kwargs):
+        ts = trajectory.ts
+        xs, xds, _, _ = self.analytical_solution(ts)
+        traj_reproduced = self.states_as_trajectory(ts, xs, xds)
+
+        axs = kwargs.get("axs", None)
+        h_demo, axs = trajectory.plot(axs)
+        h_repr, axs = traj_reproduced.plot(axs)
+
+        plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        plt.setp(h_demo, label="demonstration")
+        plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
+        plt.setp(h_repr, label="reproduced")
+
+        h_demo.extend(h_repr)
+        return h_demo, axs
