@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 """ Module for the DMP class. """
+import copy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,6 +47,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         @param y_attr: Attractor state
         @param function_approximators: Function approximators for the forcing term
         @param kwargs:
+            - transformation_system: Dynamical system for the main transformation system
             - alpha_spring_damper: alpha in the spring-damper system (default: 20.0)
             - dmp_type: Type of the Dmp, i.e. "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING",
             "COUNTDOWN_2013" (default: "KULVICIUS_2012_JOINING"). This will set the subsystems to
@@ -67,8 +69,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._y_attr = y_attr
         self._function_approximators = function_approximators
 
-        alpha = kwargs.get("alpha_spring_damper", 20.0)
-        self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
+        transformation_system = kwargs.get("transformation_system", None)
+        if transformation_system:
+            self._spring_system = transformation_system
+        else:
+            alpha = kwargs.get("alpha_spring_damper", 20.0)
+            self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
@@ -303,8 +309,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         # THE REST CANNOT BE DONE ANALYTICALLY
 
         # Reset the dynamical system, and get the first state
-        damping = self._spring_system.damping_coefficient
-        local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
+        local_spring_system = copy.deepcopy(self._spring_system)
+        #damping = self._spring_system.damping_coefficient
+        #local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state
         local_spring_system.y_attr = xs_goal[0, :]
