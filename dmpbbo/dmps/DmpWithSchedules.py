@@ -131,12 +131,21 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((n_time_steps, len(self._func_apps_schedules)))
         for i_dim in range(len(self._func_apps_schedules)):
             schedules[:, i_dim] = self._func_apps_schedules[i_dim].predict(xs[:, self.PHASE])
-            min_sched = self.min_schedules[i_dim]
-            max_sched = self.max_schedules[i_dim]
-            schedules[:, i_dim] = np.clip(schedules[:, i_dim], min_sched, max_sched)
-
+        schedules = self._enforce_schedule_bounds(schedules)
 
         return xs, xds, schedules, forcing_terms, fa_outputs
+
+    def _enforce_schedule_bounds(self, schedules):
+        if self.min_schedules is None and self.max_schedules is None:
+            # No bounds, simply return schedules
+            return schedules
+        if schedules.ndim == 1:
+            schedules = schedules.reshape((schedules.shape[0],1))
+        for i_dim in range(len(self._func_apps_schedules)):
+            min_sched = self.min_schedules[i_dim] if self.min_schedules else None
+            max_sched = self.max_schedules[i_dim] if self.max_schedules else None
+            schedules[:, i_dim] = np.clip(schedules[:, i_dim], min_sched, max_sched)
+        return schedules
 
     def integrate_start_sched(self, y_init=None):
         """ Start integrating the DMP with schedules with a new initial state.
@@ -151,10 +160,7 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((n_schedules,))
         for i_dim in range(n_schedules):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(xs[self.PHASE])
-            min_sched = self.min_schedules[i_dim]
-            max_sched = self.max_schedules[i_dim]
-            schedules[i_dim] = np.clip(schedules[i_dim], min_sched, max_sched)
-
+        schedules = self._enforce_schedule_bounds(schedules)
 
         return xs, xds, schedules
 
@@ -171,9 +177,7 @@ class DmpWithSchedules(Dmp):
         schedules = np.ndarray((len(self._func_apps_schedules),))
         for i_dim in range(len(self._func_apps_schedules)):
             schedules[i_dim] = self._func_apps_schedules[i_dim].predict(x[self.PHASE])
-            min_sched = self.min_schedules[i_dim]
-            max_sched = self.max_schedules[i_dim]
-            schedules[i_dim] = np.clip(schedules[i_dim], min_sched, max_sched)
+        schedules = self._enforce_schedule_bounds(schedules)
 
         return x, xd, schedules
 
