@@ -45,7 +45,9 @@ def main():
         print(y)
 
     # Save the DMP to a json file that can be read in C++
-    json_for_cpp.savejson_for_cpp("dmp_for_cpp.json", dmp)
+    filename = "dmp_for_cpp.json"
+    json_for_cpp.savejson_for_cpp(filename, dmp)
+    print(f'Saved {filename} to local directory.')
 
 
 if __name__ == "__main__":
