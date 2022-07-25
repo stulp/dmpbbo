@@ -386,7 +386,8 @@ class Trajectory:
 
         @param trajectory:  The trajectory to append.
         """
-        self._ts = np.concatenate((self._ts, trajectory.ts))
+        ts_appended = trajectory.ts +  (self._ts[-1] - trajectory.ts[0])
+        self._ts = np.concatenate((self._ts, ts_appended))
         self._ys = np.concatenate((self._ys, trajectory.ys))
         self._yds = np.concatenate((self._yds, trajectory.yds))
         self._ydds = np.concatenate((self._ydds, trajectory.ydds))
