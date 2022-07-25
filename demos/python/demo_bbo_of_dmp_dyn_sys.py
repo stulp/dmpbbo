@@ -27,6 +27,7 @@ from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
+from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 
@@ -37,9 +38,10 @@ class TaskFitTrajectory(Task):
 
     def __init__(self,  traj_demonstrated, **kwargs):
         self.traj_demonstrated = traj_demonstrated
+        self.i_diff = 3
 
     def get_cost_labels(self):
-        return ["mean_abs_diff"]
+        return ["mean(abs(diff))", "abs(goaldiff)"]
 
     def evaluate_rollout(self, cost_vars, sample):
         """The cost function which defines the task.
@@ -51,13 +53,11 @@ class TaskFitTrajectory(Task):
         @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
-        ys_reproduced = cost_vars[:, 1]
-        yds_reproduced = cost_vars[:, 2]
-        ydds_reproduced = cost_vars[:, 3]
-
-        diff = np.mean(np.abs(self.traj_demonstrated.yds - yds_reproduced))
-
-        return [diff]
+        cost_vars_demo = self.traj_demonstrated.as_matrix()
+        diff = np.mean(np.abs(cost_vars_demo[:, self.i_diff] - cost_vars[:, self.i_diff]))
+        diff_goal = 5*np.mean(np.abs(cost_vars_demo[-25:-1, 1] - cost_vars[-25:-1,
+                                                                      1]))
+        return [diff+diff_goal, diff, diff_goal]
 
     def plot_rollout(self, cost_vars, ax=None):
         """ Plot a rollout (the cost-relevant variables).
@@ -71,131 +71,216 @@ class TaskFitTrajectory(Task):
             ax = plt.axes()
 
         ts = cost_vars[:, 0]
-        ys_reproduced = cost_vars[:, 1]
-        yds_reproduced = cost_vars[:, 2]
-        ydds_reproduced = cost_vars[:, 3]
+        cost_vars_demo = self.traj_demonstrated.as_matrix()
 
-        lines_dem = ax.plot(ts,self.traj_demonstrated.yds,label="demonstration")
+        lines_dem = ax.plot(ts,cost_vars_demo[:,self.i_diff],label="demonstration")
         plt.setp(lines_dem, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-        lines_rep = ax.plot(ts,yds_reproduced,label="reproduced")
-        plt.setp(lines_rep, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
+        lines_rep = ax.plot(ts,cost_vars[:, self.i_diff],label="reproduced")
+        plt.setp(lines_rep, linestyle="-", linewidth=2, color=(0.0, 0.0, 0.5))
 
         return lines_rep, ax
 
+
 class TaskSolverDmpDynSys(TaskSolver):
-    """ TaskSolver that integrates a DMP.
-    """
 
     def __init__(self, trajectory):
         self._trajectory = trajectory
 
     def get_dmp(self, sample, function_apps=None):
-        tau = sample[0]
-        spring_damper_alpha = sample[1]
-        goal_system_param1 = sample[2]
-        tau_goal = sample[3]
-
         y_init = self._trajectory.ys[0, :]
         y_attr = self._trajectory.ys[-1, :]
 
-        goal_system = ExponentialSystem(tau_goal, y_init, y_attr, goal_system_param1)
+        tau = sample[0]
 
-        #def __init__(self, tau, x_init, max_rate, inflection_ratio):
-        #goal_system = SigmoidSystem(tau, y_init, goal_system_param1, goal_system_param2)
+        damping = sample[1]
+        constant = sample[2]
+        mass = sample[3]
+        transf_system = SpringDamperSystem(tau, y_init, y_attr, damping, constant, mass)
+
+        tau_goal = sample[4]
+        param1 = sample[5]
+        goal_system = ExponentialSystem(tau_goal, y_init, y_attr, param1)
+
         dmp = Dmp.from_traj(self._trajectory, function_apps, dmp_type="KULVICIUS_2012_JOINING",
-            goal_system=goal_system, alpha_spring_damper=spring_damper_alpha
+            goal_system=goal_system, transformation_system=transf_system
         )
         return dmp
 
 
     def perform_rollout(self, sample, **kwargs):
-        """ Perform rollouts, that is, given a set of samples, determine all the variables that
-        are relevant to evaluating the cost function.
-
-        @param sample: The sample to perform the rollout for
-        @return: The variables relevant to computing the cost.
-        """
         dmp = self.get_dmp(sample)
-        ts = self._trajectory.ts
-        xs, xds, _, _ = dmp.analytical_solution(ts)
-        traj = dmp.states_as_trajectory(ts, xs, xds)
+        xs, xds, _, _ = dmp.analytical_solution()
+        traj = dmp.states_as_trajectory(dmp.ts_train, xs, xds)
 
         cost_vars = traj.as_matrix()
         return cost_vars
+
+
+class TaskFitTargets(Task):
+    """ Task in which a trajectory has to pass through a viapoint."""
+
+    def __init__(self,  inputs, targets, **kwargs):
+        self.inputs = inputs
+        self.targets = targets
+
+    def get_cost_labels(self):
+        return ["mean(abs(diff))"]
+
+    def evaluate_rollout(self, cost_vars, sample):
+        diff = np.mean(np.square(self.targets - cost_vars[:, 0]))
+        return [diff]
+
+    def plot_rollout(self, cost_vars, ax=None):
+        if not ax:
+            ax = plt.axes()
+
+        lines_dem = ax.plot(self.inputs,self.targets,label="targets")
+        plt.setp(lines_dem, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        lines_rep = ax.plot(self.inputs,cost_vars[:, 0],label="predictions")
+        plt.setp(lines_rep, linestyle="-", linewidth=2, color=(0.0, 0.0, 0.5))
+
+        return lines_rep, ax
+
+class TaskSolverFunctionApp(TaskSolver):
+
+    def __init__(self, fa, inputs):
+        self.fa = fa
+        self.inputs = inputs
+
+    def perform_rollout(self, sample, **kwargs):
+        self.fa.set_param_vector(sample)
+        predictions = self.fa.predict(self.inputs)
+        predictions = predictions.reshape((-1, 1))
+        return predictions
+
+
 
 
 def main():
     """ Main function for script. """
 
     # Train a DMP with a trajectory
-    tau = 1.0
-    ts = np.linspace(0, tau, 101)
     y_first = np.array([0.0])
     y_last = np.array([1.0])
-    traj_demo = Trajectory.from_min_jerk(ts, y_first, y_last)
+    dim_dmp = len(y_first)
+    traj_demo = Trajectory.from_min_jerk(np.linspace(0, 1.0, 101), y_first, y_last)
+    traj_end =  Trajectory.from_min_jerk(np.linspace(0, 0.25, 26), y_last, y_last)
+    traj_demo.append(traj_end)
+    tau = 1.0
+    ts = traj_demo.ts
     #traj_demo = Trajectory.loadtxt("trajectory.txt")
-    #ts = traj_demo.ts
-
-    task_solver = TaskSolverDmpDynSys(traj_demo)
-
-    mean_init = np.array([tau, 15, 5, tau])
-    covar_init = np.diag([0.01, 0.5, 0.5, 0.01])
-    distribution = DistributionGaussian(mean_init, covar_init)
-    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
-
-    n_samples_per_update = 10
-    n_updates = 10
 
     task = TaskFitTrajectory(traj_demo)
+    task_solver_dyn_sys = TaskSolverDmpDynSys(traj_demo)
+
+    optimize_first = False
+    if optimize_first:
+
+        damping = 20
+        mean_init = [
+            tau, # tau = sample[0]
+            damping, # damping = sample[1]
+            damping*damping/4, # constant = sample[2]
+            1.0,  # mass = sample[3]
+            tau, # tau_goal = sample[4]
+            5 # param1 = sample[5]
+        ]
+        print(mean_init)
+        covar_init = np.diag([0.01, 1.0, 10.0, 0.1, 0.01, 0.5])
+        covar_init = np.diag([0.0, 1.0, 10.0, 0.1, 0.1, 0.5])
+        distribution = DistributionGaussian(mean_init, covar_init)
+        updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.9)
+
+        n_samples_per_update = 20
+        n_updates = 50
+
+        session = run_optimization_task(
+            task, task_solver_dyn_sys, distribution, updater, n_updates, n_samples_per_update
+        )
+
+        distribution_opt = session.ask('distribution', n_updates-1)
+        mean_opt = distribution_opt.mean
+        print(mean_opt)
+
+        axs_dmp = None
+        axs_traj = None
+        for i_update in [0, n_updates-1]:
+            distribution = session.ask('distribution', i_update)
+            dmp = task_solver_dyn_sys.get_dmp(distribution.mean)
+            xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution()
+            _, axs_dmp = dmp.plot(ts, xs, xds, forcing_terms=forcing_terms, fa_outputs=fa_outputs,
+                                  axs=axs_dmp)
+            lhs, axs_traj = dmp.plot_comparison(traj_demo,axs=axs_traj)
+
+            if i_update == 0:
+                plt.setp(lhs[3:], linestyle="-", linewidth=2, color=(0.6, 0.0, 0.0))
+            else:
+                plt.setp(lhs[3:], linestyle="-", linewidth=2, color=(0.0, 0.6, 0.0))
+            plt.legend(['demonstrated', 'reproduced (default)', None, 'reproduced (optimized)'])
+
+        fig = session.plot()
+
+    else:
+        mean_opt = [1.0, 17.65977591,  98.21818331,  2.42016606,  1.15073151,  4.20203766]
+
+    n_plots = 2
+    fig = plt.figure(figsize=(5 * n_plots, 4))
+    axs = [fig.add_subplot(1, n_plots, i + 1) for i in range(n_plots)]
+    for use_optimized in [False, True]:
+        if use_optimized:
+            mean_opt = [1.0, 17.65977591, 98.21818331, 2.42016606, 1.15073151, 4.20203766]
+            centers = np.array([0.1, 0.42, 0.7, 1.0])
+            widths = np.array([0.07, 0.12, 0.07, 0.1])
+        else:
+            mean_opt = [1.0, 20, 100.0, 1.0, 1.0, 5]
+            centers = np.array([0.13, 0.5, 0.75, 1.0])
+            widths = np.array([0.10, 0.11, 0.03, 0.1])
+
+        dmp = task_solver_dyn_sys.get_dmp(mean_opt)
+        fa_inputs_phase, fa_targets = dmp._compute_targets(traj_demo)
+
+        n_basis_functions = 4
+        fa = FunctionApproximatorRBFN(n_basis_functions, 0.5)
+        fa._meta_params.update({"centers": centers, "widths": widths})
+        fa.train(fa_inputs_phase, fa_targets)
+        ax =  axs[1] if use_optimized else axs[0]
+        fa.plot(fa_inputs_phase, targets=fa_targets, plot_model_parameters=True, ax=ax)
+        ax.set_xlim([0.0, 1.0])
+        ax.set_ylim([-25, 20])
+        ax.set_xlabel('phase')
+        ax.set_ylabel('ydd')
+        ax.set_title('dyn_sys optimized' if use_optimized else 'dyn_sys default')
+    plt.show()
+
+
+    a = 1/0
+
+    names = ["weights", "centers", "widths"]
+    fa.set_selected_param_names(names)
+
+    task = TaskFitTargets(fa_inputs_phase, fa_targets)
+    task_solver_function_app = TaskSolverFunctionApp(fa, fa_inputs_phase)
+    mean_init = fa.get_param_vector()
+    print(mean_init)
+    covar_diag = []
+    if 'weights' in names:
+        covar_diag.extend([0.0]*n_basis_functions)
+    if 'centers' in names:
+        covar_diag.extend([0.001]*n_basis_functions)
+    if 'widths' in names:
+        covar_diag.extend([0.001]*n_basis_functions)
+    print(covar_diag)
+    covar_init = np.diag(covar_diag)
+    distribution = DistributionGaussian(mean_init, covar_init)
+    updater = UpdaterCovarDecay(eliteness=10, weighting_method="PI-BB", covar_decay_factor=0.8)
+
+    n_samples_per_update = 20
+    n_updates = 30
+
     session = run_optimization_task(
-        task, task_solver, distribution, updater, n_updates, n_samples_per_update
+        task, task_solver_function_app, distribution, updater, n_updates, n_samples_per_update
     )
-
-    axs_dmp = None
-    axs_traj = None
-    for i_update in [0, n_updates-1]:
-        distribution = session.ask('distribution', i_update)
-        dmp = task_solver.get_dmp(distribution.mean)
-        xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution()
-        _, axs_dmp = dmp.plot(ts, xs, xds, forcing_terms=forcing_terms, fa_outputs=fa_outputs,
-                              axs=axs_dmp)
-        _, axs_traj = dmp.plot_comparison(traj_demo,axs=axs_traj)
-
     fig = session.plot()
-
-    if 1==0:
-        function_apps = [FunctionApproximatorRBFN(10, 0.9) for _ in range(traj.dim)]
-
-        goal_system = ExponentialSystem(tau, y_first, y_last, 5)
-    
-        #dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING",
-        #    goal_system=goal_system, alpha_spring_damper=15.0
-        #)
-
-        function_apps = None
-        dmp = Dmp.from_traj(traj, function_apps, dmp_type="KULVICIUS_2012_JOINING")
-    
-        #dmp.set_selected_param_names("weights")
-        #v = dmp.get_param_vector()
-        #print(v)
-        #v.fill(0.0)
-        #print(v)
-        #dmp.set_param_vector(v)
-
-        # Compute analytical solution
-        ts = np.linspace(0, 0.75, 151)
-        xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution(ts)
-        dmp.plot(ts, xs, xds, forcing_terms=forcing_terms, fa_outputs=fa_outputs)
-
-        lines, axs = traj.plot()
-        plt.setp(lines, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-        plt.setp(lines, label="demonstration")
-        traj_reproduced = dmp.states_as_trajectory(ts, xs, xds)
-        lines, axs = traj_reproduced.plot(axs)
-        plt.setp(lines, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
-        plt.setp(lines, label="reproduced")
-
-
 
     plt.show()
 
