@@ -16,6 +16,7 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 #
 """ Module for the DMP class. """
+import copy
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -46,6 +47,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         @param y_attr: Attractor state
         @param function_approximators: Function approximators for the forcing term
         @param kwargs:
+            - transformation_system: Dynamical system for the main transformation system
             - alpha_spring_damper: alpha in the spring-damper system (default: 20.0)
             - dmp_type: Type of the Dmp, i.e. "IJSPEERT_2002_MOVEMENT", "KULVICIUS_2012_JOINING",
             "COUNTDOWN_2013" (default: "KULVICIUS_2012_JOINING"). This will set the subsystems to
@@ -67,8 +69,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._y_attr = y_attr
         self._function_approximators = function_approximators
 
-        alpha = kwargs.get("alpha_spring_damper", 20.0)
-        self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
+        transformation_system = kwargs.get("transformation_system", None)
+        if transformation_system:
+            self._spring_system = transformation_system
+        else:
+            alpha = kwargs.get("alpha_spring_damper", 20.0)
+            self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
@@ -230,9 +236,10 @@ class Dmp(DynamicalSystem, Parameterizable):
         n_time_steps = phase_state.size
         fa_output = np.zeros([n_time_steps, self.dim_dmp()])
 
-        for i_fa in range(self.dim_dmp()):
-            if self._function_approximators[i_fa].is_trained():
-                fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
+        if self._function_approximators:
+            for i_fa in range(self.dim_dmp()):
+                if self._function_approximators[i_fa].is_trained():
+                    fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
         return fa_output
 
     def analytical_solution(self, ts=None):
@@ -302,8 +309,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         # THE REST CANNOT BE DONE ANALYTICALLY
 
         # Reset the dynamical system, and get the first state
-        damping = self._spring_system.damping_coefficient
-        local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
+        local_spring_system = copy.deepcopy(self._spring_system)
+        #damping = self._spring_system.damping_coefficient
+        #local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state
         local_spring_system.y_attr = xs_goal[0, :]
@@ -655,3 +663,20 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_ylabel(r"unknown")
 
         return all_handles, axs
+
+    def plot_comparison(self, trajectory, **kwargs):
+        ts = trajectory.ts
+        xs, xds, _, _ = self.analytical_solution(ts)
+        traj_reproduced = self.states_as_trajectory(ts, xs, xds)
+
+        axs = kwargs.get("axs", None)
+        h_demo, axs = trajectory.plot(axs)
+        h_repr, axs = traj_reproduced.plot(axs)
+
+        plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+        plt.setp(h_demo, label="demonstration")
+        plt.setp(h_repr, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
+        plt.setp(h_repr, label="reproduced")
+
+        h_demo.extend(h_repr)
+        return h_demo, axs
