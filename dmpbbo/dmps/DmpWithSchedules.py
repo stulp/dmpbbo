@@ -45,7 +45,6 @@ class DmpWithSchedules(Dmp):
         if np.isscalar(self.max_schedules):
             self.max_schedules = np.full(n_dims, self.max_schedules)
 
-
     @classmethod
     def from_traj_sched(cls, trajectory, func_apps_dmp, func_apps_schedules, **kwargs):
         """Initialize a DMP with schedules by training it from a trajectory (with schedules)
@@ -140,7 +139,7 @@ class DmpWithSchedules(Dmp):
             # No bounds, simply return schedules
             return schedules
         if schedules.ndim == 1:
-            schedules = schedules.reshape((schedules.shape[0],1))
+            schedules = schedules.reshape((schedules.shape[0], 1))
         for i_dim in range(len(self._func_apps_schedules)):
             min_sched = self.min_schedules[i_dim] if self.min_schedules else None
             max_sched = self.max_schedules[i_dim] if self.max_schedules else None
