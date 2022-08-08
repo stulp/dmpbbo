@@ -33,7 +33,7 @@ from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 
 
-class TaskViapointPerturbed(Task):
+class TaskViapointWithGains(Task):
     """ Task in which a 2D trajectory has to pass through a viapoint. It is perturbed by a force
     field. """
 
@@ -69,6 +69,9 @@ class TaskViapointPerturbed(Task):
         n_dims = self.viapoint.shape[0]
         n_time_steps = cost_vars.shape[0]
 
+        # cost_vars:
+        #   0  1      2       3        4      5      6       7
+        #   t, y_cur, yd_cur, ydd_cur, gains, y_des, yd_des, ydd_des
         ts = cost_vars[:, 0]
         ys_cur = cost_vars[:, 1 : 1 + n_dims]
         ydds_cur = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
@@ -77,7 +80,6 @@ class TaskViapointPerturbed(Task):
         # Get integer time step at t=viapoint_time
         viapoint_time_step = np.argmax(ts >= self.viapoint_time)
         # Compute distance at that time step
-
         y_via = ys_cur[viapoint_time_step, :]
         dist_to_viapoint = np.linalg.norm(y_via - self.viapoint)
 
@@ -131,8 +133,8 @@ class TaskViapointPerturbed(Task):
         return line_handles, ax
 
 
-class TaskSolverDmpWithGains(TaskSolver):
-    """ TaskSolver that integrates a DMP.
+class TaskSolverDmpWithGainsAndForceField(TaskSolver):
+    """ TaskSolver that integrates a DMP and applies a force field
 
     """
 
@@ -189,6 +191,7 @@ def main():
     """ Main function of the script. """
     directory = sys.argv[1] if len(sys.argv) > 1 else None
 
+    # Main parameter of the experiment
     stochastic_field = False
     gain_min = 20.0
     gain_max = 2000.0
@@ -200,12 +203,12 @@ def main():
     y_init = np.array([0.0])
     y_attr = np.array([1.0])
     n_dims = len(y_init)
-
     ts = np.linspace(0, tau, n_time_steps)
+
+    # Train the DMP from a min-jerk trajectory, and constant gains
     traj = Trajectory.from_min_jerk(ts, y_init, y_attr)
     schedule = np.full((n_time_steps, n_dims), gain_initial)
     traj.misc = schedule
-
     function_apps = [FunctionApproximatorRBFN(7, 0.95) for _ in range(n_dims)]
     function_apps_schedules = [FunctionApproximatorRBFN(5, 0.9) for _ in range(n_dims)]
     dmp = DmpWithSchedules.from_traj_sched(
@@ -216,16 +219,20 @@ def main():
     # dmp.plot_sched(ts, xs, xds, sched)
     # plt.show()
 
+    # Determine the size of the search space for DMP weights and gain schedules
     dmp.set_selected_param_names(["weights"])
     n_search_traj = dmp.get_param_vector_size()
     dmp.set_selected_param_names(["sched_weights"])
     n_search_gains = dmp.get_param_vector_size()
+    # We know the search spaces now: optimize both.
     dmp.set_selected_param_names(["weights", "sched_weights"])
 
     # Make the task
-    task = TaskViapointPerturbed(
-        np.full((1, n_dims), 0.8),
-        0.5,
+    viapoint = np.full((1, n_dims), 0.8)
+    viapoint_time = 0.5
+    task = TaskViapointWithGains(
+        viapoint,
+        viapoint_time,
         gain_min,
         gain_max,
         viapoint_weight=5.0,
@@ -236,8 +243,11 @@ def main():
     # Make task solver, based on a Dmp
     dt = 0.05
     integrate_dmp_beyond_tau_factor = 1.2
-    task_solver = TaskSolverDmpWithGains(dmp, dt, integrate_dmp_beyond_tau_factor, stochastic_field)
+    task_solver = TaskSolverDmpWithGainsAndForceField(
+        dmp, dt, integrate_dmp_beyond_tau_factor, stochastic_field
+    )
 
+    # Determine the initial covariance matrix, and its updater
     mean_init = dmp.get_param_vector()
     sigma_traj = 10.0
     sigma_gains = 20.0
@@ -250,7 +260,6 @@ def main():
 
     n_samples_per_update = 10
     n_updates = 100
-
     session = run_optimization_task(
         task, task_solver, distribution, updater, n_updates, n_samples_per_update, directory
     )
