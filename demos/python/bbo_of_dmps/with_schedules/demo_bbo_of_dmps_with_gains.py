@@ -71,9 +71,9 @@ class TaskViapointPerturbed(Task):
         n_time_steps = cost_vars.shape[0]
 
         ts = cost_vars[:, 0]
-        ys_cur = cost_vars[:, 1: 1 + n_dims]
-        ydds_cur = cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
-        gains = cost_vars[:, 1 + n_dims * 3: 1 + n_dims * 4]
+        ys_cur = cost_vars[:, 1 : 1 + n_dims]
+        ydds_cur = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
+        gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
 
         # Get integer time step at t=viapoint_time
         viapoint_time_step = np.argmax(ts >= self.viapoint_time)
@@ -86,7 +86,7 @@ class TaskViapointPerturbed(Task):
         costs[1] = self.viapoint_weight * dist_to_viapoint
         costs[2] = self.acceleration_weight * np.sum(np.abs(ydds_cur)) / n_time_steps
         costs[3] = self.gain_weight * (
-                (np.sum(gains) - self.min_gain) / (n_time_steps * self.max_gain)
+            (np.sum(gains) - self.min_gain) / (n_time_steps * self.max_gain)
         )
         costs[0] = np.sum(costs[1:])
         return costs
@@ -107,11 +107,11 @@ class TaskViapointPerturbed(Task):
         #   t, y_cur, yd_cur, ydd_cur, gains, y_des, yd_des, ydd_des
         n_dims = self.viapoint.shape[0]
         t = cost_vars[:, 0]
-        y_cur = cost_vars[:, 1: n_dims + 1]
-        gains = cost_vars[:, 1 + n_dims * 3: 1 + n_dims * 4]
-        y_des = cost_vars[:, 1 + n_dims * 4: 1 + n_dims * 5]
+        y_cur = cost_vars[:, 1 : n_dims + 1]
+        gains = cost_vars[:, 1 + n_dims * 3 : 1 + n_dims * 4]
+        y_des = cost_vars[:, 1 + n_dims * 4 : 1 + n_dims * 5]
         scaling = 1.0
-        line_handles = ax.plot(t, y_des, '--', linewidth=0.4)
+        line_handles = ax.plot(t, y_des, "--", linewidth=0.4)
         lh1 = ax.plot(t, y_cur, linewidth=0.5)
         # ax.plot(t, y_des + scaling * gains, linewidth=0.2)
         # ax.plot(t, y_des - scaling * gains, linewidth=0.2)
@@ -151,19 +151,26 @@ class TaskSolverDmpWithGains(TaskSolver):
         if self.stochastic_field:
             field_strength = random.randrange(-3.0, 3.0)
 
-        field_max_time = 0.5*dmp_sched.tau
-        r = force_field_simulator.perform_rollout(dmp_sched, self._integrate_time,
-                                                  self._n_time_steps,  field_strength,
-                                                  field_max_time)
+        field_max_time = 0.5 * dmp_sched.tau
+        r = force_field_simulator.perform_rollout(
+            dmp_sched, self._integrate_time, self._n_time_steps, field_strength, field_max_time
+        )
 
-        cost_vars = np.column_stack((
-            r['ts'],
-            r['ys_cur'], r['yds_cur'], r['ydds_cur'],
-            r['schedules'],
-            r['ys_des'], r['yds_des'], r['ydds_des']))
+        cost_vars = np.column_stack(
+            (
+                r["ts"],
+                r["ys_cur"],
+                r["yds_cur"],
+                r["ydds_cur"],
+                r["schedules"],
+                r["ys_des"],
+                r["yds_des"],
+                r["ydds_des"],
+            )
+        )
 
         return cost_vars
-        #return r
+        # return r
 
     def perform_rollout(self, sample, **kwargs):
         """ Perform rollouts, that is, given a set of samples, determine all the variables that
@@ -196,8 +203,9 @@ def main():
 
     function_apps = [FunctionApproximatorRBFN(8, 0.95) for _ in range(n_dims)]
     function_apps_schedules = [FunctionApproximatorRBFN(7, 0.9) for _ in range(n_dims)]
-    dmp = DmpWithSchedules.from_traj_sched(traj, function_apps, function_apps_schedules,
-                                           min_schedules=10.0, max_schedules=2000.0)
+    dmp = DmpWithSchedules.from_traj_sched(
+        traj, function_apps, function_apps_schedules, min_schedules=10.0, max_schedules=2000.0
+    )
 
     # xs, xds, sched, _, _ = dmp.analytical_solution_sched(ts)
     # dmp.plot_sched(ts, xs, xds, sched)
