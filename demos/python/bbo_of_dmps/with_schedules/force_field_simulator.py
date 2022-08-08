@@ -1,3 +1,23 @@
+# This file is part of DmpBbo, a set of libraries and programs for the
+# black-box optimization of dynamical movement primitives.
+# Copyright (C) 2022 Freek Stulp
+#
+# DmpBbo is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Lesser General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# DmpBbo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
+"""Script to simuulate DMP integration with a force field.
+Has been implemented in a separate file to facilitate debugging.
+"""
+
 import random
 
 import numpy as np
@@ -5,11 +25,19 @@ from matplotlib import pyplot as plt
 
 
 def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, field_max_time):
+    """
+    Perform a rollout with a force field
+    @param dmp_sched:  The DMP to integrate
+    @param integrate_time:  The time to integrate the DMP
+    @param n_time_steps: The number of time steps to integrate the DMP
+    @param field_strength: The strength of thw force field
+    @param field_max_time: The time at which the (Gaussian) force field has its mode
+    @return:
+    """
     ts = np.linspace(0.0, integrate_time, n_time_steps)
     dt = ts[1]
 
-    r = {}  # The rollout containing all relevant  numpy ndarrays
-    r["ts"] = ts
+    r = {"ts": ts}  # The rollout containing all relevant  numpy ndarrays
     for v in ["ys_des", "yds_des", "ydds_des", "schedules", "ys_cur", "ydds_cur", "yds_cur"]:
         r[v] = np.zeros([n_time_steps, dmp_sched.dim_y])
     r["fields"] = np.zeros([n_time_steps, 1])
@@ -51,6 +79,12 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
 
 
 def main_perform_rollout(field_strength, gains, axs):
+    """
+    Perform one rollout with a certain field strength and gain
+    @param field_strength:  The strength of the force field (between 0 and 200 is appropriate)
+    @param gains: The gains (between 10 and 2000 is appropriate)
+    @param axs: The axes to plot on
+    """
     from dmpbbo.dmps.DmpWithSchedules import DmpWithSchedules
     from dmpbbo.dmps.Trajectory import Trajectory
     from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
@@ -90,6 +124,9 @@ def main_perform_rollout(field_strength, gains, axs):
 
 
 def main():
+    """
+    Main function for this script
+    """
     field_strengths = [10.0, 100.0]
     gains = [100.0, 1000.0]
 
