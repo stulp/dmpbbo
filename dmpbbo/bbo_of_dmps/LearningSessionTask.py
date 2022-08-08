@@ -116,7 +116,6 @@ class LearningSessionTask(LearningSession):
             updates_list = [int(np.round(i)) for i in np.linspace(0, n_updates, max_n_updates)]
         else:
             updates_list = list(range(n_updates+1))
-        print(updates_list)
 
         for i_update in updates_list:
             lines, _ = self.plot_rollouts_update(
