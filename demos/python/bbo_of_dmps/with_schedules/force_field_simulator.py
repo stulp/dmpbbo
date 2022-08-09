@@ -50,10 +50,10 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
     r["schedules"][0, :] = sch
 
     for tt in range(1, n_time_steps):
+
         x_des, xd_des, sch = dmp_sched.integrate_step_sched(dt, x_des)
-        r["ys_des"][tt, :], r["yds_des"][tt, :], r["ydds_des"][
-            tt, :
-        ] = dmp_sched.states_as_pos_vel_acc(x_des, xd_des)
+        r["ys_des"][tt, :], r["yds_des"][tt, :], r["ydds_des"][tt, :] = \
+            dmp_sched.states_as_pos_vel_acc(x_des, xd_des)
 
         # Compute error terms
         y_err = r["ys_cur"][tt - 1, :] - r["ys_des"][tt, :]
@@ -62,7 +62,7 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
         # Force due to PD-controller
         r["schedules"][tt, :] = sch
         gain = sch
-        r["ydds_cur"][tt, :] = -gain * y_err - np.sqrt(gain) * yd_err
+        r["ydds_cur"][tt, :] = r["ydds_des"][tt, :] - gain * y_err - np.sqrt(gain) * yd_err
 
         # Force due to force_field
         time = ts[tt]
@@ -74,6 +74,14 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
         # Euler integration
         r["yds_cur"][tt, :] = r["yds_cur"][tt - 1, :] + dt * r["ydds_cur"][tt, :]
         r["ys_cur"][tt, :] = r["ys_cur"][tt - 1, :] + dt * r["yds_cur"][tt, :]
+
+
+    # Compute reference trajectory without perturbation (already done above)
+    #xs, xds, schedules, _, _ = dmp_sched.analytical_solution_sched(ts)
+    #traj = dmp_sched.states_as_trajectory_sched(ts, xs, xds, schedules)
+    #r["ys_des"] = traj.ys
+    #r["yds_des"] = traj.yds
+    #r["ydds_des"] = traj.ydds
 
     return r
 
@@ -102,12 +110,10 @@ def main_perform_rollout(field_strength, gains, axs):
 
     function_apps = [FunctionApproximatorRBFN(8, 0.95) for _ in range(n_dims)]
     function_apps_schedules = [FunctionApproximatorRBFN(7, 0.95) for _ in range(n_dims)]
-    dmp_sched = DmpWithSchedules.from_traj_sched(
-        traj, function_apps, function_apps_schedules, min_schedules=100, max_schedules=2000.0
-    )
+    dmp_sched = DmpWithSchedules.from_traj_sched(traj, function_apps, function_apps_schedules)
 
     integrate_time = 1.3 * tau
-    field_max_time = 0.5 * tau
+    field_max_time = 0.3 * tau
     r = perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, field_max_time)
 
     h = axs[0].plot(r["ts"], r["fields"])
@@ -117,40 +123,46 @@ def main_perform_rollout(field_strength, gains, axs):
     axs[1].plot(r["ts"], r["schedules"], color=color)
     axs[1].set_ylabel("gains")
 
-    for i, v in enumerate(["ys", "yds", "ydds"]):
-        axs[i + 2].plot(r["ts"], r[v + "_des"], "-", color=color)
-        axs[i + 2].plot(r["ts"], r[v + "_cur"], "--", color=color)
-        axs[i + 2].set_ylabel(v)
+    axs[2].plot(r["ts"], r["ys_des"], "--", color=color, linewidth=2)
+    axs[2].plot(r["ts"], r["ys_cur"], "-", color=color, linewidth=1)
+    axs[2].set_ylabel('y')
+    #for i, v in enumerate(["ys", "yds", "ydds"]):
+    #    axs[i + 2].plot(r["ts"], r[v + "_des"], "-", color=color)
+    #    axs[i + 2].plot(r["ts"], r[v + "_cur"], "--", color=color)
+    #    axs[i + 2].set_ylabel(v)
 
 
 def main():
     """
     Main function for this script
     """
-    field_strengths = [10.0, 100.0]
-    gains = [100.0, 1000.0]
+    field_strengths = [-10.0, -5.0, 0.0, 5.0, 10.0]
+    gains = [10.0, 50.0, 250.0]
 
-    n_rows = 4
-    n_cols = 5
+    n_rows = len(gains)
+    n_cols = 3
     fig = plt.figure(figsize=(5 * n_cols, 5 * n_rows))
     row = 0
-    for field_strength in field_strengths:
-        for gain in gains:
-            axs = [fig.add_subplot(n_rows, n_cols, 1 + row * n_cols + sp) for sp in range(n_cols)]
+    for gain in gains:
+        axs = [fig.add_subplot(n_rows, n_cols, 1 + row * n_cols + sp) for sp in range(n_cols)]
+        for field_strength in field_strengths:
             main_perform_rollout(field_strength, gain, axs)
-            # for i in range(n_cols):
-            #    axs[i].set_xlabel('time')
-            axs[0].set_ylim([0, 1.1 * max(field_strengths)])
+            for i in range(n_cols):
+                axs[i].set_xlabel('time')
+            axs[0].set_ylim([1.1 * min(field_strengths), 1.1 * max(field_strengths)])
             axs[1].set_ylim([0, 1.1 * max(gains)])
-            row += 1
+            axs[2].set_ylim([-0.1, 1.5])
+            for ax in axs:
+                ax.set_xlim([0.0, 1.1])
+        row += 1
 
-    n_rows = 1
-    fig = plt.figure(figsize=(5 * n_cols, 5 * n_rows))
-    axs = [fig.add_subplot(n_rows, n_cols, 1 + sp) for sp in range(n_cols)]
-    for i in range(10):
-        gain = 500.0
-        field_strength = random.randrange(-200, 200)
-        main_perform_rollout(field_strength, gain, axs)
+    #n_rows = 1
+    #fig = plt.figure(figsize=(5 * n_cols, 5 * n_rows))
+    #axs = [fig.add_subplot(n_rows, n_cols, 1 + sp) for sp in range(n_cols)]
+    #for i in range(10):
+    #    gain = 500.0
+    #    field_strength = random.randrange(-200, 200)
+    #    main_perform_rollout(field_strength, gain, axs)
 
     plt.show()
 
