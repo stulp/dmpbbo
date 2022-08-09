@@ -115,8 +115,8 @@ class TaskViapointWithGains(Task):
         line_handles = []
         lh1 = ax.plot(t, y_des, "--", linewidth=0.4)
         line_handles.extend(lh1)
-        #lh2 = ax.plot(t, y_cur, linewidth=0.5)
-        #line_handles.extend(lh2)
+        # lh2 = ax.plot(t, y_cur, linewidth=0.5)
+        # line_handles.extend(lh2)
         ax.set_ylim([-1.5, 1.5])
         # ax.plot(t, y_des + scaling * gains, linewidth=0.2)
         # ax.plot(t, y_des - scaling * gains, linewidth=0.2)
@@ -187,7 +187,8 @@ class TaskSolverDmpWithGainsAndForceField(TaskSolver):
         self._dmp_sched.set_param_vector(sample)
         return self.perform_rollout_dmp_sched(self._dmp_sched)
 
-def run_optimization(stochastic_field,directory=None):
+
+def run_optimization(stochastic_field, directory=None):
 
     # Main parameter of the experiment
     gain_min = 10.0
@@ -263,13 +264,12 @@ def run_optimization(stochastic_field,directory=None):
 
     ax = plt.figure(figsize=(5, 5)).add_subplot(1, 1, 1)
     for i_update in range(n_updates):
-        handle, _ = session.plot_rollouts_update(i_update,ax=ax)
+        handle, _ = session.plot_rollouts_update(i_update, ax=ax)
         session._set_style(handle, i_update, n_updates)
 
-    window_label = 'stochastic' if stochastic_field else 'constant'
-    plt.gcf().canvas.set_window_title(window_label+' force field')
+    window_label = "stochastic" if stochastic_field else "constant"
+    plt.gcf().canvas.set_window_title(window_label + " force field")
     return session
-
 
 
 def main():

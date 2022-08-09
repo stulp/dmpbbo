@@ -52,8 +52,9 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
     for tt in range(1, n_time_steps):
 
         x_des, xd_des, sch = dmp_sched.integrate_step_sched(dt, x_des)
-        r["ys_des"][tt, :], r["yds_des"][tt, :], r["ydds_des"][tt, :] = \
-            dmp_sched.states_as_pos_vel_acc(x_des, xd_des)
+        r["ys_des"][tt, :], r["yds_des"][tt, :], r["ydds_des"][
+            tt, :
+        ] = dmp_sched.states_as_pos_vel_acc(x_des, xd_des)
 
         # Compute error terms
         y_err = r["ys_cur"][tt - 1, :] - r["ys_des"][tt, :]
@@ -75,13 +76,12 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
         r["yds_cur"][tt, :] = r["yds_cur"][tt - 1, :] + dt * r["ydds_cur"][tt, :]
         r["ys_cur"][tt, :] = r["ys_cur"][tt - 1, :] + dt * r["yds_cur"][tt, :]
 
-
     # Compute reference trajectory without perturbation (already done above)
-    #xs, xds, schedules, _, _ = dmp_sched.analytical_solution_sched(ts)
-    #traj = dmp_sched.states_as_trajectory_sched(ts, xs, xds, schedules)
-    #r["ys_des"] = traj.ys
-    #r["yds_des"] = traj.yds
-    #r["ydds_des"] = traj.ydds
+    # xs, xds, schedules, _, _ = dmp_sched.analytical_solution_sched(ts)
+    # traj = dmp_sched.states_as_trajectory_sched(ts, xs, xds, schedules)
+    # r["ys_des"] = traj.ys
+    # r["yds_des"] = traj.yds
+    # r["ydds_des"] = traj.ydds
 
     return r
 
@@ -125,8 +125,8 @@ def main_perform_rollout(field_strength, gains, axs):
 
     axs[2].plot(r["ts"], r["ys_des"], "--", color=color, linewidth=2)
     axs[2].plot(r["ts"], r["ys_cur"], "-", color=color, linewidth=1)
-    axs[2].set_ylabel('y')
-    #for i, v in enumerate(["ys", "yds", "ydds"]):
+    axs[2].set_ylabel("y")
+    # for i, v in enumerate(["ys", "yds", "ydds"]):
     #    axs[i + 2].plot(r["ts"], r[v + "_des"], "-", color=color)
     #    axs[i + 2].plot(r["ts"], r[v + "_cur"], "--", color=color)
     #    axs[i + 2].set_ylabel(v)
@@ -148,7 +148,7 @@ def main():
         for field_strength in field_strengths:
             main_perform_rollout(field_strength, gain, axs)
             for i in range(n_cols):
-                axs[i].set_xlabel('time')
+                axs[i].set_xlabel("time")
             axs[0].set_ylim([1.1 * min(field_strengths), 1.1 * max(field_strengths)])
             axs[1].set_ylim([0, 1.1 * max(gains)])
             axs[2].set_ylim([-0.1, 1.5])
@@ -156,10 +156,10 @@ def main():
                 ax.set_xlim([0.0, 1.1])
         row += 1
 
-    #n_rows = 1
-    #fig = plt.figure(figsize=(5 * n_cols, 5 * n_rows))
-    #axs = [fig.add_subplot(n_rows, n_cols, 1 + sp) for sp in range(n_cols)]
-    #for i in range(10):
+    # n_rows = 1
+    # fig = plt.figure(figsize=(5 * n_cols, 5 * n_rows))
+    # axs = [fig.add_subplot(n_rows, n_cols, 1 + sp) for sp in range(n_cols)]
+    # for i in range(10):
     #    gain = 500.0
     #    field_strength = random.randrange(-200, 200)
     #    main_perform_rollout(field_strength, gain, axs)
