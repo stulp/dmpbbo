@@ -94,7 +94,7 @@ class DmpWithSchedules(Dmp):
 
         if targets is None:
             raise ValueError(
-                "targets is None. This means neither schedules nur trajectory.misc " "was available"
+                "targets is None. This means neither schedules nor trajectory.misc " "was available"
             )
 
         if targets.shape[1] != len(self._func_apps_schedules):
