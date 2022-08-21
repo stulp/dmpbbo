@@ -552,9 +552,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
     def set_param_vector(self, values):
         """Set a vector containing the values of the selected parameters."""
-        size = self.get_param_vector_size()
+        size = self._get_param_vector_size_local()
         if len(values) != size:
-            raise ValueError("values must have size {size}")
+            raise ValueError(f"values must have size {size}")
         offset = 0
         for fa in self._function_approximators:
             if fa.is_trained():
@@ -566,6 +566,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             self.y_attr = values[offset : offset + self.dim_dmp()]
 
     def get_param_vector_size(self):
+        return self._get_param_vector_size_local()
+
+    def _get_param_vector_size_local(self):
         """Get the size of the vector containing the values of the selected parameters."""
         size = 0
         for fa in self._function_approximators:

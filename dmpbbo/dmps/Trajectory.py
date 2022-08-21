@@ -134,7 +134,7 @@ class Trajectory:
 
         @return: true if trajectoriy has miscellaneous variables, false otherwise.
         """
-        if self._misc:
+        if self._misc is not None:
             return True
         return False
 

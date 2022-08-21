@@ -139,8 +139,8 @@ class TaskViapoint(Task):
                 t = self.viapoint_time
                 v = self.viapoint[0]
                 ax.plot([t, t], [v + r, v - r], "-k")
-                ax.set_xlabel("time (s)")
-                ax.set_ylabel("y")
+            ax.set_xlabel("time (s)")
+            ax.set_ylabel("y")
 
         elif n_dims == 2:
             line_handles = ax.plot(y[:, 0], y[:, 1], linewidth=0.5)
