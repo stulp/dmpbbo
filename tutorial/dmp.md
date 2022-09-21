@@ -136,11 +136,9 @@ where the term ![alt text](formulae/form_28.png "$ v_{\mbox{\scriptsize max}}$")
 
 In practice, using an exponential phase system may complicate imitation learning of the function approximator ![alt text](formulae/form_17.png "$ f $") , because samples are not equidistantly spaced in time. Therefore, we introduce a dynamical system that mimics the properties of the phase system described in [[kulvicius12joining]](#kulvicius12joining), whilst allowing for a more natural integration in the DMP formulation, and thus our code base. This system starts at 0, and has a constant velocity of ![alt text](formulae/form_30.png "$1/\tau$") , which means the system reaches 1 when ![alt text](formulae/form_31.png "$t=\tau$") . When this point is reached, the velocity is set to 0.
 
-
-
 ![alt text](formulae/form_116.png "\begin{eqnarray*} \dot{s} =&amp; 1/\tau \mbox{~if~} s &lt; 1 &amp; \\ &amp; 0 \mbox{~if~} s&gt;1 \\ \end{eqnarray*}") 
 
-This, in all honesty, is a bit of a hack, because it leads to a non-smooth acceleration profile. However, its properties as an input to the function approximator are so advantageous that we have designed it in this way (the implementation of this system is in the TimeSystem class).
+This is admittedly not very elegant, as this discontinuous dynamical system leads to a non-smooth velocity and acceleration profiles. However, the velocities and accelerations of this system are never used, as only the phase itself is passed to the function approximators. So it's not elegant, but it doesn't hurt. This system has been implemented in the TimeSystem class.
 
 ![alt text](images/phase_systems-svg.png  "Exponential and constant velocity dynamical systems as the 1D phase for a dynamical movement primitive.")
 
