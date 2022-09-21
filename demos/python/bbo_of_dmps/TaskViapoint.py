@@ -85,13 +85,17 @@ class TaskViapoint(Task):
         @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
-
         n_dims = self.viapoint.shape[0]
-        n_time_steps = cost_vars.shape[0]
-
         ts = cost_vars[:, 0]
         ys = cost_vars[:, 1 : 1 + n_dims]
         ydds = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
+        return self.evaluate_rollout_local(ts, ys, ydds, sample)
+
+
+    def evaluate_rollout_local(self, ts, ys, ydds, sample):
+
+        n_dims = self.viapoint.shape[0]
+        n_time_steps = ts.shape[0]
 
         dist_to_viapoint = 0.0
         if self.viapoint_weight > 0.0:
