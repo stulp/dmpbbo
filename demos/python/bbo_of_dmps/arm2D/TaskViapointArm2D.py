@@ -92,11 +92,11 @@ class TaskViapointArm2D(TaskViapoint):
         links_x = links_pos[:, 0::2]
         links_y = links_pos[:, 1::2]
         line_handles = ax.plot(links_x[:, -1], links_y[:, -1], 'r-')
-        if (plot_arm):
+        if plot_arm:
             n_time_steps = links_pos.shape[0]
             n_plots = np.min([n_plots, n_time_steps])
             for tt in np.linspace(0, n_time_steps - 1, n_plots):
-                h = ax.plot(links_x[int(tt), :], links_y[int(tt), :], 'o-', color='#cccccc')
+                h = ax.plot(links_x[int(tt), :], links_y[int(tt), :], '-', color='#cccccc')
                 line_handles.extend(h)
         ax.axis('equal')
         return line_handles, ax
