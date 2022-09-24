@@ -537,15 +537,17 @@ class Dmp(DynamicalSystem, Parameterizable):
             names = [n for n in names if n != "goal"]
 
         # Any remaining names are passed to all function approximators
-        for fa in self._function_approximators:
-            fa.set_selected_param_names(names)
+        if self._function_approximators:
+            for fa in self._function_approximators:
+                fa.set_selected_param_names(names)
 
     def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
         values = np.empty(0)
-        for fa in self._function_approximators:
-            if fa.is_trained():
-                values = np.append(values, fa.get_param_vector())
+        if self._function_approximators is not None:
+            for fa in self._function_approximators:
+                if fa.is_trained():
+                    values = np.append(values, fa.get_param_vector())
         if "goal" in self._selected_param_names:
             values = np.append(values, self._y_attr)
         return values
@@ -556,12 +558,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         if len(values) != size:
             raise ValueError(f"values must have size {size}")
         offset = 0
-        for fa in self._function_approximators:
-            if fa.is_trained():
-                cur_size = fa.get_param_vector_size()
-                cur_values = values[offset : offset + cur_size]
-                fa.set_param_vector(cur_values)
-                offset += cur_size
+        if self._function_approximators is not None:
+            for fa in self._function_approximators:
+                if fa.is_trained():
+                    cur_size = fa.get_param_vector_size()
+                    cur_values = values[offset : offset + cur_size]
+                    fa.set_param_vector(cur_values)
+                    offset += cur_size
         if "goal" in self._selected_param_names:
             self.y_attr = values[offset : offset + self.dim_dmp()]
 
@@ -571,9 +574,10 @@ class Dmp(DynamicalSystem, Parameterizable):
     def _get_param_vector_size_local(self):
         """Get the size of the vector containing the values of the selected parameters."""
         size = 0
-        for fa in self._function_approximators:
-            if fa.is_trained():
-                size += fa.get_param_vector_size()
+        if self._function_approximators is not None:
+            for fa in self._function_approximators:
+                if fa.is_trained():
+                    size += fa.get_param_vector_size()
         if "goal" in self._selected_param_names:
             size += self.dim_dmp()
         return size
@@ -592,7 +596,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         axs = [fig.add_subplot(n_rows, 5, i + 1) for i in range(n_rows * 5)]
         return axs
 
-    def plot(self, ts, xs, xds, **kwargs):
+    def plot(self, ts=None, xs=None, xds=None, **kwargs):
         """ Plot the output of the DMP.
 
         @param ts: Time steps
@@ -601,8 +605,14 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @return: The axes on which the plots were made.
         """
-        forcing_terms = kwargs.get("forcing_terms", [])
-        fa_outputs = kwargs.get("fa_outputs", [])
+        if ts is None:
+            ts = self._ts_train
+        if xs is None:
+            xs, xds, forcing_terms, fa_outputs = self.analytical_solution(ts)
+        else:
+            forcing_terms = kwargs.get("forcing_terms", [])
+            fa_outputs = kwargs.get("fa_outputs", [])
+
         ext_dims = kwargs.get("ext_dims", [])
         plot_tau = kwargs.get("plot_tau", True)
         has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
@@ -665,7 +675,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return all_handles, axs
 
     def plot_comparison(self, trajectory, **kwargs):
-        ts = trajectory.ts
+        ts = kwargs.get("ts",trajectory.ts)
         xs, xds, _, _ = self.analytical_solution(ts)
         traj_reproduced = self.states_as_trajectory(ts, xs, xds)
 
