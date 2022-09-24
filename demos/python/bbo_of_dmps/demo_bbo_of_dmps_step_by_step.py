@@ -77,7 +77,7 @@ def run_demo(directory, n_dims):
         goal=y_attr,
         goal_time=1.1 * tau,
         viapoint_weight=1.0,
-        acceleration_weight=0.0001,
+        acceleration_weight=0.00005,
         goal_weight=0.0,
     )
 

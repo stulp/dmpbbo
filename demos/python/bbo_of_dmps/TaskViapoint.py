@@ -113,6 +113,9 @@ class TaskViapoint(Task):
         sum_ydd = 0.0
         if self.acceleration_weight > 0.0:
             sum_ydd = np.sum(np.square(ydds))
+            if ydds.ndim > 1:
+                # Divide by number of joints/dimensions to make invariant to dimensionality.
+                sum_ydd /= ydds.shape[1]
 
         l2_norm = 0.0
         if self.regularization_weight > 0.0:
@@ -159,7 +162,7 @@ class TaskViapoint(Task):
                 r = self.viapoint_radius
                 t = self.viapoint_time
                 v = self.viapoint[0]
-                ax.plot([ts, ts], [v + r, v - r], "-k")
+                ax.plot([t, t], [v + r, v - r], "-k")
             t_waypoint, y_waypoint = self.get_waypoint(ts,ys)
             ax.plot([t_waypoint, t_waypoint], [y_waypoint,  self.viapoint], "ko-",
                     label="waypoint",markerfacecolor='none')
