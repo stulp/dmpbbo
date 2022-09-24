@@ -233,6 +233,10 @@ class DynamicalSystem(ABC):
             axs - Axes on which the plot the output
             fig - Figure on which to plot the output
         """
+        if xs is None:
+            # No state trajectories were provided. Generate them.
+            xs, xds = self.analytical_solution(ts)
+
         dim_x = self._dim_x
         dim_y = self._dim_y
 
