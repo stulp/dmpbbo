@@ -134,9 +134,12 @@ class Trajectory:
 
         @return: true if trajectoriy has miscellaneous variables, false otherwise.
         """
-        if self._misc is not None:
-            return True
-        return False
+        if isinstance(self._misc, np.ndarray):
+            # nd_array is special case  of shape N x 0 counts as no having misc
+            return np.prod(self._misc.shape) > 0
+        if isinstance(self._misc, list):
+            return len(self._misc) > 0
+        return self._misc is not None
 
     @property
     def length(self):
