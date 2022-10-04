@@ -240,7 +240,7 @@ class DynamicalSystem(ABC):
         dim_x = self._dim_x
         dim_y = self._dim_y
 
-        if "axs" in kwargs:
+        if "axs" in kwargs and kwargs["axs"] is not None:
             axs = kwargs["axs"]
         else:
             # 2 => plot x and xd, 3 => plot y, yd and ydd=zd/tau
