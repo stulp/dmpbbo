@@ -51,7 +51,7 @@ class SpringDamperSystem(DynamicalSystem):
         if spring_constant == "CRITICALLY_DAMPED":
             self.spring_constant = damping_coefficient * damping_coefficient / 4
         else:
-            self.spring_constant = float(spring_constant)
+            self.spring_constant = spring_constant
 
     @property
     def y_attr(self):
@@ -107,26 +107,41 @@ class SpringDamperSystem(DynamicalSystem):
         xs = np.zeros((n_time_steps, self._dim_x))
         xds = np.zeros((n_time_steps, self._dim_x))
 
+        # Ensure that the following parameters are always arrays
+        # If they are floats, convert them to arrays
+        damping_coefficients = self.damping_coefficient
+        if not isinstance(damping_coefficients, np.ndarray):
+            damping_coefficients = np.full(self._dim_y, self.damping_coefficient)
+        spring_constants = self.spring_constant
+        if not isinstance(spring_constants, np.ndarray):
+            spring_constants = np.full(self._dim_y, self.spring_constant)
+        masses = self.mass
+        if not isinstance(masses, np.ndarray):
+            masses = np.full(self._dim_y, self.mass)
+
         # Closed form solution to 2nd order canonical system
         # This system behaves like a critically damped spring-damper system
         # http://en.wikipedia.org/wiki/Damped_spring-mass_system
-        omega_0 = np.sqrt(self.spring_constant / self.mass) / self._tau  # natural frequency
-        zeta = self.damping_coefficient / (
-            2 * np.sqrt(self.mass * self.spring_constant)
+        omega_0s = np.sqrt(spring_constants / masses) / self._tau  # natural frequency
+        zetas = damping_coefficients / (
+            2 * np.sqrt(masses * self.spring_constant)
         )  # damping ratio
-        if zeta != 1.0:
-            print(f"WARNING: Spring-damper system is not critically damped, zeta={zeta}")
+
+        for i_dim, zeta in enumerate(zetas):
+            if zeta != 1.0:
+                print(f"WARNING: Spring-damper system is not critically damped for dim={i_dim} zeta"
+                      f"={zeta}")
 
         for i_dim in range(self._dim_y):
             y0 = self._x_init[i_dim] - self._y_attr[i_dim]
             yd0 = self._x_init[self._dim_y + i_dim]
 
             A = y0  # noqa
-            B = yd0 + omega_0 * y0  # noqa
+            B = yd0 + omega_0s[i_dim] * y0  # noqa
 
             # Closed form solutions
             # See http://en.wikipedia.org/wiki/Damped_spring-mass_system
-            exp_term = -omega_0 * ts
+            exp_term = -omega_0s[i_dim] * ts
             exp_term = np.exp(exp_term)
 
             Y = 0 * self._dim_y + i_dim  # noqa
@@ -137,10 +152,10 @@ class SpringDamperSystem(DynamicalSystem):
             xs[:, Y] = self._y_attr[i_dim] + ABts * exp_term  # .array()
 
             # Derivative of the above (use product rule: (f*g)' = f'*g + f*g'
-            xds[:, Y] = (B - omega_0 * ABts) * exp_term  # .array()
+            xds[:, Y] = (B - omega_0s[i_dim] * ABts) * exp_term  # .array()
 
             # Derivative of the above (again use product    rule: (f*g)' = f'*g + f*g'
-            ydds = (-omega_0 * (2 * B - omega_0 * ABts)) * exp_term
+            ydds = (-omega_0s[i_dim] * (2 * B - omega_0s[i_dim] * ABts)) * exp_term
 
             # This is how to compute the 'z' terms from the 'y' terms
             xs[:, Z] = xds[:, Y] * self._tau
