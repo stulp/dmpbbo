@@ -103,6 +103,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._scaling_amplitudes = kwargs.get("scaling_amplitudes", None)
 
         self._ts_train = None
+        self._trajectory_train = None
 
         self._selected_param_names = []
 
@@ -130,7 +131,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         dmp = cls(tau, y_init, y_attr, function_approximators, **kwargs)
 
-        dmp.train(trajectory)
+        dmp.train(trajectory, **kwargs)
 
         return dmp
 
@@ -352,7 +353,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         return xs, xds, forcing_terms, fa_outputs
 
-    def train(self, trajectory):
+    def train(self, trajectory, **kwargs):
         """Train a DMP with a trajectory.
 
         @param trajectory: The trajectory with which to train the DMP.
@@ -373,11 +374,15 @@ class Dmp(DynamicalSystem, Parameterizable):
 
             for dd in range(self.dim_dmp()):
                 fa_target = f_target[:, dd]
-                self._function_approximators[dd].train(fa_input_phase, fa_target)
+                self._function_approximators[dd].train(fa_input_phase, fa_target, **kwargs)
 
         # Save the times steps on which the Dmp was trained.
         # This is just a convenience function to be able to call
         # analytical_solution without the "ts" argument.
+        if kwargs.get("save_training_data", False):
+            self._trajectory_train = trajectory
+
+        # Always stored for backwards compatibility.
         self._ts_train = trajectory.ts
 
     def _compute_targets(self, trajectory):
