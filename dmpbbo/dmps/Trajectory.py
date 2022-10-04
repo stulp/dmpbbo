@@ -33,15 +33,22 @@ class Trajectory:
             raise ValueError("ys.shape[0] must have size {n_time_steps}")
         _dt_mean = np.mean(np.diff(ts))
 
+        if ys.ndim == 1:
+            ys = ys.reshape((n_time_steps, 1))
+
         if yds is None:
             yds = diffnc(ys, _dt_mean)
         else:
+            if yds.ndim == 1:
+                yds = yds.reshape((n_time_steps, 1))
             if ys.shape != yds.shape:
                 raise ValueError("yds must have same shape as ys {ys.shape}")
 
         if ydds is None:
             ydds = diffnc(yds, _dt_mean)
         else:
+            if ydds.ndim == 1:
+                ydds = ydds.reshape((n_time_steps, 1))
             if ys.shape != ydds.shape:
                 raise ValueError("ydds must have same shape as ys {ys.shape}")
 
