@@ -8,7 +8,7 @@ To understand DMPs:
 
 1. <a href="functionapproximators.md">Function Approximators</a>
 2. <a href="dynamicalsystems.md">Dynamical Systems</a>
-3. <a href="dmps.md">Dynamical Movement Primitives</a>
+3. <a href="dmp.md">Dynamical Movement Primitives</a>
 
 To understand the optimization of DMPs:
 

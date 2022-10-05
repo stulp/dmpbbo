@@ -97,7 +97,7 @@ The core functionality is in the Python package <a href="dmpbbo/">dmpbbo/</a>. I
   systems, as well as several specific implementations (exponential system, sigmoid system, 
   spring-damper system, etc.)
 
-+ <a href="dmpbbo/dmp">dmpbbo/dmp</a> : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
++ <a href="dmpbbo/dmps">dmpbbo/dmp</a> : implementation of dynamical movement primitives, building on the functionapproximator and dynamicalsystems packages.
 
 + <a href="dmpbbo/bbo">dmpbbo/bbo</a> : implementation of several evolutionary algorithms for the stochastic optimization of black-box cost functions
 
