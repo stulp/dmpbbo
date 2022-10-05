@@ -283,22 +283,25 @@ class FunctionApproximator(Parameterizable):
 
         outputs = self.predict(inputs)
 
+        # If only few data points, plot individual markers, otherwise plot lines
+        line_style = "o" if inputs.shape[0] < 40 else "-"
+
         h_residuals = []
         h_targets = []
         if self.dim_input() == 1:
             if len(targets) > 0:
-                h_targets = ax.plot(inputs, targets, "o")
+                h_targets = ax.plot(inputs, targets, line_style)
                 if plot_residuals:
                     for ii in range(len(inputs)):
                         x = [inputs[ii], inputs[ii]]
                         y = [targets[ii], outputs[ii]]
                         h = ax.plot(x, y, "-")
                         h_residuals.append(h)
-            h_outputs = ax.plot(inputs, outputs, "o")
+            h_outputs = ax.plot(inputs, outputs, line_style)
 
         elif self.dim_input() == 2:
             if len(targets) > 0:
-                h_targets = ax.plot(inputs[:, 0], inputs[:, 1], targets, "o")
+                h_targets = ax.plot(inputs[:, 0], inputs[:, 1], targets, line_style)
                 if plot_residuals:
                     for ii in range(len(inputs)):
                         x0 = [inputs[ii, 0], inputs[ii, 0]]
@@ -306,7 +309,7 @@ class FunctionApproximator(Parameterizable):
                         y = [targets[ii], outputs[ii]]
                         h = ax.plot(x0, x1, y, "-")
                         h_residuals.append(h)
-            h_outputs = ax.plot(inputs[:, 0], inputs[:, 1], outputs, "o")
+            h_outputs = ax.plot(inputs[:, 0], inputs[:, 1], outputs, line_style)
 
         else:
             raise ValueError(f"Cannot plot input data with dim_input() = {self.dim_input()}")
