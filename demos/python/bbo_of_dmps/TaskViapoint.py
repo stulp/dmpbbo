@@ -94,7 +94,6 @@ class TaskViapoint(Task):
 
     def evaluate_rollout_local(self, ts, ys, ydds, sample):
 
-        n_dims = self.viapoint.shape[0]
         n_time_steps = ts.shape[0]
 
         dist_to_viapoint = 0.0
