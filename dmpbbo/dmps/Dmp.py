@@ -651,7 +651,7 @@ class Dmp(DynamicalSystem, Parameterizable):
                 if plot_tau:
                     ax.plot([self._tau, self._tau], ax.get_ylim(), "--k")
 
-        if len(fa_outputs) > 1:
+        if len(fa_outputs) > 1 and len(axs) > 10:
             ax = axs[11 - 1]
             h = ax.plot(ts, fa_outputs)
             all_handles.extend(h)
@@ -661,7 +661,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
 
-        if len(forcing_terms) > 1:
+        if len(forcing_terms) > 1 and len(axs) > 11:
             ax = axs[12 - 1]
             h = ax.plot(ts, forcing_terms)
             all_handles.extend(h)
@@ -671,7 +671,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(x)$")
 
-        if len(ext_dims) > 1:
+        if len(ext_dims) > 1 and len(axs) > 12:
             ax = axs[13 - 1]
             h = ax.plot(ts, ext_dims)
             all_handles.extend(h)
