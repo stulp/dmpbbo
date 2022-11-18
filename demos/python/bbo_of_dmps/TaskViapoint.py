@@ -18,6 +18,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 
 from dmpbbo.bbo_of_dmps.Task import Task
 
@@ -39,6 +40,8 @@ class TaskViapoint(Task):
         if self.goal is not None:
             if self.goal.shape != self.viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
+    def n_dims(self):
+        return self.viapoint.shape[0]
 
     def get_cost_labels(self):
         """Labels for the different cost components.
@@ -85,12 +88,35 @@ class TaskViapoint(Task):
         @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
-        n_dims = self.viapoint.shape[0]
-        ts = cost_vars[:, 0]
-        ys = cost_vars[:, 1 : 1 + n_dims]
-        ydds = cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
+        ts = self._extract_cost_vars(cost_vars, 't')
+        ys = self._extract_cost_vars(cost_vars, 'y')
+        ydds = self._extract_cost_vars(cost_vars, 'ydd')
         return self.evaluate_rollout_local(ts, ys, ydds, sample)
 
+    def _extract_cost_vars(self, cost_vars, name):
+        n_dims = self.n_dims()
+
+        if isinstance(cost_vars, pd.DataFrame):
+            if name == 't':
+                return cost_vars['t'].values
+            elif name in ['y', 'yd', 'ydd']:
+                return cost_vars[[f'{name}{d}' for d in range(n_dims)]].values
+            else:
+                raise Exception(f'Unknown cost_var name "{name}"')
+
+        elif isinstance(cost_vars, np.ndarray):
+            if name == 't':
+                return cost_vars[:, 0]
+            elif name == 'y':
+                return cost_vars[:, 1: 1 + n_dims]
+            elif name == 'yd':
+                return cost_vars[:, 1 + n_dims * 1: 1 + n_dims * 2]
+            elif name == 'ydd':
+                return cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
+            else:
+                raise Exception(f'Unknown cost_var name "{name}"')
+        else:
+            raise Exception('cost_vars must be ndarray or DataFrame')
 
     def evaluate_rollout_local(self, ts, ys, ydds, sample):
 
@@ -149,8 +175,10 @@ class TaskViapoint(Task):
             ax = plt.axes()
 
         n_dims = self.viapoint.shape[0]
-        ts = cost_vars[:, 0]
-        ys = cost_vars[:, 1 : n_dims + 1]
+
+        ts = self._extract_cost_vars(cost_vars, 't')
+        ys = self._extract_cost_vars(cost_vars, 'y')
+
         if n_dims == 1:
             line_handles = ax.plot(ts, ys, linewidth=0.5)
             ax.plot(ts[0], ys[0], "bo", label="start")
@@ -162,7 +190,7 @@ class TaskViapoint(Task):
                 t = self.viapoint_time
                 v = self.viapoint[0]
                 ax.plot([t, t], [v + r, v - r], "-k")
-            t_waypoint, y_waypoint = self.get_waypoint(ts,ys)
+            t_waypoint, y_waypoint = self.get_waypoint(ts, ys)
             ax.plot([t_waypoint, t_waypoint], [y_waypoint,  self.viapoint], "ko-",
                     label="waypoint",markerfacecolor='none')
             ax.set_xlabel("time (s)")
