@@ -122,6 +122,13 @@ class Trajectory:
         """
         return self._ydds
 
+    def yddds(self):
+        """ Get the jerks over time.
+
+        @return: Jerks over time.
+        """
+        return diffnc(self._ydds, self._dt_mean)
+
     @property
     def misc(self):
         """ Get the miscellaneous variables over time.
