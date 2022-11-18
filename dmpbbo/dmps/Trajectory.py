@@ -19,6 +19,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.signal import butter, filtfilt
 
 
@@ -424,6 +425,22 @@ class Trajectory:
         if self._misc is not None:
             as_matrix = np.column_stack((as_matrix, self._misc))
         return as_matrix
+
+    def as_dataframe(self):
+        """ Return the trajectory as a dataframe.
+
+        @return: A dataframe representation of the trajectory.
+        """
+
+        columns = ['t']
+        columns.extend([f'y{d}' for d in range(self.dim)])
+        columns.extend([f'yd{d}' for d in range(self.dim)])
+        columns.extend([f'ydd{d}' for d in range(self.dim)])
+        columns.extend([f'misc{d}' for d in range(self.dim_misc)])
+
+        data = self.as_matrix()
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
 
     def savetxt(self, filename):
         """ Save a matrix representation of the trajectory to an ASCII file.
