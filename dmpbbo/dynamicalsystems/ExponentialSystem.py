@@ -36,7 +36,8 @@ class ExponentialSystem(DynamicalSystem):
         """
         super().__init__(1, tau, x_init)
         self._x_attr = np.atleast_1d(x_attr)
-        self.alpha = alpha
+        self.alpha = np.asarray(alpha) if isinstance(alpha, list) else alpha
+
 
     @property
     def y_attr(self):
