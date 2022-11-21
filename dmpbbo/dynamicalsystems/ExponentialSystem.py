@@ -35,7 +35,7 @@ class ExponentialSystem(DynamicalSystem):
         @param alpha: Decay constant
         """
         super().__init__(1, tau, x_init)
-        self._x_attr = x_attr
+        self._x_attr = np.atleast_1d(x_attr)
         self.alpha = alpha
 
     @property
