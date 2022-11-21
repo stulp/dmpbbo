@@ -82,6 +82,7 @@ class ExponentialSystem(DynamicalSystem):
         @param x: current state
         @return: xd - rate of change in state
         """
+
         xd = self.alpha * (self._x_attr - x) / self._tau
         return xd
 
@@ -92,20 +93,17 @@ class ExponentialSystem(DynamicalSystem):
          @param ts: A vector of times for which to compute the analytical solutions
          @return: (xs, xds) - Sequence of states and their rates of change.
         """
-        n_ts = ts.size
+        n_time_steps = ts.size
+        xs = np.zeros((n_time_steps, self._dim_x))
+        xds = np.zeros((n_time_steps, self._dim_x))
 
-        exp_term = np.exp(-self.alpha * ts / self._tau)
-        pos_scale = exp_term
-        vel_scale = -(self.alpha / self._tau) * exp_term
+        for i_dim in range(self._dim_y):
+            cur_alpha = self.alpha[i_dim] if isinstance(self.alpha, np.ndarray) else self.alpha
 
-        val_range = self._x_init - self._x_attr
-        val_range_repeat = np.repeat(np.atleast_2d(val_range), n_ts, axis=0)
-        pos_scale_repeat = np.repeat(np.atleast_2d(pos_scale), self._dim_x, axis=0)
-        xs = np.multiply(val_range_repeat, pos_scale_repeat.T)
+            exp_term = np.exp(-cur_alpha * ts / self._tau)
+            val_range = self._x_init[i_dim] - self._x_attr[i_dim]
 
-        xs = xs + np.repeat(np.atleast_2d(self._x_attr), n_ts, axis=0)
-
-        vel_scale_repeat = np.repeat(np.atleast_2d(vel_scale), self._dim_x, axis=0)
-        xds = np.multiply(val_range_repeat, vel_scale_repeat.T)
+            xs[:, i_dim] = val_range * exp_term + self._x_attr[i_dim]
+            xds[:, i_dim] = val_range * -(cur_alpha / self._tau) * exp_term
 
         return xs, xds
