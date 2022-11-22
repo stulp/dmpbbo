@@ -78,9 +78,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             alpha = kwargs.get("alpha_spring_damper", 20.0)
             self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
-        damp_init = 0.1*self._spring_system.damping_coefficient
-        damp_goal = self._spring_system.damping_coefficient
-        damping_system_default = ExponentialSystem(tau, damp_init, damp_goal, 4)
+        # damp_init = 0.1*self._spring_system.damping_coefficient
+        # damp_goal = self._spring_system.damping_coefficient
+        # damping_system_default = ExponentialSystem(tau, damp_init, damp_goal, 4)
+        damping_system_default = None
 
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
