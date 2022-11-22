@@ -78,6 +78,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             alpha = kwargs.get("alpha_spring_damper", 20.0)
             self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
+        damp_init = 0.1*self._spring_system.damping_coefficient
+        damp_goal = self._spring_system.damping_coefficient
+        damping_system_default = ExponentialSystem(tau, damp_init, damp_goal, 4)
+
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
         if dmp_type == "IJSPEERT_2002_MOVEMENT":
@@ -94,12 +98,11 @@ class Dmp(DynamicalSystem, Parameterizable):
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
 
-
         # Check if subsystems are specified in kwargs. If not, use default.
         self._phase_system = kwargs.get("phase_system", phase_system_default)
         self._gating_system = kwargs.get("gating_system", gating_system_default)
         self._goal_system = kwargs.get("goal_system", goal_system_default)
-        self._damping_system = kwargs.get("damping_system", None)
+        self._damping_system = kwargs.get("damping_system", damping_system_default)
 
         # Initialize variables related to scaling of the forcing term
         self._forcing_term_scaling = kwargs.get("forcing_term_scaling", "NO_SCALING")
