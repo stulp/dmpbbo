@@ -38,7 +38,11 @@ class SigmoidSystem(DynamicalSystem):
         super().__init__(1, tau, x_init)
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
         self._max_rate = max_rate
+        if isinstance(self._max_rate, list):
+            self._max_rate = np.asarray(self._max_rate)
         self._inflection_ratio = inflection_ratio
+        if isinstance(self._inflection_ratio, list):
+            self._inflection_ratio = np.asarray(self._inflection_ratio)
         self._Ks_cached = None
 
     @DynamicalSystem.tau.setter
@@ -92,16 +96,15 @@ class SigmoidSystem(DynamicalSystem):
          @return: (xs, xds) - Sequence of states and their rates of change.
         """
 
-        # Auxiliary variables to improve legibility
-        r = self._max_rate
-        exp_rt = np.exp(-r * ts)
-
         xs = np.empty([ts.size, self._dim_x])
         xds = np.empty([ts.size, self._dim_x])
 
         Ks = self._get_ks()  # noqa
 
         for dd in range(self._dim_x):
+            r = self._max_rate[dd] if isinstance(self._max_rate, np.ndarray) else self._max_rate
+            exp_rt = np.exp(-r * ts)
+
             # Auxiliary variables to improve legibility
             K = Ks[dd]  # noqa
             b = (K / self._x_init[dd]) - 1
@@ -117,8 +120,6 @@ class SigmoidSystem(DynamicalSystem):
 
         # Variable rename so that it is the same as on the Wikipedia page
         N_0s = self.x_init  # noqa
-        r = self._max_rate
-        t_infl = self.tau * self._inflection_ratio
 
         # The idea here is that the initial state (called N_0s above), max_rate (r above) and the
         # inflection_ratio are set by the user.
@@ -136,6 +137,9 @@ class SigmoidSystem(DynamicalSystem):
         #                                       K = N_0*(1+(1/exp(-r*t_infl)))
         self._Ks_cached = np.empty(N_0s.shape)
         for dd in range(len(N_0s)):
+            r = self._max_rate[dd] if isinstance(self._max_rate, np.ndarray) else self._max_rate
+            infl_ratio = self._inflection_ratio[dd] if isinstance(self._inflection_ratio, np.ndarray) else self._inflection_ratio
+            t_infl = self.tau * infl_ratio
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
         # If Ks is too close to N_0===initial_state, then the differential equation will always

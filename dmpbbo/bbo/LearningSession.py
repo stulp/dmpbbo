@@ -28,6 +28,7 @@ from pathlib import Path
 import jsonpickle
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from pylab import mean
 
 import dmpbbo.json_for_cpp as jc
@@ -348,7 +349,7 @@ class LearningSession:
             return True
         if self._root_dir is not None:
             abs_basename = Path(self._root_dir, basename)
-            for extension in ["json", "txt"]:
+            for extension in ["json", "txt", 'csv']:
                 if os.path.isfile(f"{abs_basename}.{extension}"):
                     return True
         return False
@@ -376,6 +377,9 @@ class LearningSession:
             if os.path.isfile(f"{abs_basename}.json"):
                 with open(f"{abs_basename}.json", "r") as f:
                     obj = jsonpickle.decode(f.read())
+
+            elif os.path.isfile(f"{abs_basename}.csv"):
+                obj = pd.read_csv(f'{abs_basename}.csv')
 
             elif os.path.isfile(f"{abs_basename}.txt"):
                 obj = np.loadtxt(f"{abs_basename}.txt")
@@ -406,7 +410,7 @@ class LearningSession:
 
         @param obj: The object to save.
         @param directory: The directory to save it to.
-        @param basename: The basename of the file (".txt" or ".json" will be added to it)
+        @param basename: The basename of the file (".txt"/".csv"/".json" will be added to it)
         @return:
         """
         abs_basename = Path(directory, basename)
@@ -417,6 +421,9 @@ class LearningSession:
         if isinstance(obj, (np.ndarray, list, int)):
             filename = f"{abs_basename}.txt"
             np.savetxt(filename, np.atleast_1d(obj))  # noqa
+        elif isinstance(obj, pd.DataFrame):
+            filename = f"{abs_basename}.csv"
+            obj.to_csv(filename, index=False)
         else:
             filename = f"{abs_basename}.json"
             jc.savejson(filename, obj)

@@ -202,6 +202,25 @@ class DynamicalSystem(ABC):
         xd_updated = self.differential_equation(x_updated)
         return x_updated, xd_updated
 
+    def integrate(self, ts, **kwargs):
+        int_method = kwargs.get("integration_method", "Runge-Kutta")
+
+        n_time_steps = len(ts)
+        xs = np.empty((n_time_steps, self.dim_x))
+        xds = np.empty((n_time_steps, self.dim_x))
+
+        xs[0, :], xds[0, :] = self.integrate_start()
+        if int_method == "Runge-Kutta":
+            for ii in range(1, n_time_steps):
+                dt = ts[ii]-ts[ii-1]
+                xs[ii, :], xds[ii, :] = self.integrate_step_runge_kutta(dt, xs[ii - 1, :])
+        else:
+            for ii in range(1, n_time_steps):
+                dt = ts[ii]-ts[ii-1]
+                xs[ii, :], xds[ii, :] = self.integrate_step_euler(dt, xs[ii - 1, :])
+
+        return xs, xds
+
     def plot(self, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.
 
@@ -214,10 +233,14 @@ class DynamicalSystem(ABC):
             axs - Axes on which the plot the output
             fig - Figure on which to plot the output
         """
+        if xs is None:
+            # No state trajectories were provided. Generate them.
+            xs, xds = self.analytical_solution(ts)
+
         dim_x = self._dim_x
         dim_y = self._dim_y
 
-        if "axs" in kwargs:
+        if "axs" in kwargs and kwargs["axs"] is not None:
             axs = kwargs["axs"]
         else:
             # 2 => plot x and xd, 3 => plot y, yd and ydd=zd/tau

@@ -36,6 +36,8 @@ class FunctionApproximator(Parameterizable):
         self._model_params = {name: None for name in model_param_names}
         self._dim_input = None
         self._selected_param_names = None
+        self._inputs_training = None
+        self._targets_training = None
 
     def train(self, inputs, targets, **kwargs):
         """ Train the function approximator with data.
@@ -48,6 +50,9 @@ class FunctionApproximator(Parameterizable):
         inputs = inputs.reshape(inputs.shape[0], -1)
         self._model_params = self._train(inputs, targets, self._meta_params, **kwargs)
         self._dim_input = inputs.shape[1]
+        if kwargs.get("save_training_data", False):
+            self._inputs_training = inputs
+            self._targets_training = targets
         return self._model_params
 
     def predict(self, inputs):
@@ -110,6 +115,9 @@ class FunctionApproximator(Parameterizable):
         self._selected_param_names = names
 
     def get_param_vector(self):
+        if self._selected_param_names is None:
+            return np.array(0)
+
         """Get a vector containing the values of the selected parameters."""
         if not self.is_trained():
             raise ValueError("FunctionApproximator is not trained.")
@@ -140,6 +148,8 @@ class FunctionApproximator(Parameterizable):
 
     def get_param_vector_size(self):
         """Get the size of the vector containing the values of the selected parameters."""
+        if self._selected_param_names is None:
+            return 0
         size = 0
         for label in self._selected_param_names:
             if label in self._model_params:
@@ -273,22 +283,25 @@ class FunctionApproximator(Parameterizable):
 
         outputs = self.predict(inputs)
 
+        # If only few data points, plot individual markers, otherwise plot lines
+        line_style = "o" if inputs.shape[0] < 40 else "-"
+
         h_residuals = []
         h_targets = []
         if self.dim_input() == 1:
             if len(targets) > 0:
-                h_targets = ax.plot(inputs, targets, "o")
+                h_targets = ax.plot(inputs, targets, line_style)
                 if plot_residuals:
                     for ii in range(len(inputs)):
                         x = [inputs[ii], inputs[ii]]
                         y = [targets[ii], outputs[ii]]
                         h = ax.plot(x, y, "-")
                         h_residuals.append(h)
-            h_outputs = ax.plot(inputs, outputs, "o")
+            h_outputs = ax.plot(inputs, outputs, line_style)
 
         elif self.dim_input() == 2:
             if len(targets) > 0:
-                h_targets = ax.plot(inputs[:, 0], inputs[:, 1], targets, "o")
+                h_targets = ax.plot(inputs[:, 0], inputs[:, 1], targets, line_style)
                 if plot_residuals:
                     for ii in range(len(inputs)):
                         x0 = [inputs[ii, 0], inputs[ii, 0]]
@@ -296,7 +309,7 @@ class FunctionApproximator(Parameterizable):
                         y = [targets[ii], outputs[ii]]
                         h = ax.plot(x0, x1, y, "-")
                         h_residuals.append(h)
-            h_outputs = ax.plot(inputs[:, 0], inputs[:, 1], outputs, "o")
+            h_outputs = ax.plot(inputs[:, 0], inputs[:, 1], outputs, line_style)
 
         else:
             raise ValueError(f"Cannot plot input data with dim_input() = {self.dim_input()}")
@@ -309,20 +322,29 @@ class FunctionApproximator(Parameterizable):
 
         return h_outputs, ax
 
-    def plot(self, inputs, **kwargs):
+    def plot(self, inputs=None, **kwargs):
         """ Plot the predictions of a function approximator for given inputs.
 
         @param inputs: The input samples (n_samples X n_input_dims )
         @return: line handles and axis
         """
+        if inputs is None:
+            if self._inputs_training is None:
+                print("WARNING: no inputs provided, and inputs for training are not available. "
+                      "Not plotting")
+                return None, None
+            else:
+                # Plot for the inputs that were used for training
+                inputs = self._inputs_training
+
         ax = kwargs.get("ax") or self._get_axis()
-        targets = kwargs.get("targets", [])
+        targets = kwargs.get("targets", self._targets_training)
         plot_residuals = kwargs.get("plot_residuals", True)
         plot_model_parameters = kwargs.get("plot_model_parameters", False)
 
         inputs_min = np.min(inputs, axis=0)
         inputs_max = np.max(inputs, axis=0)
+        self.plot_predictions(inputs, targets=targets, ax=ax, plot_residuals=plot_residuals)
         if plot_model_parameters:
             self.plot_model_parameters(inputs_min, inputs_max, ax=ax)
-        self.plot_predictions(inputs, targets=targets, ax=ax, plot_residuals=plot_residuals)
         return self.plot_predictions_grid(inputs_min, inputs_max, ax=ax)

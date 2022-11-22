@@ -28,10 +28,11 @@ class TaskSolverDmp(TaskSolver):
 
     """
 
-    def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor):
+    def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor, return_dataframe=False):
         self._dmp = copy.deepcopy(dmp)
         self._integrate_time = dmp.tau * integrate_dmp_beyond_tau_factor
         self._n_time_steps = int(np.floor(self._integrate_time / dt)) + 1
+        self._return_dataframe = return_dataframe
 
     def perform_rollout_dmp(self, dmp):
         """ Perform one rollout for a DMP.
@@ -43,8 +44,11 @@ class TaskSolverDmp(TaskSolver):
         xs, xds, forcing_terms, fa_outputs = dmp.analytical_solution(ts)
         traj = dmp.states_as_trajectory(ts, xs, xds)
         # traj.misc = forcing_terms
-        cost_vars = traj.as_matrix()
-        return cost_vars
+
+        if self._return_dataframe:
+            return traj.as_dataframe()
+        else:
+            return traj.as_matrix()
 
     def perform_rollout(self, sample, **kwargs):
         """ Perform rollouts, that is, given a set of samples, determine all the variables that

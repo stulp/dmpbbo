@@ -19,6 +19,7 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from scipy.signal import butter, filtfilt
 
 
@@ -33,15 +34,22 @@ class Trajectory:
             raise ValueError("ys.shape[0] must have size {n_time_steps}")
         _dt_mean = np.mean(np.diff(ts))
 
+        if ys.ndim == 1:
+            ys = ys.reshape((n_time_steps, 1))
+
         if yds is None:
             yds = diffnc(ys, _dt_mean)
         else:
+            if yds.ndim == 1:
+                yds = yds.reshape((n_time_steps, 1))
             if ys.shape != yds.shape:
                 raise ValueError("yds must have same shape as ys {ys.shape}")
 
         if ydds is None:
             ydds = diffnc(yds, _dt_mean)
         else:
+            if ydds.ndim == 1:
+                ydds = ydds.reshape((n_time_steps, 1))
             if ys.shape != ydds.shape:
                 raise ValueError("ydds must have same shape as ys {ys.shape}")
 
@@ -115,6 +123,13 @@ class Trajectory:
         """
         return self._ydds
 
+    def yddds(self):
+        """ Get the jerks over time.
+
+        @return: Jerks over time.
+        """
+        return diffnc(self._ydds, self._dt_mean)
+
     @property
     def misc(self):
         """ Get the miscellaneous variables over time.
@@ -134,9 +149,11 @@ class Trajectory:
 
         @return: true if trajectoriy has miscellaneous variables, false otherwise.
         """
-        if self._misc:
-            return True
-        return False
+        if not isinstance(self._misc, np.ndarray):
+            return False
+
+        # shape of N x 0 counts as not having misc
+        return np.prod(self._misc.shape) > 0
 
     @property
     def length(self):
@@ -408,6 +425,22 @@ class Trajectory:
         if self._misc is not None:
             as_matrix = np.column_stack((as_matrix, self._misc))
         return as_matrix
+
+    def as_dataframe(self):
+        """ Return the trajectory as a dataframe.
+
+        @return: A dataframe representation of the trajectory.
+        """
+
+        columns = ['t']
+        columns.extend([f'y{d}' for d in range(self.dim)])
+        columns.extend([f'yd{d}' for d in range(self.dim)])
+        columns.extend([f'ydd{d}' for d in range(self.dim)])
+        columns.extend([f'misc{d}' for d in range(self.dim_misc)])
+
+        data = self.as_matrix()
+        df = pd.DataFrame(data=data, columns=columns)
+        return df
 
     def savetxt(self, filename):
         """ Save a matrix representation of the trajectory to an ASCII file.

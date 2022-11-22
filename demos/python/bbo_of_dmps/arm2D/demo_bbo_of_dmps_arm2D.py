@@ -15,14 +15,16 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """Script for bbo_of_dmps demo."""
-import argparse
+
+
 import sys
-import tempfile
-from pathlib import Path
 
 import numpy as np
 from matplotlib import pyplot as plt
 
+from demos.python.bbo_of_dmps.TaskViapoint import TaskViapoint
+from demos.python.bbo_of_dmps.arm2D.TaskSolverDmpArm2D import TaskSolverDmpArm2D
+from demos.python.bbo_of_dmps.arm2D.TaskViapointArm2D import TaskViapointArm2D
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
@@ -30,55 +32,65 @@ from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
-from TaskViapoint import TaskViapoint
 
 
-def run_demo(directory, traj):
-    """ Run one demo for bbo_of_dmps (with single updates)
+def main(directory=None):
+    """ Run one demo for bbo_of_dmps.
 
     @param directory: Directory to save results to
-    @param traj: Initial trajectory
+    @param n_dims: Number of dimensions of the task (i.e. the viapoint)
     """
 
-    n_dims = traj.dim
-    n_basis = 10
-    h = 0.9  # intersection_height
-    function_apps = [FunctionApproximatorRBFN(n_basis, h) for _ in range(n_dims)]
+    n_dofs = 7 # Number of joints
+    n_dims = 2 # End-effector space dimensionality (must be 2)
 
-    dmp = Dmp.from_traj(traj, function_apps)
+    # Prepare a minjerk trajectory in joint angle space
+    duration = 0.8
+    angles_init = np.full(n_dofs, 0.0)
+    angles_goal = np.full(n_dofs, np.pi/n_dofs)
+    angles_goal[0] *= 0.5
+    ts = np.linspace(0, duration, 51)
+    angles_min_jerk = Trajectory.from_min_jerk(ts, angles_init, angles_goal)
+    link_lengths = np.full(n_dofs, 1.0 / n_dofs)
+
+    # Train the DMP with the minjerk trajectory
+    intersection_height = 0.9
+    n_basis = 5
+    function_apps = [FunctionApproximatorRBFN(n_basis, intersection_height) for _ in range(n_dofs)]
+    dmp = Dmp.from_traj(angles_min_jerk, function_apps)
     dmp.set_selected_param_names("weights")
-    # dmp.set_selected_param_names(['goal','weights'])
-
-    # Make the task
-    viapoint = 3 * np.ones(n_dims)
-    viapoint_time = (
-        0.3 if n_dims == 1 else None
-    )  # None means: Do not pass through viapoint at a specific time,
-    # but rather pass through it at any time.
-
-    task = TaskViapoint(
-        viapoint,
-        viapoint_time=viapoint_time,
-        viapoint_radius=0.1,
-        goal=dmp.y_attr,
-        goal_time=1.1 * dmp.tau,
-        viapoint_weight=1.0,
-        acceleration_weight=0.00005,
-        goal_weight=0.0,
-    )
 
     # Make task solver, based on a Dmp
     dt = 0.01
     integrate_dmp_beyond_tau_factor = 1.5
-    task_solver = TaskSolverDmp(dmp, dt, integrate_dmp_beyond_tau_factor)
+    task_solver = TaskSolverDmpArm2D(dmp, 0.01, integrate_dmp_beyond_tau_factor)
+
+
+    # Make the task
+    viapoint = np.full(n_dims, 0.5)
+
+    task = TaskViapointArm2D(
+        n_dofs,
+        viapoint,
+        plot_arm=True,
+#        viapoint_time=viapoint_time,
+#        viapoint_radius=0.1,
+#        goal=y_attr,
+#        goal_time=1.1 * tau,
+        viapoint_weight=1.0,
+        acceleration_weight=0.0001,
+#        goal_weight=0.0,
+    )
+
 
     n_search = dmp.get_param_vector_size()
 
-    mean_init = np.full(n_search, 0.0)
-    covar_init = 1000.0 * np.eye(n_search)
+    mean_init = dmp.get_param_vector()
+    #mean_init = np.full(n_search, 0.0)
+    covar_init = 100.0 * np.eye(n_search)
     distribution = DistributionGaussian(mean_init, covar_init)
 
-    covar_update = "cma"
+    covar_update = "decay"
     if covar_update == "none":
         updater = UpdaterMean(eliteness=10, weighting_method="PI-BB")
     elif covar_update == "decay":
@@ -94,39 +106,13 @@ def run_demo(directory, traj):
         )
 
     n_samples_per_update = 10
-    n_updates = 40
+    n_updates = 30
 
     session = run_optimization_task(
         task, task_solver, distribution, updater, n_updates, n_samples_per_update, directory
     )
     fig = session.plot()
     fig.canvas.set_window_title(f"Optimization with covar_update={covar_update}")
-
-
-def main():
-    """ Main function of the script. """
-    default_dir = Path(tempfile.gettempdir(), "dmpbbo", "demo_bbo_of_dmps")
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--dir", type=str, help="dir to write results to", default=default_dir)
-    parser.add_argument("--traj", type=str, help="optional init trajectory file")
-    args = parser.parse_args()
-
-    if args.traj:
-        traj = Trajectory.loadtxt(args.traj)
-        # traj.plot # Check if trajectory loaded correctly.
-        run_demo(args.dir, traj)
-
-    else:
-        # Some DMP parameters
-        for n_dims in [1, 2]:
-            tau = 0.5
-            dt = 0.005
-            ts = np.linspace(0.0, tau, int(tau/dt)+1)
-            y_init = np.linspace(1.8, 2.0, n_dims)
-            y_attr = np.linspace(4.0, 3.0, n_dims)
-            traj = Trajectory.from_min_jerk(ts, y_init, y_attr)
-            run_demo(args.dir, traj)
 
     plt.show()
 

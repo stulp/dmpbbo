@@ -19,6 +19,7 @@
 import inspect
 from pathlib import Path
 
+import numpy as np
 from matplotlib import pyplot as plt
 
 import dmpbbo.json_for_cpp as jc
@@ -99,17 +100,24 @@ class LearningSessionTask(LearningSession):
             cur_color = [0.3 - 0.3 * c, 0.0 + 1.0 * c, 0.0 - 0.0 * c]
             plt.setp(handle, color=cur_color, linewidth=2)
 
-    def plot_rollouts(self, ax=None):
+    def plot_rollouts(self, ax=None, max_n_updates=20):
         """ Plot all rollouts during the learning session
 
         @param ax:  Axis to plot on (default: None, then a new axis is initialized)
+        @param max_n_updates:  Max number of updates (lines) to plot
         @return: the line handles and the axis handle
         """
         if not ax:
             ax = plt.axes()
         all_lines = []
         n_updates = self.get_n_updates()
-        for i_update in range(n_updates):
+
+        if n_updates > max_n_updates:
+            updates_list = [int(np.round(i)) for i in np.linspace(0, n_updates, max_n_updates)]
+        else:
+            updates_list = list(range(n_updates+1))
+
+        for i_update in updates_list:
             lines, _ = self.plot_rollouts_update(
                 i_update, ax=ax, plot_eval=True, plot_samples=False
             )
