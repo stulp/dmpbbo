@@ -455,7 +455,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         fa_inputs_phase = xs_phase
 
         # Get parameters from the spring-dampers system to compute inverse
-        damping_coefficient = self._spring_system.damping_coefficient
+        print(self._damping_system)
+        if self._damping_system:
+            damping_coefficient = xs_ana[:, self.DAMPING]
+        else:
+            damping_coefficient = self._spring_system.damping_coefficient
+
         spring_constant = self._spring_system.spring_constant
         mass = self._spring_system.mass
 
