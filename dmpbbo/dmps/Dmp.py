@@ -272,11 +272,12 @@ class Dmp(DynamicalSystem, Parameterizable):
                     fa_output[:, i_fa] = self._function_approximators[i_fa].predict(phase_state)
         return fa_output
 
-    def analytical_solution(self, ts=None):
+    def analytical_solution(self, ts=None, suppress_forcing_term=False):
         """Return analytical solution of the system at certain times
 
         @param ts: A vector of times for which to compute the analytical solutions.
             If None is passed, the ts vector from the trajectory used to train the DMP is used.
+        @param suppress_forcing_term: Set the forcing term to zero
         @return: xs, xds: Sequence of state vectors and their rates of change. T x D
         matrix, where T is the number of times (the length of 'ts'), and D the size of the state
         (i.e. dim_x())
@@ -301,6 +302,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Compute the output of the function approximator
         fa_outputs = self._compute_func_approx_predictions(xs_phase)
+        if suppress_forcing_term:
+            fa_outputs.fill(0.0)
 
         # Gate the output to get the forcing term
         forcing_terms = fa_outputs * xs_gating
@@ -667,6 +670,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         ext_dims = kwargs.get("ext_dims", [])
         plot_tau = kwargs.get("plot_tau", True)
         has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
+        plot_no_forcing_term_also = kwargs.get("plot_no_forcing_term_also", False)
 
         axs = kwargs.get("axs") or Dmp.get_dmp_axes(has_fa_output)
 
@@ -687,6 +691,18 @@ class Dmp(DynamicalSystem, Parameterizable):
             axs_cur = system[2]
             if system[3]:
                 h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+
+                if plot_no_forcing_term_also and system[0] == 'spring-damper':
+                    # Integrate without forcing term and plot it
+                    suppress_forcing_term = True
+                    xs_no, xds_no, _, _ = self.analytical_solution(ts, suppress_forcing_term)
+                    xs_cur_no = xs_no[:, system[1]]
+                    xds_cur_no = xds_no[:, system[1]]
+                    h_no, _ = system[3].plot(ts, xs_cur_no, xds_cur_no, axs=axs_cur)
+                    for i in range(len(h)):
+                        h_no[i].update_from(h[i]) # Copy line style
+                    plt.setp(h_no, linestyle="--", linewidth=1) # Make smaller and dashed
+
             else:
                 # No dynamical system available. Just plot x values.
                 h = axs_cur[0].plot(ts, xs_cur)
