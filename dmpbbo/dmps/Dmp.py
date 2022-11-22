@@ -609,7 +609,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             for fa in self._function_approximators:
                 fa.set_selected_param_names(names)
 
-    def set_param_dyn_sys(self, params):
+    def set_params_dyn_sys(self, params):
         for system_name in ['spring_system', 'goal_system', 'damping_system']:
             attr_name = '_'+system_name
             if system_name in params:
