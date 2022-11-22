@@ -177,10 +177,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._spring_system.y_attr = x[self.GOAL]
 
         # Set the damping coefficient
-        if self._damping_system is not None:
+        if self._damping_system is None:
+            # No damping system, simply set to default
+            x[self.DAMPING] = self._spring_system.damping_coefficient
+            xd[self.DAMPING] = 0.0
+        else:
             x[self.DAMPING], xd[self.DAMPING] = self._damping_system.integrate_start()
             self._spring_system.damping_coefficient = x[self.DAMPING]
-
 
         # Start integrating all further subsystems
         (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrate_start()
@@ -323,7 +326,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Get damping coefficient
         if self._damping_system is None:
             # If there is no dynamical system for the delayed goal, damping is constant
-            xs_damping = np.tile(self._spring_system.spring_constant, (n_time_steps, 1))
+            xs_damping = np.tile(self._spring_system.damping_coefficient, (n_time_steps, 1))
             # with zero change
             xds_damping = np.zeros(xs_damping.shape)
         else:
@@ -669,6 +672,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             ("phase", range(3 * d, 3 * d + 1), axs[0:2], self._phase_system),
             ("gating", range(3 * d + 1, 3 * d + 2), axs[5:7], self._gating_system),
             ("goal", range(2 * d, 3 * d), axs[2:4], self._goal_system),
+            ("damping", range(3 * d + 2, 4 * d + 2), [axs[4]], self._damping_system),
             ("spring-damper", range(0 * d, 2 * d), axs[7:10], self._spring_system),
         ]
         # system_varname = ["x", "v", "y^{g_d}", "y"]
