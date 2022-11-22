@@ -56,6 +56,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             - phase_system: Dynamical system to compute the phase
             - gating_system: Dynamical system to compute the gating term
             - goal_system: Dynamical system to compute delayed goal (default: None)
+            - damping_system: Dynamical system to compute damping (default: None)
             - forcing_term_scaling: Scaling method for the forcing terms, i.e. "NO_SCALING",
             "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" (default: "NO_SCALING")
             - scaling_amplitudes: Amplitudes for each dimension for
@@ -64,6 +65,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
 
         dim_dmp = 3 * y_init.size + 2
+        dim_dmp += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_dmp)
 
         self._y_attr = y_attr
@@ -97,6 +99,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._phase_system = kwargs.get("phase_system", phase_system_default)
         self._gating_system = kwargs.get("gating_system", gating_system_default)
         self._goal_system = kwargs.get("goal_system", goal_system_default)
+        self._damping_system = kwargs.get("damping_system", None)
 
         # Initialize variables related to scaling of the forcing term
         self._forcing_term_scaling = kwargs.get("forcing_term_scaling", "NO_SCALING")
@@ -119,6 +122,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         self.PHASE =    np.arange(offset, offset + 1)
         offset += 1
         self.GATING =    np.arange(offset, offset + 1)
+        offset += 1
+        self.DAMPING =   np.arange(offset, offset + 1 * d)
 
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
@@ -171,6 +176,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Set the attractor state of the spring system
         self._spring_system.y_attr = x[self.GOAL]
 
+        # Set the damping coefficient
+        if self._damping_system is not None:
+            x[self.DAMPING], xd[self.DAMPING] = self._damping_system.integrate_start()
+            self._spring_system.damping_coefficient = x[self.DAMPING]
+
+
         # Start integrating all further subsystems
         (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrate_start()
         (x[self.PHASE], xd[self.PHASE]) = self._phase_system.integrate_start()
@@ -204,6 +215,12 @@ class Dmp(DynamicalSystem, Parameterizable):
             xd[self.GOAL] = self._goal_system.differential_equation(x_goal)
             # The goal state is the attractor state of the spring-damper system
             self._spring_system.y_attr = x_goal
+
+        if self._damping_system is None:
+            xd[self.DAMPING] = np.zeros(self._dim_y)
+        else:
+            self._spring_system.damping_coefficient = x[self.DAMPING]
+            xd[self.DAMPING] = self._damping_system.differential_equation(x[self.DAMPING])
 
         # Integrate spring damper system
         # Forcing term is added to spring_state later
@@ -292,7 +309,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             _scaling_amplitudes_rep = np.tile(self._scaling_amplitudes, (n_time_steps, 1))
             forcing_terms *= _scaling_amplitudes_rep
 
-        # Get current delayed goal
+        # Get delayed goal
         if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state
@@ -303,6 +320,16 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Integrate goal system and get current goal state
             xs_goal, xds_goal = self._goal_system.analytical_solution(ts)
 
+        # Get damping coefficient
+        if self._damping_system is None:
+            # If there is no dynamical system for the delayed goal, damping is constant
+            xs_damping = np.tile(self._spring_system.spring_constant, (n_time_steps, 1))
+            # with zero change
+            xds_damping = np.zeros(xs_damping.shape)
+        else:
+            # Integrate damping system
+            xs_damping, xds_damping = self._damping_system.analytical_solution(ts)
+
         xs = np.zeros([n_time_steps, self._dim_x])
         xds = np.zeros([n_time_steps, self._dim_x])
 
@@ -312,6 +339,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         xds[:, self.PHASE] = xds_phase
         xs[:, self.GATING] = xs_gating
         xds[:, self.GATING] = xds_gating
+        xs[:, self.DAMPING] = xs_damping
+        xds[:, self.DAMPING] = xds_damping
 
         # THE REST CANNOT BE DONE ANALYTICALLY
 
@@ -320,8 +349,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         #damping = self._spring_system.damping_coefficient
         #local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
-        # Set first attractor state
+        # Set first attractor state andn damping
         local_spring_system.y_attr = xs_goal[0, :]
+        local_spring_system.damping_coefficient = xs_damping[0, :]
 
         # Start integrating spring damper system
         x_spring, xd_spring = local_spring_system.integrate_start()
@@ -344,8 +374,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Euler integration
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
-            # Set the attractor state of the spring system
+            # Set the attractor and damping of the spring system
             local_spring_system.y_attr = xs[tt, self.GOAL]
+            local_spring_system.damping_coefficient = xs[tt, self.DAMPING]
 
             # Integrate spring damper system
             xds[tt, SPRING] = local_spring_system.differential_equation(xs[tt, SPRING])
