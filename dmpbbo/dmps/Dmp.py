@@ -637,7 +637,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         systems = [
             ("phase", range(3 * d, 3 * d + 1), axs[0:2], self._phase_system),
             ("gating", range(3 * d + 1, 3 * d + 2), axs[5:7], self._gating_system),
-            ("goal", range(2 * d, 3 * d), axs[2:4], self._gating_system),
+            ("goal", range(2 * d, 3 * d), axs[2:4], self._goal_system),
             ("spring-damper", range(0 * d, 2 * d), axs[7:10], self._spring_system),
         ]
         # system_varname = ["x", "v", "y^{g_d}", "y"]
@@ -647,7 +647,12 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs_cur = xs[:, system[1]]
             xds_cur = xds[:, system[1]]
             axs_cur = system[2]
-            h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+            if system[3]:
+                h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+            else:
+                # No dynamical system available. Just plot x values.
+                h = axs_cur[0].plot(ts, xs_cur)
+                axs_cur = [axs_cur[0]]  # Avoid plotting vel/acc
             all_handles.append(h)
             for i, ax in enumerate(axs_cur):
                 x = np.mean(ax.get_xlim())
