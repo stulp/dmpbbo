@@ -610,6 +610,26 @@ class Dmp(DynamicalSystem, Parameterizable):
             for fa in self._function_approximators:
                 fa.set_selected_param_names(names)
 
+    def set_param_dyn_sys(self, params):
+        for system_name in ['spring_system', 'goal_system', 'damping_system']:
+            attr_name = '_'+system_name
+            if system_name in params:
+                system = self.__dict__[attr_name]
+                if not system:
+                    raise Exception(f'Trying to set param of "{system_name}", but it is None')
+
+                for param_name in params[system_name]:
+                    if param_name in system.__dict__:
+                        value = params[system_name][param_name]
+                        system.__dict__[param_name] = value
+                    else:
+                        raise Exception(f'Unknown param "{param_name}" in "{system_name}" of "{system.__class__}"')
+
+        # To check and give feedback
+        for system_name in params:
+            if '_'+system_name not in self.__dict__:
+                raise Exception(f'Unknown system "{system_name}"')
+
     def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
         values = np.empty(0)
