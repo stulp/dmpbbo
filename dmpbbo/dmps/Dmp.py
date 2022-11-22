@@ -96,6 +96,15 @@ class Dmp(DynamicalSystem, Parameterizable):
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
 
+        elif dmp_type in ["2022"]:
+            goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
+            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.85)
+            count_down = True
+            phase_system_default = TimeSystem(tau, count_down)
+            damping_final = self._spring_system.damping_coefficient
+            damping_init = 0.1 * damping_final
+            damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
+
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
 
