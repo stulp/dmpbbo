@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Script for training a DMP from a trajectory. """
+from matplotlib import pyplot as plt
 
 import dmpbbo.json_for_cpp as json_for_cpp
 from dmpbbo.dmps.Dmp import Dmp
@@ -42,12 +43,15 @@ def main():
         x, xd = dmp.integrate_step(dt, x)
         # Convert complete DMP state to end-eff state
         y, yd, ydd = dmp.states_as_pos_vel_acc(x, xd)
-        print(y)
 
     # Save the DMP to a json file that can be read in C++
     filename = "dmp_for_cpp.json"
     json_for_cpp.savejson_for_cpp(filename, dmp)
     print(f'Saved {filename} to local directory.')
+
+    dmp.plot(plot_demonstration=traj)
+    dmp.plot_comparison(traj)
+    plt.show()
 
 
 if __name__ == "__main__":
