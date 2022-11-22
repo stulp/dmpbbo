@@ -634,6 +634,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         plot_tau = kwargs.get("plot_tau", True)
         has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
         plot_no_forcing_term_also = kwargs.get("plot_no_forcing_term_also", False)
+        plot_demonstration = kwargs.get("plot_demonstration", False)
 
         axs = kwargs.get("axs") or Dmp.get_dmp_axes(has_fa_output)
 
@@ -652,6 +653,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             xds_cur = xds[:, system[1]]
             axs_cur = system[2]
             if system[3]:
+
+                if plot_demonstration and system[0] == 'spring-damper':
+                    h_demo, _ = plot_demonstration.plot(axs_cur)
+                    plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+
                 h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
 
                 if plot_no_forcing_term_also and system[0] == 'spring-damper':
