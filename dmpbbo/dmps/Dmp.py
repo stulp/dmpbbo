@@ -108,12 +108,17 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._selected_param_names = []
 
         d = self._dim_y
-        self.SPRING = np.arange(0 * d + 0, 0 * d + 0 + 2 * d)
-        self.SPRING_Y = np.arange(0 * d + 0, 0 * d + 0 + 1 * d)
-        self.SPRING_Z = np.arange(1 * d + 0, 1 * d + 0 + 1 * d)
-        self.GOAL = np.arange(2 * d + 0, 2 * d + 0 + 1 * d)
-        self.PHASE = np.arange(3 * d + 0, 3 * d + 0 + 1)
-        self.GATING = np.arange(3 * d + 1, 3 * d + 1 + 1)
+        offset = 0
+        self.SPRING =   np.arange(offset, offset + 2 * d)
+        self.SPRING_Y = np.arange(offset, offset + 1 * d)
+        offset += d
+        self.SPRING_Z = np.arange(offset, offset + 1 * d)
+        offset += d
+        self.GOAL =     np.arange(offset, offset + 1 * d)
+        offset += d
+        self.PHASE =    np.arange(offset, offset + 1)
+        offset += 1
+        self.GATING =    np.arange(offset, offset + 1)
 
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
