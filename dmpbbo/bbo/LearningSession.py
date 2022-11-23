@@ -171,7 +171,8 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
 
     n_dims = len(distribution.mean)
     if n_dims == 1:
-        raise ValueError("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
+        print("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
+        return [], []
 
     if n_dims >= 2:
         distr_mean = distribution.mean[0:2]
