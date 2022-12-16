@@ -24,6 +24,7 @@ import numpy as np
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
@@ -97,13 +98,13 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system_default = TimeSystem(tau, count_down)
 
         elif dmp_type in ["2022"]:
-            goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
-            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.85)
+            goal_system_default = RichardsSystem.as_normalized(tau, 0.5*tau, 20.0, 1.0)
+            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.6)
             count_down = True
             phase_system_default = TimeSystem(tau, count_down)
             damping_final = self._spring_system.damping_coefficient
             damping_init = 0.1 * damping_final
-            damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
+            #damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
 
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
@@ -130,8 +131,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         offset += d
         self.SPRING_Z = np.arange(offset, offset + 1 * d)
         offset += d
-        self.GOAL =     np.arange(offset, offset + 1 * d)
-        offset += d
+        d_goal = self._goal_system.dim_x
+        self.GOAL =     np.arange(offset, offset + 1 * d_goal)
+        offset += d_goal
         self.PHASE =    np.arange(offset, offset + 1)
         offset += 1
         self.GATING =    np.arange(offset, offset + 1)
@@ -184,10 +186,15 @@ class Dmp(DynamicalSystem, Parameterizable):
             xd[self.GOAL] = 0.0
         else:
             # Goal system exists. Start integrating it.
-            (x[self.GOAL], xd[self.GOAL]) = self._goal_system.integrate_start()
+            x[self.GOAL], xd[self.GOAL] = self._goal_system.integrate_start()
 
         # Set the attractor state of the spring system
-        self._spring_system.y_attr = x[self.GOAL]
+        if not isinstance(self._goal_system, RichardsSystem):
+            self._spring_system.y_attr = x[self.GOAL]
+        else:
+            # Scaled goal
+            scaled_goal = self._y_init + (self._y_attr - self._y_init) * x[self.GOAL]
+            self._spring_system.y_attr = scaled_goal
 
         # Set the damping coefficient
         if self._damping_system is None:
@@ -227,10 +234,17 @@ class Dmp(DynamicalSystem, Parameterizable):
         else:
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
-            x_goal = x[self.GOAL]
-            xd[self.GOAL] = self._goal_system.differential_equation(x_goal)
-            # The goal state is the attractor state of the spring-damper system
-            self._spring_system.y_attr = x_goal
+            xd[self.GOAL] = self._goal_system.differential_equation(x[self.GOAL])
+            print("-----------------")
+            print(x[self.GOAL])
+            if not isinstance(self._goal_system, RichardsSystem):
+                # The goal state is the attractor state of the spring-damper system
+                self._spring_system.y_attr = x[self.GOAL]
+            else:
+                # Scaled goal
+                scaled_goal = self._y_init + (self._y_attr - self._y_init) * x[self.GOAL]
+                self._spring_system.y_attr = scaled_goal
+            print(self._spring_system.y_attr)
 
         if self._damping_system is None:
             xd[self.DAMPING] = np.zeros(self._dim_y)
@@ -368,8 +382,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         #damping = self._spring_system.damping_coefficient
         #local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
-        # Set first attractor state andn damping
-        local_spring_system.y_attr = xs_goal[0, :]
+        # Set first attractor state and damping
+        if isinstance(self._goal_system, RichardsSystem):
+            # Scaled goal
+            # scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs_goal[0, :]
+            local_spring_system.y_attr = self._y_init
+        else:
+            local_spring_system.y_attr = xs_goal[0, :]
         local_spring_system.damping_coefficient = xs_damping[0, :]
 
         # Start integrating spring damper system
@@ -394,7 +413,12 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
             # Set the attractor and damping of the spring system
-            local_spring_system.y_attr = xs[tt, self.GOAL]
+            if isinstance(self._goal_system, RichardsSystem):
+                # Scaled goal
+                scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs[tt, self.GOAL]
+                local_spring_system.y_attr = scaled_goal
+            else:
+                local_spring_system.y_attr = xs[tt, self.GOAL]
             local_spring_system.damping_coefficient = xs[tt, self.DAMPING]
 
             # Integrate spring damper system
@@ -560,7 +584,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
         if self._goal_system is not None:
-            self._goal_system.y_init = y_init_new
+            if not isinstance(self._goal_system, RichardsSystem):
+                self._goal_system.y_init = y_init_new
 
     @property
     def y_attr(self):
