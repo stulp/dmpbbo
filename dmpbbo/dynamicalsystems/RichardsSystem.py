@@ -26,7 +26,7 @@ class RichardsSystem(DynamicalSystem):
     """ A dynamical system representing a Richard's system (generalized sigmoid system).
     """
 
-    def __init__(self, tau, x_init, t_inflection, right_asymp, growth_rate=1.0, v=1.0):
+    def __init__(self, tau, x_init, t_inflection_ratio, right_asymp, growth_rate=1.0, v=1.0):
         """ Initialize a RichardsSystem.
 
         @param tau: Time constant
@@ -34,27 +34,11 @@ class RichardsSystem(DynamicalSystem):
         """
         super().__init__(1, tau, x_init)
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
-        self.t_inflection_ratio = t_inflection/tau
+        self._t_inflection_ratio = t_inflection_ratio
         self.right_asymp = right_asymp
         self.growth_rate = growth_rate
         self.v = v
-
-        self.left_asymp = RichardsSystem.compute_left_asymp_from_inflection_time(
-            t_inflection, x_init, right_asymp, growth_rate, v)
-
-    @staticmethod
-    def as_normalized(tau, t_inflection, growth_rate=1.0, v=1.0):
-        """ Initialize a normalized Richards System.
-
-        @param tau: Time constant
-        """
-        x_0 = np.array([0.0])
-        x_1 = np.array([1.0])
-        system = RichardsSystem(tau, x_0, t_inflection, x_1, growth_rate, v)
-        system.left_asymp = RichardsSystem.compute_left_asymp_from_inflection_time(
-            t_inflection, x_0, x_1, growth_rate, v)
-        return system
-
+        self._update_left_asymp()
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
@@ -63,10 +47,31 @@ class RichardsSystem(DynamicalSystem):
         @param new_tau: Time constant
         """
         self._tau = new_tau
-        t_inflection = self.t_inflection_ratio * new_tau
-        self.left_asymp = RichardsSystem.compute_left_asymp_from_inflection_time(
-            t_inflection, self.x_init, self.right_asymp, self.growth_rate, self.v)
+        self._update_left_asymp()
 
+    @property
+    def t_inflection_ratio(self):
+        return self._t_inflection_ratio
+
+    @t_inflection_ratio.setter
+    def tau(self, new_ratio):
+        self._t_inflection_ratio = new_ratio
+        self._update_left_asymp()
+
+    def _update_left_asymp(self):
+        # Solve for left_asymp, given t_infl, etc.
+        t_infl = self.t_inflection_ratio * self.tau
+        c = np.power(1.0 + np.exp(self.growth_rate*t_infl), 1.0/self.v)
+        self.left_asymp = (c * self.x_init - self.right_asymp) / (c - 1)
+
+    @DynamicalSystem.tau.setter
+    def tau(self, new_tau):
+        """ Set the time constant.
+
+        @param new_tau: Time constant
+        """
+        self._tau = new_tau
+        self._update_left_asymp()
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
@@ -107,10 +112,3 @@ class RichardsSystem(DynamicalSystem):
             xs[:, dd] += A
 
         return xs, xds
-
-    @staticmethod
-    def compute_left_asymp_from_inflection_time(t_infl, x_init, right_asymp, growth_rate, v):
-        # Solve for left_asymp, given t_infl, etc.
-        c = np.power(1.0 + np.exp(growth_rate*t_infl), 1.0/v)
-        left_asymp = (c*x_init-right_asymp)/(c-1)
-        return left_asymp

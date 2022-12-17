@@ -52,12 +52,10 @@ def main():
     dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
 
     # RichardsSystem, i.e. a generalized SigmoidSystem
-    t_infl = 0.5*tau
+    t_infl_ratio = 0.5
     alpha = 10.0
     v = 1.2
-    dyn_systems["Richards"] = RichardsSystem(tau, x_init, t_infl, x_attr, alpha, v)
-    dyn_systems["RichardsNormalized"] =  RichardsSystem.as_normalized(tau, t_infl, alpha, v)
-
+    dyn_systems["Richards"] = RichardsSystem(tau, x_init, t_infl_ratio, x_attr, alpha, v)
 
     # SpringDamperSystem
     alpha = 12.0
