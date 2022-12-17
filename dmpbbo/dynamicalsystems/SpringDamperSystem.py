@@ -123,14 +123,14 @@ class SpringDamperSystem(DynamicalSystem):
         # This system behaves like a critically damped spring-damper system
         # http://en.wikipedia.org/wiki/Damped_spring-mass_system
         omega_0s = np.sqrt(spring_constants / masses) / self._tau  # natural frequency
-        zetas = damping_coefficients / (
-            2 * np.sqrt(masses * self.spring_constant)
-        )  # damping ratio
+        zetas = damping_coefficients / (2 * np.sqrt(masses * self.spring_constant))  # damping ratio
 
         for i_dim, zeta in enumerate(zetas):
             if zeta != 1.0:
-                print(f"WARNING: Spring-damper system is not critically damped for dim={i_dim} zeta"
-                      f"={zeta}")
+                print(
+                    f"WARNING: Spring-damper system is not critically damped for dim={i_dim} zeta"
+                    f"={zeta}"
+                )
 
         for i_dim in range(self._dim_y):
             y0 = self._x_init[i_dim] - self._y_attr[i_dim]

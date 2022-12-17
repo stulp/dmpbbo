@@ -92,7 +92,6 @@ class Dmp(DynamicalSystem, Parameterizable):
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
 
-
         # Check if subsystems are specified in kwargs. If not, use default.
         self._phase_system = kwargs.get("phase_system", phase_system_default)
         self._gating_system = kwargs.get("gating_system", gating_system_default)
@@ -109,16 +108,16 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         d = self._dim_y
         offset = 0
-        self.SPRING =   np.arange(offset, offset + 2 * d)
+        self.SPRING = np.arange(offset, offset + 2 * d)
         self.SPRING_Y = np.arange(offset, offset + 1 * d)
         offset += d
         self.SPRING_Z = np.arange(offset, offset + 1 * d)
         offset += d
-        self.GOAL =     np.arange(offset, offset + 1 * d)
+        self.GOAL = np.arange(offset, offset + 1 * d)
         offset += d
-        self.PHASE =    np.arange(offset, offset + 1)
+        self.PHASE = np.arange(offset, offset + 1)
         offset += 1
-        self.GATING =    np.arange(offset, offset + 1)
+        self.GATING = np.arange(offset, offset + 1)
 
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
@@ -320,8 +319,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Reset the dynamical system, and get the first state
         local_spring_system = copy.deepcopy(self._spring_system)
-        #damping = self._spring_system.damping_coefficient
-        #local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
+        # damping = self._spring_system.damping_coefficient
+        # local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state
         local_spring_system.y_attr = xs_goal[0, :]
@@ -485,7 +484,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         @param new_tau: The new time constant
         """
         self._tau = new_tau  # noqa defined inside __init__ of DynamicalSystem
-        tau_scale = new_tau/self.tau
+        tau_scale = new_tau / self.tau
 
         # Set value in all relevant subsystems also
         self._phase_system.tau *= tau_scale
@@ -639,7 +638,6 @@ class Dmp(DynamicalSystem, Parameterizable):
         plot_no_forcing_term_also = kwargs.get("plot_no_forcing_term_also", False)
         plot_demonstration = kwargs.get("plot_demonstration", False)
 
-
         d = self.dim_dmp()  # noqa Abbreviation for convenience
         systems = [
             ("goal", self.GOAL, axs[0:1], self._goal_system),
@@ -656,13 +654,13 @@ class Dmp(DynamicalSystem, Parameterizable):
             axs_cur = system[2]
             if system[3]:
 
-                if plot_demonstration and system[0] == 'spring-damper':
+                if plot_demonstration and system[0] == "spring-damper":
                     h_demo, _ = plot_demonstration.plot(axs_cur)
                     plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
 
                 h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
 
-                if plot_no_forcing_term_also and system[0] == 'spring-damper':
+                if plot_no_forcing_term_also and system[0] == "spring-damper":
                     # Integrate without forcing term and plot it
                     suppress_forcing_term = True
                     xs_no, xds_no, _, _ = self.analytical_solution(ts, suppress_forcing_term)
@@ -670,8 +668,8 @@ class Dmp(DynamicalSystem, Parameterizable):
                     xds_cur_no = xds_no[:, system[1]]
                     h_no, _ = system[3].plot(ts, xs_cur_no, xds_cur_no, axs=axs_cur)
                     for i in range(len(h)):
-                        h_no[i].update_from(h[i]) # Copy line style
-                    plt.setp(h_no, linestyle="--", linewidth=1) # Make smaller and dashed
+                        h_no[i].update_from(h[i])  # Copy line style
+                    plt.setp(h_no, linestyle="--", linewidth=1)  # Make smaller and dashed
 
             else:
                 # No dynamical system available. Just plot x values.
@@ -708,7 +706,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         return all_handles, axs
 
     def plot_comparison(self, trajectory, **kwargs):
-        ts = kwargs.get("ts",trajectory.ts)
+        ts = kwargs.get("ts", trajectory.ts)
         xs, xds, _, _ = self.analytical_solution(ts)
         traj_reproduced = self.states_as_trajectory(ts, xs, xds)
 

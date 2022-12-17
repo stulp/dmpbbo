@@ -349,7 +349,7 @@ class LearningSession:
             return True
         if self._root_dir is not None:
             abs_basename = Path(self._root_dir, basename)
-            for extension in ["json", "txt", 'csv']:
+            for extension in ["json", "txt", "csv"]:
                 if os.path.isfile(f"{abs_basename}.{extension}"):
                     return True
         return False
@@ -379,7 +379,7 @@ class LearningSession:
                     obj = jsonpickle.decode(f.read())
 
             elif os.path.isfile(f"{abs_basename}.csv"):
-                obj = pd.read_csv(f'{abs_basename}.csv')
+                obj = pd.read_csv(f"{abs_basename}.csv")
 
             elif os.path.isfile(f"{abs_basename}.txt"):
                 obj = np.loadtxt(f"{abs_basename}.txt")

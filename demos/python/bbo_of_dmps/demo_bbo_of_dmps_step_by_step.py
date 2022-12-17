@@ -27,8 +27,7 @@ from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarDecay
 from dmpbbo.bbo_of_dmps.step_by_step_optimization import prepare_optimization, update_step
 from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
-from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.dmps.Dmp import Trajectory
+from dmpbbo.dmps.Dmp import Dmp, Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from TaskViapoint import TaskViapoint
 
@@ -49,7 +48,7 @@ def run_demo(directory, traj):
     plot_dmp = False
     if plot_dmp:
         dt = 0.005
-        integration_time =  3*dmp.tau
+        integration_time = 3 * dmp.tau
         ts = np.linspace(0.0, integration_time, int(integration_time / dt) + 1)
         dmp.plot(ts)  # Check if all is OK with the dynamical systems
         dmp.plot_comparison(traj)  # Check if fitting is good.
@@ -126,7 +125,7 @@ def main():
         for n_dims in [2]:
             tau = 0.5
             dt = 0.005
-            ts = np.linspace(0.0, tau, int(tau/dt)+1)
+            ts = np.linspace(0.0, tau, int(tau / dt) + 1)
             y_init = np.linspace(1.8, 2.0, n_dims)
             y_attr = np.linspace(4.0, 3.0, n_dims)
             traj = Trajectory.from_min_jerk(ts, y_init, y_attr)

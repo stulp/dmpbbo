@@ -40,6 +40,7 @@ class TaskViapoint(Task):
         if self.goal is not None:
             if self.goal.shape != self.viapoint.shape:
                 raise ValueError("goal and viapoint must have the same shape")
+
     def n_dims(self):
         return self.viapoint.shape[0]
 
@@ -88,35 +89,35 @@ class TaskViapoint(Task):
         @return: costs The scalar cost components for the sample. The first item costs[0] should
             contain the total cost.
         """
-        ts = self._extract_cost_vars(cost_vars, 't')
-        ys = self._extract_cost_vars(cost_vars, 'y')
-        ydds = self._extract_cost_vars(cost_vars, 'ydd')
+        ts = self._extract_cost_vars(cost_vars, "t")
+        ys = self._extract_cost_vars(cost_vars, "y")
+        ydds = self._extract_cost_vars(cost_vars, "ydd")
         return self.evaluate_rollout_local(ts, ys, ydds, sample)
 
     def _extract_cost_vars(self, cost_vars, name):
         n_dims = self.n_dims()
 
         if isinstance(cost_vars, pd.DataFrame):
-            if name == 't':
-                return cost_vars['t'].values
-            elif name in ['y', 'yd', 'ydd']:
-                return cost_vars[[f'{name}{d}' for d in range(n_dims)]].values
+            if name == "t":
+                return cost_vars["t"].values
+            elif name in ["y", "yd", "ydd"]:
+                return cost_vars[[f"{name}{d}" for d in range(n_dims)]].values
             else:
                 raise Exception(f'Unknown cost_var name "{name}"')
 
         elif isinstance(cost_vars, np.ndarray):
-            if name == 't':
+            if name == "t":
                 return cost_vars[:, 0]
-            elif name == 'y':
-                return cost_vars[:, 1: 1 + n_dims]
-            elif name == 'yd':
-                return cost_vars[:, 1 + n_dims * 1: 1 + n_dims * 2]
-            elif name == 'ydd':
-                return cost_vars[:, 1 + n_dims * 2: 1 + n_dims * 3]
+            elif name == "y":
+                return cost_vars[:, 1 : 1 + n_dims]
+            elif name == "yd":
+                return cost_vars[:, 1 + n_dims * 1 : 1 + n_dims * 2]
+            elif name == "ydd":
+                return cost_vars[:, 1 + n_dims * 2 : 1 + n_dims * 3]
             else:
                 raise Exception(f'Unknown cost_var name "{name}"')
         else:
-            raise Exception('cost_vars must be ndarray or DataFrame')
+            raise Exception("cost_vars must be ndarray or DataFrame")
 
     def evaluate_rollout_local(self, ts, ys, ydds, sample):
 
@@ -154,7 +155,6 @@ class TaskViapoint(Task):
             goal_repeat = np.repeat(np.atleast_2d(self.goal), n_time_steps, axis=0)
             delay_cost_mean = np.mean(np.linalg.norm(ys_after_goal - goal_repeat, axis=1))
 
-
         costs = np.zeros(1 + 4)
         costs[1] = self.viapoint_weight * dist_to_viapoint
         costs[2] = self.acceleration_weight * sum_ydd / n_time_steps
@@ -176,8 +176,8 @@ class TaskViapoint(Task):
 
         n_dims = self.viapoint.shape[0]
 
-        ts = self._extract_cost_vars(cost_vars, 't')
-        ys = self._extract_cost_vars(cost_vars, 'y')
+        ts = self._extract_cost_vars(cost_vars, "t")
+        ys = self._extract_cost_vars(cost_vars, "y")
 
         if n_dims == 1:
             line_handles = ax.plot(ts, ys, linewidth=0.5)
@@ -191,8 +191,13 @@ class TaskViapoint(Task):
                 v = self.viapoint[0]
                 ax.plot([t, t], [v + r, v - r], "-k")
             t_waypoint, y_waypoint = self.get_waypoint(ts, ys)
-            ax.plot([t_waypoint, t_waypoint], [y_waypoint,  self.viapoint], "ko-",
-                    label="waypoint",markerfacecolor='none')
+            ax.plot(
+                [t_waypoint, t_waypoint],
+                [y_waypoint, self.viapoint],
+                "ko-",
+                label="waypoint",
+                markerfacecolor="none",
+            )
             ax.set_xlabel("time (s)")
             ax.set_ylabel("y")
 
@@ -201,9 +206,14 @@ class TaskViapoint(Task):
             ax.plot(ys[0, 0], ys[0, 1], "bo", label="start")
             ax.plot(ys[-1, 0], ys[-1, 1], "go", label="end")
             ax.plot(self.viapoint[0], self.viapoint[1], "ko", label="viapoint")
-            _, y_waypoint = self.get_waypoint(ts,ys)
-            ax.plot([y_waypoint[0], self.viapoint[0]], [y_waypoint[1], self.viapoint[1]], "ko-",
-                    label="waypoint",markerfacecolor='none')
+            _, y_waypoint = self.get_waypoint(ts, ys)
+            ax.plot(
+                [y_waypoint[0], self.viapoint[0]],
+                [y_waypoint[1], self.viapoint[1]],
+                "ko-",
+                label="waypoint",
+                markerfacecolor="none",
+            )
 
             if self.viapoint_radius > 0.0:
                 circle = plt.Circle(self.viapoint, self.viapoint_radius, color="k", fill=False)
@@ -216,13 +226,14 @@ class TaskViapoint(Task):
 
         return line_handles, ax
 
+
 def main():
     """ Main function of the script. """
-    from dmpbbo.dmps.Trajectory import Trajectory # Only needed when main is called
+    from dmpbbo.dmps.Trajectory import Trajectory  # Only needed when main is called
 
     duration = 0.8
-    viapoint_time = 0.5*duration
-    viapoint_time = None # Finds the closest waypoint, rather than at a specific time
+    viapoint_time = 0.5 * duration
+    viapoint_time = None  # Finds the closest waypoint, rather than at a specific time
     n_dims = 2
     viapoint = np.full(n_dims, 0.5)
 
@@ -232,7 +243,7 @@ def main():
     y_init = np.full(n_dims, 0.0)
     y_goal_mean = np.full(n_dims, 1.0)
     for _ in range(5):
-        y_goal = y_goal_mean + 0.3*np.random.randn(n_dims)
+        y_goal = y_goal_mean + 0.3 * np.random.randn(n_dims)
         traj_min_jerk = Trajectory.from_min_jerk(ts, y_init, y_goal)
         cost_vars = traj_min_jerk.as_matrix()
 
@@ -240,10 +251,10 @@ def main():
         cost_labels = task.get_cost_labels()
 
         _, ax = task.plot_rollout(traj_min_jerk.as_matrix())
-        if n_dims==1:
-            ax.text(duration,y_goal, f'{np.array2string(costs, precision=3)}')
+        if n_dims == 1:
+            ax.text(duration, y_goal, f"{np.array2string(costs, precision=3)}")
         else:
-            ax.text(y_goal[0], y_goal[1], f'{np.array2string(costs, precision=3)}')
+            ax.text(y_goal[0], y_goal[1], f"{np.array2string(costs, precision=3)}")
     plt.show()
 
 

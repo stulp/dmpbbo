@@ -212,11 +212,11 @@ class DynamicalSystem(ABC):
         xs[0, :], xds[0, :] = self.integrate_start()
         if int_method == "Runge-Kutta":
             for ii in range(1, n_time_steps):
-                dt = ts[ii]-ts[ii-1]
+                dt = ts[ii] - ts[ii - 1]
                 xs[ii, :], xds[ii, :] = self.integrate_step_runge_kutta(dt, xs[ii - 1, :])
         else:
             for ii in range(1, n_time_steps):
-                dt = ts[ii]-ts[ii-1]
+                dt = ts[ii] - ts[ii - 1]
                 xs[ii, :], xds[ii, :] = self.integrate_step_euler(dt, xs[ii - 1, :])
 
         return xs, xds

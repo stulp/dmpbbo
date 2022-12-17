@@ -269,7 +269,7 @@ class DmpWithSchedules(Dmp):
 
         @return: The axes on which the plots were made.
         """
-        kwargs["n_subplot_columns"] = 5 # Add column to plot schedule
+        kwargs["n_subplot_columns"] = 5  # Add column to plot schedule
         lines, axs = super().plot(ts, xs, xds, **kwargs)
 
         ax = plt.gcf().add_subplot(2, 5, 10)

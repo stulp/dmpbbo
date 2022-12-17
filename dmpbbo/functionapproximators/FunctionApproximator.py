@@ -330,8 +330,10 @@ class FunctionApproximator(Parameterizable):
         """
         if inputs is None:
             if self._inputs_training is None:
-                print("WARNING: no inputs provided, and inputs for training are not available. "
-                      "Not plotting")
+                print(
+                    "WARNING: no inputs provided, and inputs for training are not available. "
+                    "Not plotting"
+                )
                 return None, None
             else:
                 # Plot for the inputs that were used for training
