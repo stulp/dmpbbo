@@ -91,7 +91,11 @@ def train(fa_name, n_dims):
 def main():
     """Run some training sessions and plot results."""
 
-    names = ["Weighted Least Squares", "Radial Basis Function Network", "Locally Weighted Regression"]
+    names = [
+        "Weighted Least Squares",
+        "Radial Basis Function Network",
+        "Locally Weighted Regression",
+    ]
     for fa_name in names:
         for n_dims in [1, 2]:
             train(fa_name, n_dims)

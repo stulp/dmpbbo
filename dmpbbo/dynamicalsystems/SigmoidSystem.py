@@ -138,7 +138,11 @@ class SigmoidSystem(DynamicalSystem):
         self._Ks_cached = np.empty(N_0s.shape)
         for dd in range(len(N_0s)):
             r = self._max_rate[dd] if isinstance(self._max_rate, np.ndarray) else self._max_rate
-            infl_ratio = self._inflection_ratio[dd] if isinstance(self._inflection_ratio, np.ndarray) else self._inflection_ratio
+            infl_ratio = (
+                self._inflection_ratio[dd]
+                if isinstance(self._inflection_ratio, np.ndarray)
+                else self._inflection_ratio
+            )
             t_infl = self.tau * infl_ratio
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 

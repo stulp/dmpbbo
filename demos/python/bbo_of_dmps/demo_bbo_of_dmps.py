@@ -122,7 +122,7 @@ def main():
         for n_dims in [1, 2]:
             tau = 0.5
             dt = 0.005
-            ts = np.linspace(0.0, tau, int(tau/dt)+1)
+            ts = np.linspace(0.0, tau, int(tau / dt) + 1)
             y_init = np.linspace(1.8, 2.0, n_dims)
             y_attr = np.linspace(4.0, 3.0, n_dims)
             traj = Trajectory.from_min_jerk(ts, y_init, y_attr)

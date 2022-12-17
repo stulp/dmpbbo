@@ -47,7 +47,7 @@ def main():
     # Save the DMP to a json file that can be read in C++
     filename = "dmp_for_cpp.json"
     json_for_cpp.savejson_for_cpp(filename, dmp)
-    print(f'Saved {filename} to local directory.')
+    print(f"Saved {filename} to local directory.")
 
     dmp.plot(plot_demonstration=traj)
     dmp.plot_comparison(traj)

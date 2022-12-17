@@ -18,6 +18,7 @@
 """ Module for the DMP with gain/force schedules class. """
 
 import numpy as np
+from matplotlib import pyplot as plt
 
 from dmpbbo.dmps.Dmp import Dmp
 
@@ -268,13 +269,18 @@ class DmpWithSchedules(Dmp):
 
         @return: The axes on which the plots were made.
         """
+        kwargs["n_subplot_columns"] = 5  # Add column to plot schedule
         lines, axs = super().plot(ts, xs, xds, **kwargs)
 
-        ax = axs[4]
-        ax.plot(ts, schedules)
+        ax = plt.gcf().add_subplot(2, 5, 10)
+
+        h = ax.plot(ts, schedules)
         x = np.mean(ax.get_xlim())
         y = np.mean(ax.get_ylim())
         ax.text(x, y, "schedules", horizontalalignment="center")
         ax.set_xlabel(r"time ($s$)")
         ax.set_ylabel(r"schedules")
+
+        lines.extend(h)
+        axs.append(ax)
         return lines, axs

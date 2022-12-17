@@ -38,7 +38,6 @@ class ExponentialSystem(DynamicalSystem):
         self._x_attr = np.atleast_1d(x_attr)
         self.alpha = np.asarray(alpha) if isinstance(alpha, list) else alpha
 
-
     @property
     def y_attr(self):
         """ Return the y part of the attractor state.

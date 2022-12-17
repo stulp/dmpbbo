@@ -24,6 +24,7 @@ from matplotlib import pyplot as plt
 from demos.python.bbo_of_dmps.arm2D.TaskViapointArm2D import TaskViapointArm2D
 from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 
+
 class TaskSolverDmpArm2D(TaskSolverDmp):
     """ TaskSolver that integrates a DMP for a 2D arm.
 
@@ -34,10 +35,10 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
         if not link_lengths:
             n_dofs = dmp.dim_dmp()
             # Every link has same length, and they sum to 1.0
-            link_lengths = np.full(n_dofs, 1.0/n_dofs)
+            link_lengths = np.full(n_dofs, 1.0 / n_dofs)
 
         # N link lengths => N joints
-        assert(len(link_lengths) == dmp.dim_dmp())
+        assert len(link_lengths) == dmp.dim_dmp()
         self.link_lengths = link_lengths
 
     def perform_rollout_dmp(self, dmp):
@@ -70,8 +71,8 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
     def angles_to_link_positions(angles, link_lengths):
         n_time_steps = angles.shape[0]
         n_dofs = angles.shape[1]
-        links_x = np.zeros((n_time_steps, n_dofs+1))
-        links_y = np.zeros((n_time_steps, n_dofs+1))
+        links_x = np.zeros((n_time_steps, n_dofs + 1))
+        links_y = np.zeros((n_time_steps, n_dofs + 1))
         for tt in range(n_time_steps):
             sum_angles = 0.0
             for i_dof in range(n_dofs):
@@ -81,20 +82,21 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
                 links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * l
 
         # Format for each row: x_0, y_0, x_1, y_1 ... x_endeff,  y_endeff
-        links_xyxyxy = np.zeros((n_time_steps, 2*(n_dofs+1)))
-        for i_link in range(n_dofs+1):
-            links_xyxyxy[:, 2 * i_link + 0]  = links_x[:,i_link]
-            links_xyxyxy[:, 2 * i_link + 1] =  links_y[:, i_link]
+        links_xyxyxy = np.zeros((n_time_steps, 2 * (n_dofs + 1)))
+        for i_link in range(n_dofs + 1):
+            links_xyxyxy[:, 2 * i_link + 0] = links_x[:, i_link]
+            links_xyxyxy[:, 2 * i_link + 1] = links_y[:, i_link]
         return links_xyxyxy
+
 
 def main():
     """ Main function of the script. """
-    from dmpbbo.dmps.Trajectory import Trajectory # Only needed when main is called
+    from dmpbbo.dmps.Trajectory import Trajectory  # Only needed when main is called
 
     n_dofs = 7
     duration = 0.8
     angles_init = np.full(n_dofs, 0.0)
-    angles_goal = np.full(n_dofs, np.pi/n_dofs)
+    angles_goal = np.full(n_dofs, np.pi / n_dofs)
     angles_goal[0] *= 0.5
     ts = np.linspace(0, duration, 51)
     angles_min_jerk = Trajectory.from_min_jerk(ts, angles_init, angles_goal)
@@ -109,16 +111,16 @@ def main():
     dmp = Dmp.from_traj(angles_min_jerk, function_apps)
     dmp.set_selected_param_names("weights")
     sample = dmp.get_param_vector()
-    solver = TaskSolverDmpArm2D(dmp, 0.01, 1.5*duration)
+    solver = TaskSolverDmpArm2D(dmp, 0.01, 1.5 * duration)
 
     cost_vars = solver.perform_rollout(sample)
-    task = TaskViapointArm2D(n_dofs, np.full(2,0.5))
+    task = TaskViapointArm2D(n_dofs, np.full(2, 0.5))
     h, ax = task.plot_rollout(cost_vars)
-    plt.setp(h,color='blue')
+    plt.setp(h, color="blue")
 
-    perturbed_sample =  np.random.normal(sample, np.abs(0.3*sample))
+    perturbed_sample = np.random.normal(sample, np.abs(0.3 * sample))
     cost_vars = solver.perform_rollout(perturbed_sample)
-    task = TaskViapointArm2D(n_dofs, np.full(2,0.5))
+    task = TaskViapointArm2D(n_dofs, np.full(2, 0.5))
     h, ax = task.plot_rollout(cost_vars, ax)
 
     plt.show()

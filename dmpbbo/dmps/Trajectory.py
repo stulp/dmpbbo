@@ -403,7 +403,7 @@ class Trajectory:
 
         @param trajectory:  The trajectory to append.
         """
-        ts_appended = trajectory.ts +  (self._ts[-1] - trajectory.ts[0])
+        ts_appended = trajectory.ts + (self._ts[-1] - trajectory.ts[0])
         self._ts = np.concatenate((self._ts, ts_appended))
         self._ys = np.concatenate((self._ys, trajectory.ys))
         self._yds = np.concatenate((self._yds, trajectory.yds))
@@ -432,11 +432,11 @@ class Trajectory:
         @return: A dataframe representation of the trajectory.
         """
 
-        columns = ['t']
-        columns.extend([f'y{d}' for d in range(self.dim)])
-        columns.extend([f'yd{d}' for d in range(self.dim)])
-        columns.extend([f'ydd{d}' for d in range(self.dim)])
-        columns.extend([f'misc{d}' for d in range(self.dim_misc)])
+        columns = ["t"]
+        columns.extend([f"y{d}" for d in range(self.dim)])
+        columns.extend([f"yd{d}" for d in range(self.dim)])
+        columns.extend([f"ydd{d}" for d in range(self.dim)])
+        columns.extend([f"misc{d}" for d in range(self.dim_misc)])
 
         data = self.as_matrix()
         df = pd.DataFrame(data=data, columns=columns)
