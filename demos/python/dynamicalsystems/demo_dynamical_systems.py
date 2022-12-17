@@ -55,9 +55,8 @@ def main():
     t_infl = 0.5*tau
     alpha = 10.0
     v = 1.2
-    left_asymp = np.array([0.49, 1.01])
-    dyn_systems["Richards"] = RichardsSystem(tau, x_init, left_asymp, x_attr, alpha, v)
-    dyn_systems["RichardsNormalized"] =  RichardsSystem.as_normalized(tau, 0.5*tau, alpha, v)
+    dyn_systems["Richards"] = RichardsSystem(tau, x_init, t_infl, x_attr, alpha, v)
+    dyn_systems["RichardsNormalized"] =  RichardsSystem.as_normalized(tau, t_infl, alpha, v)
 
 
     # SpringDamperSystem

@@ -104,7 +104,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system_default = TimeSystem(tau, count_down)
             damping_final = self._spring_system.damping_coefficient
             damping_init = 0.1 * damping_final
-            #damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
+            damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
 
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
