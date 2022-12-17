@@ -530,9 +530,9 @@ class Trajectory:
             axs[3].set_xlabel("time (s)")
             axs[3].set_ylabel("misc")
 
-        x_lim = [min(self._ts), max(self._ts)]
-        for ax in axs:
-            ax.set_xlim(x_lim[0], x_lim[1])
+        #x_lim = [min(self._ts), max(self._ts)]
+        #for ax in axs:
+        #    ax.set_xlim(x_lim[0], x_lim[1])
 
         return all_handles, axs
 

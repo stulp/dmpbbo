@@ -131,7 +131,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         offset += d
         self.SPRING_Z = np.arange(offset, offset + 1 * d)
         offset += d
-        d_goal = self._goal_system.dim_x
+        d_goal = self._goal_system.dim_x if self._goal_system else d
         self.GOAL =     np.arange(offset, offset + 1 * d_goal)
         offset += d_goal
         self.PHASE =    np.arange(offset, offset + 1)
@@ -167,6 +167,15 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         return self._dim_y
 
+    def goal_system_requires_scaling(self):
+        return isinstance(self._goal_system, RichardsSystem)
+
+    def scale_goal_system(self, x_goal):
+        if self.goal_system_requires_scaling():
+            return self._y_init + (self._y_attr - self._y_init) *  x_goal
+        else:
+            return x_goal
+
     def integrate_start(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
 
@@ -189,12 +198,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             x[self.GOAL], xd[self.GOAL] = self._goal_system.integrate_start()
 
         # Set the attractor state of the spring system
-        if not isinstance(self._goal_system, RichardsSystem):
+        if not self.goal_system_requires_scaling():
             self._spring_system.y_attr = x[self.GOAL]
         else:
-            # Scaled goal
-            scaled_goal = self._y_init + (self._y_attr - self._y_init) * x[self.GOAL]
-            self._spring_system.y_attr = scaled_goal
+            self._spring_system.y_attr = self.scale_goal_system(x[self.GOAL])
 
         # Set the damping coefficient
         if self._damping_system is None:
@@ -235,16 +242,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
             xd[self.GOAL] = self._goal_system.differential_equation(x[self.GOAL])
-            print("-----------------")
-            print(x[self.GOAL])
-            if not isinstance(self._goal_system, RichardsSystem):
+            if not self.goal_system_requires_scaling():
                 # The goal state is the attractor state of the spring-damper system
                 self._spring_system.y_attr = x[self.GOAL]
             else:
-                # Scaled goal
-                scaled_goal = self._y_init + (self._y_attr - self._y_init) * x[self.GOAL]
-                self._spring_system.y_attr = scaled_goal
-            print(self._spring_system.y_attr)
+                self._spring_system.y_attr = self.scale_goal_system(x[self.GOAL])
 
         if self._damping_system is None:
             xd[self.DAMPING] = np.zeros(self._dim_y)
@@ -484,6 +486,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         xs_goal = xs_ana[:, self.GOAL]
         xs_gating = xs_ana[:, self.GATING]
         xs_phase = xs_ana[:, self.PHASE]
+
+        if self.goal_system_requires_scaling():
+            xs_goal = self.scale_goal_system(xs_goal)
 
         fa_inputs_phase = xs_phase
 
@@ -751,11 +756,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             axs_cur = system[2]
             if system[3]:
 
+                h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+
                 if plot_demonstration and system[0] == "spring-damper":
                     h_demo, _ = plot_demonstration.plot(axs_cur)
-                    plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-
-                h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+                    plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.6, 0.6, 0.6),  alpha=0.5)
 
                 if plot_no_forcing_term_also and system[0] == "spring-damper":
                     # Integrate without forcing term and plot it
@@ -777,8 +782,6 @@ class Dmp(DynamicalSystem, Parameterizable):
                 x = np.mean(ax.get_xlim())
                 y = np.mean(ax.get_ylim())
                 ax.text(x, y, system[0], horizontalalignment="center")
-                if plot_tau:
-                    ax.plot([self._tau, self._tau], ax.get_ylim(), "--k")
 
         if len(fa_outputs) > 1:
             ax = axs[5]
@@ -799,6 +802,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             ax.text(x, y, "forcing term", horizontalalignment="center")
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(x)$")
+
+        if plot_tau:
+            for ax in axs:
+                ax.axvline(self._tau, color='k', linewidth=1)
 
         return all_handles, axs
 
