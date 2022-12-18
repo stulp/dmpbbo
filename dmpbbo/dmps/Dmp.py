@@ -451,6 +451,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Needs to be done BEFORE _compute_targets
         self._scaling_amplitudes = trajectory.get_range_per_dim()
 
+        if "function_approximators" in kwargs:
+            self._function_approximators = kwargs.get("function_approximators")
+
         # Do not train function approximators if there are none
         if self._function_approximators is not None:
             fa_input_phase, f_target = self._compute_targets(trajectory)
