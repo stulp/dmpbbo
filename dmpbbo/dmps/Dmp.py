@@ -610,7 +610,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set value in all relevant subsystems also
         if self._goal_system is not None:
-            self._goal_system.y_attr = y_attr_new
+            if not isinstance(self._goal_system, RichardsNormalizedSystem):
+                self._goal_system.y_attr = y_attr_new
 
         # Do NOT do the following. The attractor state of the spring system is
         # determined by the goal system.
