@@ -22,22 +22,23 @@ import numpy as np
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 
 
-class RichardsSystem(DynamicalSystem):
+class RichardsNormalizedSystem(DynamicalSystem):
     """ A dynamical system representing a Richard's system (generalized sigmoid system).
     """
 
-    def __init__(self, tau, x_init, t_inflection_ratio, right_asymp, growth_rate=1.0, v=1.0):
+    def __init__(self, tau, t_inflection_ratio, growth_rate=1.0, v=1.0):
         """ Initialize a RichardsSystem.
 
         @param tau: Time constant
         @param x_init: Initial state
         """
-        super().__init__(1, tau, x_init)
+        super().__init__(1, tau, np.array([0.0]))
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
         self._t_inflection_ratio = t_inflection_ratio
-        self.right_asymp = right_asymp
         self.growth_rate = growth_rate
         self.v = v
+        self.right_asymp = np.array([1.0])
+        self.left_asymp = None
         self._update_left_asymp()
 
     @DynamicalSystem.tau.setter
@@ -54,7 +55,7 @@ class RichardsSystem(DynamicalSystem):
         return self._t_inflection_ratio
 
     @t_inflection_ratio.setter
-    def tau(self, new_ratio):
+    def t_inflection_ratio(self, new_ratio):
         self._t_inflection_ratio = new_ratio
         self._update_left_asymp()
 
@@ -63,15 +64,6 @@ class RichardsSystem(DynamicalSystem):
         t_infl = self.t_inflection_ratio * self.tau
         c = np.power(1.0 + np.exp(self.growth_rate*t_infl), 1.0/self.v)
         self.left_asymp = (c * self.x_init - self.right_asymp) / (c - 1)
-
-    @DynamicalSystem.tau.setter
-    def tau(self, new_tau):
-        """ Set the time constant.
-
-        @param new_tau: Time constant
-        """
-        self._tau = new_tau
-        self._update_left_asymp()
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
@@ -87,7 +79,7 @@ class RichardsSystem(DynamicalSystem):
         # B = growth_rate
         # A = left_asymp
         # K = right_asymp
-        r = (x-self.left_asymp)/(self.right_asymp-self.left_asymp)
+        r = (x-self.left_asymp)/(self.right_asymp - self.left_asymp)
         return (self.growth_rate/self.v) * (1.0 - np.power(r, self.v)) * (x - self.left_asymp) / self.tau
 
     def analytical_solution(self, ts):

@@ -22,7 +22,7 @@ import numpy as np
 
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
+from dmpbbo.dynamicalsystems.RichardsNormalizedSystem import RichardsNormalizedSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
@@ -55,7 +55,7 @@ def main():
     t_infl_ratio = 0.5
     alpha = 10.0
     v = 1.2
-    dyn_systems["Richards"] = RichardsSystem(tau, x_init, t_infl_ratio, x_attr, alpha, v)
+    dyn_systems["RichardsNormalized"] = RichardsNormalizedSystem(tau, t_infl_ratio, alpha, v)
 
     # SpringDamperSystem
     alpha = 12.0
