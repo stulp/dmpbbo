@@ -34,29 +34,11 @@ class RichardsNormalizedSystem(DynamicalSystem):
         """
         super().__init__(1, tau, np.array([0.0]))
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
-        self._t_inflection_ratio = t_inflection_ratio
+        self.t_inflection_ratio = t_inflection_ratio
         self.growth_rate = growth_rate
         self.v = v
         self.right_asymp = np.array([1.0])
         self.left_asymp = None
-        self._update_left_asymp()
-
-    @DynamicalSystem.tau.setter
-    def tau(self, new_tau):
-        """ Set the time constant.
-
-        @param new_tau: Time constant
-        """
-        self._tau = new_tau
-        self._update_left_asymp()
-
-    @property
-    def t_inflection_ratio(self):
-        return self._t_inflection_ratio
-
-    @t_inflection_ratio.setter
-    def t_inflection_ratio(self, new_ratio):
-        self._t_inflection_ratio = new_ratio
         self._update_left_asymp()
 
     def _update_left_asymp(self):
@@ -79,6 +61,7 @@ class RichardsNormalizedSystem(DynamicalSystem):
         # B = growth_rate
         # A = left_asymp
         # K = right_asymp
+        self._update_left_asymp()
         r = (x-self.left_asymp)/(self.right_asymp - self.left_asymp)
         return (self.growth_rate/self.v) * (1.0 - np.power(r, self.v)) * (x - self.left_asymp) / self.tau
 
@@ -96,6 +79,7 @@ class RichardsNormalizedSystem(DynamicalSystem):
         alpha = (self.growth_rate/self.v)
         exp_term = np.exp(-alpha * self.v *  ts / self.tau)
 
+        self._update_left_asymp()
         for dd in range(self.dim_x):
             A = self.left_asymp[dd]
             K = self.right_asymp[dd]
