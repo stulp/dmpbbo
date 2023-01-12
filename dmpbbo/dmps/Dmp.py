@@ -388,7 +388,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         if isinstance(self._goal_system, RichardsNormalizedSystem):
             # Scaled goal
             # scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs_goal[0, :]
-            local_spring_system.y_attr = self._y_init
+            local_spring_system.y_attr = self.y_init
         else:
             local_spring_system.y_attr = xs_goal[0, :]
         local_spring_system.damping_coefficient = xs_damping[0, :]
@@ -417,7 +417,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Set the attractor and damping of the spring system
             if isinstance(self._goal_system, RichardsNormalizedSystem):
                 # Scaled goal
-                scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs[tt, self.GOAL]
+                scaled_goal =  self.y_init + (self._y_attr - self.y_init)*xs[tt, self.GOAL]
                 local_spring_system.y_attr = scaled_goal
             else:
                 local_spring_system.y_attr = xs[tt, self.GOAL]
@@ -776,7 +776,7 @@ class Dmp(DynamicalSystem, Parameterizable):
                     for i in range(len(h)):
                         h_no[i].update_from(h[i])  # Copy line style
                     plt.setp(h_no, linestyle="--", linewidth=1)  # Make smaller and dashed
-
+                    all_handles.append(h_no)
             else:
                 # No dynamical system available. Just plot x values.
                 h = axs_cur[0].plot(ts, xs_cur)
