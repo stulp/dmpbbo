@@ -64,6 +64,9 @@ class DmpContextualTwoStep(DynamicalSystem):
             # Deep copies of separate function approximator for each DMP dim
             self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_params) ]
 
+        self.train(task_params_and_trajs, **kwargs)
+
+    def train(self, task_params_and_trajs, **kwargs):
         # Train the policy parameter function
         targets = []  # The dmp parameters
         inputs = []  # The task parameters
