@@ -98,11 +98,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system_default = TimeSystem(tau, count_down)
 
         elif dmp_type in ["2022"]:
-            goal_system_default = RichardsNormalizedSystem(tau, 0.5, 20.0, 1.0)
+            goal_system_default = RichardsNormalizedSystem(tau, y_init.size, 0.5, 20.0, 1.0)
             gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.6)
             count_down = True
             phase_system_default = TimeSystem(tau, count_down)
-            damping_final = self._spring_system.damping_coefficient
+            damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
             damping_init = 0.1 * damping_final
             damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
 
@@ -391,7 +391,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             local_spring_system.y_attr = self.y_init
         else:
             local_spring_system.y_attr = xs_goal[0, :]
-        local_spring_system.damping_coefficient = xs_damping[0, :]
+        xs_damping_cur = xs_damping[0, :]
+        if xs_damping_cur.size == 1:
+            local_spring_system.damping_coefficient = xs_damping_cur[0]
+        else:
+            local_spring_system.damping_coefficient = xs_damping_cur
 
         # Start integrating spring damper system
         x_spring, xd_spring = local_spring_system.integrate_start()
@@ -624,6 +628,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         @return: Time steps of the trajectory on which the DMP was trained.
         """
         return self._ts_train
+
+    def decouple_parameters(self):
+        self._spring_system.decouple_parameters()
+        if self._goal_system:
+            self._goal_system.decouple_parameters()
+        if self._damping_system:
+            self._damping_system.decouple_parameters()
 
     def set_selected_param_names(self, names):
         """ Get the names of the parameters that have been selected.

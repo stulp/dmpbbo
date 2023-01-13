@@ -167,3 +167,10 @@ class SigmoidSystem(DynamicalSystem):
             )
 
         return self._Ks_cached
+
+    def decouple_parameters(self):
+        if np.isscalar(self._max_rate):
+            self._max_rate = np.full((self.dim_x, ), self._max_rate)
+        if np.isscalar(self._inflection_ratio):
+            self._inflection_ratio = np.full((self.dim_x, ), self._inflection_ratio)
+        self._Ks_cached = None

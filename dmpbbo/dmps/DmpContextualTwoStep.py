@@ -135,6 +135,9 @@ class DmpContextualTwoStep(DynamicalSystem):
     def states_as_trajectory(self, ts, x_in, xd_in):
         return self.dmp.states_as_trajectory(ts, x_in, xd_in)
 
+    def decouple_parameters(self):
+        self.dmp.decouple_parameters()
+
     def plot(self, ts=None, xs=None, xds=None, **kwargs):
         return self.dmp.plot(ts, xs, xds, **kwargs)
 

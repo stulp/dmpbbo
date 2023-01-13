@@ -220,6 +220,14 @@ class DynamicalSystem(ABC):
                 xs[ii, :], xds[ii, :] = self.integrate_step_euler(dt, xs[ii - 1, :])
 
         return xs, xds
+    @abstractmethod
+    def decouple_parameters(self):
+        """ Decouple the parameters of a multi-dimensional system.
+
+        This is achieved by converting a scalar parameter (e.g. alpha=6.0)
+        into an np.array (e.g. alpha = np.array([6.0, 6.0]))
+        """
+        pass
 
     def plot(self, ts, xs, xds, **kwargs):
         """Plot the output of the integration of a dynamical system.

@@ -26,18 +26,18 @@ class RichardsNormalizedSystem(DynamicalSystem):
     """ A dynamical system representing a Richard's system (generalized sigmoid system).
     """
 
-    def __init__(self, tau, t_inflection_ratio, growth_rate=1.0, v=1.0):
+    def __init__(self, tau, n_dims, t_inflection_ratio, growth_rate=1.0, v=1.0):
         """ Initialize a RichardsSystem.
 
         @param tau: Time constant
         @param x_init: Initial state
         """
-        super().__init__(1, tau, np.array([0.0]))
+        super().__init__(1, tau, np.zeros((n_dims,)))
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
         self.t_inflection_ratio = t_inflection_ratio
         self.growth_rate = growth_rate
         self.v = v
-        self.right_asymp = np.array([1.0])
+        self.right_asymp = np.ones((n_dims,))
         self.left_asymp = None
         self._update_left_asymp()
 
@@ -56,7 +56,8 @@ class RichardsNormalizedSystem(DynamicalSystem):
         @return: xd - rate of change in state
         """
 
-        # https: // en.wikipedia.org / wiki / Generalised_logistic_function  # Generalised_logistic_differential_equation
+        # https: // en.wikipedia.org / wiki / Generalised_logistic_function
+        # Generalised_logistic_differential_equation
         # xd = (B / v) * (1 - ((x - A) / (K - A)) ^ v) * (x - A)
         # B = growth_rate
         # A = left_asymp
@@ -76,15 +77,26 @@ class RichardsNormalizedSystem(DynamicalSystem):
         xs = np.zeros([ts.size, self._dim_x])
         xds = np.zeros([ts.size, self._dim_x])
 
-        alpha = (self.growth_rate/self.v)
-        exp_term = np.exp(-alpha * self.v *  ts / self.tau)
-
         self._update_left_asymp()
         for dd in range(self.dim_x):
+            B =  self.growth_rate if np.isscalar(self.growth_rate) else self.growth_rate[dd]
+            exp_term = np.exp(-B * ts / self.tau)
+
+            v = self.v if np.isscalar(self.v) else self.v[dd]
             A = self.left_asymp[dd]
             K = self.right_asymp[dd]
-            q = -1 + np.power((K-A)/(self.x_init[dd]-A), self.v)
-            xs[:, dd] = (K-A) / np.power(1+q*exp_term, 1/self.v)
+            q = -1 + np.power((K-A)/(self.x_init[dd]-A), v)
+
+            xs[:, dd] = (K-A) / np.power(1+q*exp_term, 1/v)
             xs[:, dd] += A
 
         return xs, xds
+
+    def decouple_parameters(self):
+        if np.isscalar(self.t_inflection_ratio):
+            self.t_inflection_ratio = np.full((self.dim_x, ), self.t_inflection_ratio)
+        if np.isscalar(self.growth_rate):
+            self.growth_rate = np.full((self.dim_x, ), self.growth_rate)
+        if np.isscalar(self.v):
+            self.v = np.full((self.dim_x, ), self.v)
+        pass

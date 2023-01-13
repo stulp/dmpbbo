@@ -31,13 +31,14 @@ def main():
     """ Main function of the script. """
     ###########################################################################
     # Create all systems and add them to a dictionary
+    dyn_systems = {}
 
     # ExponentialSystem
     tau = 0.6  # Time constant
     x_init = np.array([0.5, 1.0])
     x_attr = np.array([0.8, 0.1])
     alpha = 6.0  # Decay factor
-    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}  # noqa
+    dyn_systems["Exponential"] = ExponentialSystem(tau, x_init, x_attr, alpha)  # noqa
 
     # TimeSystem
     dyn_systems["Time"] = TimeSystem(tau)
@@ -52,10 +53,11 @@ def main():
     dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
 
     # RichardsSystem, i.e. a generalized SigmoidSystem
+    n_dims = len(x_init)
     t_infl_ratio = 0.5
     alpha = 10.0
     v = 1.2
-    dyn_systems["RichardsNormalized"] = RichardsNormalizedSystem(tau, t_infl_ratio, alpha, v)
+    dyn_systems["RichardsNormalized"] = RichardsNormalizedSystem(tau, n_dims, t_infl_ratio, alpha, v)
 
     # SpringDamperSystem
     alpha = 12.0
