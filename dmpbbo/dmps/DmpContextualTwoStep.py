@@ -46,11 +46,13 @@ class DmpContextualTwoStep(DynamicalSystem):
         @param dmp: DMP to be parameterized by the context
         @param ppf_function_approximator: Function approximator for the policy parameter function
         """
+
         first_traj = task_params_and_trajs[0][1]
         tau = first_traj.duration
         y_init = first_traj.y_init
         dim_y = first_traj.dim
         dim_x = 3 * dim_y + 2
+        dim_x += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_x)
 
         self.dmp = Dmp.from_traj(first_traj, dmp_function_apps, **kwargs)
@@ -64,7 +66,8 @@ class DmpContextualTwoStep(DynamicalSystem):
             # Deep copies of separate function approximator for each DMP dim
             self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_params) ]
 
-        self.train(task_params_and_trajs, **kwargs)
+        save_training_data = kwargs.get("save_training_data", False)
+        self.train(task_params_and_trajs, save_training_data=save_training_data)
 
     def train(self, task_params_and_trajs, **kwargs):
         # Train the policy parameter function
@@ -112,11 +115,13 @@ class DmpContextualTwoStep(DynamicalSystem):
         @return: x, xd - The first vector of state variables and their rates of change
         """
 
+        # Predict dmp parameters from task parameters using the ppf
         n_params = self.dmp.get_param_vector_size()
-        param_vector = np.array(n_params)
-        for i_param in n_params:
+        param_vector = np.zeros((n_params, 1))
+        for i_param in range(n_params):
             param_vector[i_param] = self.ppf[i_param].predict(task_params)
 
+        # Set the dmp parameters
         self.dmp.set_param_vector(param_vector)
 
         return self.dmp.integrate_start(y_init)
