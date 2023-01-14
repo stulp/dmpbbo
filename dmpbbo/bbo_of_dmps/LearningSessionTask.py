@@ -159,16 +159,19 @@ class LearningSessionTask(LearningSession):
 
         return lines_eval, ax
 
-    def plot(self, fig=None):
+    def plot(self, fig=None, **kwargs):
         """ Plot the distribution updates, the rollouts, the exploration curve and learning curve in
         one figure.
 
         @param fig:  The figure to plot in (default: None, then a new figure is initialized)
         @return: The figure handle
         """
-        if not fig:
-            fig = plt.figure(figsize=(20, 5))
-        axs = [fig.add_subplot(141 + sp) for sp in range(4)]
+        axs = kwargs.get("axs", None)
+        if axs is None or len(axs) == 0:
+            if not fig:
+                fig = plt.figure(figsize=(20, 5))
+            axs = [fig.add_subplot(141 + sp) for sp in range(4)]
+
         self.plot_distribution_updates(axs[0])
         self.plot_rollouts(axs[1])
         self.plot_exploration_curve(axs[2])
