@@ -42,7 +42,7 @@ def main():
         y_yd_ydd_viapoint = np.array([-0.2, 0.0, 0.0])
     viapoint_time = 0.4 * ts[-1]
 
-    params_train = np.linspace(-0.5, 0.1, 3)
+    params_train = np.linspace(-0.5, 0.1, 5)
     params_and_trajs = []
     for param in params_train:
         y_yd_ydd_viapoint[0] = param
@@ -52,7 +52,7 @@ def main():
     dmp_type = "KULVICIUS_2012_JOINING"
     fas_dmp = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
     fa_ppf = FunctionApproximatorWLS()
-    dmp_contextual = DmpContextualTwoStep(
+    dmp_contextual = DmpContextualTwoStep.from_trajs(
         params_and_trajs, fas_dmp, ["weights"], fa_ppf, dmp_type=dmp_type, save_training_data=True)
     h, axs = dmp_contextual.plot_training(ts)
 

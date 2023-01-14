@@ -40,36 +40,29 @@ class DmpContextualTwoStep(DynamicalSystem):
         https://arxiv.org/abs/1206.6398
     """
 
-    def __init__(self, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs):
+    def __init__(self, tau, y_init, y_attr, dmp_function_apps, **kwargs):
         """Initialize a contextual DMP
 
         @param dmp: DMP to be parameterized by the context
         @param ppf_function_approximator: Function approximator for the policy parameter function
         """
-
-        first_traj = task_params_and_trajs[0][1]
-        tau = first_traj.duration
-        y_init = first_traj.y_init
-        dim_y = first_traj.dim
+        dim_y = len(y_init)
         dim_x = 3 * dim_y + 2
+        print(y_init)
         dim_x += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_x)
 
-        self.dmp = Dmp.from_traj(first_traj, dmp_function_apps, **kwargs)
-        self.dmp.set_selected_param_names(param_names)
-        n_params = self.dmp.get_param_vector_size()
+        self.dmp = Dmp(tau, y_init, y_attr, dmp_function_apps, **kwargs)
 
-        # ppf = policy parameter function
-        if isinstance(ppf_function_app, list):
-            self.ppf = ppf_function_app
-        else:
-            # Deep copies of separate function approximator for each DMP dim
-            self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_params) ]
+        # The policy parameter function can only be trained once trajectories have
+        # been provided.
+        self.ppf = None
 
+    def train(self, task_params_and_trajs, param_names, ppf_function_app, **kwargs):
         save_training_data = kwargs.get("save_training_data", False)
-        self.train(task_params_and_trajs, save_training_data=save_training_data)
 
-    def train(self, task_params_and_trajs, **kwargs):
+        self.dmp.set_selected_param_names(param_names)
+
         # Train the policy parameter function
         targets = []  # The dmp parameters
         inputs = []  # The task parameters
@@ -80,20 +73,67 @@ class DmpContextualTwoStep(DynamicalSystem):
             traj = task_param_and_traj[1]
             self.dmp.train(traj)
             dmp_params = self.dmp.get_param_vector()
+            n_dmp_params = len(dmp_params)
             targets.append(dmp_params)
 
         inputs = np.array(inputs)
         targets = np.array(targets)
 
-        # ax = None
-        for i_param in range(targets.shape[1]):
-            self.ppf[i_param].train(inputs, targets[:, i_param])
+        # ppf = policy parameter function
+        if isinstance(ppf_function_app, list):
+            if not len(ppf_function_app) == n_dmp_params:
+                raise RuntimeError(f"Length of 'ppf_function_app' list ({len(ppf_function_app)}) must be the as"\
+                                   f" the vector of dmp parameters ({n_dmp_params}). ")
+            self.ppf = ppf_function_app
+        else:
+            # Deep copies of separate function approximator, one for each DMP dim
+            self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_dmp_params)]
+
+        #ax = None
+        for i_param in range(n_dmp_params):
+            self.ppf[i_param].train(inputs, targets[:, i_param]) # , save_training_data=True)
             #_, ax = self.ppf[i_param].plot(inputs, ax=ax, plot_model_parameters=True)
 
-        if kwargs.get("save_training_data", False):
-            self._task_params_and_trajs = task_params_and_trajs
-        else:
-            self._task_params_and_trajs = None
+        self._task_params_and_trajs = task_params_and_trajs if save_training_data else None
+
+    @classmethod
+    def from_trajs(cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs):
+        """Initialize a DMP by training it from a trajectory.
+
+        @param trajectories: the trajectories to train on
+        @param dmp_function_apps: Function approximators for the DMP forcing term
+        @param kwargs: All kwargs are passed to the Dmp constructor.
+        """
+
+        # Relevant variables from trajectory
+        traj_index = 1
+        first_traj = task_params_and_trajs[0][traj_index] # For now it is assumed tau, y_init and y_attr are the same for all
+        tau = first_traj.ts[-1]
+        y_init = first_traj.ys[0, :]
+        y_attr = first_traj.ys[-1, :]
+
+        dmp_contextual = cls(tau, y_init, y_attr, dmp_function_apps, **kwargs)
+
+        dmp_contextual.train(task_params_and_trajs, param_names, ppf_function_app, **kwargs)
+
+        return dmp_contextual
+    @classmethod
+    def from_dmp(cls, task_params_and_trajs, dmp, param_names, ppf_function_app, **kwargs):
+        """Initialize a DMP by training it from a trajectory.
+
+        @param trajectories: the trajectories to train on
+        @param dmp: The DMP
+        """
+
+        # Relevant variables from trajectory
+
+        dmp_contextual = cls(dmp.tau, dmp.y_init, dmp.y_attr, dmp._function_approximators)
+        # Replace the dmp that was constructure in the above by the one that was passed.
+        dmp_contextual.dmp = dmp
+
+        dmp_contextual.train(task_params_and_trajs, param_names, ppf_function_app, **kwargs)
+
+        return dmp_contextual
 
     def dim_dmp(self):
         return self.dmp.dim_dmp
