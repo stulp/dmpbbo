@@ -10,3 +10,4 @@ thirdparty/
 include/
 lib/
 license/
+.mypy_cache
