@@ -54,27 +54,10 @@ def main():
     fa_ppf = FunctionApproximatorWLS()
     dmp_contextual = DmpContextualTwoStep.from_trajs(
         params_and_trajs, fas_dmp, ["weights"], fa_ppf, dmp_type=dmp_type, save_training_data=True)
-    h, axs = dmp_contextual.plot_training(ts)
 
-    params_test = np.linspace(-0.6, 0.2, 10)
-    for params in params_test:
-        task_params = np.array([params])
-
-        # Analytical solution
-        xs, xds, ft, fa = dmp_contextual.analytical_solution(task_params, ts)
-        h, _ = dmp_contextual.plot(ts, xs, xds, forcing_terms=ft, fa_outputs=fa, axs=axs)
-        plt.setp(h, linestyle="-", linewidth=1, color=(0.0, 0.5, 0.0))
-
-        # Numerical integration
-        xs[0, :], xds[0, :] = dmp_contextual.integrate_start(task_params)
-        for ii in range(1, n_time_steps):
-            dt = ts[ii] - ts[ii - 1]
-            xs[ii, :], xds[ii, :] = dmp_contextual.integrate_step(dt, xs[ii - 1, :])
-        h, _ = dmp_contextual.plot(ts, xs, xds, axs=axs)
-        plt.setp(h, linestyle="-", linewidth=1, color=(0.5, 1.0, 0.5))
-
+    traj_demos = [pt[1] for pt in params_and_trajs]
+    dmp_contextual.plot(plot_demonstrations=traj_demos, plot_no_forcing_term_also=True)
     plt.show()
-
 
 if __name__ == "__main__":
     main()

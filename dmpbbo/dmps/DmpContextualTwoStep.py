@@ -20,6 +20,7 @@ import copy
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib import cm
 
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dmps.Dmp import Dmp
@@ -57,6 +58,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         # The policy parameter function can only be trained once trajectories have
         # been provided.
         self.ppf = None
+        self.task_params_train = None
 
     def train(self, task_params_and_trajs, param_names, ppf_function_app, **kwargs):
         save_training_data = kwargs.get("save_training_data", False)
@@ -76,8 +78,10 @@ class DmpContextualTwoStep(DynamicalSystem):
             n_dmp_params = len(dmp_params)
             targets.append(dmp_params)
 
-        inputs = np.array(inputs)
         targets = np.array(targets)
+        inputs = np.array(inputs)
+        # Useful for plotting and sanity checks
+        self.task_params_train = inputs
 
         # ppf = policy parameter function
         if isinstance(ppf_function_app, list):
@@ -178,26 +182,37 @@ class DmpContextualTwoStep(DynamicalSystem):
     def decouple_parameters(self):
         self.dmp.decouple_parameters()
 
-    def plot(self, ts=None, xs=None, xds=None, **kwargs):
-        return self.dmp.plot(ts, xs, xds, **kwargs)
+    def plot(self, ts=None, **kwargs):
 
-    def plot_training(self, ts, **kwargs):
-        if not self._task_params_and_trajs:
-            print("Can only plot when 'save_training_data' was passed to constructor.")
-            return [], []
+        axs = kwargs.get("axs", None)
+        if axs is None:
+            axs = self.dmp.get_dmp_axes()
+            kwargs["axs"] = axs # This will be passed to self.dmp later
 
-        axs = kwargs.get("axs", self.dmp.get_dmp_axes())
-        h = []
-        for task_param_and_traj in self._task_params_and_trajs:
-            traj_demo = task_param_and_traj[1]
+        plot_demonstration = kwargs.pop("plot_demonstrations", [])
+        for traj_demo in plot_demonstration:
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
-            plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
+            plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
 
-            task_params = np.atleast_1d(task_param_and_traj[0])
-            self.set_task_params(task_params)
-            h_dmp, axs = self.dmp.plot(ts, axs=axs)
-            h.extend(h_dmp)
+        # Determine the range of the task parameters used or training.
+        task_params_train_min = self.task_params_train.min(axis=0)
+        task_params_train_max = self.task_params_train.max(axis=0)
 
-        plt.setp(h, linestyle="--", linewidth=2, color=(0.0, 0.0, 0.5))
-        return h, axs
+        n_train = self.task_params_train.shape[0]
+        #n_test = 2*n_train + 1
+        n_test = n_train
+
+        params_test = np.linspace(task_params_train_min, task_params_train_max, n_test)
+
+        cmap = cm.copper
+
+        for params in params_test:
+            self.set_task_params(params)
+            h_dmp, _ = self.dmp.plot(ts, **kwargs)
+
+            scaled = (params[0] - task_params_train_min[0])/(task_params_train_max[0]-task_params_train_min[0])
+            scaled = np.clip(scaled, 0, 1)
+            plt.setp(h_dmp, color=cmap(scaled))
+
+        return h_dmp, axs
 
