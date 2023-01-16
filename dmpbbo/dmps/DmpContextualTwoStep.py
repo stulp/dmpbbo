@@ -49,7 +49,6 @@ class DmpContextualTwoStep(DynamicalSystem):
         """
         dim_y = len(y_init)
         dim_x = 3 * dim_y + 2
-        print(y_init)
         dim_x += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_x)
 
@@ -206,6 +205,7 @@ class DmpContextualTwoStep(DynamicalSystem):
 
         cmap = cm.copper
 
+        h = []
         for params in params_test:
             self.set_task_params(params)
             h_dmp, _ = self.dmp.plot(ts, **kwargs)
@@ -213,6 +213,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             scaled = (params[0] - task_params_train_min[0])/(task_params_train_max[0]-task_params_train_min[0])
             scaled = np.clip(scaled, 0, 1)
             plt.setp(h_dmp, color=cmap(scaled))
+            h.extend(h_dmp)
 
-        return h_dmp, axs
+        return h, axs
 
