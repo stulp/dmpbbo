@@ -52,6 +52,9 @@ def main():
     inflection_ratio = 0.8
     dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
 
+    x_tau_0_ratio = 0.15
+    dyn_systems["SigmoidGating"] = SigmoidSystem.for_gating(tau, x_tau_0_ratio)
+
     # RichardsSystem, i.e. a generalized SigmoidSystem
     n_dims = len(x_init)
     t_infl_ratio = 0.5
@@ -99,7 +102,7 @@ def main():
         plt.setp(lines[0], label="Runge-Kutta")
 
         # Runge-kutta integration with different tau
-        dyn_system.tau = 1.5 * tau
+        dyn_system.tau = 0.8 * tau
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])

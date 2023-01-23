@@ -93,13 +93,18 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
             goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
-            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.85)
+            #gating_system_default = SigmoidSystem(tau, 1, -10.0, 0.9)
+            y_tau_0_ratio = 0.1
+            gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
+
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
 
         elif dmp_type in ["2022"]:
-            goal_system_default = RichardsNormalizedSystem(tau, y_init.size, 0.5, 20.0, 1.0)
-            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.6)
+            goal_system_default = RichardsNormalizedSystem(tau, y_init.size, 0.0, 20.0, 1.0)
+            #gating_system_default = SigmoidSystem(tau, 1, -10.0, 0.9)
+            y_tau_0_ratio = 0.1
+            gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
             count_down = True
             phase_system_default = TimeSystem(tau, count_down)
             damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
@@ -821,6 +826,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         if plot_tau:
             for ax in axs:
                 ax.axvline(self._tau, color='k', linewidth=1)
+
+        for ax in axs:
+            ax.set_xlim([min(ts), max(ts)])
 
         return all_handles, axs
 

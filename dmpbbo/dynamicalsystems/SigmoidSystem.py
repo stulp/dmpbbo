@@ -45,6 +45,45 @@ class SigmoidSystem(DynamicalSystem):
             self._inflection_ratio = np.asarray(self._inflection_ratio)
         self._Ks_cached = None
 
+    @classmethod
+    def for_gating(cls, tau, y_tau_0_ratio=0.1, n_dims=1):
+
+        # Known (analytical solution)
+        #   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
+        # Known in this function
+        #   N_0 = 1, K = N_0 + D = 1 + D, N_tau = ratio*N_0
+        #
+        # Compute r = max_rate from the above
+        #   N_tau = ratio*N_0
+        #   N(tau) = N_tau = ratio*N_0 = K / ( 1 + (K/N_0 - 1)*exp(-r*tau))
+        #   ratio = (1 + D) / ( 1 + ((1+D)/1 - 1)*exp(-r*tau))
+        #   ratio = (1 + D) / ( 1 + D*exp(-r*tau))
+        #   1 + D*exp(-r*tau) = (1 + D)/ratio
+        #   exp(-r*tau) = (((1 + D)/ratio)-1)/D
+        #   r = -log((((1 + D)/ratio)-1)/D)/tau
+
+        # Choosing even smaller D leads to issues with Euler integration (tested empirically)
+        D = 10e-7
+        max_rate = -np.log((((1 + D)/y_tau_0_ratio)-1)/D)/tau
+
+        # Known (see _get_ks())
+        #   K = N_0*(1+(1/exp(-r*t_infl)))
+        # Known in this function
+        #   N_0 = 1, K = N_0 + D = 1 + D, r < 0
+        #
+        # Compute inflection time from the above
+        #   1 + D = 1*(1+(1/exp(-r*t_infl)))
+        #   D = 1/exp(-r*t_infl)
+        #   1/D = exp(-r*t_infl)
+        #   -ln(1/D) = r*t_infl
+        # The above defined a relationship between r and t_infl for a given D
+        t_infl = -np.log(1/D)/max_rate
+        inflection_ratio = t_infl/tau
+        dyn_sys = cls(tau, np.ones((n_dims,)), max_rate, inflection_ratio)
+
+        return dyn_sys
+
+
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
         """ Set the time constant.
