@@ -43,7 +43,6 @@ class RichardsSystem(DynamicalSystem):
         Z = np.power((self.v / exp_term) + 1, 1 / self.v)
         self.left_asymp = (Z * self.x_init - self.right_asymp) / (Z - 1)
 
-
     def differential_equation(self, x):
         """ The differential equation which defines the system.
 
@@ -84,8 +83,8 @@ class RichardsSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self.t_inflection_ratio):
-            self.t_inflection_ratio = np.full((self.dim_x, ), self.t_inflection_ratio)
+            self.t_inflection_ratio = np.full((self.dim_x,), self.t_inflection_ratio)
         if np.isscalar(self.growth_rate):
-            self.growth_rate = np.full((self.dim_x, ), self.growth_rate)
+            self.growth_rate = np.full((self.dim_x,), self.growth_rate)
         if np.isscalar(self.v):
-            self.v = np.full((self.dim_x, ), self.v)
+            self.v = np.full((self.dim_x,), self.v)
