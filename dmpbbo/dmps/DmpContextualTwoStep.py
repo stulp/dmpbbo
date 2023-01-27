@@ -189,9 +189,11 @@ class DmpContextualTwoStep(DynamicalSystem):
             kwargs["axs"] = axs # This will be passed to self.dmp later
 
         plot_demonstration = kwargs.pop("plot_demonstrations", [])
+        tau_demos = []
         for traj_demo in plot_demonstration:
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
+            tau_demos.append(traj_demo.duration)
 
         # Determine the range of the task parameters used or training.
         task_params_train_min = self.task_params_train.min(axis=0)
@@ -206,14 +208,19 @@ class DmpContextualTwoStep(DynamicalSystem):
         cmap = cm.copper
 
         h = []
-        for params in params_test:
+        prev_tau = self.dmp.tau
+        for i_params in range(len(params_test)):
+            params = params_test[i_params]
             self.set_task_params(params)
+            #if tau_demos:
+            #    self.dmp.tau = tau_demos[i_params]
             h_dmp, _ = self.dmp.plot(ts, **kwargs)
 
             scaled = (params[0] - task_params_train_min[0])/(task_params_train_max[0]-task_params_train_min[0])
             scaled = np.clip(scaled, 0, 1)
             plt.setp(h_dmp, color=cmap(scaled))
             h.extend(h_dmp)
+        self.dmp.tau = prev_tau
 
         return h, axs
 
