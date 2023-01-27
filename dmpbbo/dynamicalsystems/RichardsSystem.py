@@ -26,22 +26,27 @@ class RichardsSystem(DynamicalSystem):
     """ A dynamical system representing a Richard's system (generalized sigmoid system).
     """
 
-    def __init__(self, tau, x_init, x_attr, t_infl, alpha=1.0, v=1.0):
+    def __init__(self, tau, x_init, x_attr, t_infl_ratio, alpha=1.0, v=1.0):
         super().__init__(1, tau, x_init)
         self._tau = tau  # To avoid flake8 warnings (is already set by super.init above)
         self.alpha = alpha
         self.v = v
         self.right_asymp = x_attr
+        self.t_infl_ratio = t_infl_ratio
         self.left_asymp = None
-        self.set_t_infl(t_infl)
 
     def set_left_asymp(self, left_asymp):
         self.left_asymp = left_asymp
 
-    def set_t_infl(self, t_infl):
+    def _get_left_asymptote(self):
+        if self.left_asymp is not None:
+            return self.left_asymp
+
+        t_infl = self.tau * self.t_infl_ratio
         exp_term = np.exp(-self.alpha * self.v * t_infl / self.tau)
         Z = np.power((self.v / exp_term) + 1, 1 / self.v)
-        self.left_asymp = (Z * self.x_init - self.right_asymp) / (Z - 1)
+        left_asymp = (Z * self.x_init - self.right_asymp) / (Z - 1)
+        return left_asymp
 
     def differential_equation(self, x):
         """ The differential equation which defines the system.
@@ -51,8 +56,9 @@ class RichardsSystem(DynamicalSystem):
         @param x: current state
         @return: xd - rate of change in state
         """
-        r = (x - self.left_asymp) / (self.right_asymp - self.left_asymp)
-        return self.alpha * (1.0 - np.power(r, self.v)) * (x - self.left_asymp) / self.tau
+        left_asymp = self._get_left_asymptote()
+        r = (x - left_asymp) / (self.right_asymp - left_asymp)
+        return self.alpha * (1.0 - np.power(r, self.v)) * (x - left_asymp) / self.tau
 
     def analytical_solution(self, ts):
         """
@@ -69,7 +75,7 @@ class RichardsSystem(DynamicalSystem):
         # Giving the variables these names make the relationship to
         # the Wikipedia article clearer.
         # https://en.wikipedia.org/wiki/Generalised_logistic_function
-        A = self.left_asymp
+        A = self._get_left_asymptote()
         K = self.right_asymp
         Q = -1 + np.power((K - A) / (self.x_init - A), self.v)
 
