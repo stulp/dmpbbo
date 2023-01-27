@@ -101,12 +101,10 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system_default = TimeSystem(tau, count_down)
 
         elif dmp_type in ["2022"]:
-            #goal_system_default = RichardsNormalizedSystem(tau, y_init.size, 0.05, 10.0, 1.0)
-            # (self, tau, x_init, x_attr, t_infl_ratio, alpha=1.0, v=1.0):
-            n = self.dim_y
             t_infl_ratio = 0.1
             alpha = 10.0
             v = 1.0
+            n = self.dim_y
             goal_system_default = RichardsSystem(tau, np.zeros((n,)), np.ones((n,)), t_infl_ratio, alpha, v)
             #gating_system_default = SigmoidSystem(tau, 1, -10.0, 0.9)
 
