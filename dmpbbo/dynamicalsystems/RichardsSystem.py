@@ -1,6 +1,6 @@
 # This file is part of DmpBbo, a set of libraries and programs for the
 # black-box optimization of dynamical movement primitives.
-# Copyright (C) 2022 Freek Stulp
+# Copyright (C) 2023 Freek Stulp
 #
 # DmpBbo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -45,10 +45,23 @@ class RichardsSystem(DynamicalSystem):
 
 
     def differential_equation(self, x):
+        """ The differential equation which defines the system.
+
+        It relates state values to rates of change of those state values.
+
+        @param x: current state
+        @return: xd - rate of change in state
+        """
         r = (x - self.left_asymp) / (self.right_asymp - self.left_asymp)
         return self.alpha * (1.0 - np.power(r, self.v)) * (x - self.left_asymp) / self.tau
 
     def analytical_solution(self, ts):
+        """
+         Return analytical solution of the system at certain times.
+
+         @param ts: A vector of times for which to compute the analytical solutions
+         @return: (xs, xds) - Sequence of states and their rates of change.
+        """
         xs = np.zeros([ts.size, self._dim_x])
         xds = np.zeros([ts.size, self._dim_x])
 
