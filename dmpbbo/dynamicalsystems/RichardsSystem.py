@@ -72,18 +72,23 @@ class RichardsSystem(DynamicalSystem):
 
         exp_term = np.exp(-self.alpha * self.v * ts / self.tau)
 
-        # Giving the variables these names make the relationship to
-        # the Wikipedia article clearer.
-        # https://en.wikipedia.org/wiki/Generalised_logistic_function
-        A = self._get_left_asymptote()
-        K = self.right_asymp
-        Q = -1 + np.power((K - A) / (self.x_init - A), self.v)
+        left_asymp = self._get_left_asymptote()
+        for dd in range(self.dim_x):
+            alpha = self.alpha if np.isscalar(self.alpha) else self.alpha[dd]
+            v = self.v if np.isscalar(self.v) else self.v[dd]
+            A = left_asymp if np.isscalar(left_asymp) else left_asymp[dd]
 
-        xs = (K - A) / np.power(1 + Q * exp_term, 1 / self.v)
-        xs += A
+            # Giving the variables these names make the relationship to
+            # the Wikipedia article clearer.
+            # https://en.wikipedia.org/wiki/Generalised_logistic_function
+            K = self.right_asymp[dd]
+            Q = -1 + np.power((K - A) / (self.x_init[dd] - A), v)
 
-        # This is not correct yet
-        xds = (Q * self.alpha * (K - A)) * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / self.v))
+            xs[:, dd] = (K - A) / np.power(1 + Q * exp_term, 1 / v)
+            xs[:, dd] += A
+
+            # This is not correct yet
+            xds[:, dd] = (Q * alpha * (K - A)) * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v))
 
         return xs, xds
 
