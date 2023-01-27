@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.RichardsNormalizedSystem import RichardsNormalizedSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
@@ -56,11 +57,10 @@ def main():
     dyn_systems["SigmoidGating"] = SigmoidSystem.for_gating(tau, x_tau_0_ratio)
 
     # RichardsSystem, i.e. a generalized SigmoidSystem
-    n_dims = len(x_init)
-    t_infl_ratio = 0.5
-    alpha = 10.0
+    t_infl_ratio = 0.50
+    alpha = 10
     v = 1.2
-    dyn_systems["RichardsNormalized"] = RichardsNormalizedSystem(tau, n_dims, t_infl_ratio, alpha, v)
+    dyn_systems["Richards"] = RichardsSystem(tau, x_init, x_attr, t_infl_ratio, alpha, v)
 
     # SpringDamperSystem
     alpha = 12.0
@@ -133,6 +133,8 @@ def main():
             plt.setp(lines[0], label="attractor")
             dyn_system.y_attr = x_attr
 
+        for ax in axs:
+            ax.axvline(tau, color="b", linewidth=2)
         axs[0].legend()
 
         plt.gcf().suptitle(name)
