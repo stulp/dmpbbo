@@ -52,6 +52,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         dim_x += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_x)
 
+        self.dmp_function_apps = dmp_function_apps
         self.dmp = Dmp(tau, y_init, y_attr, dmp_function_apps, **kwargs)
 
         # The policy parameter function can only be trained once trajectories have
@@ -61,21 +62,36 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     def train(self, task_params_and_trajs, param_names, ppf_function_app, **kwargs):
         save_training_data = kwargs.get("save_training_data", False)
+        plot_me = kwargs.get("plot_me", False)
 
         self.dmp.set_selected_param_names(param_names)
 
         # Train the policy parameter function
         targets = []  # The dmp parameters
         inputs = []  # The task parameters
+        cur_dmp = None
+        taus = []
+        y_attrs = []
+        y_inits = []
         for task_param_and_traj in task_params_and_trajs:
             task_params = np.atleast_1d(task_param_and_traj[0])
             inputs.append(task_params)
 
             traj = task_param_and_traj[1]
-            self.dmp.train(traj)
-            dmp_params = self.dmp.get_param_vector()
+            cur_dmp = self.dmp.from_traj(traj, self.dmp_function_apps)
+            if plot_me:
+                cur_dmp.plot(plot_demonstration=traj, plot_no_forcing_term_also=True)
+            dmp_params = cur_dmp.get_param_vector()
             n_dmp_params = len(dmp_params)
             targets.append(dmp_params)
+
+            taus.append(cur_dmp.tau)
+            y_attrs.append(cur_dmp.y_attr)
+            y_inits.append(cur_dmp.y_init)
+
+        self.dmp.tau = np.mean(taus)
+        self.dmp.y_init = np.mean(y_inits, axis=0)
+        self.dmp.y_attr = np.mean(y_attrs, axis=0)
 
         targets = np.array(targets)
         inputs = np.array(inputs)
@@ -92,10 +108,14 @@ class DmpContextualTwoStep(DynamicalSystem):
             # Deep copies of separate function approximator, one for each DMP dim
             self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_dmp_params)]
 
-        #ax = None
+        if plot_me:
+            n_rows = int(np.ceil(np.sqrt(n_dmp_params)))
+            fig, axs = plt.subplots(n_rows, n_rows)
+            axs = axs.flatten()
         for i_param in range(n_dmp_params):
-            self.ppf[i_param].train(inputs, targets[:, i_param]) # , save_training_data=True)
-            #_, ax = self.ppf[i_param].plot(inputs, ax=ax, plot_model_parameters=True)
+            self.ppf[i_param].train(inputs, targets[:, i_param], save_training_data=True)
+            if plot_me:
+                self.ppf[i_param].plot(inputs, ax=axs[i_param], plot_model_parameters=True)
 
         self._task_params_and_trajs = task_params_and_trajs if save_training_data else None
 
@@ -220,6 +240,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             scaled = np.clip(scaled, 0, 1)
             plt.setp(h_dmp, color=cmap(scaled))
             h.extend(h_dmp)
+
         self.dmp.tau = prev_tau
 
         return h, axs
