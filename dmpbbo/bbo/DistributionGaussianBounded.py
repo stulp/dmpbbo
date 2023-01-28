@@ -39,5 +39,5 @@ class DistributionGaussianBounded(DistributionGaussian):
 
     def generate_samples(self, n_samples=1):
         samples = super().generate_samples(n_samples)
-        clipped_samples = samples.clip(self.lower_bound)
+        clipped_samples = samples.clip(self.lower_bound, self.upper_bound)
         return clipped_samples
