@@ -101,7 +101,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             phase_system_default = TimeSystem(tau, count_down)
 
         elif dmp_type in ["2022"]:
-            t_infl_ratio = 0.1
+            t_infl_ratio = 0.4
             alpha = 10.0
             v = 1.0
             n = self.dim_y
