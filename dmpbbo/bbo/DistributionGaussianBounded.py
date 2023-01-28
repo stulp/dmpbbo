@@ -40,12 +40,4 @@ class DistributionGaussianBounded(DistributionGaussian):
     def generate_samples(self, n_samples=1):
         samples = super().generate_samples(n_samples)
         clipped_samples = samples.clip(self.lower_bound)
-        np.set_printoptions(suppress=True)
-        np.set_printoptions(precision=3)
-        np.set_printoptions(linewidth=300)
-        #print(samples)
-        #print(self.lower_bound)
-        #print(clipped_samples)
-        print("clipping")
-        print(f"#clipped = {sum(sum(clipped_samples!=samples))}")
         return clipped_samples
