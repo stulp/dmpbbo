@@ -43,6 +43,8 @@ class RichardsSystem(DynamicalSystem):
             return self.left_asymp
 
         t_infl = self.tau * self.t_infl_ratio
+        t_infl = np.clip(t_infl, 0.0, None)
+        self.v = np.clip(self.v, 0.5, None)
         exp_term = np.exp(-self.alpha * self.v * t_infl / self.tau)
         Z = np.power((self.v / exp_term) + 1, 1 / self.v)
         left_asymp = (Z * self.x_init - self.right_asymp) / (Z - 1)
@@ -95,8 +97,8 @@ class RichardsSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self.t_infl_ratio):
-            self.t_inflection_ratio = np.full((self.dim_x,), self.t_infl_ratio)
+            self.t_infl_ratio = np.full((self.dim_x,), self.t_infl_ratio)
         if np.isscalar(self.alpha):
-            self.growth_rate = np.full((self.dim_x,), self.alpha)
+            self.alpha = np.full((self.dim_x,), self.alpha)
         if np.isscalar(self.v):
             self.v = np.full((self.dim_x,), self.v)
