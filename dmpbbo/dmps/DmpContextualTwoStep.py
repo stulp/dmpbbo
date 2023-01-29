@@ -17,6 +17,7 @@
 #
 """ Module for the DMP class. """
 import copy
+import pprint
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -62,14 +63,12 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     def train(self, task_params_and_trajs, param_names, ppf_function_app, **kwargs):
         save_training_data = kwargs.get("save_training_data", False)
-        plot_me = kwargs.get("plot_me", False)
 
         self.dmp.set_selected_param_names(param_names)
 
         # Train the policy parameter function
         targets = []  # The dmp parameters
         inputs = []  # The task parameters
-        cur_dmp = None
         taus = []
         y_attrs = []
         y_inits = []
@@ -78,9 +77,9 @@ class DmpContextualTwoStep(DynamicalSystem):
             inputs.append(task_params)
 
             traj = task_param_and_traj[1]
-            cur_dmp = self.dmp.from_traj(traj, self.dmp_function_apps)
-            if plot_me:
-                cur_dmp.plot(plot_demonstration=traj, plot_no_forcing_term_also=True)
+            cur_dmp = copy.deepcopy(self.dmp)
+            cur_dmp.train(traj)
+            # h, axs = cur_dmp.plot(plot_demonstration=traj)
             dmp_params = cur_dmp.get_param_vector()
             n_dmp_params = len(dmp_params)
             targets.append(dmp_params)
@@ -108,14 +107,8 @@ class DmpContextualTwoStep(DynamicalSystem):
             # Deep copies of separate function approximator, one for each DMP dim
             self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_dmp_params)]
 
-        if plot_me:
-            n_rows = int(np.ceil(np.sqrt(n_dmp_params)))
-            fig, axs = plt.subplots(n_rows, n_rows)
-            axs = axs.flatten()
         for i_param in range(n_dmp_params):
-            self.ppf[i_param].train(inputs, targets[:, i_param], save_training_data=True)
-            if plot_me:
-                self.ppf[i_param].plot(inputs, ax=axs[i_param], plot_model_parameters=True)
+            self.ppf[i_param].train(inputs, targets[:, i_param], save_training_data=save_training_data)
 
         self._task_params_and_trajs = task_params_and_trajs if save_training_data else None
 
@@ -169,6 +162,7 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     def analytical_solution(self, task_params, ts=None, suppress_forcing_term=False):
         self.set_task_params(task_params)
+        pprint.pprint(self.dmp.__dict__["_goal_system"].__dict__)
         return self.dmp.analytical_solution(ts, suppress_forcing_term)
 
     def integrate_start(self, task_params, y_init=None):
@@ -201,20 +195,47 @@ class DmpContextualTwoStep(DynamicalSystem):
     def decouple_parameters(self):
         self.dmp.decouple_parameters()
 
-    def plot(self, ts=None, **kwargs):
+    def plot_policy_parameter_function(self):
+        n_rows = int(np.ceil(np.sqrt(len(self.ppf))))
+        fig, axs = plt.subplots(n_rows, n_rows)
+        axs = axs.flatten()
+        for i_param, fa in enumerate(self.ppf):
+            fa.plot(ax=axs[i_param], plot_model_parameters=True)
+
+    def plot(self, task_params_and_trajs, **kwargs):
 
         axs = kwargs.get("axs", None)
         if axs is None:
             axs = self.dmp.get_dmp_axes()
-            kwargs["axs"] = axs # This will be passed to self.dmp later
+            kwargs["axs"] = axs  # This will be passed to self.dmp later
 
-        plot_demonstration = kwargs.pop("plot_demonstrations", [])
-        tau_demos = []
-        for traj_demo in plot_demonstration:
+        max_duration = 0.0
+        for task_param_and_traj in task_params_and_trajs:
+            traj_demo = task_param_and_traj[1]
+            max_duration = max(max_duration, traj_demo.duration)
+            dt = traj_demo._dt_mean
+
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
-            tau_demos.append(traj_demo.duration)
 
+        ts = np.arange(0.0, max_duration, dt)
+
+        for task_param_and_traj in task_params_and_trajs:
+            traj_demo = task_param_and_traj[1]
+            task_param =  task_param_and_traj[0]
+
+            self.dmp.tau = traj_demo.duration
+            self.dmp.y_init = traj_demo.y_init
+            self.dmp.y_attr = traj_demo.y_final
+            self.set_task_params(np.array([task_param]))
+
+            h, _ = self.dmp.plot(ts, axs=axs, plot_no_forcing_term_also=True)
+            #plt.setp(h, color='k', linestyle=':')
+
+            for ax in axs:
+                ax.axvline(self.dmp.tau, color='k', linewidth=1)
+
+        return
         # Determine the range of the task parameters used or training.
         task_params_train_min = self.task_params_train.min(axis=0)
         task_params_train_max = self.task_params_train.max(axis=0)
