@@ -726,18 +726,23 @@ class Dmp(DynamicalSystem, Parameterizable):
         return size
 
     @staticmethod
-    def get_dmp_axes(n_cols=4):
+    def get_dmp_axes(n_cols=4, **kwargs):
         """ Get matplotlib axes on which to plot the output of a DMP.
 
         @param has_fa_output: Whether the output of the function approximators is available.
         @return: list of axes on which the DMP was plotted
         """
-        n_rows = 2
+        plot_compact = kwargs.get("plot_compact", True)
+        n_rows = 1 if plot_compact else 2
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
 
         # We need two loops for the two rows, in case there are extra cols (n_cols>4)
-        axs = [fig.add_subplot(n_rows, n_cols, i + 1) for i in range(4)]
-        axs.extend([fig.add_subplot(n_rows, n_cols, i + n_cols + 1) for i in range(4)])
+        axs = [fig.add_subplot(n_rows, n_cols, i + 1) for i in range(n_cols)]
+        if plot_compact:
+            pass
+            #axs.append(axs[-1].twinx())
+        else:
+            axs.extend([fig.add_subplot(n_rows, n_cols, i + n_cols + 1) for i in range(n_cols)])
         return axs
 
     def plot(self, ts=None, xs=None, xds=None, **kwargs):
@@ -766,12 +771,20 @@ class Dmp(DynamicalSystem, Parameterizable):
         plot_demonstration = kwargs.get("plot_demonstration", False)
 
         d = self.dim_dmp()  # noqa Abbreviation for convenience
-        systems = [
-            ("goal", self.GOAL, axs[0:1], self._goal_system),
-            ("spring-damper", self.SPRING, axs[1:4], self._spring_system),
-            ("phase", self.PHASE, axs[4:5], self._phase_system),
-            ("gating", self.GATING, axs[6:7], self._gating_system),
-        ]
+        plot_compact = kwargs.get("plot_compact", True)
+        if not plot_compact:
+            systems = [
+                ("goal", self.GOAL, axs[0:1], self._goal_system),
+                ("spring-damper", self.SPRING, axs[1:4], self._spring_system),
+                ("phase", self.PHASE, axs[4:5], self._phase_system),
+                ("gating", self.GATING, axs[6:7], self._gating_system),
+            ]
+        else:
+            systems = [
+                ("spring-damper", self.SPRING, axs[0:3], self._spring_system),
+                ("goal", self.GOAL, axs[0:1], self._goal_system),
+                #("gating", self.GATING, axs[4:5], self._gating_system),
+            ]
         # system_varname = ["x", "v", "y^{g_d}", "y"]
 
         all_handles = []
@@ -803,30 +816,35 @@ class Dmp(DynamicalSystem, Parameterizable):
                 h = axs_cur[0].plot(ts, xs_cur)
                 axs_cur = [axs_cur[0]]  # Avoid plotting vel/acc
             all_handles.append(h)
-            for i, ax in enumerate(axs_cur):
-                x = np.mean(ax.get_xlim())
-                y = np.mean(ax.get_ylim())
-                ax.text(x, y, system[0], horizontalalignment="center")
+            if not plot_compact:
+                for i, ax in enumerate(axs_cur):
+                    x = np.mean(ax.get_xlim())
+                    y = np.mean(ax.get_ylim())
+                    ax.text(x, y, system[0], horizontalalignment="center")
 
-        if len(fa_outputs) > 1:
-            ax = axs[5]
-            h = ax.plot(ts, fa_outputs)
-            all_handles.extend(h)
-            x = np.mean(ax.get_xlim())
-            y = np.mean(ax.get_ylim())
-            ax.text(x, y, "func. approx.", horizontalalignment="center")
-            ax.set_xlabel(r"time ($s$)")
-            ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
 
         if len(forcing_terms) > 1:
-            ax = axs[7]
+            ax = axs[3] if plot_compact else axs[7]
             h = ax.plot(ts, forcing_terms)
             all_handles.extend(h)
             x = np.mean(ax.get_xlim())
             y = np.mean(ax.get_ylim())
-            ax.text(x, y, "forcing term", horizontalalignment="center")
+            if not plot_compact:
+                ax.text(x, y, "forcing term", horizontalalignment="center")
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(x)$")
+
+        if len(fa_outputs) > 1:
+            ax = axs[3] if plot_compact else axs[5]
+            h = ax.plot(ts, fa_outputs)
+            all_handles.extend(h)
+            x = np.mean(ax.get_xlim())
+            y = np.mean(ax.get_ylim())
+            if not plot_compact:
+                ax.text(x, y, "func. approx.", horizontalalignment="center")
+            ax.set_xlabel(r"time ($s$)")
+            ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
+
 
         if plot_tau:
             for ax in axs:
@@ -834,6 +852,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         for ax in axs:
             ax.set_xlim([min(ts), max(ts)])
+            ax.grid(False)
 
         return all_handles, axs
 
