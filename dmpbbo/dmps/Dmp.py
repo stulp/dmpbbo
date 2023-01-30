@@ -84,6 +84,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         # damping_system_default = ExponentialSystem(tau, damp_init, damp_goal, 4)
         damping_system_default = None
 
+        self.goal_system_requires_scaling = False
+
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
         if dmp_type == "IJSPEERT_2002_MOVEMENT":
@@ -100,16 +102,20 @@ class Dmp(DynamicalSystem, Parameterizable):
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
 
-        elif dmp_type in ["2022"]:
-            t_infl_ratio = 0.4
+        elif dmp_type in ["2022", "2022_NO_SCALING"]:
+            self.goal_system_requires_scaling = dmp_type != "2022_NO_SCALING"
+
+            t_infl_ratio = 0.3
             alpha = 10.0
             v = 1.0
             n = self.dim_y
-            goal_system_default = RichardsSystem(tau, np.zeros((n,)), np.ones((n,)), t_infl_ratio, alpha, v)
-            #gating_system_default = SigmoidSystem(tau, 1, -10.0, 0.9)
-
-            y_tau_0_ratio = 0.5
-            gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
+            if self.goal_system_requires_scaling:
+                goal_system_default = RichardsSystem(tau, np.zeros((n,)), np.ones((n,)), t_infl_ratio, alpha, v)
+            else:
+                goal_system_default = RichardsSystem(tau, y_init, y_attr, t_infl_ratio, alpha, v)
+            gating_system_default = RichardsSystem(tau, np.ones((1,)), np.zeros((1,)), 1.0, 10.0, 10.0)
+            #y_tau_0_ratio = 0.5
+            #gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
             count_down = True
             phase_system_default = TimeSystem(tau, count_down)
             damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
@@ -177,11 +183,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         return self._dim_y
 
-    def goal_system_requires_scaling(self):
-        return isinstance(self._goal_system, RichardsSystem)
-
     def scale_goal_system(self, x_goal):
-        if self.goal_system_requires_scaling():
+        if self.goal_system_requires_scaling:
             return self._y_init + (self._y_attr - self._y_init) *  x_goal
         else:
             return x_goal
@@ -395,7 +398,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state and damping
-        if isinstance(self._goal_system, RichardsSystem):
+        if self.goal_system_requires_scaling:
             # Scaled goal
             # scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs_goal[0, :]
             local_spring_system.y_attr = self.y_init
@@ -429,7 +432,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
             # Set the attractor and damping of the spring system
-            if isinstance(self._goal_system, RichardsSystem):
+            if self.goal_system_requires_scaling:
                 # Scaled goal
                 scaled_goal =  self.y_init + (self._y_attr - self.y_init)*xs[tt, self.GOAL]
                 local_spring_system.y_attr = scaled_goal
@@ -504,7 +507,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         xs_gating = xs_ana[:, self.GATING]
         xs_phase = xs_ana[:, self.PHASE]
 
-        if self.goal_system_requires_scaling():
+        if self.goal_system_requires_scaling:
             xs_goal = self.scale_goal_system(xs_goal)
 
         fa_inputs_phase = xs_phase
@@ -606,7 +609,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
         if self._goal_system is not None:
-            if not isinstance(self._goal_system, RichardsSystem):
+            if not self.goal_system_requires_scaling:
                 self._goal_system.y_init = y_init_new
 
     @property
@@ -624,7 +627,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set value in all relevant subsystems also
         if self._goal_system is not None:
-            if not isinstance(self._goal_system, RichardsSystem):
+            if not self.goal_system_requires_scaling:
                 self._goal_system.y_attr = y_attr_new
 
         # Do NOT do the following. The attractor state of the spring system is
@@ -734,14 +737,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         plot_compact = kwargs.get("plot_compact", True)
         n_rows = 1 if plot_compact else 2
+        n_cols = 5 if plot_compact else n_cols
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
 
         # We need two loops for the two rows, in case there are extra cols (n_cols>4)
         axs = [fig.add_subplot(n_rows, n_cols, i + 1) for i in range(n_cols)]
-        if plot_compact:
-            pass
-            #axs.append(axs[-1].twinx())
-        else:
+        if not plot_compact:
             axs.extend([fig.add_subplot(n_rows, n_cols, i + n_cols + 1) for i in range(n_cols)])
         return axs
 
@@ -783,7 +784,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             systems = [
                 ("spring-damper", self.SPRING, axs[0:3], self._spring_system),
                 ("goal", self.GOAL, axs[0:1], self._goal_system),
-                #("gating", self.GATING, axs[4:5], self._gating_system),
+                ("gating", self.GATING, axs[4:5], self._gating_system),
             ]
         # system_varname = ["x", "v", "y^{g_d}", "y"]
 
