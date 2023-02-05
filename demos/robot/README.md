@@ -178,7 +178,11 @@ The `--save` flag additional saves the graph to a png file. This script automati
 
 ![](images/optimization.png  "Optimization results after 15 updates.")
 
-The left graph shows the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. The second plot shows 2 dimensions of the search space (in this case 2*10 basis functions is 20D). The third plot shows the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in <a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a>. The final graph shows the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
+These plots show:
+1. two dimensions of the search space (in this case 2*10 basis functions is 20D)
+2. the evaluation rollout after each update, the red one being the first, and more green rollouts corresponding to more recent rollouts. 
+3. the exploration magnitude (sigma) at each update. Here it decays, with a decay factor of 0.8, which was specified in <a href="step4_prepare_optimization.py">`step4_prepare_optimization.py`</a>. 
+4. the learning curve. The black line corresponds to the cost of the evaluation rollout, which is based on the updated mean of the Gaussian distribution. The thinner lines correspond to the different cost components, in this case the distance to the landing site, and the cost for accelerations. Finally, the grey dots correspond to the cost of each rollout during the optimization, i.e. those sampled from the Gaussian distribution.
 
 We see that after 15 rollouts, the "robot" has learned to throw the ball in the specified area. The accelerations have increased slightly because the movement to do this requires slightly higher velocities than those in the demonstration.
 
