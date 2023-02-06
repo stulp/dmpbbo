@@ -78,6 +78,12 @@ class DistributionGaussian:
         self.mean = mean
         self.covar = covar
 
+        if isinstance(self.mean, np.ndarray):
+            if self.mean.size != self.covar.shape[0]:
+                raise ValueError(
+                    f"size of mean ({self.mean.size}) must correspond to that of covar ({self.covar.shape[0]})"
+                )
+
     def generate_samples(self, n_samples=1):
         """ Generate samples from the distribution.
 
