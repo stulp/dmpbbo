@@ -735,7 +735,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         @param has_fa_output: Whether the output of the function approximators is available.
         @return: list of axes on which the DMP was plotted
         """
-        plot_compact = kwargs.get("plot_compact", True)
+        plot_compact = kwargs.get("plot_compact", False)
         n_rows = 1 if plot_compact else 2
         n_cols = 5 if plot_compact else n_cols
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
@@ -764,7 +764,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             fa_outputs = kwargs.get("fa_outputs", [])
 
         n_subplot_columns = kwargs.get("n_subplot_columns", 4)
-        axs = kwargs.get("axs") or Dmp.get_dmp_axes(n_subplot_columns)
+        axs = kwargs.get("axs") or Dmp.get_dmp_axes(n_subplot_columns, **kwargs)
 
         plot_tau = kwargs.get("plot_tau", True)
         # has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
@@ -772,7 +772,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         plot_demonstration = kwargs.get("plot_demonstration", False)
 
         d = self.dim_dmp()  # noqa Abbreviation for convenience
-        plot_compact = kwargs.get("plot_compact", True)
+        plot_compact = kwargs.get("plot_compact", False)
         if not plot_compact:
             systems = [
                 ("goal", self.GOAL, axs[0:1], self._goal_system),
