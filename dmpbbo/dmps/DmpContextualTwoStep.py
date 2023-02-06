@@ -17,7 +17,6 @@
 #
 """ Module for the DMP class. """
 import copy
-import pprint
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -88,6 +87,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             y_attrs.append(cur_dmp.y_attr)
             y_inits.append(cur_dmp.y_init)
 
+        self.dmp = cur_dmp
         self.dmp.tau = np.mean(taus)
         self.dmp.y_init = np.mean(y_inits, axis=0)
         self.dmp.y_attr = np.mean(y_attrs, axis=0)
@@ -162,7 +162,6 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     def analytical_solution(self, task_params, ts=None, suppress_forcing_term=False):
         self.set_task_params(task_params)
-        pprint.pprint(self.dmp.__dict__["_goal_system"].__dict__)
         return self.dmp.analytical_solution(ts, suppress_forcing_term)
 
     def integrate_start(self, task_params, y_init=None):
@@ -235,7 +234,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             for ax in axs:
                 ax.axvline(self.dmp.tau, color='k', linewidth=1)
 
-        return
+        return h, axs
         # Determine the range of the task parameters used or training.
         task_params_train_min = self.task_params_train.min(axis=0)
         task_params_train_max = self.task_params_train.max(axis=0)
