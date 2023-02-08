@@ -74,14 +74,14 @@ class RichardsSystem(DynamicalSystem):
 
         left_asymp = self._get_left_asymptote()
         for dd in range(self.dim_x):
+
             alpha = self.alpha if np.isscalar(self.alpha) else self.alpha[dd]
             v = self.v if np.isscalar(self.v) else self.v[dd]
-            A = left_asymp if np.isscalar(left_asymp) else left_asymp[dd]
-
             # Giving the variables these names make the relationship to
             # the Wikipedia article clearer.
             # https://en.wikipedia.org/wiki/Generalised_logistic_function
-            K = self.right_asymp[dd]
+            A = left_asymp if np.isscalar(left_asymp) else left_asymp[dd]
+            K = self.right_asymp if np.isscalar(self.right_asymp) else self.right_asymp[dd]
             Q = -1 + np.power((K - A) / (self.x_init[dd] - A), v)
 
             exp_term = np.exp(-alpha * v * ts / self.tau)
