@@ -64,7 +64,7 @@ class SigmoidSystem(DynamicalSystem):
 
         # Choosing even smaller D leads to issues with Euler integration (tested empirically)
         D = 10e-7
-        max_rate = -np.log((((1 + D)/y_tau_0_ratio)-1)/D)/tau
+        max_rate = -np.log((((1 + D) / y_tau_0_ratio) - 1) / D) / tau
 
         # Known (see _get_ks())
         #   K = N_0*(1+(1/exp(-r*t_infl)))
@@ -77,12 +77,11 @@ class SigmoidSystem(DynamicalSystem):
         #   1/D = exp(-r*t_infl)
         #   -ln(1/D) = r*t_infl
         # The above defined a relationship between r and t_infl for a given D
-        t_infl = -np.log(1/D)/max_rate
-        inflection_ratio = t_infl/tau
+        t_infl = -np.log(1 / D) / max_rate
+        inflection_ratio = t_infl / tau
         dyn_sys = cls(tau, np.ones((n_dims,)), max_rate, inflection_ratio)
 
         return dyn_sys
-
 
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
@@ -209,7 +208,7 @@ class SigmoidSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self._max_rate):
-            self._max_rate = np.full((self.dim_x, ), self._max_rate)
+            self._max_rate = np.full((self.dim_x,), self._max_rate)
         if np.isscalar(self._inflection_ratio):
-            self._inflection_ratio = np.full((self.dim_x, ), self._inflection_ratio)
+            self._inflection_ratio = np.full((self.dim_x,), self._inflection_ratio)
         self._Ks_cached = None

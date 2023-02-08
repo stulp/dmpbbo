@@ -110,5 +110,4 @@ class ExponentialSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self.alpha):
-            self.alpha = np.full((self.dim_x, ), self.alpha)
-
+            self.alpha = np.full((self.dim_x,), self.alpha)

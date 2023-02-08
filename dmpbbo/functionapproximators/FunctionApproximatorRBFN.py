@@ -61,7 +61,6 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         model_params["centers"] = meta_params.get("centers", centers)
         model_params["widths"] = meta_params.get("widths", widths)
 
-
         # Get the activations of the basis functions
         activations = FunctionApproximatorRBFN._activations(inputs, model_params)
 
@@ -103,9 +102,9 @@ class FunctionApproximatorRBFN(FunctionApproximator):
 
         ax = kwargs.get("ax") or self._get_axis()
 
-        #lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
+        # lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
         lines = self._plot_grid_values(inputs, weighted_acts, ax, n_samples_per_dim)
         alpha = 1.0 if self.dim_input() < 2 else 0.3
-        plt.setp(lines, linestyle='--', color=[0.7, 0.7, 0.7], linewidth=2, alpha=alpha)
+        plt.setp(lines, linestyle="--", color=[0.7, 0.7, 0.7], linewidth=2, alpha=alpha)
 
         return lines, ax

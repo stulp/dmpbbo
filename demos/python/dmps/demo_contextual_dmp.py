@@ -46,18 +46,22 @@ def main():
     params_and_trajs = []
     for param in params_train:
         y_yd_ydd_viapoint[0] = param
-        traj = Trajectory.from_viapoint_polynomial(ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr)
+        traj = Trajectory.from_viapoint_polynomial(
+            ts, y_init, y_yd_ydd_viapoint, viapoint_time, y_attr
+        )
         params_and_trajs.append((param, traj))
 
     dmp_type = "KULVICIUS_2012_JOINING"
     fas_dmp = [FunctionApproximatorRBFN(10, 0.7) for _ in range(n_dims)]
     fa_ppf = FunctionApproximatorWLS()
     dmp_contextual = DmpContextualTwoStep.from_trajs(
-        params_and_trajs, fas_dmp, ["weights"], fa_ppf, dmp_type=dmp_type, save_training_data=True)
+        params_and_trajs, fas_dmp, ["weights"], fa_ppf, dmp_type=dmp_type, save_training_data=True
+    )
 
     traj_demos = [pt[1] for pt in params_and_trajs]
     dmp_contextual.plot(plot_demonstrations=traj_demos, plot_no_forcing_term_also=True)
     plt.show()
+
 
 if __name__ == "__main__":
     main()

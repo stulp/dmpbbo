@@ -22,8 +22,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
 
-from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dmps.Dmp import Dmp
+from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
@@ -100,20 +100,26 @@ class DmpContextualTwoStep(DynamicalSystem):
         # ppf = policy parameter function
         if isinstance(ppf_function_app, list):
             if not len(ppf_function_app) == n_dmp_params:
-                raise RuntimeError(f"Length of 'ppf_function_app' list ({len(ppf_function_app)}) must be the as"\
-                                   f" the vector of dmp parameters ({n_dmp_params}). ")
+                raise RuntimeError(
+                    f"Length of 'ppf_function_app' list ({len(ppf_function_app)}) must be the as"
+                    f" the vector of dmp parameters ({n_dmp_params}). "
+                )
             self.ppf = ppf_function_app
         else:
             # Deep copies of separate function approximator, one for each DMP dim
             self.ppf = [copy.deepcopy(ppf_function_app) for _ in range(n_dmp_params)]
 
         for i_param in range(n_dmp_params):
-            self.ppf[i_param].train(inputs, targets[:, i_param], save_training_data=save_training_data)
+            self.ppf[i_param].train(
+                inputs, targets[:, i_param], save_training_data=save_training_data
+            )
 
         self._task_params_and_trajs = task_params_and_trajs if save_training_data else None
 
     @classmethod
-    def from_trajs(cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs):
+    def from_trajs(
+        cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs
+    ):
         """Initialize a DMP by training it from a trajectory.
 
         @param trajectories: the trajectories to train on
@@ -123,7 +129,9 @@ class DmpContextualTwoStep(DynamicalSystem):
 
         # Relevant variables from trajectory
         traj_index = 1
-        first_traj = task_params_and_trajs[0][traj_index] # For now it is assumed tau, y_init and y_attr are the same for all
+        first_traj = task_params_and_trajs[0][
+            traj_index
+        ]  # For now it is assumed tau, y_init and y_attr are the same for all
         tau = first_traj.ts[-1]
         y_init = first_traj.ys[0, :]
         y_attr = first_traj.ys[-1, :]
@@ -133,6 +141,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         dmp_contextual.train(task_params_and_trajs, param_names, ppf_function_app, **kwargs)
 
         return dmp_contextual
+
     @classmethod
     def from_dmp(cls, task_params_and_trajs, dmp, param_names, ppf_function_app, **kwargs):
         """Initialize a DMP by training it from a trajectory.
@@ -221,7 +230,7 @@ class DmpContextualTwoStep(DynamicalSystem):
 
         for task_param_and_traj in task_params_and_trajs:
             traj_demo = task_param_and_traj[1]
-            task_param =  task_param_and_traj[0]
+            task_param = task_param_and_traj[0]
 
             self.dmp.tau = traj_demo.duration
             self.dmp.y_init = traj_demo.y_init
@@ -229,10 +238,10 @@ class DmpContextualTwoStep(DynamicalSystem):
             self.set_task_params(np.array([task_param]))
 
             h, _ = self.dmp.plot(ts, axs=axs, plot_no_forcing_term_also=True)
-            #plt.setp(h, color='k', linestyle=':')
+            # plt.setp(h, color='k', linestyle=':')
 
             for ax in axs:
-                ax.axvline(self.dmp.tau, color='k', linewidth=1)
+                ax.axvline(self.dmp.tau, color="k", linewidth=1)
 
         return h, axs
         # Determine the range of the task parameters used or training.
@@ -240,7 +249,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         task_params_train_max = self.task_params_train.max(axis=0)
 
         n_train = self.task_params_train.shape[0]
-        #n_test = 2*n_train + 1
+        # n_test = 2*n_train + 1
         n_test = n_train
 
         params_test = np.linspace(task_params_train_min, task_params_train_max, n_test)
@@ -252,11 +261,13 @@ class DmpContextualTwoStep(DynamicalSystem):
         for i_params in range(len(params_test)):
             params = params_test[i_params]
             self.set_task_params(params)
-            #if tau_demos:
+            # if tau_demos:
             #    self.dmp.tau = tau_demos[i_params]
             h_dmp, _ = self.dmp.plot(ts, **kwargs)
 
-            scaled = (params[0] - task_params_train_min[0])/(task_params_train_max[0]-task_params_train_min[0])
+            scaled = (params[0] - task_params_train_min[0]) / (
+                task_params_train_max[0] - task_params_train_min[0]
+            )
             scaled = np.clip(scaled, 0, 1)
             plt.setp(h_dmp, color=cmap(scaled))
             h.extend(h_dmp)
@@ -264,4 +275,3 @@ class DmpContextualTwoStep(DynamicalSystem):
         self.dmp.tau = prev_tau
 
         return h, axs
-

@@ -90,8 +90,16 @@ class SpringDamperSystem(DynamicalSystem):
         zd = np.zeros(yd.shape)
 
         for dd in range(self.dim_y):
-            K = self.spring_constant if np.isscalar(self.spring_constant) else self.spring_constant[dd]
-            D = self.damping_coefficient if np.isscalar(self.damping_coefficient) else self.damping_coefficient[dd]
+            K = (
+                self.spring_constant
+                if np.isscalar(self.spring_constant)
+                else self.spring_constant[dd]
+            )
+            D = (
+                self.damping_coefficient
+                if np.isscalar(self.damping_coefficient)
+                else self.damping_coefficient[dd]
+            )
             m = self.mass if np.isscalar(self.mass) else self.mass[dd]
             zd[dd] = (-K * (y[dd] - self._y_attr[dd]) - D * z[dd]) / (m * self._tau)
 
@@ -168,8 +176,8 @@ class SpringDamperSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self.damping_coefficient):
-            self.damping_coefficient = np.full((self.dim_y, ), self.damping_coefficient)
+            self.damping_coefficient = np.full((self.dim_y,), self.damping_coefficient)
         if np.isscalar(self.spring_constant):
-            self.spring_constant = np.full((self.dim_y, ), self.spring_constant)
+            self.spring_constant = np.full((self.dim_y,), self.spring_constant)
         if np.isscalar(self.mass):
-            self.mass = np.full((self.dim_y, ), self.mass)
+            self.mass = np.full((self.dim_y,), self.mass)

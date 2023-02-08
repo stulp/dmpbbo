@@ -21,13 +21,14 @@ from matplotlib import pyplot as plt
 from dmpbbo.functionapproximators.basis_functions import Gaussian
 from dmpbbo.functionapproximators.FunctionApproximator import FunctionApproximator
 
+
 class FunctionApproximatorGPR(FunctionApproximator):
     """Function approximator based on Gaussian Process Regression (GPR).
     """
 
     def __init__(self, max_covariance, lengths):
         """Constructor for GPR function approximator
-        
+
         Args:
             maximum_covariance (double): The maximum allowable covariance of the covar function (aka sigma in Ebden'15)
             lengths (scalar or numpy.array:  Standard deviation in the isotropic covariance function, i.e.  \f$ e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\f$, with \f$ \mathbf{W} = lengths^2 * \mathbf{I} \f$
@@ -39,10 +40,7 @@ class FunctionApproximatorGPR(FunctionApproximator):
     @staticmethod
     def _activations(inputs, model_params):
         activations = Gaussian.activations(
-            inputs,
-            centers=model_params["inputs"],
-            widths=model_params["lengths"],
-            normalized=False
+            inputs, centers=model_params["inputs"], widths=model_params["lengths"], normalized=False
         )
         return model_params["max_covariance"] * activations
 
@@ -59,13 +57,12 @@ class FunctionApproximatorGPR(FunctionApproximator):
         gram = FunctionApproximatorGPR._activations(inputs, model_params)
 
         gram_inv = np.linalg.inv(gram)
-        gram_inv_targets =  gram_inv @ targets
+        gram_inv_targets = gram_inv @ targets
 
         model_params["gram_inv_targets"] = gram_inv_targets  # Required to compute mean
         # model_params["gram_inv"] = gram_inv  # Required to compute variance
 
         return model_params
-
 
     @staticmethod
     def _predict(inputs, model_params):
@@ -97,9 +94,9 @@ class FunctionApproximatorGPR(FunctionApproximator):
 
         ax = kwargs.get("ax") or self._get_axis()
 
-        #lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
+        # lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
         lines = self._plot_grid_values(inputs, weighted_acts, ax, n_samples_per_dim)
         alpha = 1.0 if self.dim_input() < 2 else 0.3
-        plt.setp(lines, linestyle='--', color=[0.7, 0.7, 0.7], linewidth=2, alpha=alpha)
+        plt.setp(lines, linestyle="--", color=[0.7, 0.7, 0.7], linewidth=2, alpha=alpha)
 
         return lines, ax

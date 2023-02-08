@@ -27,6 +27,7 @@ from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 class DistributionGaussianBounded(DistributionGaussian):
     """ A class for representing a bounded Gaussian distribution.
     """
+
     def __init__(self, mean=0.0, covar=1.0, lower_bound=None, upper_bound=None):
         """ Construct the Gaussian distribution with a mean and covariance matrix.
 

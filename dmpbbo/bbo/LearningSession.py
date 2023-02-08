@@ -441,11 +441,11 @@ class LearningSession:
 
     def get_eval_cost_before_after(self):
         before, _ = self.get_eval_costs(0)
-        after, _ = self.get_eval_costs(self.get_n_updates()-1)
+        after, _ = self.get_eval_costs(self.get_n_updates() - 1)
         return before, after
 
     def get_cost_ratio(self):
-        before, after =  self.get_eval_cost_before_after()
+        before, after = self.get_eval_cost_before_after()
         # Only use total cost, not the cost components
         return after[0] / before[0]
 

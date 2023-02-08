@@ -72,7 +72,6 @@ class RichardsSystem(DynamicalSystem):
         xs = np.zeros([ts.size, self._dim_x])
         xds = np.zeros([ts.size, self._dim_x])
 
-
         left_asymp = self._get_left_asymptote()
         for dd in range(self.dim_x):
             alpha = self.alpha if np.isscalar(self.alpha) else self.alpha[dd]
@@ -91,7 +90,11 @@ class RichardsSystem(DynamicalSystem):
             xs[:, dd] += A
 
             # This is not correct yet
-            xds[:, dd] = (Q * alpha * (K - A)) * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v)) / self.tau
+            xds[:, dd] = (
+                (Q * alpha * (K - A))
+                * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v))
+                / self.tau
+            )
 
         return xs, xds
 

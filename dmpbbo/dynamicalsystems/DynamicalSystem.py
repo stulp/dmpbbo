@@ -220,6 +220,7 @@ class DynamicalSystem(ABC):
                 xs[ii, :], xds[ii, :] = self.integrate_step_euler(dt, xs[ii - 1, :])
 
         return xs, xds
+
     @abstractmethod
     def decouple_parameters(self):
         """ Decouple the parameters of a multi-dimensional system.
