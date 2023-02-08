@@ -119,7 +119,7 @@ def main():
     perturbed_sample = np.random.normal(sample, np.abs(0.3 * sample))
     cost_vars = solver.perform_rollout(perturbed_sample)
     task = TaskViapointArm2D(n_dofs, np.full(2, 0.5))
-    h, ax = task.plot_rollout(cost_vars, ax)
+    task.plot_rollout(cost_vars, ax)
 
     plt.show()
 

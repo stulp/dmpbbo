@@ -17,18 +17,14 @@
 """Script for bbo_of_dmps demo."""
 
 
-import sys
-
 import numpy as np
 from matplotlib import pyplot as plt
 
 from demos.python.bbo_of_dmps.arm2D.TaskSolverDmpArm2D import TaskSolverDmpArm2D
 from demos.python.bbo_of_dmps.arm2D.TaskViapointArm2D import TaskViapointArm2D
-from demos.python.bbo_of_dmps.TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
-from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
@@ -38,7 +34,6 @@ def main(directory=None):
     """ Run one demo for bbo_of_dmps.
 
     @param directory: Directory to save results to
-    @param n_dims: Number of dimensions of the task (i.e. the viapoint)
     """
 
     n_dofs = 7  # Number of joints

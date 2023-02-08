@@ -125,7 +125,7 @@ class SpringDamperSystem(DynamicalSystem):
             damping_coefficients = np.full(self._dim_y, self.damping_coefficient)
         spring_constants = self.spring_constant
         if not isinstance(spring_constants, np.ndarray):
-            spring_constants = np.full(self._dim_y, self.spring_constant)
+            spring_constants = np.full(self._dim_y, float(self.spring_constant))
         masses = self.mass
         if not isinstance(masses, np.ndarray):
             masses = np.full(self._dim_y, self.mass)
@@ -176,8 +176,8 @@ class SpringDamperSystem(DynamicalSystem):
 
     def decouple_parameters(self):
         if np.isscalar(self.damping_coefficient):
-            self.damping_coefficient = np.full((self.dim_y,), self.damping_coefficient)
+            self.damping_coefficient = np.full((self.dim_y,), float(self.damping_coefficient))
         if np.isscalar(self.spring_constant):
-            self.spring_constant = np.full((self.dim_y,), self.spring_constant)
+            self.spring_constant = np.full((self.dim_y,), float(self.spring_constant))
         if np.isscalar(self.mass):
-            self.mass = np.full((self.dim_y,), self.mass)
+            self.mass = np.full((self.dim_y,), float(self.mass))

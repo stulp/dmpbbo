@@ -23,9 +23,7 @@ import numpy as np
 from matplotlib import cm
 
 from dmpbbo.dmps.Dmp import Dmp
-from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
-from dmpbbo.functionapproximators.Parameterizable import Parameterizable
 
 
 class DmpContextualTwoStep(DynamicalSystem):
@@ -72,6 +70,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         y_attrs = []
         y_inits = []
         cur_dmp = None
+        n_dmp_params = 0
         for task_param_and_traj in task_params_and_trajs:
             task_params = np.atleast_1d(task_param_and_traj[0])
             inputs.append(task_params)
@@ -99,7 +98,6 @@ class DmpContextualTwoStep(DynamicalSystem):
         self.task_params_train = inputs
 
         # ppf = policy parameter function
-        n_dmp_params = 0
         if isinstance(ppf_function_app, list):
             if not len(ppf_function_app) == n_dmp_params:
                 raise RuntimeError(

@@ -16,7 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """Script for bbo_of_dmps demo (with single updates saved to file)."""
 import argparse
-import sys
 import tempfile
 from pathlib import Path
 
