@@ -91,7 +91,7 @@ class RichardsSystem(DynamicalSystem):
             xs[:, dd] += A
 
             # This is not correct yet
-            xds[:, dd] = (Q * alpha * (K - A)) * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v))
+            xds[:, dd] = (Q * alpha * (K - A)) * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v)) / self.tau
 
         return xs, xds
 
