@@ -20,9 +20,6 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
-
-
 class Updater(ABC):
     """ Virtual class for updating a Gaussian distribution with reward-weighted averaging.
     """

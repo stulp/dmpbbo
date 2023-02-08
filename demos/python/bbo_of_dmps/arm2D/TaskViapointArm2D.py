@@ -20,8 +20,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from demos.python.bbo_of_dmps.TaskViapoint import TaskViapoint
-from dmpbbo.bbo_of_dmps.Task import Task
-from dmpbbo.dmps.Trajectory import Trajectory
 
 
 class TaskViapointArm2D(TaskViapoint):

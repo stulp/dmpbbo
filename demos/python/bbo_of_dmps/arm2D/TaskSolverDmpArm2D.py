@@ -16,8 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Module for the TaskSolverDmp class. """
 
-import copy
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -77,9 +75,9 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
             sum_angles = 0.0
             for i_dof in range(n_dofs):
                 sum_angles += angles[tt, i_dof]
-                l = link_lengths[i_dof]
-                links_x[tt, i_dof + 1] = links_x[tt, i_dof] + np.cos(sum_angles) * l
-                links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * l
+                ll = link_lengths[i_dof]
+                links_x[tt, i_dof + 1] = links_x[tt, i_dof] + np.cos(sum_angles) * ll
+                links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * ll
 
         # Format for each row: x_0, y_0, x_1, y_1 ... x_endeff,  y_endeff
         links_xyxyxy = np.zeros((n_time_steps, 2 * (n_dofs + 1)))
