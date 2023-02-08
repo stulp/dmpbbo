@@ -86,7 +86,7 @@ class LearningSessionTask(LearningSession):
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 
     @staticmethod
-    def _set_style(handle, i_update, n_updates):
+    def set_style(handle, i_update, n_updates):
         """ Set the color of an object, according to how far the optimization has proceeded.
 
         @param handle: Handle to the object
@@ -121,7 +121,7 @@ class LearningSessionTask(LearningSession):
             lines, _ = self.plot_rollouts_update(
                 i_update, ax=ax, plot_eval=True, plot_samples=False
             )
-            LearningSessionTask._set_style(lines, i_update, n_updates)
+            LearningSessionTask.set_style(lines, i_update, n_updates)
             all_lines.extend(lines)
         return all_lines, ax
 
