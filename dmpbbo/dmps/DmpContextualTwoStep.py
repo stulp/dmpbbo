@@ -71,6 +71,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         taus = []
         y_attrs = []
         y_inits = []
+        cur_dmp = None
         for task_param_and_traj in task_params_and_trajs:
             task_params = np.atleast_1d(task_param_and_traj[0])
             inputs.append(task_params)
@@ -98,6 +99,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         self.task_params_train = inputs
 
         # ppf = policy parameter function
+        n_dmp_params = 0
         if isinstance(ppf_function_app, list):
             if not len(ppf_function_app) == n_dmp_params:
                 raise RuntimeError(
@@ -221,7 +223,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         for task_param_and_traj in task_params_and_trajs:
             traj_demo = task_param_and_traj[1]
             max_duration = max(max_duration, traj_demo.duration)
-            dt = traj_demo._dt_mean
+            dt = traj_demo.dt_mean
 
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
