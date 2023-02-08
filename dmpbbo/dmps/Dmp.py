@@ -215,7 +215,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             x[self.GOAL], xd[self.GOAL] = self._goal_system.integrate_start()
 
         # Set the attractor state of the spring system
-        if not self.goal_system_requires_scaling():
+        if not self.goal_system_requires_scaling:
             self._spring_system.y_attr = x[self.GOAL]
         else:
             self._spring_system.y_attr = self.scale_goal_system(x[self.GOAL])
@@ -259,7 +259,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
             xd[self.GOAL] = self._goal_system.differential_equation(x[self.GOAL])
-            if not self.goal_system_requires_scaling():
+            if not self.goal_system_requires_scaling:
                 # The goal state is the attractor state of the spring-damper system
                 self._spring_system.y_attr = x[self.GOAL]
             else:
