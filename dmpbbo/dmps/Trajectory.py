@@ -32,13 +32,13 @@ class Trajectory:
         n_time_steps = ts.size
         if n_time_steps != ys.shape[0]:
             raise ValueError("ys.shape[0] must have size {n_time_steps}")
-        _dt_mean = np.mean(np.diff(ts))
+        dt_mean = np.mean(np.diff(ts))
 
         if ys.ndim == 1:
             ys = ys.reshape((n_time_steps, 1))
 
         if yds is None:
-            yds = diffnc(ys, _dt_mean)
+            yds = diffnc(ys, dt_mean)
         else:
             if yds.ndim == 1:
                 yds = yds.reshape((n_time_steps, 1))
@@ -46,7 +46,7 @@ class Trajectory:
                 raise ValueError("yds must have same shape as ys {ys.shape}")
 
         if ydds is None:
-            ydds = diffnc(yds, _dt_mean)
+            ydds = diffnc(yds, dt_mean)
         else:
             if ydds.ndim == 1:
                 ydds = ydds.reshape((n_time_steps, 1))
@@ -62,7 +62,7 @@ class Trajectory:
             self._dim = ys.shape[1]
 
         self._ts = ts
-        self._dt_mean = _dt_mean
+        self._dt_mean = dt_mean
         self._ys = ys
         self._yds = yds
         self._ydds = ydds
@@ -98,6 +98,14 @@ class Trajectory:
         @return: Times at which the measurements were made.
         """
         return self._ts
+
+    @property
+    def dt_mean(self):
+        """ Get the mean dt value over all time stepst.
+
+        @return: Mean dt value over all time stepst.
+        """
+        return self._dt_mean
 
     @property
     def ys(self):
