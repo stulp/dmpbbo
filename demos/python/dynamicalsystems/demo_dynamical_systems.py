@@ -23,7 +23,6 @@ import numpy as np
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
 from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
-from dmpbbo.dynamicalsystems.RichardsNormalizedSystem import RichardsNormalizedSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
 
@@ -112,7 +111,7 @@ def main():
         dyn_system.tau = tau
 
         # Runge-kutta integration with a perturbation
-        if not "Richards" in name:
+        if "Richards" not in name:
             xs[0, :], xds[0, :] = dyn_system.integrate_start()
             for ii in range(1, n_time_steps):
                 if ii == int(np.ceil(0.3 * n_time_steps)):
