@@ -30,8 +30,10 @@ class FunctionApproximatorGPR(FunctionApproximator):
         """Constructor for GPR function approximator
 
         Args:
-            maximum_covariance (double): The maximum allowable covariance of the covar function (aka sigma in Ebden'15)
-            lengths (scalar or numpy.array:  Standard deviation in the isotropic covariance function, i.e.  \f$ e^{(-0.5*(\mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\f$, with \f$ \mathbf{W} = lengths^2 * \mathbf{I} \f$
+            max_covariance (double): The maximum allowable covariance of the covar function (aka sigma in Ebden'15)
+            lengths (scalar or numpy.array:  Standard deviation in the isotropic covariance function, i.e.  \f$ e^{(-0.5*(
+            \mathbf{x}-\mathbf{x}')^T * \mathbf{W} * (\mathbf{x}-\mathbf{x}'))}\f$, with \f$ \mathbf{W} = lengths^2 *
+            \mathbf{I} \f$ # noqa
         """
         meta_params = {"max_covariance": max_covariance, "lengths": np.atleast_1d(lengths)}
         model_param_names = ["gram_inv", "gram_inv_targets"]
