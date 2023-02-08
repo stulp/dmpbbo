@@ -265,7 +265,7 @@ def run_optimization(stochastic_field, directory=None):
     ax = plt.figure(figsize=(5, 5)).add_subplot(1, 1, 1)
     for i_update in range(n_updates):
         handle, _ = session.plot_rollouts_update(i_update, ax=ax)
-        session._set_style(handle, i_update, n_updates)
+        session.set_style(handle, i_update, n_updates)
 
     window_label = "stochastic" if stochastic_field else "constant"
     plt.gcf().canvas.set_window_title(window_label + " force field")
