@@ -1,6 +1,6 @@
 # This file is part of DmpBbo, a set of libraries and programs for the
 # black-box optimization of dynamical movement primitives.
-# Copyright (C) 2018 Freek Stulp
+# Copyright (C) 2023 Freek Stulp
 #
 # DmpBbo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Lesser General Public License as published by
@@ -205,10 +205,14 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     def plot_policy_parameter_function(self):
         n_rows = int(np.ceil(np.sqrt(len(self.ppf))))
-        fig, axs = plt.subplots(n_rows, n_rows)
+        _, axs = plt.subplots(n_rows, n_rows)
         axs = axs.flatten()
+        hs = []
         for i_param, fa in enumerate(self.ppf):
-            fa.plot(ax=axs[i_param], plot_model_parameters=True)
+            h, _ = fa.plot(ax=axs[i_param], plot_model_parameters=True)
+            hs.extend(h)
+        return hs, axs
+
 
     def plot(self, task_params_and_trajs, **kwargs):
 
@@ -219,19 +223,25 @@ class DmpContextualTwoStep(DynamicalSystem):
 
         max_duration = 0.0
         dt = None
-        for task_param_and_traj in task_params_and_trajs:
-            traj_demo = task_param_and_traj[1]
+        all_task_params = []
+        for task_param, traj_demo in task_params_and_trajs:
             max_duration = max(max_duration, traj_demo.duration)
             dt = traj_demo.dt_mean
+            all_task_params.append(task_param)
 
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
 
-        ts = np.arange(0.0, max_duration, dt)
-        h = None
-        for task_param_and_traj in task_params_and_trajs:
-            traj_demo = task_param_and_traj[1]
-            task_param = task_param_and_traj[0]
+        ts = np.arange(0.0, 1.1*max_duration, dt)
+
+        all_task_params = np.array(all_task_params)
+        tp_min = np.atleast_1d(np.min(all_task_params, axis=0))
+        tp_max = np.atleast_1d(np.max(all_task_params, axis=0))
+
+        hs = []
+        cmap = cm.copper
+        prev_tau = self.dmp.tau
+        for task_param, traj_demo in task_params_and_trajs:
 
             self.dmp.tau = traj_demo.duration
             self.dmp.y_init = traj_demo.y_init
@@ -239,40 +249,17 @@ class DmpContextualTwoStep(DynamicalSystem):
             self.set_task_params(np.array([task_param]))
 
             h, _ = self.dmp.plot(ts, axs=axs, plot_no_forcing_term_also=True)
-            # plt.setp(h, color='k', linestyle=':')
+
+            tp = np.atleast_1d(task_param)
+            scaled = (tp[0] - tp_min[0]) / (tp_max[0] - tp_min[0])
+            color = cmap(np.clip(scaled, 0, 1))
+            plt.setp(h, color=color)
+
+            hs.extend(h)
 
             for ax in axs:
-                ax.axvline(self.dmp.tau, color="k", linewidth=1)
-
-        return h, axs
-        # Determine the range of the task parameters used or training.
-        task_params_train_min = self.task_params_train.min(axis=0)
-        task_params_train_max = self.task_params_train.max(axis=0)
-
-        n_train = self.task_params_train.shape[0]
-        # n_test = 2*n_train + 1
-        n_test = n_train
-
-        params_test = np.linspace(task_params_train_min, task_params_train_max, n_test)
-
-        cmap = cm.copper
-
-        h = []
-        prev_tau = self.dmp.tau
-        for i_params in range(len(params_test)):
-            params = params_test[i_params]
-            self.set_task_params(params)
-            # if tau_demos:
-            #    self.dmp.tau = tau_demos[i_params]
-            h_dmp, _ = self.dmp.plot(ts, **kwargs)
-
-            scaled = (params[0] - task_params_train_min[0]) / (
-                task_params_train_max[0] - task_params_train_min[0]
-            )
-            scaled = np.clip(scaled, 0, 1)
-            plt.setp(h_dmp, color=cmap(scaled))
-            h.extend(h_dmp)
+                ax.axvline(self.dmp.tau, color=color, linewidth=1)
 
         self.dmp.tau = prev_tau
 
-        return h, axs
+        return hs, axs
