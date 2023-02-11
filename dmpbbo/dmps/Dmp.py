@@ -588,9 +588,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param new_tau: The new time constant
         """
-        self._tau = new_tau  # noqa defined inside __init__ of DynamicalSystem
         tau_scale = new_tau / self.tau
-
+        self._tau = new_tau
+        
         # Set value in all relevant subsystems also
         self._phase_system.tau *= tau_scale
         self._gating_system.tau *= tau_scale
