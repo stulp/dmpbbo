@@ -36,6 +36,7 @@ def main():
     parser.add_argument("--save", action="store_true", help="save result plots to png")
     args = parser.parse_args()
 
+    directory = None
     if os.path.isdir(args.input):
         directory = args.input
         cost_vars_filenames = glob(str(Path(directory, "*cost_vars*.txt")))

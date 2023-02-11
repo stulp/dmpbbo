@@ -184,25 +184,25 @@ class SigmoidSystem(DynamicalSystem):
             t_infl = self.tau * infl_ratio
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
-        # If Ks is too close to N_0===initial_state, then the differential equation will always
-        # return 0. See differential_equation below
-        #   xd = max_rate_*x*(1-(x/Ks))
-        # For initial_state this is
-        #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
-        # If initial_state is very close/equal to Ks we get
-        #   xd = max_rate_*Ks*(1-(Ks/Ks))
-        #   xd = max_rate_*Ks*(1-1)
-        #   xd = max_rate_*Ks*0
-        #   xd = 0
-        # And integration fails, especially for Euler integration.
-        # So we now give a warning if this is likely to happen.
-        div = np.divide(N_0s, self._Ks_cached) - 1.0
-        if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
-            print(
-                f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors "
-                f"during numerical integration. Recommended solution: choose a lower magnitude "
-                f"for the maximum rate of change (currently it is {r}) "
-            )
+            # If Ks is too close to N_0===initial_state, then the differential equation will always
+            # return 0. See differential_equation below
+            #   xd = max_rate_*x*(1-(x/Ks))
+            # For initial_state this is
+            #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
+            # If initial_state is very close/equal to Ks we get
+            #   xd = max_rate_*Ks*(1-(Ks/Ks))
+            #   xd = max_rate_*Ks*(1-1)
+            #   xd = max_rate_*Ks*0
+            #   xd = 0
+            # And integration fails, especially for Euler integration.
+            # So we now give a warning if this is likely to happen.
+            div = np.divide(N_0s[dd], self._Ks_cached[dd]) - 1.0
+            if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
+                print(
+                    f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors "
+                    f"during numerical integration. Recommended solution: choose a lower magnitude "
+                    f"for the maximum rate of change (currently it is {r}) "
+                )
 
         return self._Ks_cached
 

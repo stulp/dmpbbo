@@ -218,6 +218,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             kwargs["axs"] = axs  # This will be passed to self.dmp later
 
         max_duration = 0.0
+        dt = None
         for task_param_and_traj in task_params_and_trajs:
             traj_demo = task_param_and_traj[1]
             max_duration = max(max_duration, traj_demo.duration)
@@ -227,7 +228,7 @@ class DmpContextualTwoStep(DynamicalSystem):
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
 
         ts = np.arange(0.0, max_duration, dt)
-
+        h = None
         for task_param_and_traj in task_params_and_trajs:
             traj_demo = task_param_and_traj[1]
             task_param = task_param_and_traj[0]
