@@ -118,7 +118,7 @@ class DmpContextualTwoStep(DynamicalSystem):
 
     @classmethod
     def from_trajs(
-            cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs
+        cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs
     ):
         """Initialize a DMP by training it from a trajectory.
 
@@ -156,7 +156,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         """
 
         # Relevant variables from dmp
-        fas = dmp._function_approximators # noqa
+        fas = dmp._function_approximators  # noqa
         dmp_contextual = cls(dmp.tau, dmp.y_init, dmp.y_attr, fas)
         # Replace the dmp that was constructed in the above by the one that was passed.
         dmp_contextual.dmp = dmp

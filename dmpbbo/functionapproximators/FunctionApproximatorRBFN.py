@@ -59,7 +59,7 @@ class FunctionApproximatorRBFN(FunctionApproximator):
 
         model_params = {
             "centers": meta_params.get("centers", centers),
-            "widths": meta_params.get("widths", widths)
+            "widths": meta_params.get("widths", widths),
         }
 
         # Get the activations of the basis functions

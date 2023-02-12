@@ -590,7 +590,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         tau_scale = new_tau / self.tau
         self._tau = new_tau
-        
+
         # Set value in all relevant subsystems also
         self._phase_system.tau *= tau_scale
         self._gating_system.tau *= tau_scale
