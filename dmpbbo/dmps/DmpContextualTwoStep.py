@@ -56,7 +56,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         # The policy parameter function can only be trained once trajectories have
         # been provided.
         self.ppf = None
-        self.task_params_train = None
+        self._task_params_and_trajs_train = None
 
     def train(self, task_params_and_trajs, param_names, ppf_function_app, **kwargs):
         save_training_data = kwargs.get("save_training_data", False)
@@ -95,7 +95,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         targets = np.array(targets)
         inputs = np.array(inputs)
         # Useful for plotting and sanity checks
-        self.task_params_train = inputs
+        # self.task_params_train = inputs
 
         # ppf = policy parameter function
         if isinstance(ppf_function_app, list):
@@ -114,16 +114,18 @@ class DmpContextualTwoStep(DynamicalSystem):
                 inputs, targets[:, i_param], save_training_data=save_training_data
             )
 
-        self._task_params_and_trajs = task_params_and_trajs if save_training_data else None
+        self._task_params_and_trajs_train = task_params_and_trajs if save_training_data else None
 
     @classmethod
     def from_trajs(
-        cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs
+            cls, task_params_and_trajs, dmp_function_apps, param_names, ppf_function_app, **kwargs
     ):
         """Initialize a DMP by training it from a trajectory.
 
-        @param trajectories: the trajectories to train on
+        @param task_params_and_trajs: list of task_params / trajectory tuples
         @param dmp_function_apps: Function approximators for the DMP forcing term
+        @param param_names: names of the function approximator parameters to predict.
+        @param ppf_function_app: Function approximators for the policy-parameter function
         @param kwargs: All kwargs are passed to the Dmp constructor.
         """
 
@@ -131,7 +133,7 @@ class DmpContextualTwoStep(DynamicalSystem):
         traj_index = 1
         first_traj = task_params_and_trajs[0][
             traj_index
-        ]  # For now it is assumed tau, y_init and y_attr are the same for all
+        ]  # It is assumed tau, y_init and y_attr are the same for all
         tau = first_traj.ts[-1]
         y_init = first_traj.ys[0, :]
         y_attr = first_traj.ys[-1, :]
@@ -146,14 +148,17 @@ class DmpContextualTwoStep(DynamicalSystem):
     def from_dmp(cls, task_params_and_trajs, dmp, param_names, ppf_function_app, **kwargs):
         """Initialize a DMP by training it from a trajectory.
 
-        @param trajectories: the trajectories to train on
+        @param task_params_and_trajs: list of task_params / trajectory tuples
         @param dmp: The DMP
+        @param param_names: names of the function approximator parameters to predict.
+        @param ppf_function_app: Function approximators for the policy-parameter function
+        @param kwargs: All kwargs are passed to the Dmp constructor.
         """
 
-        # Relevant variables from trajectory
-
-        dmp_contextual = cls(dmp.tau, dmp.y_init, dmp.y_attr, dmp._function_approximators)
-        # Replace the dmp that was constructure in the above by the one that was passed.
+        # Relevant variables from dmp
+        fas = dmp._function_approximators # noqa
+        dmp_contextual = cls(dmp.tau, dmp.y_init, dmp.y_attr, fas)
+        # Replace the dmp that was constructed in the above by the one that was passed.
         dmp_contextual.dmp = dmp
 
         dmp_contextual.train(task_params_and_trajs, param_names, ppf_function_app, **kwargs)
@@ -176,6 +181,7 @@ class DmpContextualTwoStep(DynamicalSystem):
     def integrate_start(self, task_params, y_init=None):
         """ Start integrating the DMP with a new initial state.
 
+        @param task_params: The task parameters
         @param y_init: The initial state vector (y part)
         @return: x, xd - The first vector of state variables and their rates of change
         """
@@ -213,7 +219,6 @@ class DmpContextualTwoStep(DynamicalSystem):
             hs.extend(h)
         return hs, axs
 
-
     def plot(self, task_params_and_trajs, **kwargs):
 
         axs = kwargs.get("axs", None)
@@ -232,14 +237,14 @@ class DmpContextualTwoStep(DynamicalSystem):
             h_demo, _ = traj_demo.plot(axs=axs[1:4])
             plt.setp(h_demo, linestyle="-", linewidth=3, color=(0.7, 0.7, 0.7))
 
-        ts = np.arange(0.0, 1.1*max_duration, dt)
+        ts = np.arange(0.0, 1.1 * max_duration, dt)
 
         all_task_params = np.array(all_task_params)
         tp_min = np.atleast_1d(np.min(all_task_params, axis=0))
         tp_max = np.atleast_1d(np.max(all_task_params, axis=0))
 
         hs = []
-        cmap = cm.copper
+        cmap = cm.copper  # noqa
         prev_tau = self.dmp.tau
         for task_param, traj_demo in task_params_and_trajs:
 

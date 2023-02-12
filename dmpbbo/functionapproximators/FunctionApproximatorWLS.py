@@ -73,7 +73,7 @@ class FunctionApproximatorWLS(FunctionApproximator):
         #                                          ( (n_betas x n_sam)*(n_sam x n_sam)*(n_sam * 1) )
         # = inv(n_betas x n_betas)*(n_betas x 1)
         #
-        # Least squares is a one-liner
+        # The least squares algorithms is a one-liner
         # Apparently, not everybody has python3.5 installed, so don't use @
         # betas = np.linalg.inv(X.T@W@X + Gamma)@X.T@W@targets
         # In python<=3.4, it is not a one-liner

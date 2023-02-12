@@ -89,19 +89,11 @@ class SpringDamperSystem(DynamicalSystem):
 
         zd = np.zeros(yd.shape)
 
-        for dd in range(self.dim_y):
-            K = (
-                self.spring_constant
-                if np.isscalar(self.spring_constant)
-                else self.spring_constant[dd]
-            )
-            D = (
-                self.damping_coefficient
-                if np.isscalar(self.damping_coefficient)
-                else self.damping_coefficient[dd]
-            )
-            m = self.mass if np.isscalar(self.mass) else self.mass[dd]
-            zd[dd] = (-K * (y[dd] - self._y_attr[dd]) - D * z[dd]) / (m * self._tau)
+        for ii in range(self.dim_y):
+            k = self.spring_constant if np.isscalar(self.spring_constant) else self.spring_constant[ii]
+            d = self.damping_coefficient if np.isscalar(self.damping_coefficient) else self.damping_coefficient[ii]
+            m = self.mass if np.isscalar(self.mass) else self.mass[ii] # noqa
+            zd[ii] = (-k * (y[ii] - self._y_attr[ii]) - d * z[ii]) / (m * self._tau) # noqa
 
         xd = np.concatenate((yd, zd))
 

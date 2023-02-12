@@ -223,7 +223,7 @@ class DynamicalSystem(ABC):
 
     @abstractmethod
     def decouple_parameters(self):
-        """ Decouple the parameters of a multi-dimensional system.
+        """ Decouple the parameters of a multidimensional system.
 
         This is achieved by converting a scalar parameter (e.g. alpha=6.0)
         into an np.array (e.g. alpha = np.array([6.0, 6.0]))

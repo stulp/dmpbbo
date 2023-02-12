@@ -57,9 +57,10 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         height = meta_params["intersection_height"]
         centers, widths = Gaussian.get_centers_and_widths(inputs, n_bfs_per_dim, height)
 
-        model_params = {}
-        model_params["centers"] = meta_params.get("centers", centers)
-        model_params["widths"] = meta_params.get("widths", widths)
+        model_params = {
+            "centers": meta_params.get("centers", centers),
+            "widths": meta_params.get("widths", widths)
+        }
 
         # Get the activations of the basis functions
         activations = FunctionApproximatorRBFN._activations(inputs, model_params)

@@ -101,9 +101,9 @@ class Trajectory:
 
     @property
     def dt_mean(self):
-        """ Get the mean dt value over all time stepst.
+        """ Get the mean dt value over all time steps.
 
-        @return: Mean dt value over all time stepst.
+        @return: Mean dt value over all time steps.
         """
         return self._dt_mean
 
@@ -155,7 +155,7 @@ class Trajectory:
     def has_misc(self):
         """ Get whether the trajectory the miscellaneous variables over time.
 
-        @return: true if trajectoriy has miscellaneous variables, false otherwise.
+        @return: true if trajectory has miscellaneous variables, false otherwise.
         """
         if not isinstance(self._misc, np.ndarray):
             return False
@@ -259,7 +259,7 @@ class Trajectory:
                 )
                 return
 
-            # Convert time 'fro' to index 'fro'
+            # Convert time 'start' to index 'start'
             if start <= self._ts[0]:
                 # Time 'start' lies before first time in trajectory
                 start = 0
@@ -537,10 +537,6 @@ class Trajectory:
             all_handles.extend(h)
             axs[3].set_xlabel("time (s)")
             axs[3].set_ylabel("misc")
-
-        # x_lim = [min(self._ts), max(self._ts)]
-        # for ax in axs:
-        #    ax.set_xlim(x_lim[0], x_lim[1])
 
         return all_handles, axs
 

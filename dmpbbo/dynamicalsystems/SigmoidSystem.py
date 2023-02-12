@@ -63,8 +63,8 @@ class SigmoidSystem(DynamicalSystem):
         #   r = -log((((1 + D)/ratio)-1)/D)/tau
 
         # Choosing even smaller D leads to issues with Euler integration (tested empirically)
-        D = 10e-7
-        max_rate = -np.log((((1 + D) / y_tau_0_ratio) - 1) / D) / tau
+        d = 10e-7
+        max_rate = -np.log((((1 + d) / y_tau_0_ratio) - 1) / d) / tau
 
         # Known (see _get_ks())
         #   K = N_0*(1+(1/exp(-r*t_infl)))
@@ -77,7 +77,7 @@ class SigmoidSystem(DynamicalSystem):
         #   1/D = exp(-r*t_infl)
         #   -ln(1/D) = r*t_infl
         # The above defined a relationship between r and t_infl for a given D
-        t_infl = -np.log(1 / D) / max_rate
+        t_infl = -np.log(1 / d) / max_rate
         inflection_ratio = t_infl / tau
         dyn_sys = cls(tau, np.ones((n_dims,)), max_rate, inflection_ratio)
 

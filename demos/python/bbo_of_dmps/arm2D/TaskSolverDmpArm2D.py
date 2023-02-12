@@ -51,7 +51,7 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
         # We have the joint trajectories as a Trajectory. Convert them to end-eff.
         y_links = self.angles_to_link_positions(joint_trajs.ys, self.link_lengths)
 
-        # Cost-vars now contains: ts, joint pos/vel/acc, endeff pos
+        # Cost-vars now contains: ts, joint pos/vel/acc, end-eff pos
         cost_vars = np.column_stack((joint_trajs.as_matrix(), y_links))
         return cost_vars
 
@@ -79,7 +79,7 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
                 links_x[tt, i_dof + 1] = links_x[tt, i_dof] + np.cos(sum_angles) * ll
                 links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * ll
 
-        # Format for each row: x_0, y_0, x_1, y_1 ... x_endeff,  y_endeff
+        # Format for each row: x_0, y_0, x_1, y_1 ... x_end_eff,  y_end_eff
         links_xyxyxy = np.zeros((n_time_steps, 2 * (n_dofs + 1)))
         for i_link in range(n_dofs + 1):
             links_xyxyxy[:, 2 * i_link + 0] = links_x[:, i_link]

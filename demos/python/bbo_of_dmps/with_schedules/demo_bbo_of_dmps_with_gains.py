@@ -115,15 +115,11 @@ class TaskViapointWithGains(Task):
         line_handles = []
         lh1 = ax.plot(t, y_des, "--", linewidth=0.4)
         line_handles.extend(lh1)
-        # lh2 = ax.plot(t, y_cur, linewidth=0.5)
-        # line_handles.extend(lh2)
         ax.set_ylim([-1.5, 1.5])
-        # ax.plot(t, y_des + scaling * gains, linewidth=0.2)
-        # ax.plot(t, y_des - scaling * gains, linewidth=0.2)
         ax2 = ax.twinx()
-        lh3 = ax2.plot(t, scaling * gains, linewidth=1)
+        lh2 = ax2.plot(t, scaling * gains, linewidth=1)
         ax2.set_ylim([0, 1000])
-        line_handles.extend(lh3)
+        line_handles.extend(lh2)
 
         # ax.plot(t[0], y[0], "bo", label="start")
         # ax.plot(t[-1], y[-1], "go", label="end")

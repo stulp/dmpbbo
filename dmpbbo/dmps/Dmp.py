@@ -738,7 +738,7 @@ class Dmp(DynamicalSystem, Parameterizable):
     def get_dmp_axes(n_cols=4, **kwargs):
         """ Get matplotlib axes on which to plot the output of a DMP.
 
-        @param has_fa_output: Whether the output of the function approximators is available.
+        @param n_cols: Number of columns for the subplots.
         @return: list of axes on which the DMP was plotted
         """
         plot_compact = kwargs.get("plot_compact", False)

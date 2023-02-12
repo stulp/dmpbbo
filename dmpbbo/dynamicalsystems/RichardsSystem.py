@@ -46,8 +46,8 @@ class RichardsSystem(DynamicalSystem):
         t_infl = np.clip(t_infl, 0.0, None)
         self.v = np.clip(self.v, 0.5, None)
         exp_term = np.exp(-self.alpha * self.v * t_infl / self.tau)
-        Z = np.power((self.v / exp_term) + 1, 1 / self.v)
-        left_asymp = (Z * self.x_init - self.right_asymp) / (Z - 1)
+        z = np.power((self.v / exp_term) + 1, 1 / self.v)
+        left_asymp = (z * self.x_init - self.right_asymp) / (z - 1)
         return left_asymp
 
     def differential_equation(self, x):
@@ -75,24 +75,24 @@ class RichardsSystem(DynamicalSystem):
         left_asymp = self._get_left_asymptote()
         for dd in range(self.dim_x):
 
-            alpha = self.alpha if np.isscalar(self.alpha) else self.alpha[dd]
-            v = self.v if np.isscalar(self.v) else self.v[dd]
+            alpha = self.alpha if np.isscalar(self.alpha) else self.alpha[dd] # noqa
+            v = self.v if np.isscalar(self.v) else self.v[dd] # noqa
             # Giving the variables these names make the relationship to
             # the Wikipedia article clearer.
             # https://en.wikipedia.org/wiki/Generalised_logistic_function
-            A = left_asymp if np.isscalar(left_asymp) else left_asymp[dd]
-            K = self.right_asymp if np.isscalar(self.right_asymp) else self.right_asymp[dd]
-            Q = -1 + np.power((K - A) / (self.x_init[dd] - A), v)
+            a = left_asymp if np.isscalar(left_asymp) else left_asymp[dd]
+            k = self.right_asymp if np.isscalar(self.right_asymp) else self.right_asymp[dd]
+            q = -1 + np.power((k - a) / (self.x_init[dd] - a), v)
 
             exp_term = np.exp(-alpha * v * ts / self.tau)
 
-            xs[:, dd] = (K - A) / np.power(1 + Q * exp_term, 1 / v)
-            xs[:, dd] += A
+            xs[:, dd] = (k - a) / np.power(1 + q * exp_term, 1 / v)
+            xs[:, dd] += a
 
             # This is not correct yet
             xds[:, dd] = (
-                (Q * alpha * (K - A))
-                * (exp_term / np.power(1 + Q * exp_term, 1 + 1 / v))
+                (q * alpha * (k - a))
+                * (exp_term / np.power(1 + q * exp_term, 1 + 1 / v))
                 / self.tau
             )
 
