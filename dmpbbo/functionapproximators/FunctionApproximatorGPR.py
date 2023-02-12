@@ -26,7 +26,7 @@ class FunctionApproximatorGPR(FunctionApproximator):
     """Function approximator based on Gaussian Process Regression (GPR).
     """
 
-    def __init__(self, max_covariance, lengths):
+    def __init__(self, max_covariance=1.0, lengths=1.0):
         """Constructor for GPR function approximator
 
         Args:
