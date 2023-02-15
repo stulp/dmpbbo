@@ -209,13 +209,13 @@ class DmpContextualTwoStep(DynamicalSystem):
     def decouple_parameters(self):
         self.dmp.decouple_parameters()
 
-    def plot_policy_parameter_function(self):
+    def plot_policy_parameter_function(self, **kwargs):
         n_rows = int(np.ceil(np.sqrt(len(self.ppf))))
         _, axs = plt.subplots(n_rows, n_rows)
         axs = axs.flatten()
         hs = []
         for i_param, fa in enumerate(self.ppf):
-            h, _ = fa.plot(ax=axs[i_param], plot_model_parameters=True)
+            h, _ = fa.plot(ax=axs[i_param], **kwargs)
             hs.extend(h)
         return hs, axs
 
