@@ -30,7 +30,7 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
 
     def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor, link_lengths=None):
         super().__init__(dmp, dt, integrate_dmp_beyond_tau_factor)
-        if not link_lengths:
+        if link_lengths is not None or len(link_lengths)>0:
             n_dofs = dmp.dim_dmp()
             # Every link has same length, and they sum to 1.0
             link_lengths = np.full(n_dofs, 1.0 / n_dofs)
