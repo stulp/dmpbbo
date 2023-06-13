@@ -34,6 +34,13 @@ class DistributionGaussianBounded(DistributionGaussian):
         self.lower_bound = lower_bound
         self.upper_bound = upper_bound
 
+    def __str__(self):
+        """ Get a string representation of an object of this class.
+
+        @return: A string representation of an object of this class.
+        """
+        return f"N( {self.mean}, {self.covar}, {self.lower_bound}, {self.upper_bound})"
+
     def generate_samples(self, n_samples=1):
         samples = super().generate_samples(n_samples)
         clipped_samples = samples.clip(self.lower_bound, self.upper_bound)
