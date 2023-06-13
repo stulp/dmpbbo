@@ -281,6 +281,28 @@ class Trajectory:
         if self._misc is not None:
             self._misc = self._misc[start:end, :]
 
+    def pad_front(self, n_padding=100):
+        ts_padding = np.arange(0.0, n_padding*self._dt_mean, self._dt_mean)
+        ys_padding = np.tile(self.y_init, (n_padding, 1))
+        prepend_traj = Trajectory(
+            ts_padding,
+            ys_padding,
+            np.zeros((n_padding, self.yds.shape[1])),
+            np.zeros((n_padding, self.ydds.shape[1])),
+        )
+        self.prepend(prepend_traj)
+
+    def pad_end(self, n_padding=100):
+        ts_padding = np.arange(0.0, n_padding*self._dt_mean, self._dt_mean)
+        ys_padding = np.tile(self.y_final, (n_padding, 1))
+        append_traj = Trajectory(
+            ts_padding,
+            ys_padding,
+            np.zeros((n_padding, self.yds.shape[1])),
+            np.zeros((n_padding, self.ydds.shape[1])),
+        )
+        self.append(append_traj)
+
     @classmethod
     def from_polynomial(cls, ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
         """ Generate a polynomial trajectory.
@@ -420,6 +442,23 @@ class Trajectory:
             self._misc = None
         else:
             self._misc = np.concatenate((self._misc, trajectory.misc))
+    def prepend(self, trajectory):
+        """ Prepend another trajectory to this one.
+
+        Whether the positions / velocities / acceleration are compatible is not checked.
+
+        @param trajectory:  The trajectory to append.
+        """
+        self.set_start_time_to_zero()
+        self.ts[:] += trajectory.duration + trajectory._dt_mean
+        self._ts = np.concatenate((trajectory.ts, self._ts))
+        self._ys = np.concatenate((trajectory.ys, self._ys))
+        self._yds = np.concatenate((trajectory.yds, self._yds))
+        self._ydds = np.concatenate((trajectory.ydds, self._ydds))
+        if self._misc is None or trajectory.misc is None:
+            self._misc = None
+        else:
+            self._misc = np.concatenate((trajectory.misc, self._misc))
 
     def as_matrix(self):
         """ Return the trajectory as a matrix.

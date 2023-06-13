@@ -176,4 +176,4 @@ class LearningSessionTask(LearningSession):
         self.plot_rollouts(axs[1])
         self.plot_exploration_curve(axs[2])
         self.plot_learning_curve(axs[3])
-        return fig
+        return axs
