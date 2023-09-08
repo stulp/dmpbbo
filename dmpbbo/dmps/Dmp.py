@@ -79,9 +79,6 @@ class Dmp(DynamicalSystem, Parameterizable):
             alpha = kwargs.get("alpha_spring_damper", 20.0)
             self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
-        # damp_init = 0.1*self._spring_system.damping_coefficient
-        # damp_goal = self._spring_system.damping_coefficient
-        # damping_system_default = ExponentialSystem(tau, damp_init, damp_goal, 4)
         damping_system_default = None
 
         self.goal_system_requires_scaling = False
@@ -95,15 +92,14 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
             goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
-            # gating_system_default = SigmoidSystem(tau, 1, -10.0, 0.9)
             y_tau_0_ratio = 0.1
             gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
 
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
 
-        elif dmp_type in ["2022", "2022_NO_SCALING"]:
-            self.goal_system_requires_scaling = dmp_type != "2022_NO_SCALING"
+        elif "2022" in dmp_type:
+            self.goal_system_requires_scaling = "NO_SCALING" not in dmp_type
 
             t_infl_ratio = 0.3
             alpha = 10.0
@@ -115,16 +111,18 @@ class Dmp(DynamicalSystem, Parameterizable):
                 )
             else:
                 goal_system_default = RichardsSystem(tau, y_init, y_attr, t_infl_ratio, alpha, v)
+
             gating_system_default = RichardsSystem(
                 tau, np.ones((1,)), np.zeros((1,)), 1.0, 10.0, 10.0
             )
-            # y_tau_0_ratio = 0.5
-            # gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
+
             count_down = True
             phase_system_default = TimeSystem(tau, count_down)
-            damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
-            damping_init = 0.1 * damping_final
-            damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
+
+            if "DAMPING" in dmp_type:
+                damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
+                damping_init = 0.1 * damping_final
+                damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
 
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
