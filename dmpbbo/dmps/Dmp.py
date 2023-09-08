@@ -374,7 +374,7 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Get damping coefficient
         if self._damping_system is None:
-            # If there is no dynamical system for the delayed goal, damping is constant
+            # If there is no dynamical system for the damping system, damping is constant
             xs_damping = np.tile(self._spring_system.damping_coefficient, (n_time_steps, 1))
             # with zero change
             xds_damping = np.zeros(xs_damping.shape)
@@ -401,11 +401,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set first attractor state and damping
         local_spring_system.y_attr = self.scale_goal_system(xs_goal[0, :])
-        xs_damping_cur = xs_damping[0, :]
-        if xs_damping_cur.size == 1:
-            local_spring_system.damping_coefficient = xs_damping_cur[0]
-        else:
-            local_spring_system.damping_coefficient = xs_damping_cur
+        # spring_system.damping_coefficient is passed scalar if damping has only one number
+        damp = xs_damping[0, :]
+        local_spring_system.damping_coefficient = damp[0] if damp.size == 1 else damp
 
         # Start integrating spring damper system
         x_spring, xd_spring = local_spring_system.integrate_start()
