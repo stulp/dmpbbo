@@ -116,8 +116,7 @@ class Dmp(DynamicalSystem, Parameterizable):
                 tau, np.ones((1,)), np.zeros((1,)), 1.0, 10.0, 10.0
             )
 
-            count_down = True
-            phase_system_default = TimeSystem(tau, count_down)
+            phase_system_default = TimeSystem(tau, count_down=True)
 
             if "DAMPING" in dmp_type:
                 damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
