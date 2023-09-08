@@ -400,7 +400,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         local_spring_system = copy.deepcopy(self._spring_system)
 
         # Set first attractor state and damping
-            local_spring_system.y_attr = self.scale_goal_system(xs_goal[0, :])
+        local_spring_system.y_attr = self.scale_goal_system(xs_goal[0, :])
         xs_damping_cur = xs_damping[0, :]
         if xs_damping_cur.size == 1:
             local_spring_system.damping_coefficient = xs_damping_cur[0]
