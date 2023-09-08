@@ -398,16 +398,9 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Reset the dynamical system, and get the first state
         local_spring_system = copy.deepcopy(self._spring_system)
-        # damping = self._spring_system.damping_coefficient
-        # local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
         # Set first attractor state and damping
-        if self.goal_system_requires_scaling:
-            # Scaled goal
-            # scaled_goal =  self._y_init + (self._y_attr - self._y_init)*xs_goal[0, :]
-            local_spring_system.y_attr = self.y_init
-        else:
-            local_spring_system.y_attr = xs_goal[0, :]
+            local_spring_system.y_attr = self.scale_goal_system(xs_goal[0, :])
         xs_damping_cur = xs_damping[0, :]
         if xs_damping_cur.size == 1:
             local_spring_system.damping_coefficient = xs_damping_cur[0]
@@ -436,12 +429,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
             # Set the attractor and damping of the spring system
-            if self.goal_system_requires_scaling:
-                # Scaled goal
-                scaled_goal = self.y_init + (self._y_attr - self.y_init) * xs[tt, self.GOAL]
-                local_spring_system.y_attr = scaled_goal
-            else:
-                local_spring_system.y_attr = xs[tt, self.GOAL]
+            local_spring_system.y_attr = self.scale_goal_system(xs[tt, self.GOAL])
             local_spring_system.damping_coefficient = xs[tt, self.DAMPING]
 
             # Integrate spring damper system
