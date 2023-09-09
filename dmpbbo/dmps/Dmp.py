@@ -85,12 +85,12 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
-        if dmp_type == "IJSPEERT_2002_MOVEMENT":
+        if dmp_type in ["IJSPEERT_2002_MOVEMENT", "Ijs02"]:
             goal_system_default = None
             gating_system_default = ExponentialSystem(tau, 1, 0, 4)
             phase_system_default = ExponentialSystem(tau, 1, 0, 4)
 
-        elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
+        elif dmp_type in ["KULVICIUS_2012_JOINING", "Kul12", "COUNTDOWN_2013"]:
             goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
             y_tau_0_ratio = 0.1
             gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
@@ -98,7 +98,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
 
-        elif "2022" in dmp_type:
+        elif "2022" in dmp_type or "SCT23" in dmp_type:
             self.goal_system_requires_scaling = "NO_SCALING" not in dmp_type
 
             t_infl_ratio = 0.3
