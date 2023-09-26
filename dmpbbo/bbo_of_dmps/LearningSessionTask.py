@@ -86,7 +86,7 @@ class LearningSessionTask(LearningSession):
         self.tell(eval_cost_vars, "eval_cost_vars", i_update)
 
     @staticmethod
-    def _set_style(handle, i_update, n_updates):
+    def set_style(handle, i_update, n_updates):
         """ Set the color of an object, according to how far the optimization has proceeded.
 
         @param handle: Handle to the object
@@ -121,7 +121,7 @@ class LearningSessionTask(LearningSession):
             lines, _ = self.plot_rollouts_update(
                 i_update, ax=ax, plot_eval=True, plot_samples=False
             )
-            LearningSessionTask._set_style(lines, i_update, n_updates)
+            LearningSessionTask.set_style(lines, i_update, n_updates)
             all_lines.extend(lines)
         return all_lines, ax
 
@@ -159,18 +159,21 @@ class LearningSessionTask(LearningSession):
 
         return lines_eval, ax
 
-    def plot(self, fig=None):
+    def plot(self, fig=None, **kwargs):
         """ Plot the distribution updates, the rollouts, the exploration curve and learning curve in
         one figure.
 
         @param fig:  The figure to plot in (default: None, then a new figure is initialized)
         @return: The figure handle
         """
-        if not fig:
-            fig = plt.figure(figsize=(20, 5))
-        axs = [fig.add_subplot(141 + sp) for sp in range(4)]
+        axs = kwargs.get("axs", None)
+        if axs is None or len(axs) == 0:
+            if not fig:
+                fig = plt.figure(figsize=(20, 5))
+            axs = [fig.add_subplot(141 + sp) for sp in range(4)]
+
         self.plot_distribution_updates(axs[0])
         self.plot_rollouts(axs[1])
         self.plot_exploration_curve(axs[2])
         self.plot_learning_curve(axs[3])
-        return fig
+        return axs

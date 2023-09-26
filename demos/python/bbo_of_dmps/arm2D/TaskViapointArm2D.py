@@ -20,8 +20,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from demos.python.bbo_of_dmps.TaskViapoint import TaskViapoint
-from dmpbbo.bbo_of_dmps.Task import Task
-from dmpbbo.dmps.Trajectory import Trajectory
 
 
 class TaskViapointArm2D(TaskViapoint):
@@ -49,12 +47,12 @@ class TaskViapointArm2D(TaskViapoint):
         n_link_pos = (self.n_dofs + 1) * 2
         link_positions = cost_vars[:, -n_link_pos:]
         n_dims = 2  # Per definition, see the name of the class
-        endeff_positions = cost_vars[:, -n_dims:]
+        end_eff_positions = cost_vars[:, -n_dims:]
 
         offset = 1 + self.n_dofs * 2
         joint_accelerations = cost_vars[:, offset : offset + self.n_dofs]
 
-        return super().evaluate_rollout_local(ts, endeff_positions, joint_accelerations, sample)
+        return super().evaluate_rollout_local(ts, end_eff_positions, joint_accelerations, sample)
 
     def plot_rollout(self, cost_vars, ax=None):
         """ Plot a rollout (the cost-relevant variables).

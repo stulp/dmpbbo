@@ -15,12 +15,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Module for the different distribution updater classes. """
-
+import copy
 from abc import ABC, abstractmethod
 
 import numpy as np
-
-from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 
 
 class Updater(ABC):
@@ -70,7 +68,8 @@ class UpdaterMean(Updater):
         mean_new = np.average(samples, 0, weights)
 
         # Update the covariance matrix
-        distribution_new = DistributionGaussian(mean_new, distribution.covar)
+        distribution_new = copy.deepcopy(distribution)
+        distribution_new.mean = mean_new
 
         return distribution_new, weights
 
@@ -112,7 +111,9 @@ class UpdaterCovarDecay(Updater):
         covar_new = decay * decay * distribution.covar
 
         # Update the covariance matrix
-        distribution_new = DistributionGaussian(mean_new, covar_new)
+        distribution_new = copy.deepcopy(distribution)
+        distribution_new.mean = mean_new
+        distribution_new.covar = covar_new
 
         return distribution_new, weights
 
@@ -207,7 +208,9 @@ class UpdaterCovarAdaptation(Updater):
                     covar_new[ii, ii] = level_min
 
         # Update the covariance matrix
-        distribution_new = DistributionGaussian(mean_new, covar_new)
+        distribution_new = copy.deepcopy(distribution)
+        distribution_new.mean = mean_new
+        distribution_new.covar = covar_new
 
         return distribution_new, weights
 

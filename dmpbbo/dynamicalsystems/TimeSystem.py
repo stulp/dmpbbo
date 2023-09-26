@@ -91,3 +91,7 @@ class TimeSystem(DynamicalSystem):
             xs[xs > 1.0] = 1.0
 
         return xs, xds
+
+    def decouple_parameters(self):
+        # Has no parameters, so do nothing.
+        pass

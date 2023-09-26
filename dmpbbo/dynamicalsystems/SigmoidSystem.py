@@ -45,6 +45,44 @@ class SigmoidSystem(DynamicalSystem):
             self._inflection_ratio = np.asarray(self._inflection_ratio)
         self._Ks_cached = None
 
+    @classmethod
+    def for_gating(cls, tau, y_tau_0_ratio=0.1, n_dims=1):
+
+        # Known (analytical solution)
+        #   N(t) = K / ( 1 + (K/N_0 - 1)*exp(-r*t))
+        # Known in this function
+        #   N_0 = 1, K = N_0 + D = 1 + D, N_tau = ratio*N_0
+        #
+        # Compute r = max_rate from the above
+        #   N_tau = ratio*N_0
+        #   N(tau) = N_tau = ratio*N_0 = K / ( 1 + (K/N_0 - 1)*exp(-r*tau))
+        #   ratio = (1 + D) / ( 1 + ((1+D)/1 - 1)*exp(-r*tau))
+        #   ratio = (1 + D) / ( 1 + D*exp(-r*tau))
+        #   1 + D*exp(-r*tau) = (1 + D)/ratio
+        #   exp(-r*tau) = (((1 + D)/ratio)-1)/D
+        #   r = -log((((1 + D)/ratio)-1)/D)/tau
+
+        # Choosing even smaller D leads to issues with Euler integration (tested empirically)
+        d = 10e-7
+        max_rate = -np.log((((1 + d) / y_tau_0_ratio) - 1) / d) / tau
+
+        # Known (see _get_ks())
+        #   K = N_0*(1+(1/exp(-r*t_infl)))
+        # Known in this function
+        #   N_0 = 1, K = N_0 + D = 1 + D, r < 0
+        #
+        # Compute inflection time from the above
+        #   1 + D = 1*(1+(1/exp(-r*t_infl)))
+        #   D = 1/exp(-r*t_infl)
+        #   1/D = exp(-r*t_infl)
+        #   -ln(1/D) = r*t_infl
+        # The above defined a relationship between r and t_infl for a given D
+        t_infl = -np.log(1 / d) / max_rate
+        inflection_ratio = t_infl / tau
+        dyn_sys = cls(tau, np.ones((n_dims,)), max_rate, inflection_ratio)
+
+        return dyn_sys
+
     @DynamicalSystem.tau.setter
     def tau(self, new_tau):
         """ Set the time constant.
@@ -146,24 +184,31 @@ class SigmoidSystem(DynamicalSystem):
             t_infl = self.tau * infl_ratio
             self._Ks_cached[dd] = N_0s[dd] * (1.0 + (1.0 / np.exp(-r * t_infl)))
 
-        # If Ks is too close to N_0===initial_state, then the differential equation will always
-        # return 0. See differential_equation below
-        #   xd = max_rate_*x*(1-(x/Ks))
-        # For initial_state this is
-        #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
-        # If initial_state is very close/equal to Ks we get
-        #   xd = max_rate_*Ks*(1-(Ks/Ks))
-        #   xd = max_rate_*Ks*(1-1)
-        #   xd = max_rate_*Ks*0
-        #   xd = 0
-        # And integration fails, especially for Euler integration.
-        # So we now give a warning if this is likely to happen.
-        div = np.divide(N_0s, self._Ks_cached) - 1.0
-        if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
-            print(
-                f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors "
-                f"during numerical integration. Recommended solution: choose a lower magnitude "
-                f"for the maximum rate of change (currently it is {r}) "
-            )
+            # If Ks is too close to N_0===initial_state, then the differential equation will always
+            # return 0. See differential_equation below
+            #   xd = max_rate_*x*(1-(x/Ks))
+            # For initial_state this is
+            #   xd = max_rate_*initial_state*(1-(initial_state/Ks))
+            # If initial_state is very close/equal to Ks we get
+            #   xd = max_rate_*Ks*(1-(Ks/Ks))
+            #   xd = max_rate_*Ks*(1-1)
+            #   xd = max_rate_*Ks*0
+            #   xd = 0
+            # And integration fails, especially for Euler integration.
+            # So we now give a warning if this is likely to happen.
+            div = np.divide(N_0s[dd], self._Ks_cached[dd]) - 1.0
+            if np.any(np.abs(div) < 10e-9):  # 10e-9 determined empirically
+                print(
+                    f"In function SigmoidSystem, Ks is too close to N_0s. This may lead to errors "
+                    f"during numerical integration. Recommended solution: choose a lower magnitude "
+                    f"for the maximum rate of change (currently it is {r}) "
+                )
 
         return self._Ks_cached
+
+    def decouple_parameters(self):
+        if np.isscalar(self._max_rate):
+            self._max_rate = np.full((self.dim_x,), float(self._max_rate))
+        if np.isscalar(self._inflection_ratio):
+            self._inflection_ratio = np.full((self.dim_x,), float(self._inflection_ratio))
+        self._Ks_cached = None

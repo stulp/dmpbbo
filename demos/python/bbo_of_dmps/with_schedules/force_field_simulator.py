@@ -14,11 +14,11 @@
 #
 # You should have received a copy of the GNU Lesser General Public License
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
-"""Script to simuulate DMP integration with a force field.
+"""Script to simulate DMP integration with a force field.
 Has been implemented in a separate file to facilitate debugging.
 """
 
-import random
+# import random
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -37,7 +37,7 @@ def perform_rollout(dmp_sched, integrate_time, n_time_steps, field_strength, fie
     ts = np.linspace(0.0, integrate_time, n_time_steps)
     dt = ts[1]
 
-    r = {"ts": ts}  # The rollout containing all relevant  numpy ndarrays
+    r = {"ts": ts}  # The rollout containing all relevant cost_vars
     for v in ["ys_des", "yds_des", "ydds_des", "schedules", "ys_cur", "ydds_cur", "yds_cur"]:
         r[v] = np.zeros([n_time_steps, dmp_sched.dim_y])
     r["fields"] = np.zeros([n_time_steps, 1])
@@ -129,7 +129,7 @@ def main_perform_rollout(field_strength, gains, axs):
     # for i, v in enumerate(["ys", "yds", "ydds"]):
     #    axs[i + 2].plot(r["ts"], r[v + "_des"], "-", color=color)
     #    axs[i + 2].plot(r["ts"], r[v + "_cur"], "--", color=color)
-    #    axs[i + 2].set_ylabel(v)
+    #    axs[i + 2].set_y_label(v)
 
 
 def main():

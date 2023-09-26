@@ -110,10 +110,6 @@ def main():
             ################################################
             # Plot results
 
-            # h, axs = dmp.plot(dmp.tau,ts,xs_step,xds_step)
-            # fig.canvas.set_window_title(f'Step-by-step integration (n_bfs={n_bfs})')
-            # fig.savefig(Path(args.output_directory,f'dmp_trained_{n_bfs}.png'))
-
             h_demo, axs = traj.plot()
             h_repr, _ = traj_reproduced.plot(axs)
             d = "demonstration"

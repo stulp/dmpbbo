@@ -75,8 +75,13 @@ class DistributionGaussian:
         @param mean: Mean of the distribution
         @param covar: Covariance matrix of the distribution
         """
-        self.mean = mean
-        self.covar = covar
+        self.mean = np.atleast_1d(mean)
+        self.covar = np.atleast_2d(covar)
+
+        if self.mean.size != self.covar.shape[0]:
+            raise ValueError(
+                f"size of mean ({self.mean.size}) must correspond to that of covar ({self.covar.shape[0]})"
+            )
 
     def generate_samples(self, n_samples=1):
         """ Generate samples from the distribution.

@@ -19,6 +19,7 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
+from dmpbbo.functionapproximators.FunctionApproximatorGPR import FunctionApproximatorGPR
 from dmpbbo.functionapproximators.FunctionApproximatorLWR import FunctionApproximatorLWR
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
 from dmpbbo.functionapproximators.FunctionApproximatorWLS import FunctionApproximatorWLS
@@ -72,9 +73,15 @@ def train(fa_name, n_dims):
         # because it makes the linear segments quite obvious.
         intersection = 0.2
         fa = FunctionApproximatorLWR(n_rfs, intersection)
-    else:
+    elif fa_name == "Radial Basis Function Network":
         intersection = 0.7
         fa = FunctionApproximatorRBFN(n_rfs, intersection)
+    elif fa_name == "Gaussian Process Regression":
+        max_covariance = 2.0
+        lengths = 0.1 if n_dims == 1 else 0.5
+        fa = FunctionApproximatorGPR(max_covariance, lengths)
+    else:
+        raise ValueError(f"Unknown function approximator name: {fa_name}")
 
     # Train function approximator with data
     fa.train(inputs, targets)
@@ -83,7 +90,7 @@ def train(fa_name, n_dims):
     outputs = fa.predict(inputs)  # noqa
 
     # Plotting
-    (h, ax) = fa.plot(inputs, targets=targets, plot_residuals=True, plot_model_parameters=True)
+    h, ax = fa.plot(inputs, targets=targets, plot_residuals=True, plot_model_parameters=True)
     ax.set_title(f"{fa_name} {n_dims}D")
     plt.gcf().canvas.set_window_title(f"{fa_name} {n_dims}D")
 
@@ -95,6 +102,7 @@ def main():
         "Weighted Least Squares",
         "Radial Basis Function Network",
         "Locally Weighted Regression",
+        "Gaussian Process Regression",
     ]
     for fa_name in names:
         for n_dims in [1, 2]:

@@ -21,6 +21,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
@@ -30,13 +31,14 @@ def main():
     """ Main function of the script. """
     ###########################################################################
     # Create all systems and add them to a dictionary
+    dyn_systems = {}
 
     # ExponentialSystem
     tau = 0.6  # Time constant
     x_init = np.array([0.5, 1.0])
     x_attr = np.array([0.8, 0.1])
     alpha = 6.0  # Decay factor
-    dyn_systems = {"Exponential": ExponentialSystem(tau, x_init, x_attr, alpha)}  # noqa
+    dyn_systems["Exponential"] = ExponentialSystem(tau, x_init, x_attr, alpha)  # noqa
 
     # TimeSystem
     dyn_systems["Time"] = TimeSystem(tau)
@@ -49,6 +51,15 @@ def main():
     max_rate = -10
     inflection_ratio = 0.8
     dyn_systems["Sigmoid"] = SigmoidSystem(tau, x_init, max_rate, inflection_ratio)
+
+    x_tau_0_ratio = 0.15
+    dyn_systems["SigmoidGating"] = SigmoidSystem.for_gating(tau, x_tau_0_ratio)
+
+    # RichardsSystem, i.e. a generalized SigmoidSystem
+    t_infl_ratio = 0.50
+    alpha = 10
+    v = 1.2
+    dyn_systems["Richards"] = RichardsSystem(tau, x_init, x_attr, t_infl_ratio, alpha, v)
 
     # SpringDamperSystem
     alpha = 12.0
@@ -65,6 +76,7 @@ def main():
     ts = np.linspace(0.0, integration_duration, n_time_steps)
 
     for name, dyn_system in dyn_systems.items():
+        print(name)
 
         # Analytical solution
         xs, xds = dyn_system.analytical_solution(ts)
@@ -89,7 +101,7 @@ def main():
         plt.setp(lines[0], label="Runge-Kutta")
 
         # Runge-kutta integration with different tau
-        dyn_system.tau = 1.5 * tau
+        dyn_system.tau = 0.8 * tau
         xs[0, :], xds[0, :] = dyn_system.integrate_start()
         for ii in range(1, n_time_steps):
             xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
@@ -99,14 +111,15 @@ def main():
         dyn_system.tau = tau
 
         # Runge-kutta integration with a perturbation
-        xs[0, :], xds[0, :] = dyn_system.integrate_start()
-        for ii in range(1, n_time_steps):
-            if ii == int(np.ceil(0.3 * n_time_steps)):
-                xs[ii - 1, :] = xs[ii - 1, :] - 0.2
-            xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
-        lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
-        plt.setp(lines, linestyle="-", linewidth=1, color=(0.2, 0.2, 0.8))
-        plt.setp(lines[0], label="perturbation")
+        if "Richards" not in name:
+            xs[0, :], xds[0, :] = dyn_system.integrate_start()
+            for ii in range(1, n_time_steps):
+                if ii == int(np.ceil(0.3 * n_time_steps)):
+                    xs[ii - 1, :] = xs[ii - 1, :] - 0.2
+                xs[ii, :], xds[ii, :] = dyn_system.integrate_step_runge_kutta(dt, xs[ii - 1, :])
+            lines, _ = dyn_system.plot(ts, xs, xds, axs=axs)
+            plt.setp(lines, linestyle="-", linewidth=1, color=(0.2, 0.2, 0.8))
+            plt.setp(lines[0], label="perturbation")
 
         # Runge-kutta integration with a different attractor
         if name == "Exponential" or name == "SpringDamper":
@@ -119,6 +132,8 @@ def main():
             plt.setp(lines[0], label="attractor")
             dyn_system.y_attr = x_attr
 
+        for ax in axs:
+            ax.axvline(tau, color="b", linewidth=2)
         axs[0].legend()
 
         plt.gcf().suptitle(name)

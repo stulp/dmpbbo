@@ -17,18 +17,14 @@
 """Script for bbo_of_dmps demo."""
 
 
-import sys
-
 import numpy as np
 from matplotlib import pyplot as plt
 
 from demos.python.bbo_of_dmps.arm2D.TaskSolverDmpArm2D import TaskSolverDmpArm2D
 from demos.python.bbo_of_dmps.arm2D.TaskViapointArm2D import TaskViapointArm2D
-from demos.python.bbo_of_dmps.TaskViapoint import TaskViapoint
 from dmpbbo.bbo.DistributionGaussian import DistributionGaussian
 from dmpbbo.bbo.updaters import UpdaterCovarAdaptation, UpdaterCovarDecay, UpdaterMean
 from dmpbbo.bbo_of_dmps.run_optimization_task import run_optimization_task
-from dmpbbo.bbo_of_dmps.TaskSolverDmp import TaskSolverDmp
 from dmpbbo.dmps.Dmp import Dmp
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.functionapproximators.FunctionApproximatorRBFN import FunctionApproximatorRBFN
@@ -38,13 +34,12 @@ def main(directory=None):
     """ Run one demo for bbo_of_dmps.
 
     @param directory: Directory to save results to
-    @param n_dims: Number of dimensions of the task (i.e. the viapoint)
     """
 
     n_dofs = 7  # Number of joints
     n_dims = 2  # End-effector space dimensionality (must be 2)
 
-    # Prepare a minjerk trajectory in joint angle space
+    # Prepare a min-jerk trajectory in joint angle space
     duration = 0.8
     angles_init = np.full(n_dofs, 0.0)
     angles_goal = np.full(n_dofs, np.pi / n_dofs)
@@ -53,7 +48,7 @@ def main(directory=None):
     angles_min_jerk = Trajectory.from_min_jerk(ts, angles_init, angles_goal)
     link_lengths = np.full(n_dofs, 1.0 / n_dofs)
 
-    # Train the DMP with the minjerk trajectory
+    # Train the DMP with the min-jerk trajectory
     intersection_height = 0.9
     n_basis = 5
     function_apps = [FunctionApproximatorRBFN(n_basis, intersection_height) for _ in range(n_dofs)]
@@ -63,7 +58,7 @@ def main(directory=None):
     # Make task solver, based on a Dmp
     dt = 0.01
     integrate_dmp_beyond_tau_factor = 1.5
-    task_solver = TaskSolverDmpArm2D(dmp, 0.01, integrate_dmp_beyond_tau_factor)
+    task_solver = TaskSolverDmpArm2D(dmp, dt, integrate_dmp_beyond_tau_factor)
 
     # Make the task
     viapoint = np.full(n_dims, 0.5)

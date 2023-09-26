@@ -107,3 +107,7 @@ class ExponentialSystem(DynamicalSystem):
             xds[:, i_dim] = val_range * -(cur_alpha / self._tau) * exp_term
 
         return xs, xds
+
+    def decouple_parameters(self):
+        if np.isscalar(self.alpha):
+            self.alpha = np.full((self.dim_x,), self.alpha)

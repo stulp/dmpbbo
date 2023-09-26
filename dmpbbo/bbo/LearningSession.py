@@ -171,7 +171,8 @@ def plot_update(distribution, samples, weights, distribution_new, **kwargs):
 
     n_dims = len(distribution.mean)
     if n_dims == 1:
-        raise ValueError("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
+        print("Sorry, only know how to plot for n_dims==2, but you provided n_dims==1")
+        return [], []
 
     if n_dims >= 2:
         distr_mean = distribution.mean[0:2]
@@ -437,6 +438,16 @@ class LearningSession:
         """
         for basename, obj in self._cache.items():
             LearningSession.save(obj, directory, basename)
+
+    def get_eval_cost_before_after(self):
+        before, _ = self.get_eval_costs(0)
+        after, _ = self.get_eval_costs(self.get_n_updates() - 1)
+        return before, after
+
+    def get_cost_ratio(self):
+        before, after = self.get_eval_cost_before_after()
+        # Only use total cost, not the cost components
+        return after[0] / before[0]
 
     def get_eval_costs(self, i_update):
         """ Get the evaluation cost for a given update.

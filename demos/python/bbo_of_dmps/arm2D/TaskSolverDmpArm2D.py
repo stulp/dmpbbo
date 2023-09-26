@@ -16,8 +16,6 @@
 # along with DmpBbo.  If not, see <http://www.gnu.org/licenses/>.
 """ Module for the TaskSolverDmp class. """
 
-import copy
-
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -32,7 +30,7 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
 
     def __init__(self, dmp, dt, integrate_dmp_beyond_tau_factor, link_lengths=None):
         super().__init__(dmp, dt, integrate_dmp_beyond_tau_factor)
-        if not link_lengths:
+        if link_lengths is not None or len(link_lengths)>0:
             n_dofs = dmp.dim_dmp()
             # Every link has same length, and they sum to 1.0
             link_lengths = np.full(n_dofs, 1.0 / n_dofs)
@@ -53,7 +51,7 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
         # We have the joint trajectories as a Trajectory. Convert them to end-eff.
         y_links = self.angles_to_link_positions(joint_trajs.ys, self.link_lengths)
 
-        # Cost-vars now contains: ts, joint pos/vel/acc, endeff pos
+        # Cost-vars now contains: ts, joint pos/vel/acc, end-eff pos
         cost_vars = np.column_stack((joint_trajs.as_matrix(), y_links))
         return cost_vars
 
@@ -77,11 +75,11 @@ class TaskSolverDmpArm2D(TaskSolverDmp):
             sum_angles = 0.0
             for i_dof in range(n_dofs):
                 sum_angles += angles[tt, i_dof]
-                l = link_lengths[i_dof]
-                links_x[tt, i_dof + 1] = links_x[tt, i_dof] + np.cos(sum_angles) * l
-                links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * l
+                ll = link_lengths[i_dof]
+                links_x[tt, i_dof + 1] = links_x[tt, i_dof] + np.cos(sum_angles) * ll
+                links_y[tt, i_dof + 1] = links_y[tt, i_dof] + np.sin(sum_angles) * ll
 
-        # Format for each row: x_0, y_0, x_1, y_1 ... x_endeff,  y_endeff
+        # Format for each row: x_0, y_0, x_1, y_1 ... x_end_eff,  y_end_eff
         links_xyxyxy = np.zeros((n_time_steps, 2 * (n_dofs + 1)))
         for i_link in range(n_dofs + 1):
             links_xyxyxy[:, 2 * i_link + 0] = links_x[:, i_link]
@@ -121,7 +119,7 @@ def main():
     perturbed_sample = np.random.normal(sample, np.abs(0.3 * sample))
     cost_vars = solver.perform_rollout(perturbed_sample)
     task = TaskViapointArm2D(n_dofs, np.full(2, 0.5))
-    h, ax = task.plot_rollout(cost_vars, ax)
+    task.plot_rollout(cost_vars, ax)
 
     plt.show()
 

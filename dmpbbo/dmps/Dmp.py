@@ -24,6 +24,7 @@ import numpy as np
 from dmpbbo.dmps.Trajectory import Trajectory
 from dmpbbo.dynamicalsystems.DynamicalSystem import DynamicalSystem
 from dmpbbo.dynamicalsystems.ExponentialSystem import ExponentialSystem
+from dmpbbo.dynamicalsystems.RichardsSystem import RichardsSystem
 from dmpbbo.dynamicalsystems.SigmoidSystem import SigmoidSystem
 from dmpbbo.dynamicalsystems.SpringDamperSystem import SpringDamperSystem
 from dmpbbo.dynamicalsystems.TimeSystem import TimeSystem
@@ -56,6 +57,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             - phase_system: Dynamical system to compute the phase
             - gating_system: Dynamical system to compute the gating term
             - goal_system: Dynamical system to compute delayed goal (default: None)
+            - damping_system: Dynamical system to compute damping (default: None)
             - forcing_term_scaling: Scaling method for the forcing terms, i.e. "NO_SCALING",
             "G_MINUS_Y0_SCALING", "AMPLITUDE_SCALING" (default: "NO_SCALING")
             - scaling_amplitudes: Amplitudes for each dimension for
@@ -64,6 +66,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
 
         dim_dmp = 3 * y_init.size + 2
+        dim_dmp += y_init.size  # new: damping coefficient system
         super().__init__(1, tau, y_init, dim_dmp)
 
         self._y_attr = y_attr
@@ -76,18 +79,49 @@ class Dmp(DynamicalSystem, Parameterizable):
             alpha = kwargs.get("alpha_spring_damper", 20.0)
             self._spring_system = SpringDamperSystem(tau, y_init, y_attr, alpha)
 
+        damping_system_default = None
+
+        self.goal_system_requires_scaling = False
+
         # Get sensible defaults for subsystems
         dmp_type = kwargs.get("dmp_type", "KULVICIUS_2012_JOINING")
-        if dmp_type == "IJSPEERT_2002_MOVEMENT":
+        if dmp_type in ["IJSPEERT_2002_MOVEMENT", "Ijs02"]:
             goal_system_default = None
             gating_system_default = ExponentialSystem(tau, 1, 0, 4)
             phase_system_default = ExponentialSystem(tau, 1, 0, 4)
 
-        elif dmp_type in ["KULVICIUS_2012_JOINING", "COUNTDOWN_2013"]:
+        elif dmp_type in ["KULVICIUS_2012_JOINING", "Kul12", "COUNTDOWN_2013"]:
             goal_system_default = ExponentialSystem(tau, y_init, y_attr, 15)
-            gating_system_default = SigmoidSystem(tau, 1, -15.0, 0.85)
+            y_tau_0_ratio = 0.1
+            gating_system_default = SigmoidSystem.for_gating(tau, y_tau_0_ratio)
+
             count_down = dmp_type == "COUNTDOWN_2013"
             phase_system_default = TimeSystem(tau, count_down)
+
+        elif "2022" in dmp_type or "SCT23" in dmp_type:
+            self.goal_system_requires_scaling = "NO_SCALING" not in dmp_type
+
+            t_infl_ratio = 0.3
+            alpha = 10.0
+            v = 1.0
+            n = self.dim_y
+            if self.goal_system_requires_scaling:
+                goal_system_default = RichardsSystem(
+                    tau, np.zeros((n,)), np.ones((n,)), t_infl_ratio, alpha, v
+                )
+            else:
+                goal_system_default = RichardsSystem(tau, y_init, y_attr, t_infl_ratio, alpha, v)
+
+            gating_system_default = RichardsSystem(
+                tau, np.ones((1,)), np.zeros((1,)), 1.0, 10.0, 10.0
+            )
+
+            phase_system_default = TimeSystem(tau, count_down=True)
+
+            if "DAMPING" in dmp_type:
+                damping_final = np.full((y_init.size,), self._spring_system.damping_coefficient)
+                damping_init = 0.1 * damping_final
+                damping_system_default = ExponentialSystem(tau, damping_init, damping_final, 4)
 
         else:
             raise ValueError(f"Unknown dmp_type: {dmp_type}")
@@ -96,6 +130,7 @@ class Dmp(DynamicalSystem, Parameterizable):
         self._phase_system = kwargs.get("phase_system", phase_system_default)
         self._gating_system = kwargs.get("gating_system", gating_system_default)
         self._goal_system = kwargs.get("goal_system", goal_system_default)
+        self._damping_system = kwargs.get("damping_system", damping_system_default)
 
         # Initialize variables related to scaling of the forcing term
         self._forcing_term_scaling = kwargs.get("forcing_term_scaling", "NO_SCALING")
@@ -113,11 +148,14 @@ class Dmp(DynamicalSystem, Parameterizable):
         offset += d
         self.SPRING_Z = np.arange(offset, offset + 1 * d)
         offset += d
-        self.GOAL = np.arange(offset, offset + 1 * d)
-        offset += d
+        d_goal = self._goal_system.dim_x if self._goal_system else d
+        self.GOAL = np.arange(offset, offset + 1 * d_goal)
+        offset += d_goal
         self.PHASE = np.arange(offset, offset + 1)
         offset += 1
         self.GATING = np.arange(offset, offset + 1)
+        offset += 1
+        self.DAMPING = np.arange(offset, offset + 1 * d)
 
     @classmethod
     def from_traj(cls, trajectory, function_approximators, **kwargs):
@@ -146,6 +184,12 @@ class Dmp(DynamicalSystem, Parameterizable):
         """
         return self._dim_y
 
+    def scale_goal_system(self, x_goal):
+        if self.goal_system_requires_scaling:
+            return self._y_init + (self._y_attr - self._y_init) * x_goal
+        else:
+            return x_goal
+
     def integrate_start(self, y_init=None):
         """ Start integrating the DMP with a new initial state.
 
@@ -165,10 +209,22 @@ class Dmp(DynamicalSystem, Parameterizable):
             xd[self.GOAL] = 0.0
         else:
             # Goal system exists. Start integrating it.
-            (x[self.GOAL], xd[self.GOAL]) = self._goal_system.integrate_start()
+            x[self.GOAL], xd[self.GOAL] = self._goal_system.integrate_start()
 
         # Set the attractor state of the spring system
-        self._spring_system.y_attr = x[self.GOAL]
+        if not self.goal_system_requires_scaling:
+            self._spring_system.y_attr = x[self.GOAL]
+        else:
+            self._spring_system.y_attr = self.scale_goal_system(x[self.GOAL])
+
+        # Set the damping coefficient
+        if self._damping_system is None:
+            # No damping system, simply set to default
+            x[self.DAMPING] = self._spring_system.damping_coefficient
+            xd[self.DAMPING] = 0.0
+        else:
+            x[self.DAMPING], xd[self.DAMPING] = self._damping_system.integrate_start()
+            self._spring_system.damping_coefficient = x[self.DAMPING]
 
         # Start integrating all further subsystems
         (x[self.SPRING], xd[self.SPRING]) = self._spring_system.integrate_start()
@@ -199,10 +255,18 @@ class Dmp(DynamicalSystem, Parameterizable):
         else:
             # Integrate goal system and get current goal state
             self._goal_system.y_attr = self._y_attr
-            x_goal = x[self.GOAL]
-            xd[self.GOAL] = self._goal_system.differential_equation(x_goal)
-            # The goal state is the attractor state of the spring-damper system
-            self._spring_system.y_attr = x_goal
+            xd[self.GOAL] = self._goal_system.differential_equation(x[self.GOAL])
+            if not self.goal_system_requires_scaling:
+                # The goal state is the attractor state of the spring-damper system
+                self._spring_system.y_attr = x[self.GOAL]
+            else:
+                self._spring_system.y_attr = self.scale_goal_system(x[self.GOAL])
+
+        if self._damping_system is None:
+            xd[self.DAMPING] = np.zeros(self._dim_y)
+        else:
+            self._spring_system.damping_coefficient = x[self.DAMPING]
+            xd[self.DAMPING] = self._damping_system.differential_equation(x[self.DAMPING])
 
         # Integrate spring damper system
         # Forcing term is added to spring_state later
@@ -294,7 +358,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             _scaling_amplitudes_rep = np.tile(self._scaling_amplitudes, (n_time_steps, 1))
             forcing_terms *= _scaling_amplitudes_rep
 
-        # Get current delayed goal
+        # Get delayed goal
         if self._goal_system is None:
             # If there is no dynamical system for the delayed goal, the goal is
             # simply the attractor state
@@ -305,6 +369,16 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Integrate goal system and get current goal state
             xs_goal, xds_goal = self._goal_system.analytical_solution(ts)
 
+        # Get damping coefficient
+        if self._damping_system is None:
+            # If there is no dynamical system for the damping system, damping is constant
+            xs_damping = np.tile(self._spring_system.damping_coefficient, (n_time_steps, 1))
+            # with zero change
+            xds_damping = np.zeros(xs_damping.shape)
+        else:
+            # Integrate damping system
+            xs_damping, xds_damping = self._damping_system.analytical_solution(ts)
+
         xs = np.zeros([n_time_steps, self._dim_x])
         xds = np.zeros([n_time_steps, self._dim_x])
 
@@ -314,16 +388,19 @@ class Dmp(DynamicalSystem, Parameterizable):
         xds[:, self.PHASE] = xds_phase
         xs[:, self.GATING] = xs_gating
         xds[:, self.GATING] = xds_gating
+        xs[:, self.DAMPING] = xs_damping
+        xds[:, self.DAMPING] = xds_damping
 
         # THE REST CANNOT BE DONE ANALYTICALLY
 
         # Reset the dynamical system, and get the first state
         local_spring_system = copy.deepcopy(self._spring_system)
-        # damping = self._spring_system.damping_coefficient
-        # local_spring_system = SpringDamperSystem(self._tau, self.y_init, self._y_attr, damping)
 
-        # Set first attractor state
-        local_spring_system.y_attr = xs_goal[0, :]
+        # Set first attractor state and damping
+        local_spring_system.y_attr = self.scale_goal_system(xs_goal[0, :])
+        # spring_system.damping_coefficient is passed scalar if damping has only one number
+        damp = xs_damping[0, :]
+        local_spring_system.damping_coefficient = damp[0] if damp.size == 1 else damp
 
         # Start integrating spring damper system
         x_spring, xd_spring = local_spring_system.integrate_start()
@@ -346,8 +423,9 @@ class Dmp(DynamicalSystem, Parameterizable):
             # Euler integration
             xs[tt, SPRING] = xs[tt - 1, SPRING] + dt * xds[tt - 1, SPRING]
 
-            # Set the attractor state of the spring system
-            local_spring_system.y_attr = xs[tt, self.GOAL]
+            # Set the attractor and damping of the spring system
+            local_spring_system.y_attr = self.scale_goal_system(xs[tt, self.GOAL])
+            local_spring_system.damping_coefficient = xs[tt, self.DAMPING]
 
             # Integrate spring damper system
             xds[tt, SPRING] = local_spring_system.differential_equation(xs[tt, SPRING])
@@ -374,6 +452,9 @@ class Dmp(DynamicalSystem, Parameterizable):
         # This needs to be computed for (optional) scaling of the forcing term.
         # Needs to be done BEFORE _compute_targets
         self._scaling_amplitudes = trajectory.get_range_per_dim()
+
+        if "function_approximators" in kwargs:
+            self._function_approximators = kwargs.get("function_approximators")
 
         # Do not train function approximators if there are none
         if self._function_approximators is not None:
@@ -413,10 +494,17 @@ class Dmp(DynamicalSystem, Parameterizable):
         xs_gating = xs_ana[:, self.GATING]
         xs_phase = xs_ana[:, self.PHASE]
 
+        if self.goal_system_requires_scaling:
+            xs_goal = self.scale_goal_system(xs_goal)
+
         fa_inputs_phase = xs_phase
 
         # Get parameters from the spring-dampers system to compute inverse
-        damping_coefficient = self._spring_system.damping_coefficient
+        if self._damping_system:
+            damping_coefficient = xs_ana[:, self.DAMPING]
+        else:
+            damping_coefficient = self._spring_system.damping_coefficient
+
         spring_constant = self._spring_system.spring_constant
         mass = self._spring_system.mass
 
@@ -483,8 +571,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         @param new_tau: The new time constant
         """
-        self._tau = new_tau  # noqa defined inside __init__ of DynamicalSystem
         tau_scale = new_tau / self.tau
+        self._tau = new_tau
 
         # Set value in all relevant subsystems also
         self._phase_system.tau *= tau_scale
@@ -508,7 +596,8 @@ class Dmp(DynamicalSystem, Parameterizable):
         # Set value in all relevant subsystems also
         self._spring_system.y_init = y_init_new
         if self._goal_system is not None:
-            self._goal_system.y_init = y_init_new
+            if not self.goal_system_requires_scaling:
+                self._goal_system.y_init = y_init_new
 
     @property
     def y_attr(self):
@@ -525,7 +614,8 @@ class Dmp(DynamicalSystem, Parameterizable):
 
         # Set value in all relevant subsystems also
         if self._goal_system is not None:
-            self._goal_system.y_attr = y_attr_new
+            if not self.goal_system_requires_scaling:
+                self._goal_system.y_attr = y_attr_new
 
         # Do NOT do the following. The attractor state of the spring system is
         # determined by the goal system.
@@ -538,6 +628,13 @@ class Dmp(DynamicalSystem, Parameterizable):
         @return: Time steps of the trajectory on which the DMP was trained.
         """
         return self._ts_train
+
+    def decouple_parameters(self):
+        self._spring_system.decouple_parameters()
+        if self._goal_system:
+            self._goal_system.decouple_parameters()
+        if self._damping_system:
+            self._damping_system.decouple_parameters()
 
     def set_selected_param_names(self, names):
         """ Get the names of the parameters that have been selected.
@@ -556,6 +653,28 @@ class Dmp(DynamicalSystem, Parameterizable):
         if self._function_approximators:
             for fa in self._function_approximators:
                 fa.set_selected_param_names(names)
+
+    def set_params_dyn_sys(self, params):
+        for system_name in ["spring_system", "goal_system", "damping_system"]:
+            attr_name = "_" + system_name
+            if system_name in params:
+                system = self.__dict__[attr_name]
+                if not system:
+                    raise Exception(f'Trying to set param of "{system_name}", but it is None')
+
+                for param_name in params[system_name]:
+                    if param_name in system.__dict__:
+                        value = params[system_name][param_name]
+                        system.__dict__[param_name] = value
+                    else:
+                        raise Exception(
+                            f'Unknown param "{param_name}" in "{system_name}" of "{system.__class__}"'
+                        )
+
+        # To check and give feedback
+        for system_name in params:
+            if "_" + system_name not in self.__dict__:
+                raise Exception(f'Unknown system "{system_name}"')
 
     def get_param_vector(self):
         """Get a vector containing the values of the selected parameters."""
@@ -599,18 +718,21 @@ class Dmp(DynamicalSystem, Parameterizable):
         return size
 
     @staticmethod
-    def get_dmp_axes(n_cols=4):
+    def get_dmp_axes(n_cols=4, **kwargs):
         """ Get matplotlib axes on which to plot the output of a DMP.
 
-        @param has_fa_output: Whether the output of the function approximators is available.
+        @param n_cols: Number of columns for the subplots.
         @return: list of axes on which the DMP was plotted
         """
-        n_rows = 2
+        plot_compact = kwargs.get("plot_compact", False)
+        n_rows = 1 if plot_compact else 2
+        n_cols = 5 if plot_compact else n_cols
         fig = plt.figure(figsize=(3 * n_cols, 3 * n_rows))
 
         # We need two loops for the two rows, in case there are extra cols (n_cols>4)
-        axs = [fig.add_subplot(n_rows, n_cols, i + 1) for i in range(4)]
-        axs.extend([fig.add_subplot(n_rows, n_cols, i + n_cols + 1) for i in range(4)])
+        axs = [fig.add_subplot(n_rows, n_cols, i + 1) for i in range(n_cols)]
+        if not plot_compact:
+            axs.extend([fig.add_subplot(n_rows, n_cols, i + n_cols + 1) for i in range(n_cols)])
         return axs
 
     def plot(self, ts=None, xs=None, xds=None, **kwargs):
@@ -631,7 +753,7 @@ class Dmp(DynamicalSystem, Parameterizable):
             fa_outputs = kwargs.get("fa_outputs", [])
 
         n_subplot_columns = kwargs.get("n_subplot_columns", 4)
-        axs = kwargs.get("axs") or Dmp.get_dmp_axes(n_subplot_columns)
+        axs = kwargs.get("axs") or Dmp.get_dmp_axes(n_subplot_columns, **kwargs)
 
         plot_tau = kwargs.get("plot_tau", True)
         # has_fa_output = len(forcing_terms) > 0 or len(fa_outputs) > 0
@@ -639,12 +761,20 @@ class Dmp(DynamicalSystem, Parameterizable):
         plot_demonstration = kwargs.get("plot_demonstration", False)
 
         d = self.dim_dmp()  # noqa Abbreviation for convenience
-        systems = [
-            ("goal", self.GOAL, axs[0:1], self._goal_system),
-            ("spring-damper", self.SPRING, axs[1:4], self._spring_system),
-            ("phase", self.PHASE, axs[4:5], self._phase_system),
-            ("gating", self.GATING, axs[6:7], self._gating_system),
-        ]
+        plot_compact = kwargs.get("plot_compact", False)
+        if not plot_compact:
+            systems = [
+                ("goal", self.GOAL, axs[0:1], self._goal_system),
+                ("spring-damper", self.SPRING, axs[1:4], self._spring_system),
+                ("phase", self.PHASE, axs[4:5], self._phase_system),
+                ("gating", self.GATING, axs[6:7], self._gating_system),
+            ]
+        else:
+            systems = [
+                ("spring-damper", self.SPRING, axs[0:3], self._spring_system),
+                ("goal", self.GOAL, axs[0:1], self._goal_system),
+                ("gating", self.GATING, axs[4:5], self._gating_system),
+            ]
         # system_varname = ["x", "v", "y^{g_d}", "y"]
 
         all_handles = []
@@ -654,11 +784,11 @@ class Dmp(DynamicalSystem, Parameterizable):
             axs_cur = system[2]
             if system[3]:
 
+                h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+
                 if plot_demonstration and system[0] == "spring-damper":
                     h_demo, _ = plot_demonstration.plot(axs_cur)
-                    plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.8, 0.8, 0.8))
-
-                h, _ = system[3].plot(ts, xs_cur, xds_cur, axs=axs_cur)
+                    plt.setp(h_demo, linestyle="-", linewidth=4, color=(0.6, 0.6, 0.6), alpha=0.5)
 
                 if plot_no_forcing_term_also and system[0] == "spring-damper":
                     # Integrate without forcing term and plot it
@@ -670,38 +800,47 @@ class Dmp(DynamicalSystem, Parameterizable):
                     for i in range(len(h)):
                         h_no[i].update_from(h[i])  # Copy line style
                     plt.setp(h_no, linestyle="--", linewidth=1)  # Make smaller and dashed
-
+                    all_handles.append(h_no)
             else:
                 # No dynamical system available. Just plot x values.
                 h = axs_cur[0].plot(ts, xs_cur)
                 axs_cur = [axs_cur[0]]  # Avoid plotting vel/acc
             all_handles.append(h)
-            for i, ax in enumerate(axs_cur):
-                x = np.mean(ax.get_xlim())
-                y = np.mean(ax.get_ylim())
-                ax.text(x, y, system[0], horizontalalignment="center")
-                if plot_tau:
-                    ax.plot([self._tau, self._tau], ax.get_ylim(), "--k")
-
-        if len(fa_outputs) > 1:
-            ax = axs[5]
-            h = ax.plot(ts, fa_outputs)
-            all_handles.extend(h)
-            x = np.mean(ax.get_xlim())
-            y = np.mean(ax.get_ylim())
-            ax.text(x, y, "func. approx.", horizontalalignment="center")
-            ax.set_xlabel(r"time ($s$)")
-            ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
+            if not plot_compact:
+                for i, ax in enumerate(axs_cur):
+                    x = np.mean(ax.get_xlim())
+                    y = np.mean(ax.get_ylim())
+                    ax.text(x, y, system[0], horizontalalignment="center")
 
         if len(forcing_terms) > 1:
-            ax = axs[7]
+            ax = axs[3] if plot_compact else axs[7]
             h = ax.plot(ts, forcing_terms)
             all_handles.extend(h)
             x = np.mean(ax.get_xlim())
             y = np.mean(ax.get_ylim())
-            ax.text(x, y, "forcing term", horizontalalignment="center")
+            if not plot_compact:
+                ax.text(x, y, "forcing term", horizontalalignment="center")
             ax.set_xlabel(r"time ($s$)")
             ax.set_ylabel(r"$v\cdot f_{\mathbf{\theta}}(x)$")
+
+        if len(fa_outputs) > 1:
+            ax = axs[3] if plot_compact else axs[5]
+            h = ax.plot(ts, fa_outputs)
+            all_handles.extend(h)
+            x = np.mean(ax.get_xlim())
+            y = np.mean(ax.get_ylim())
+            if not plot_compact:
+                ax.text(x, y, "func. approx.", horizontalalignment="center")
+            ax.set_xlabel(r"time ($s$)")
+            ax.set_ylabel(r"$f_\mathbf{\theta}(x)$")
+
+        if plot_tau:
+            for ax in axs:
+                ax.axvline(self._tau, color="k", linewidth=1)
+
+        for ax in axs:
+            ax.set_xlim([min(ts), max(ts)])
+            ax.grid(False)
 
         return all_handles, axs
 

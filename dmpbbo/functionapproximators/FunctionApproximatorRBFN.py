@@ -50,12 +50,17 @@ class FunctionApproximatorRBFN(FunctionApproximator):
     @staticmethod
     def _train(inputs, targets, meta_params, **kwargs):
         # Determine the centers and widths of the basis functions, given the input data range
+
         n_bfs_per_dim = meta_params["n_basis_functions_per_dim"]
         n_bfs = np.prod(n_bfs_per_dim)
 
         height = meta_params["intersection_height"]
         centers, widths = Gaussian.get_centers_and_widths(inputs, n_bfs_per_dim, height)
-        model_params = {"centers": centers, "widths": widths}
+
+        model_params = {
+            "centers": meta_params.get("centers", centers),
+            "widths": meta_params.get("widths", widths),
+        }
 
         # Get the activations of the basis functions
         activations = FunctionApproximatorRBFN._activations(inputs, model_params)
@@ -92,11 +97,15 @@ class FunctionApproximatorRBFN(FunctionApproximator):
         """
         inputs, n_samples_per_dim = FunctionApproximator._get_grid(inputs_min, inputs_max)
         activations = self._activations(inputs, self._model_params)
+        weighted_acts = np.zeros(activations.shape)
+        for ii in range(activations.shape[1]):
+            weighted_acts[:, ii] = activations[:, ii] * self._model_params["weights"][ii]
 
         ax = kwargs.get("ax") or self._get_axis()
 
-        lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
+        # lines = self._plot_grid_values(inputs, activations, ax, n_samples_per_dim)
+        lines = self._plot_grid_values(inputs, weighted_acts, ax, n_samples_per_dim)
         alpha = 1.0 if self.dim_input() < 2 else 0.3
-        plt.setp(lines, color=[0.7, 0.7, 0.7], linewidth=1, alpha=alpha)
+        plt.setp(lines, linestyle="--", color=[0.7, 0.7, 0.7], linewidth=2, alpha=alpha)
 
         return lines, ax

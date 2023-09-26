@@ -32,13 +32,13 @@ class Trajectory:
         n_time_steps = ts.size
         if n_time_steps != ys.shape[0]:
             raise ValueError("ys.shape[0] must have size {n_time_steps}")
-        _dt_mean = np.mean(np.diff(ts))
+        dt_mean = np.mean(np.diff(ts))
 
         if ys.ndim == 1:
             ys = ys.reshape((n_time_steps, 1))
 
         if yds is None:
-            yds = diffnc(ys, _dt_mean)
+            yds = diffnc(ys, dt_mean)
         else:
             if yds.ndim == 1:
                 yds = yds.reshape((n_time_steps, 1))
@@ -46,7 +46,7 @@ class Trajectory:
                 raise ValueError("yds must have same shape as ys {ys.shape}")
 
         if ydds is None:
-            ydds = diffnc(yds, _dt_mean)
+            ydds = diffnc(yds, dt_mean)
         else:
             if ydds.ndim == 1:
                 ydds = ydds.reshape((n_time_steps, 1))
@@ -62,7 +62,7 @@ class Trajectory:
             self._dim = ys.shape[1]
 
         self._ts = ts
-        self._dt_mean = _dt_mean
+        self._dt_mean = dt_mean
         self._ys = ys
         self._yds = yds
         self._ydds = ydds
@@ -98,6 +98,14 @@ class Trajectory:
         @return: Times at which the measurements were made.
         """
         return self._ts
+
+    @property
+    def dt_mean(self):
+        """ Get the mean dt value over all time steps.
+
+        @return: Mean dt value over all time steps.
+        """
+        return self._dt_mean
 
     @property
     def ys(self):
@@ -147,7 +155,7 @@ class Trajectory:
     def has_misc(self):
         """ Get whether the trajectory the miscellaneous variables over time.
 
-        @return: true if trajectoriy has miscellaneous variables, false otherwise.
+        @return: true if trajectory has miscellaneous variables, false otherwise.
         """
         if not isinstance(self._misc, np.ndarray):
             return False
@@ -251,7 +259,7 @@ class Trajectory:
                 )
                 return
 
-            # Convert time 'fro' to index 'fro'
+            # Convert time 'start' to index 'start'
             if start <= self._ts[0]:
                 # Time 'start' lies before first time in trajectory
                 start = 0
@@ -272,6 +280,28 @@ class Trajectory:
         self._ydds = self._ydds[start:end, :]
         if self._misc is not None:
             self._misc = self._misc[start:end, :]
+
+    def pad_front(self, n_padding=100):
+        ts_padding = np.arange(0.0, n_padding*self._dt_mean, self._dt_mean)
+        ys_padding = np.tile(self.y_init, (n_padding, 1))
+        prepend_traj = Trajectory(
+            ts_padding,
+            ys_padding,
+            np.zeros((n_padding, self.yds.shape[1])),
+            np.zeros((n_padding, self.ydds.shape[1])),
+        )
+        self.prepend(prepend_traj)
+
+    def pad_end(self, n_padding=100):
+        ts_padding = np.arange(0.0, n_padding*self._dt_mean, self._dt_mean)
+        ys_padding = np.tile(self.y_final, (n_padding, 1))
+        append_traj = Trajectory(
+            ts_padding,
+            ys_padding,
+            np.zeros((n_padding, self.yds.shape[1])),
+            np.zeros((n_padding, self.ydds.shape[1])),
+        )
+        self.append(append_traj)
 
     @classmethod
     def from_polynomial(cls, ts, y_from, yd_from, ydd_from, y_to, yd_to, ydd_to):
@@ -403,7 +433,7 @@ class Trajectory:
 
         @param trajectory:  The trajectory to append.
         """
-        ts_appended = trajectory.ts + (self._ts[-1] - trajectory.ts[0])
+        ts_appended = (trajectory.ts - trajectory.ts[0]) + (self._ts[-1] + self._dt_mean)
         self._ts = np.concatenate((self._ts, ts_appended))
         self._ys = np.concatenate((self._ys, trajectory.ys))
         self._yds = np.concatenate((self._yds, trajectory.yds))
@@ -412,6 +442,23 @@ class Trajectory:
             self._misc = None
         else:
             self._misc = np.concatenate((self._misc, trajectory.misc))
+    def prepend(self, trajectory):
+        """ Prepend another trajectory to this one.
+
+        Whether the positions / velocities / acceleration are compatible is not checked.
+
+        @param trajectory:  The trajectory to append.
+        """
+        self.set_start_time_to_zero()
+        self.ts[:] += trajectory.duration + trajectory._dt_mean
+        self._ts = np.concatenate((trajectory.ts, self._ts))
+        self._ys = np.concatenate((trajectory.ys, self._ys))
+        self._yds = np.concatenate((trajectory.yds, self._yds))
+        self._ydds = np.concatenate((trajectory.ydds, self._ydds))
+        if self._misc is None or trajectory.misc is None:
+            self._misc = None
+        else:
+            self._misc = np.concatenate((trajectory.misc, self._misc))
 
     def as_matrix(self):
         """ Return the trajectory as a matrix.
@@ -504,7 +551,7 @@ class Trajectory:
         @param axs: Axes to plot on (default: None, then new axes are initialized)
         @return: line_handles and axes
         """
-        if not axs:
+        if axs is None or len(axs) == 0:
             n_plots = 4 if self.has_misc() else 3
             fig = plt.figure(figsize=(5 * n_plots, 4))
             axs = [fig.add_subplot(1, n_plots, i + 1) for i in range(n_plots)]
@@ -529,10 +576,6 @@ class Trajectory:
             all_handles.extend(h)
             axs[3].set_xlabel("time (s)")
             axs[3].set_ylabel("misc")
-
-        x_lim = [min(self._ts), max(self._ts)]
-        for ax in axs:
-            ax.set_xlim(x_lim[0], x_lim[1])
 
         return all_handles, axs
 
