@@ -4,7 +4,7 @@
 
 This repository provides an implementation of dynamical systems, 
 function approximators, 
-[dynamical movement primitives](http://www-clmc.usc.edu/Resources/Details?id=2663), and black-box optimization
+[dynamical movement primitives](https://ieeexplore.ieee.org/document/6797340), and black-box optimization
 with evolution strategies, in particular the optimization of the parameters
 of dynamical movement primitives.
 
